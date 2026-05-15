@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ShopMate Category</title>
+
+    <link rel="stylesheet" href="../css/appStyles.css" />
+  </head>
+
+  <body>
+    <div class="appContainer">
+      <header class="pageHeader">
+        <button class="backButton" id="backButton">←</button>
+
+        <h1 class="pageTitle" id="categoryPageTitle">Category</h1>
+      </header>
+
+      <main class="pageContent">
+        <div class="tabContainer">
+          <button class="tabButton activeTab" data-tab="lists">Lists</button>
+
+          <button class="tabButton" data-tab="favorites">Favorites</button>
+
+          <button class="tabButton" data-tab="purchased">Purchased</button>
+        </div>
+
+        <input type="text" class="searchInput" placeholder="Search Items" />
+
+        <section class="emptyStateSection" id="itemEmptyState"></section>
+
+        <section class="itemList" id="itemList"></section>
+      </main>
+
+      <div class="bulkActionBar hidden" id="bulkActionBar">
+        <div class="bulkSelectionCount" id="bulkSelectionCount">1 Selected</div>
+
+        <button class="bulkActionButton" id="bulkFavoriteButton">♥</button>
+
+        <button class="bulkActionButton" id="bulkPurchasedButton">✓</button>
+
+        <button class="bulkActionButton" id="bulkDeleteButton">🗑</button>
+      </div>
+
+      <footer class="appFooter">© Wisemen IT Solutions</footer>
+
+      <button class="floatingActionButton" id="openItemBottomSheetButton">
+        +
+      </button>
+
+      <div class="snackbar hidden" id="snackbar">
+        <span class="snackbarText" id="snackbarText"></span>
+
+        <button class="snackbarButton" id="snackbarUndoButton">Undo</button>
+      </div>
+
+      <div class="screenOverlay hidden" id="screenOverlay"></div>
+
+      <div class="bottomSheet hidden" id="bottomSheet">
+        <div class="bottomSheetHandle"></div>
+
+        <div class="bottomSheetContent" id="bottomSheetContent"></div>
+      </div>
+    </div>
+
+    <script src="../js/stateManager.js"></script>
+    <script src="../js/helpers.js"></script>
+    <script src="../js/favoritesManager.js"></script>
+    <script src="../js/itemManager.js"></script>
+    <script src="../js/swipeGestures.js"></script>
+    <script src="../js/snackbarManager.js"></script>
+    <script src="../js/selectionManager.js"></script>
+    <script src="../js/categoryPage.js"></script>
+  </body>
+</html>

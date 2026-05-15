@@ -1,0 +1,1081 @@
+/* Reset */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Root Variables */
+
+:root {
+  --primaryColor: #2f7e94;
+
+  --greenColor: #18b34a;
+
+  --backgroundColor: #f5f5f5;
+
+  --cardColor: #ffffff;
+
+  --textColor: #111111;
+
+  --borderColor: #dddddd;
+
+  --footerColor: #ffffff;
+
+  --overlayColor: rgba(0, 0, 0, 0.4);
+
+  --borderRadiusSmall: 12px;
+
+  --borderRadiusMedium: 18px;
+
+  --borderRadiusLarge: 28px;
+
+  --spacingSmall: 8px;
+
+  --spacingMedium: 16px;
+
+  --spacingLarge: 24px;
+
+  --headerHeight: 72px;
+
+  --footerHeight: 50px;
+
+  --animationSpeed: 0.3s;
+}
+
+/* Body */
+
+body {
+  font-family: Arial, sans-serif;
+
+  background-color: var(--backgroundColor);
+
+  color: var(--textColor);
+
+  overflow-x: hidden;
+}
+
+/* App Container */
+
+.appContainer {
+  min-height: 100vh;
+
+  position: relative;
+
+  padding-bottom: 100px;
+}
+
+/* Dashboard Header */
+
+.dashboardHeader {
+  height: var(--headerHeight);
+
+  background-color: #d8eef3;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 var(--spacingMedium);
+
+  border-bottom: 1px solid var(--borderColor);
+}
+
+/* Header Left */
+
+.headerLeftSection {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+/* App Logo */
+
+.appLogo {
+  width: 34px;
+
+  height: 34px;
+
+  object-fit: contain;
+}
+
+/* App Name */
+
+.appName {
+  font-size: 32px;
+
+  color: #001c8f;
+}
+
+/* Menu Button */
+
+.menuButton {
+  border: none;
+
+  background: none;
+
+  font-size: 28px;
+
+  color: var(--greenColor);
+
+  cursor: pointer;
+}
+
+/* Page Content */
+
+.pageContent {
+  padding: var(--spacingMedium);
+}
+
+/* Group Dropdown Section */
+
+.groupDropdownSection {
+  margin-bottom: 28px;
+}
+
+/* Group Dropdown Button */
+
+.groupDropdownButton {
+  width: 100%;
+
+  background-color: var(--cardColor);
+
+  border: 1px solid var(--borderColor);
+
+  border-radius: var(--borderRadiusMedium);
+
+  padding: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+/* Dropdown Arrow */
+
+.dropdownArrow {
+  color: #7cc242;
+
+  font-size: 16px;
+}
+
+/* Empty State */
+
+.emptyStateSection {
+  margin-top: 60px;
+
+  text-align: center;
+}
+
+.emptyStateText {
+  font-size: 18px;
+
+  color: #777777;
+}
+
+/* Category List */
+
+.categoryList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--spacingMedium);
+}
+
+/* Category Card */
+
+.categoryCard {
+  background-color: var(--cardColor);
+
+  border-radius: var(--borderRadiusMedium);
+
+  padding: 20px;
+
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+  cursor: pointer;
+}
+
+/* Category Title */
+
+.categoryTitle {
+  font-size: 20px;
+
+  margin-bottom: 10px;
+}
+
+/* Category Info */
+
+.categoryInfo {
+  color: #777777;
+
+  font-size: 14px;
+}
+
+/* Footer */
+
+.appFooter {
+  height: var(--footerHeight);
+
+  background-color: var(--footerColor);
+
+  border-top: 1px solid var(--borderColor);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  position: fixed;
+
+  bottom: 0;
+
+  width: 100%;
+
+  z-index: 5;
+
+  transition: opacity var(--animationSpeed);
+}
+
+/* Hidden Footer */
+
+.appFooter.hiddenFooter {
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+/* Floating Action Button */
+
+.floatingActionButton {
+  width: 64px;
+
+  height: 64px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background-color: var(--greenColor);
+
+  color: white;
+
+  font-size: 36px;
+
+  position: fixed;
+
+  right: 24px;
+
+  bottom: 80px;
+
+  cursor: pointer;
+
+  z-index: 20;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* Overlay */
+
+.screenOverlay {
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  background-color: var(--overlayColor);
+
+  z-index: 40;
+
+  opacity: 1;
+
+  transition: opacity var(--animationSpeed);
+}
+
+/* Bottom Sheet */
+
+.bottomSheet {
+  position: fixed;
+
+  left: 0;
+
+  bottom: 0;
+
+  width: 100%;
+
+  background-color: var(--cardColor);
+
+  border-top-left-radius: var(--borderRadiusLarge);
+
+  border-top-right-radius: var(--borderRadiusLarge);
+
+  padding: var(--spacingLarge);
+
+  z-index: 50;
+
+  transform: translateY(0);
+
+  transition: transform var(--animationSpeed);
+
+  min-height: 250px;
+}
+
+/* Hidden Bottom Sheet */
+
+.bottomSheet.hidden {
+  transform: translateY(100%);
+}
+
+/* Bottom Sheet Handle */
+
+.bottomSheetHandle {
+  width: 60px;
+
+  height: 5px;
+
+  background-color: #cccccc;
+
+  border-radius: 999px;
+
+  margin: 0 auto 20px auto;
+}
+
+/* Bottom Sheet Header */
+
+.bottomSheetHeader {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+/* Close Button */
+
+.closeButton {
+  border: none;
+
+  background: none;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+/* Bottom Sheet Body */
+
+.bottomSheetBody {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--spacingMedium);
+}
+
+/* Group List */
+
+.groupList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--spacingMedium);
+
+  margin-bottom: 24px;
+}
+
+/* Group Item */
+
+.groupItem {
+  border: 1px solid var(--borderColor);
+
+  border-radius: var(--borderRadiusMedium);
+
+  padding: 18px;
+
+  background-color: var(--backgroundColor);
+
+  cursor: pointer;
+}
+
+/* Bottom Sheet Input */
+
+.bottomSheetInput {
+  width: 100%;
+
+  border: 1px solid var(--borderColor);
+
+  border-radius: var(--borderRadiusMedium);
+
+  padding: 18px;
+
+  font-size: 16px;
+
+  outline: none;
+
+  margin-bottom: 20px;
+}
+
+/* Button Row */
+
+.bottomSheetButtonRow {
+  display: flex;
+
+  gap: var(--spacingMedium);
+}
+
+/* Primary Button */
+
+.primaryButton {
+  flex: 1;
+
+  border: none;
+
+  background-color: var(--primaryColor);
+
+  color: white;
+
+  padding: 18px;
+
+  border-radius: var(--borderRadiusMedium);
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+/* Secondary Button */
+
+.secondaryButton {
+  flex: 1;
+
+  border: none;
+
+  background-color: #e4e4e4;
+
+  color: black;
+
+  padding: 18px;
+
+  border-radius: var(--borderRadiusMedium);
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+/* Hidden State */
+
+.hidden {
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+/* Category Header */
+
+.categoryHeader {
+  height: var(--headerHeight);
+
+  background-color: #d8eef3;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 0 var(--spacingMedium);
+
+  border-bottom: 1px solid var(--borderColor);
+}
+
+/* Back Button */
+
+.backButton {
+  border: none;
+
+  background: none;
+
+  font-size: 28px;
+
+  cursor: pointer;
+}
+
+/* Category Page Title */
+
+.categoryPageTitle {
+  font-size: 24px;
+
+  color: #001c8f;
+}
+
+/* Search Section */
+
+.searchSection {
+  margin-bottom: 20px;
+}
+
+/* Search Input */
+
+.searchInput {
+  width: 100%;
+
+  border: 1px solid var(--borderColor);
+
+  border-radius: var(--borderRadiusMedium);
+
+  padding: 18px;
+
+  font-size: 16px;
+
+  outline: none;
+}
+
+/* Tab Section */
+
+.tabSection {
+  display: flex;
+
+  gap: 12px;
+
+  margin-bottom: 24px;
+}
+
+/* Tab Button */
+
+.tabButton {
+  flex: 1;
+
+  border: none;
+
+  background-color: #e4e4e4;
+
+  padding: 14px;
+
+  border-radius: var(--borderRadiusMedium);
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+/* Active Tab */
+
+.activeTab {
+  background-color: var(--primaryColor);
+
+  color: white;
+}
+
+/* Item List */
+
+.itemList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--spacingMedium);
+}
+
+/* Item Card */
+
+.itemCard {
+  background-color: var(--cardColor);
+
+  border-radius: var(--borderRadiusMedium);
+
+  padding: 18px;
+
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Item Name */
+
+.itemName {
+  font-size: 18px;
+
+  margin-bottom: 8px;
+}
+
+/* Item Details */
+
+.itemDetails {
+  font-size: 14px;
+
+  color: #777777;
+}
+
+/* Item Card Top Row */
+
+.itemCardTopRow {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+/* Item Action Buttons */
+
+.itemActionButtons {
+  display: flex;
+
+  gap: 10px;
+}
+
+/* Item Action Button */
+
+.itemActionButton {
+  border: none;
+
+  background: none;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+/* Swipe Wrapper */
+
+.swipeWrapper {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: var(--borderRadiusMedium);
+}
+
+/* Swipe Background */
+
+.swipeBackground {
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 0 20px;
+
+  border-radius: var(--borderRadiusMedium);
+
+  overflow: hidden;
+}
+
+/* Purchased Swipe */
+
+.swipePurchased {
+  background-color: #18b34a;
+
+  color: white;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 20px;
+
+  border-radius: var(--borderRadiusMedium);
+}
+
+/* Delete Swipe */
+
+.swipeDelete {
+  background-color: #d9534f;
+
+  color: white;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 20px;
+
+  border-radius: var(--borderRadiusMedium);
+}
+
+/* Swipe Card */
+
+.swipeCard {
+  position: relative;
+
+  z-index: 2;
+
+  transition: transform 0.2s ease;
+
+  touch-action: pan-y;
+}
+
+/* Snackbar */
+
+.snackbar {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 90px;
+
+  transform: translateX(-50%);
+
+  width: calc(100% - 32px);
+
+  background-color: #222222;
+
+  color: white;
+
+  padding: 16px;
+
+  border-radius: var(--borderRadiusMedium);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  z-index: 200;
+
+  opacity: 1;
+
+  transition: opacity 0.3s ease;
+}
+
+/* Snackbar Undo Button */
+
+.snackbarUndoButton {
+  border: none;
+
+  background: none;
+
+  color: #7cc242;
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+/* Hidden Snackbar */
+
+.snackbar.hidden {
+  display: none;
+}
+
+/* Prevent Swipe Blocking Buttons */
+
+.itemActionButtons {
+  position: relative;
+
+  z-index: 20;
+}
+
+.itemActionButton {
+  position: relative;
+
+  z-index: 30;
+
+  pointer-events: auto;
+}
+
+/* Bulk Action Bar */
+
+.bulkActionBar {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 90px;
+
+  transform: translateX(-50%);
+
+  width: calc(100% - 32px);
+
+  background-color: white;
+
+  border-radius: var(--borderRadiusLarge);
+
+  padding: 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-around;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  z-index: 300;
+}
+
+/* Bulk Action Button */
+
+.bulkActionButton {
+  border: none;
+
+  background: none;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+/* Selected Item */
+
+.selectedItem {
+  border: 3px solid #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+  transform: scale(0.98);
+}
+
+/* Bulk Action Bar */
+
+.bulkActionBar {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 90px;
+
+  transform: translateX(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 14px 18px;
+
+  border-radius: 999px;
+
+  background-color: #111827;
+
+  z-index: 999;
+}
+
+/* Bulk Action Button */
+
+.bulkActionButton {
+  width: 52px;
+
+  height: 52px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  font-size: 22px;
+
+  cursor: pointer;
+
+  background-color: white;
+}
+
+/* Swipe Animation */
+
+.swipeCard {
+  will-change: transform;
+}
+
+/* Swipe Active */
+
+.swipeCard:active {
+  transition: none;
+}
+
+/* Bulk Selection Count */
+
+.bulkSelectionCount {
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  padding-right: 8px;
+}
+
+/* Bottom Sheet Animation */
+
+.bottomSheet {
+  transform: translateY(100%);
+
+  transition: transform 0.25s ease;
+}
+
+/* Bottom Sheet Visible */
+
+.bottomSheet:not(.hidden) {
+  transform: translateY(0%);
+}
+
+/* Screen Overlay */
+
+.screenOverlay {
+  opacity: 1;
+
+  transition: opacity 0.2s ease;
+}
+
+/* Hidden Overlay */
+
+.screenOverlay.hidden {
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+/* Category Card */
+
+.categoryCard {
+  position: relative;
+
+  overflow: hidden;
+}
+
+/* Category Hover */
+
+.categoryCard:active {
+  transform: scale(0.98);
+}
+
+/* Category Info */
+
+.categoryInfo {
+  margin-top: 6px;
+
+  font-size: 13px;
+
+  opacity: 0.7;
+}
+
+/* Category More Button */
+
+.categoryMoreButton {
+  position: absolute;
+
+  top: 14px;
+
+  right: 14px;
+
+  width: 36px;
+
+  height: 36px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: transparent;
+
+  font-size: 20px;
+
+  cursor: pointer;
+}
+
+/* Bottom Sheet Action Button */
+
+.bottomSheetActionButton {
+  width: 100%;
+
+  border: none;
+
+  padding: 16px;
+
+  border-radius: 14px;
+
+  margin-bottom: 12px;
+
+  text-align: left;
+
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+/* Bottom Sheet Delete Button */
+
+.bottomSheetDeleteButton {
+  width: 100%;
+
+  border: none;
+
+  padding: 16px;
+
+  border-radius: 14px;
+
+  background-color: #dc2626;
+
+  color: white;
+
+  text-align: left;
+
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+/* Group Item Row */
+
+.groupItemRow {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+/* Group More Button */
+
+.groupMoreButton {
+  width: 38px;
+
+  height: 38px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: transparent;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
