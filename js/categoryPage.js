@@ -105,26 +105,41 @@ function renderItems(items) {
                         🗑 Delete
                     </div>
                 </div>
-                <div
-                    class="itemCard swipeCard
-                    ${
-                      appState.selectedItems.includes(item.name)
-                        ? "selectedItem"
-                        : ""
-                    }
-                    "
-                    data-item-name="${item.name}"
-                >
+               <div
+    class="
+        itemCard
+        swipeCard
+        ${appState.selectedItems.includes(item.name) ? "selectedItem" : ""}
+    "
+    data-item-name="${item.name}"
+    onclick="
+        ${
+          "appState.selectionMode ? toggleItemSelection('" +
+          item.name +
+          "') : null"
+        }
+    "
+    oncontextmenu="
+        event.preventDefault();
+        toggleItemSelection('${item.name}');
+    "
+>
 <div class="itemCardTopRow">
 
     <div class="itemTitleSection">
 
         <h2
-            class="itemName"
-            onclick="renderEditItemForm('${item.name}')"
-        >
-            ${item.name}
-        </h2>
+    class="itemName"
+    onclick="
+        event.stopPropagation();
+
+        if (!appState.selectionMode) {
+            renderEditItemForm('${item.name}');
+        }
+    "
+>
+    ${item.name}
+</h2>
 
         <p class="itemQuantityBadge">
             Qty: ${item.quantity}
@@ -135,15 +150,20 @@ function renderItems(items) {
     <div class="itemActionButtons">
 
         <button
-            class="
-                modernActionButton
-                favoriteActionButton
-                ${isFavorite ? "activeFavoriteButton" : ""}
-            "
-            onclick="toggleFavorite('${item.name}')"
-        >
-            ${isFavorite ? "♥" : "♡"}
-        </button>
+    class="
+        modernActionButton
+        favoriteActionButton
+        ${isFavorite ? "activeFavoriteButton" : ""}
+    "
+    onclick="
+        event.stopPropagation();
+        toggleFavorite('${item.name}');
+    "
+>
+    <span class="actionButtonIcon">
+        ${isFavorite ? "♥" : "♡"}
+    </span>
+</button>
 
         ${
           appState.activeTab === "favorites"
@@ -157,15 +177,20 @@ function renderItems(items) {
             `
             : `
             <button
-                class="
-                    modernActionButton
-                    purchasedActionButton
-                    ${item.purchased ? "activePurchasedButton" : ""}
-                "
-                onclick="togglePurchased('${item.name}')"
-            >
-                ${appState.activeTab === "purchased" ? "↺" : "✓"}
-            </button>
+    class="
+        modernActionButton
+        purchasedActionButton
+        ${item.purchased ? "activePurchasedButton" : ""}
+    "
+    onclick="
+        event.stopPropagation();
+        togglePurchased('${item.name}');
+    "
+>
+    <span class="actionButtonIcon">
+        ${appState.activeTab === "purchased" ? "↺" : "✓"}
+    </span>
+</button>
             `
         }
 

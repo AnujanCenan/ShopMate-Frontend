@@ -4,7 +4,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 /* Root Variables */
 :root {
   --primaryColor: #2f7e94;
@@ -25,7 +24,6 @@
   --footerHeight: 50px;
   --animationSpeed: 0.3s;
 }
-
 /* Body */
 body {
   font-family: Arial, sans-serif;
@@ -33,14 +31,12 @@ body {
   color: var(--textColor);
   overflow-x: hidden;
 }
-
 /* App Container */
 .appContainer {
   min-height: 100vh;
   position: relative;
   padding-bottom: 100px;
 }
-
 /* Dashboard Header */
 .dashboardHeader {
   height: var(--headerHeight);
@@ -51,27 +47,23 @@ body {
   padding: 0 var(--spacingMedium);
   border-bottom: 1px solid var(--borderColor);
 }
-
 /* Header Left */
 .headerLeftSection {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 /* App Logo */
 .appLogo {
   width: 34px;
   height: 34px;
   object-fit: contain;
 }
-
 /* App Name */
 .appName {
   font-size: 32px;
   color: #001c8f;
 }
-
 /* Menu Button */
 .menuButton {
   border: none;
@@ -80,7 +72,6 @@ body {
   color: var(--greenColor);
   cursor: pointer;
 }
-
 /* Page Content */
 .pageContent {
   display: flex;
@@ -88,12 +79,10 @@ body {
   gap: 8px;
   padding: 12px 20px 120px;
 }
-
 /* Group Dropdown Section */
 .groupDropdownSection {
   margin-bottom: 28px;
 }
-
 /* Group Dropdown Button */
 .groupDropdownButton {
   width: 100%;
@@ -470,21 +459,13 @@ body {
 /* Snackbar Undo Button */
 .snackbarUndoButton {
   background: transparent;
-
   border: none;
-
   color: #4fc3f7;
-
   font-size: 15px;
-
   font-weight: 600;
-
   cursor: pointer;
-
   padding: 0;
-
   margin: 0;
-
   min-width: fit-content;
 }
 /* Hidden Snackbar */
@@ -656,67 +637,44 @@ body {
   font-size: 18px;
   cursor: pointer;
 }
-
 @keyframes snackbarSlideUp {
   from {
     opacity: 0;
-
     transform: translateX(-50%) translateY(20px);
   }
-
   to {
     opacity: 1;
-
     transform: translateX(-50%) translateY(0);
   }
 }
-
 /* =========================
    MODERN CATEGORY PAGE UI
 ========================= */
-
 .modernHeader {
   display: flex;
-
   align-items: center;
-
   gap: 14px;
-
   padding: 22px 20px 10px;
-
   background: white;
 }
-
 .modernBackButton {
   border: none;
-
   background: transparent;
-
   font-size: 30px;
-
   cursor: pointer;
-
   color: #1e1e1e;
-
   padding: 0;
-
   margin: 0;
 }
-
 .modernPageTitle {
   font-size: 24px;
-
   font-weight: 700;
-
   color: #111111;
-
   margin: 0;
 }
-
 /* =========================
    TABS
 ========================= */
-
 .modernTabContainer {
   display: flex;
   align-items: center;
@@ -724,281 +682,251 @@ body {
   padding: 12px 0 10px;
   /* background: white; */
 }
-
 .modernTabButton {
   border: none;
-
   background: #f1f1f1;
-
   padding: 12px 18px;
-
   border-radius: 18px;
-
   font-size: 15px;
-
   cursor: pointer;
-
   transition: all 0.2s ease;
 }
-
 .modernTabButton.activeTab {
   background: #118ab2;
-
   color: white;
-
   box-shadow: 0 4px 12px rgba(17, 138, 178, 0.25);
 }
-
 /* =========================
    SEARCH
 ========================= */
-
 .searchWrapper {
   position: relative;
-
   display: flex;
-
   align-items: center;
-
   height: 48px;
-
   margin-bottom: 6px;
-
   /* background: white; */
 }
-
 .searchIcon {
   position: absolute;
-
   left: 18px;
-
   top: 50%;
-
   transform: translateY(-50%);
-
   font-size: 20px;
-
   line-height: 1;
-
   color: #9ca3af;
-
   pointer-events: none;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 }
-
 /* .modernSearchInput {
   width: 100%;
-
   height: 56px;
-
   border: 1px solid #e5e7eb;
-
   border-radius: 22px;
-
   padding: 0 18px 0 52px;
-
   font-size: 16px;
-
   outline: none;
-
   background: white;
-
   box-sizing: border-box;
-
   transition: all 0.2s ease;
 } */
-
 .modernSearchInput {
   width: 100%;
-
   height: 48px;
-
   border: 1px solid #e5e7eb;
-
   border-radius: 18px;
-
   padding: 0 18px 0 48px;
-
   font-size: 15px;
-
   outline: none;
-
   background: white;
-
   box-sizing: border-box;
-
   transition: all 0.2s ease;
 }
-
 .modernSearchInput:focus {
   border-color: #118ab2;
-
   box-shadow: 0 0 0 4px rgba(17, 138, 178, 0.08);
 }
-
 /* =========================
    SNACKBAR
 ========================= */
-
 .snackbar {
   position: fixed;
-
   bottom: 90px;
-
   left: 50%;
-
   transform: translateX(-50%);
-
   width: calc(100% - 40px);
-
   max-width: 360px;
-
   background: #1f1f1f;
-
   color: white;
-
   border-radius: 18px;
-
   padding: 16px 18px;
-
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-
   z-index: 9999;
 }
-
 .snackbarButton {
   background: transparent;
-
   border: none;
-
   color: #22c55e;
-
   font-size: 15px;
-
   font-weight: 600;
-
   cursor: pointer;
-
   padding: 0;
-
   margin: 0;
 }
-
 .duplicateMessage {
   font-size: 15px;
-
   line-height: 1.5;
-
   color: #4b5563;
-
   margin-bottom: 14px;
 }
-
 /* Item Card Modern Actions */
-
 .itemTitleSection {
   display: flex;
-
   flex-direction: column;
-
   gap: 8px;
 }
-
 .itemQuantityBadge {
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
-
   width: fit-content;
-
   padding: 6px 12px;
-
   border-radius: 999px;
-
   background: #eef6ff;
-
   color: #2563eb;
-
   font-size: 13px;
-
   font-weight: 600;
-
   margin: 0;
 }
-
 .itemActionButtons {
   display: flex;
-
   align-items: center;
-
   gap: 10px;
 }
-
 .modernActionButton {
-  width: 42px;
-
-  height: 42px;
-
+  width: 48px;
+  height: 48px;
   border: none;
-
-  border-radius: 14px;
-
+  border-radius: 16px;
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
-  font-size: 18px;
-
   cursor: pointer;
-
   transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7);
 }
-
 .favoriteActionButton {
   background: #fff1f2;
-
   color: #e11d48;
 }
-
 .activeFavoriteButton {
   background: #e11d48;
-
   color: white;
 }
-
-.purchasedActionButton {
+/* .purchasedActionButton {
   background: #ecfdf5;
-
   color: #059669;
 }
-
 .activePurchasedButton {
   background: #059669;
-
   color: white;
+} */
+.purchasedActionButton {
+  background: #ecfdf5 !important;
+  color: #059669 !important;
+  font-size: 22px;
+  font-weight: 700;
 }
-
+.activePurchasedButton {
+  background: #059669 !important;
+  color: white !important;
+  font-size: 22px;
+  font-weight: 700;
+}
 .addActionButton {
   background: #eff6ff;
-
   color: #2563eb;
 }
-
 .modernActionButton:active {
   transform: scale(0.95);
+}
+/* Multi Select */
+.selectedItem {
+  border: 2px solid #2563eb;
+  background: #eff6ff;
+  transform: scale(0.98);
+}
+.bulkActionBar {
+  position: fixed;
+  bottom: 82px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 380px;
+  background: white;
+  border-radius: 22px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
+}
+.bulkSelectionCount {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+.bulkActionButton {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 14px;
+  background: #f3f4f6;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+.bulkActionButton:active {
+  transform: scale(0.95);
+}
+.actionButtonIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+.favoriteActionButton {
+  background: linear-gradient(145deg, #fff5f7, #ffe4ea);
+  color: #e11d48;
+}
+.activeFavoriteButton {
+  background: linear-gradient(145deg, #ff4d79, #e11d48);
+  color: white;
+}
+.purchasedActionButton {
+  background: linear-gradient(145deg, #f3fff8, #dcfce7);
+  color: #059669;
+}
+.activePurchasedButton {
+  background: linear-gradient(145deg, #10b981, #059669);
+  color: white;
+}
+.modernActionButton:active {
+  transform: scale(0.94);
 }
