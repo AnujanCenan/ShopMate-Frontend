@@ -115,48 +115,64 @@ function renderItems(items) {
                     "
                     data-item-name="${item.name}"
                 >
-                    <div class="itemCardTopRow">
-                        <h2
-    class="itemName"
-    onclick="renderEditItemForm('${item.name}')"
->
-    ${item.name}
-</h2>
-                        <div class="itemActionButtons">
-                            <button
-                                class="itemActionButton"
-                                onclick="toggleFavorite('${item.name}')"
-                            >
-                                ${isFavorite ? "♥" : "♡"}
-                            </button>
-                            ${
-                              appState.activeTab === "favorites"
-                                ? `
-                                <button
-                                    class="itemActionButton"
-                                    onclick="addFavoriteToList('${item.name}')"
-                                >
-                                    +
-                                </button>
-                                `
-                                : `
-                                <button
-                                    class="itemActionButton"
-                                    onclick="togglePurchased('${item.name}')"
-                                >
-                                    ${
-                                      appState.activeTab === "purchased"
-                                        ? "↺"
-                                        : "✓"
-                                    }
-                                </button>
-                                `
-                            }
-                        </div>
-                    </div>
-                    <p class="itemDetails">
-                        Quantity: ${item.quantity}
-                    </p>
+<div class="itemCardTopRow">
+
+    <div class="itemTitleSection">
+
+        <h2
+            class="itemName"
+            onclick="renderEditItemForm('${item.name}')"
+        >
+            ${item.name}
+        </h2>
+
+        <p class="itemQuantityBadge">
+            Qty: ${item.quantity}
+        </p>
+
+    </div>
+
+    <div class="itemActionButtons">
+
+        <button
+            class="
+                modernActionButton
+                favoriteActionButton
+                ${isFavorite ? "activeFavoriteButton" : ""}
+            "
+            onclick="toggleFavorite('${item.name}')"
+        >
+            ${isFavorite ? "♥" : "♡"}
+        </button>
+
+        ${
+          appState.activeTab === "favorites"
+            ? `
+            <button
+                class="modernActionButton addActionButton"
+                onclick="addFavoriteToList('${item.name}')"
+            >
+                +
+            </button>
+            `
+            : `
+            <button
+                class="
+                    modernActionButton
+                    purchasedActionButton
+                    ${item.purchased ? "activePurchasedButton" : ""}
+                "
+                onclick="togglePurchased('${item.name}')"
+            >
+                ${appState.activeTab === "purchased" ? "↺" : "✓"}
+            </button>
+            `
+        }
+
+    </div>
+
+</div>
+
                     <p class="itemDetails">
                         Notes: ${item.notes || "-"}
                     </p>
