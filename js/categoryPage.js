@@ -116,9 +116,12 @@ function renderItems(items) {
                     data-item-name="${item.name}"
                 >
                     <div class="itemCardTopRow">
-                        <h2 class="itemName">
-                            ${item.name}
-                        </h2>
+                        <h2
+    class="itemName"
+    onclick="renderEditItemForm('${item.name}')"
+>
+    ${item.name}
+</h2>
                         <div class="itemActionButtons">
                             <button
                                 class="itemActionButton"

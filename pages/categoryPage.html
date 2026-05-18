@@ -12,27 +12,55 @@
 
   <body>
     <div class="appContainer">
-      <header class="pageHeader">
-        <button class="backButton" id="backButton">←</button>
+      <!-- HEADER -->
 
-        <h1 class="pageTitle" id="categoryPageTitle">Category</h1>
+      <header class="modernHeader">
+        <button class="modernBackButton" id="backButton">←</button>
+
+        <h1 class="modernPageTitle" id="categoryPageTitle">Category</h1>
       </header>
 
+      <!-- MAIN CONTENT -->
+
       <main class="pageContent">
-        <div class="tabContainer">
-          <button class="tabButton activeTab" data-tab="lists">Lists</button>
+        <!-- TABS -->
 
-          <button class="tabButton" data-tab="favorites">Favorites</button>
+        <div class="modernTabContainer">
+          <button class="modernTabButton tabButton activeTab" data-tab="lists">
+            Lists
+          </button>
 
-          <button class="tabButton" data-tab="purchased">Purchased</button>
+          <button class="modernTabButton tabButton" data-tab="favorites">
+            Favorites
+          </button>
+
+          <button class="modernTabButton tabButton" data-tab="purchased">
+            Purchased
+          </button>
         </div>
 
-        <input type="text" class="searchInput" placeholder="Search Items" />
+        <!-- SEARCH -->
+
+        <div class="searchWrapper">
+          <span class="searchIcon">⌕</span>
+
+          <input
+            type="text"
+            class="modernSearchInput searchInput"
+            placeholder="Search Items"
+          />
+        </div>
+
+        <!-- EMPTY STATE -->
 
         <section class="emptyStateSection" id="itemEmptyState"></section>
 
+        <!-- ITEM LIST -->
+
         <section class="itemList" id="itemList"></section>
       </main>
+
+      <!-- BULK ACTION BAR -->
 
       <div class="bulkActionBar hidden" id="bulkActionBar">
         <div class="bulkSelectionCount" id="bulkSelectionCount">1 Selected</div>
@@ -44,11 +72,17 @@
         <button class="bulkActionButton" id="bulkDeleteButton">🗑</button>
       </div>
 
+      <!-- FOOTER -->
+
       <footer class="appFooter">© Wisemen IT Solutions</footer>
+
+      <!-- FLOATING ACTION BUTTON -->
 
       <button class="floatingActionButton" id="openItemBottomSheetButton">
         +
       </button>
+
+      <!-- SNACKBAR -->
 
       <div class="snackbar hidden" id="snackbar">
         <span class="snackbarText" id="snackbarText"></span>
@@ -56,7 +90,11 @@
         <button class="snackbarButton" id="snackbarUndoButton">Undo</button>
       </div>
 
+      <!-- OVERLAY -->
+
       <div class="screenOverlay hidden" id="screenOverlay"></div>
+
+      <!-- BOTTOM SHEET -->
 
       <div class="bottomSheet hidden" id="bottomSheet">
         <div class="bottomSheetHandle"></div>
@@ -65,13 +103,22 @@
       </div>
     </div>
 
+    <!-- SCRIPTS -->
+
     <script src="../js/stateManager.js"></script>
+
     <script src="../js/helpers.js"></script>
+
     <script src="../js/favoritesManager.js"></script>
+
     <script src="../js/itemManager.js"></script>
+
     <script src="../js/swipeGestures.js"></script>
+
     <script src="../js/snackbarManager.js"></script>
+
     <script src="../js/selectionManager.js"></script>
+
     <script src="../js/categoryPage.js"></script>
   </body>
 </html>
