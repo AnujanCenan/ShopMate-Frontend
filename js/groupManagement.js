@@ -19,18 +19,96 @@ const screenOverlay = document.getElementById("screenOverlay");
 /* Initialize */
 
 function initializeGroupManagement() {
+  renderGroupSwitcher();
+
   renderMembers();
 
   setupPermissions();
 }
 
+/* Render Group Switcher */
+
+function renderGroupSwitcher() {
+  const existingSwitcher = document.querySelector(".groupSwitcher");
+
+  if (existingSwitcher) {
+    existingSwitcher.remove();
+  }
+
+  const groups = Object.keys(appState.groups);
+
+  let switcherHTML = `
+    <div class="groupSwitcher">
+
+      <h3 class="groupSwitcherTitle">
+        Your Groups
+      </h3>
+  `;
+
+  groups.forEach(function (groupName) {
+    switcherHTML += `
+      <button
+        class="
+          groupSwitcherButton
+          ${
+            groupName === appState.activeGroup
+              ? "activeGroupSwitcherButton"
+              : ""
+          }
+        "
+        onclick="
+          switchGroup(
+            '${groupName}'
+          )
+        "
+      >
+        ${groupName}
+      </button>
+    `;
+  });
+
+  switcherHTML += `
+    </div>
+  `;
+
+  memberList.insertAdjacentHTML(
+    "beforebegin",
+
+    switcherHTML,
+  );
+}
+
+/* Switch Group */
+
+function switchGroup(groupName) {
+  appState.activeGroup = groupName;
+
+  saveAppState();
+
+  window.location.reload();
+}
+
 /* Permissions */
 
 function setupPermissions() {
-  if (!isAdmin()) {
+  const currentUser = getCurrentUser();
+
+  const members = getCurrentGroupMembers();
+
+  const currentMember = members.find(function (member) {
+    return member.id === currentUser.id;
+  });
+
+  if (!currentMember) {
+    return;
+  }
+
+  if (currentMember.role !== "admin" && currentMember.role !== "owner") {
     inviteMemberButton.style.display = "none";
 
     readOnlyBanner.classList.remove("hidden");
+  } else {
+    readOnlyBanner.classList.add("hidden");
   }
 }
 
@@ -48,12 +126,31 @@ function renderMembers() {
   memberList.innerHTML = "";
 
   members.forEach(function (member) {
-    const memberStatus = member.role === "admin" ? "Admin" : "Active";
+    let memberStatus = "Active";
+
+    if (member.role === "owner") {
+      memberStatus = "Owner";
+    }
+
+    if (member.role === "admin") {
+      memberStatus = "Admin";
+    }
+
+    if (member.status === "pending") {
+      memberStatus = "Pending Invite";
+    }
 
     memberList.innerHTML += `
       <div class="memberCard">
 
-        <div class="memberInfo">
+        <div
+          class="memberInfo clickableMember"
+          onclick="
+            openMemberProfile(
+              '${member.id}'
+            )
+          "
+        >
 
           <div class="memberAvatar">
             ${member.name.charAt(0)}
@@ -66,14 +163,14 @@ function renderMembers() {
             </h3>
 
             <p class="memberRole">
-              ${member.role}
+              ${member.role || "member"}
             </p>
 
             <div
               class="
                 memberStatusBadge
                 ${
-                  member.role === "admin"
+                  member.role === "admin" || member.role === "owner"
                     ? "adminStatusBadge"
                     : "activeStatusBadge"
                 }
@@ -108,6 +205,28 @@ function renderMembers() {
   });
 }
 
+/* Open Member Profile */
+
+function openMemberProfile(memberId) {
+  const members = getCurrentGroupMembers();
+
+  const member = members.find(function (member) {
+    return member.id === memberId;
+  });
+
+  if (!member) {
+    return;
+  }
+
+  localStorage.setItem(
+    "selectedMember",
+
+    JSON.stringify(member),
+  );
+
+  window.location.href = "../pages/profilePage.html";
+}
+
 /* Member Actions */
 
 function openMemberActions(memberId) {
@@ -140,7 +259,7 @@ function openMemberActions(memberId) {
     <div class="bottomSheetBody">
 
       ${
-        member.role !== "admin"
+        member.role !== "admin" && member.role !== "owner"
           ? `
             <button
               class="bottomSheetActionButton"
@@ -151,6 +270,23 @@ function openMemberActions(memberId) {
               "
             >
               👑 Make Admin
+            </button>
+          `
+          : ""
+      }
+
+      ${
+        member.role !== "owner"
+          ? `
+            <button
+              class="bottomSheetActionButton"
+              onclick="
+                transferOwnership(
+                  '${member.id}'
+                )
+              "
+            >
+              👑 Transfer Ownership
             </button>
           `
           : ""
@@ -190,6 +326,34 @@ function makeAdmin(memberId) {
   }
 
   member.role = "admin";
+
+  saveAppState();
+
+  closeBottomSheet();
+
+  renderMembers();
+}
+
+/* Transfer Ownership */
+
+function transferOwnership(memberId) {
+  const members = getCurrentGroupMembers();
+
+  members.forEach(function (member) {
+    if (member.role === "owner") {
+      member.role = "admin";
+    }
+  });
+
+  const selectedMember = members.find(function (member) {
+    return member.id === memberId;
+  });
+
+  if (!selectedMember) {
+    return;
+  }
+
+  selectedMember.role = "owner";
 
   saveAppState();
 
@@ -280,6 +444,8 @@ inviteMemberButton.addEventListener(
       code: inviteCode,
 
       groupName: appState.activeGroup,
+
+      status: "pending",
     });
 
     saveAppState();
@@ -402,11 +568,11 @@ function leaveCurrentGroup() {
   });
 
   const adminCount = members.filter(function (member) {
-    return member.role === "admin";
+    return member.role === "admin" || member.role === "owner";
   }).length;
 
   if (
-    currentMember.role === "admin" &&
+    (currentMember.role === "admin" || currentMember.role === "owner") &&
     adminCount === 1 &&
     members.length > 1
   ) {

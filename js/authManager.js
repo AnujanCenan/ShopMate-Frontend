@@ -21,11 +21,23 @@ function getCurrentUser() {
 }
 
 function isAdmin() {
-  if (!appState.currentUser) {
+  const members = getCurrentGroupMembers();
+
+  const currentUser = getCurrentUser();
+
+  if (!currentUser) {
     return false;
   }
 
-  return appState.currentUser.role === "admin";
+  const currentMember = members.find(function (member) {
+    return member.id === currentUser.id;
+  });
+
+  if (!currentMember) {
+    return false;
+  }
+
+  return currentMember.role === "admin";
 }
 
 function getCurrentGroupMembers() {
