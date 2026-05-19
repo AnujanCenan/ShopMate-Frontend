@@ -23,9 +23,9 @@ const defaultAppState = {
     {
       id: "user_1",
 
-      name: "Hari",
+      name: "Admin",
 
-      email: "hari@shopmate.app",
+      email: "admin@shopmate.app",
 
       password: "123456",
 
@@ -74,7 +74,7 @@ const defaultAppState = {
 
         name: "Hari",
 
-        email: "hari@shopmate.app",
+        email: "admin@shopmate.app",
 
         role: "admin",
       },

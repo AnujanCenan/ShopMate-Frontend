@@ -568,6 +568,10 @@ function renderDashboardMenu() {
                 ✕
             </button>
         </div>
+        <button
+        class="bottomSheetActionButton"
+        onclick="window.location.href ='../pages/familyManagementPage.html'">
+        👨‍👩‍👧 Group Management </button>
         <div class="bottomSheetBody">
             <button
                 class="bottomSheetActionButton"
