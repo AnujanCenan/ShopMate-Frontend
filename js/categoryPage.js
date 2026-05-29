@@ -105,50 +105,18 @@ function renderItems(items) {
                         🗑 Delete
                     </div>
                 </div>
-               <div
-    class="
-        itemCard
-        swipeCard
-        ${appState.selectedItems.includes(item.name) ? "selectedItem" : ""}
-    "
-    data-item-name="${item.name}"
-    onclick="
-        ${
-          "appState.selectionMode ? toggleItemSelection('" +
-          item.name +
-          "') : null"
-        }
-    "
-    oncontextmenu="
-        event.preventDefault();
-        toggleItemSelection('${item.name}');
-    "
->
-<div class="itemCardTopRow">
-
-    <div class="itemTitleSection">
-
-        <h2
-    class="itemName"
-    onclick="
-        event.stopPropagation();
-
-        if (!appState.selectionMode) {
-            renderEditItemForm('${item.name}');
-        }
-    "
->
-    ${item.name}
-</h2>
-
-        <p class="itemQuantityBadge">
-            Qty: ${item.quantity}
-        </p>
-
-    </div>
-
+               <div class="itemCard swipeCard ${appState.selectedItems.includes(item.name) ? "selectedItem" : ""}"data-item-name="${item.name}"onclick="${"appState.selectionMode ? toggleItemSelection('" + item.name + "') : "}"oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.name}');">
+               <div class="itemCardTopRow">
+               <div class="itemTitleSection">
+               <h2 class="itemName" onclick=" event.stopPropagation();
+               if (!appState.selectionMode) {
+               renderEditItemForm('${item.name}');
+               }
+               ">${item.name}</h2>
+               <p class="itemQuantityBadge">
+               Qty: ${item.quantity}</p>
+               </div>
     <div class="itemActionButtons">
-
         <button
     class="
         modernActionButton
@@ -164,7 +132,6 @@ function renderItems(items) {
         ${isFavorite ? "♥" : "♡"}
     </span>
 </button>
-
         ${
           appState.activeTab === "favorites"
             ? `
@@ -193,11 +160,8 @@ function renderItems(items) {
 </button>
             `
         }
-
     </div>
-
 </div>
-
                     <p class="itemDetails">
                         Notes: ${item.notes || "-"}
                     </p>

@@ -6,23 +6,24 @@ Reset * {
 }
 /* Root Variables */
 :root {
-  --primaryColor: #2f7e94;
-  --greenColor: #18b34a;
-  --backgroundColor: #f5f5f5;
+  --primaryColor: #118ab2;
+  --primaryDark: #0f6d8d;
+  --successColor: #10b981;
+  --dangerColor: #ef4444;
+  --warningColor: #f59e0b;
+  --backgroundColor: #f4f7fb;
   --cardColor: #ffffff;
-  --textColor: #111111;
-  --borderColor: #dddddd;
-  --footerColor: #ffffff;
-  --overlayColor: rgba(0, 0, 0, 0.4);
-  --borderRadiusSmall: 12px;
-  --borderRadiusMedium: 18px;
-  --borderRadiusLarge: 28px;
-  --spacingSmall: 8px;
-  --spacingMedium: 16px;
-  --spacingLarge: 24px;
-  --headerHeight: 72px;
-  --footerHeight: 50px;
-  --animationSpeed: 0.3s;
+  --textColor: #111827;
+  --mutedTextColor: #6b7280;
+  --borderColor: #e5e7eb;
+  --overlayColor: rgba(0, 0, 0, 0.45);
+  --shadowSmall: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadowMedium: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadowLarge: 0 12px 36px rgba(0, 0, 0, 0.14);
+  --radiusSmall: 14px;
+  --radiusMedium: 20px;
+  --radiusLarge: 28px;
+  --animationSpeed: 0.24s;
 }
 /* HTML */
 html {
@@ -32,7 +33,7 @@ html {
 /* Body */
 body {
   font-family: Arial, sans-serif;
-  background: #f4f7fb;
+  background: var(--backgroundColor);
   color: var(--textColor);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -132,12 +133,15 @@ body {
 }
 /* Category Title */
 .categoryTitle {
-  font-size: 20px;
+  /* font-size: 20px; */
   margin-bottom: 10px;
-  font-weight: 700;
+  /* font-weight: 700; */
   margin-bottom: 16px;
   position: relative;
   z-index: 2;
+  font-size: 24px;
+  font-weight: 700;
+  /* margin-bottom: 18px; */
 }
 /* Category Info */
 .categoryInfo {
@@ -226,22 +230,20 @@ body {
 .bottomSheet {
   position: fixed;
   left: 0;
+  right: 0;
   bottom: 0;
-  width: 100%;
-  background-color: var(--cardColor);
-  border-top-left-radius: var(--borderRadiusLarge);
-  border-top-right-radius: var(--borderRadiusLarge);
-  padding: var(--spacingLarge);
-  z-index: 50;
-  transform: translateY(0);
-  transition: transform var(--animationSpeed);
-  min-height: 250px;
+  background: var(--cardColor);
+  border-top-left-radius: 34px;
+  border-top-right-radius: 34px;
+  padding: 20px 20px 34px;
+  z-index: 9999;
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.18);
   transform: translateY(100%);
-  transition: transform 0.25s ease;
+  transition: transform 0.24s ease;
 }
 /* Bottom Sheet Visible */
 .bottomSheet:not(.hidden) {
-  transform: translateY(0%);
+  transform: translateY(0);
 }
 /* Hidden Bottom Sheet */
 .bottomSheet.hidden {
@@ -295,29 +297,18 @@ body {
 }
 /* Delete Button */
 .bottomSheetDeleteButton {
-  flex: 1;
-  height: 54px;
-  border: none;
-  border-radius: 18px;
-  background: #ef4444;
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
   width: 100%;
-  min-height: 56px;
+  min-height: 54px;
   border: none;
-  border-radius: 16px;
-  background: #ef4444;
+  border-radius: var(--radiusMedium);
+  background: var(--dangerColor);
   color: white;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 .bottomSheetDeleteButton:active {
   transform: scale(0.98);
@@ -356,33 +347,37 @@ body {
 }
 /* Primary Button */
 .primaryButton {
-  flex: 1;
-  height: 54px;
+  min-height: 54px;
   border: none;
-  border-radius: 18px;
-  background-color: var(--primaryColor);
+  border-radius: var(--radiusMedium);
+  background: linear-gradient(135deg, var(--primaryColor), var(--primaryDark));
   color: white;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
+  padding: 0 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  box-shadow: 0 10px 24px rgba(17, 138, 178, 0.22);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .primaryButton:active {
   transform: scale(0.98);
 }
 /* Secondary Button */
 .secondaryButton {
-  min-width: 96px;
-  height: 54px;
+  min-height: 54px;
   border: none;
-  border-radius: 18px;
-  background-color: #f1f1f1;
-  color: #111111;
+  border-radius: var(--radiusMedium);
+  background: #f3f4f6;
+  color: var(--textColor);
   font-size: 16px;
   font-weight: 600;
   padding: 0 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 .secondaryButton:active {
   transform: scale(0.98);
@@ -407,27 +402,15 @@ body {
 /* Category Card */
 .categoryCard {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   overflow: hidden;
-  min-height: 124px;
-  padding: 22px;
-  background: #fff;
-  border-radius: 28px;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.06);
+  background: var(--cardColor);
+  border-radius: var(--radiusLarge);
+  padding: 24px;
+  min-height: 140px;
+  box-shadow: var(--shadowMedium);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 10px;
-  min-height: 124px;
-  padding: 24px;
-  background-color: white;
 }
 /* Category Hover Active */
 .categoryCard:active {
@@ -553,20 +536,30 @@ body {
 }
 /* Item Card */
 .itemCard {
-  background-color: var(--cardColor);
-  border-radius: var(--borderRadiusMedium);
-  padding: 18px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  background: var(--cardColor);
+  border-radius: 26px;
+  padding: 16px 18px;
+  margin-bottom: 0;
+  box-shadow: var(--shadowMedium);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 /* Item Name */
 .itemName {
-  font-size: 18px;
-  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: 10px;
 }
 /* Item Details */
 .itemDetails {
   font-size: 14px;
   color: #777777;
+  margin-top: 4px;
+  line-height: 1.3;
 }
 /* Item Card Top Row */
 .itemCardTopRow {
@@ -598,74 +591,93 @@ body {
 /* Swipe Wrapper */
 .swipeWrapper {
   position: relative;
+
   overflow: hidden;
-  border-radius: var(--borderRadiusMedium);
+
+  border-radius: 28px;
+
+  margin-bottom: 16px;
+
+  display: inline-block;
+
+  width: 100%;
 }
 /* Swipe Background */
 .swipeBackground {
   position: absolute;
+
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
+
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  border-radius: var(--borderRadiusMedium);
+
+  border-radius: inherit;
+
   overflow: hidden;
+
+  z-index: 1;
+
+  /* opacity: 0; */
+  transition: opacity 0.15s ease;
 }
 /* Purchased Swipe */
 .swipePurchased {
-  background-color: #18b34a;
+  flex: 1;
+  background: #16a34a;
   color: white;
-  height: 97%;
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  border-radius: var(--borderRadiusMedium);
+  justify-content: flex-start;
+  padding-left: 28px;
+  font-size: 15px;
+  font-weight: 700;
 }
 /* Delete Swipe */
 .swipeDelete {
-  background-color: #d9534f;
+  flex: 1;
+  background: #ef4444;
   color: white;
-  height: 97%;
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  border-radius: var(--borderRadiusMedium);
+  justify-content: flex-end;
+  padding-right: 28px;
+  font-size: 15px;
+  font-weight: 700;
 }
 /* Swipe Card */
 .swipeCard {
   position: relative;
   z-index: 2;
+  background: white;
+  border-radius: 28px;
   transition: transform 0.2s ease;
-  touch-action: pan-y;
-  will-change: transform;
 }
 /* Swipe Active */
 .swipeCard:active {
   transition: none;
+  opacity: 1;
 }
 /* Snackbar */
 .snackbar {
   position: fixed;
-  bottom: 90px;
   left: 50%;
+  bottom: 90px;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  max-width: 360px;
+  max-width: 80%;
+  background: #111827;
+  color: white;
+  border-radius: 22px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 18px;
-  background: #1f1f1f;
-  color: #fff;
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadowLarge);
   z-index: 9999;
-  animation: snackbarSlideUp 0.25s ease;
+  animation: snackbarSlideUp 0.22s ease;
 }
 /* Snackbar Undo Button */
 .snackbarUndoButton {
@@ -784,14 +796,12 @@ body {
   box-shadow: 0 0 0 4px rgba(17, 138, 178, 0.08);
 }
 .snackbarButton {
-  background: transparent;
   border: none;
-  color: #22c55e;
+  background: transparent;
+  color: #38bdf8;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  padding: 0;
-  margin: 0;
 }
 .duplicateMessage {
   font-size: 15px;
@@ -822,17 +832,13 @@ body {
   width: 48px;
   height: 48px;
   border: none;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.7);
+  font-size: 20px;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .modernActionButton:active {
   transform: scale(0.94);
@@ -840,16 +846,15 @@ body {
 .activeFavoriteButton {
   background: #e11d48;
   color: white;
-  background: linear-gradient(145deg, #ff4d79, #e11d48);
-  color: white;
+  box-shadow: 0 8px 20px rgba(225, 29, 72, 0.28);
 }
 .activePurchasedButton {
-  background: #059669 !important;
-  color: white !important;
   font-size: 22px;
   font-weight: 700;
   background: linear-gradient(145deg, #10b981, #059669);
-  color: white;
+  /* background: var(--successColor) !important; */
+  color: white !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
 }
 .addActionButton {
   background: #eff6ff;
@@ -878,11 +883,11 @@ body {
 }
 .bulkActionBar {
   position: fixed;
-  bottom: 82px;
+  bottom: 150px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 32px);
-  max-width: 380px;
+  max-width: 80%;
   background: white;
   border-radius: 22px;
   padding: 14px 18px;
@@ -1041,15 +1046,13 @@ body {
   width: 100px;
   height: 100px;
   border-radius: 24px;
-  background: #dbeafe;
+  /* background: #dbeafe; */
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
   font-weight: 700;
-  color: #2563eb;
 }
-
 .authLogo {
   width: 100px;
 }
@@ -1126,21 +1129,14 @@ body {
   margin-bottom: 28px;
 }
 .memberCard {
-  background: white;
-  border-radius: 22px;
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-  position: relative;
-  background: white;
-  border-radius: 24px;
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  background: var(--cardColor);
+  border-radius: var(--radiusLarge);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadowMedium);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .memberInfo {
   display: flex;
@@ -1380,7 +1376,6 @@ body {
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
-
 /* Notifications */
 .notificationCard {
   background: white;
@@ -1389,7 +1384,6 @@ body {
   margin-bottom: 16px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
-
 .notificationTitle {
   font-size: 16px;
   font-weight: 600;
@@ -1399,7 +1393,6 @@ body {
   color: #6b7280;
   font-size: 14px;
 }
-
 /* Budget */
 .budgetHero {
   background: linear-gradient(135deg, #118ab2, #0f6d8d);
@@ -1442,7 +1435,16 @@ body {
   background: #111827;
   color: white;
 }
-
+/* UTILITIES */
+.hidden {
+  display: none !important;
+}
+.clickable {
+  cursor: pointer;
+}
+.fullWidth {
+  width: 100%;
+}
 /* PASTE ABOVE THIS FOR NORMAL CSS ATTRIBUTES */
 /* KEYFRAMES FOR ANIMATION */
 @keyframes snackbarSlideUp {
