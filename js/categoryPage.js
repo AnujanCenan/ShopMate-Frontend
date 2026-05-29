@@ -105,7 +105,13 @@ function renderItems(items) {
                         🗑 Delete
                     </div>
                 </div>
-               <div class="itemCard swipeCard ${appState.selectedItems.includes(item.name) ? "selectedItem" : ""}"data-item-name="${item.name}"onclick="${"appState.selectionMode ? toggleItemSelection('" + item.name + "') : "}"oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.name}');">
+               <div class="itemCard swipeCard ${
+                 appState.selectedItems.includes(item.name)
+                   ? "selectedItem"
+                   : " "
+               }" data-item-name="${
+                 item.name
+               }" onclick="${"appState.selectionMode ? toggleItemSelection('" + item.name + "') : "}" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.name}');">
                <div class="itemCardTopRow">
                <div class="itemTitleSection">
                <h2 class="itemName" onclick=" event.stopPropagation();
@@ -116,33 +122,17 @@ function renderItems(items) {
                <p class="itemQuantityBadge">
                Qty: ${item.quantity}</p>
                </div>
-    <div class="itemActionButtons">
-        <button
-    class="
-        modernActionButton
-        favoriteActionButton
-        ${isFavorite ? "activeFavoriteButton" : ""}
-    "
-    onclick="
-        event.stopPropagation();
-        toggleFavorite('${item.name}');
-    "
->
-    <span class="actionButtonIcon">
-        ${isFavorite ? "♥" : "♡"}
-    </span>
-</button>
-        ${
-          appState.activeTab === "favorites"
-            ? `
-            <button
-                class="modernActionButton addActionButton"
-                onclick="addFavoriteToList('${item.name}')"
-            >
-                +
-            </button>
+               <div class="itemActionButtons">
+               <button class="modernActionButton favoriteActionButton ${isFavorite ? "activeFavoriteButton" : ""} " onclick="event.stopPropagation(); toggleFavorite('${item.name}');">
+               <span class="actionButtonIcon">
+               ${isFavorite ? "♥" : "♡"}
+               </span>
+               </button>
+               ${
+                 appState.activeTab === "favorites"
+                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.name}')">+</button>
             `
-            : `
+                   : `
             <button
     class="
         modernActionButton
@@ -159,7 +149,7 @@ function renderItems(items) {
     </span>
 </button>
             `
-        }
+               }
     </div>
 </div>
                     <p class="itemDetails">
