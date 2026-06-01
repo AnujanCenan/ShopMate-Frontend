@@ -5,132 +5,102 @@ const bottomSheetContent = document.getElementById("bottomSheetContent");
 /* Render Add Item Form */
 function renderAddItemForm() {
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Add Item
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                ✕
-            </button>
+    <div class="bottomSheetHeader">
+      <h2>
+        Add Item
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="formField">
+        <label class="formLabel">
+          Item Name
+        </label>
+        <input
+          type="text"
+          id="itemNameInput"
+          class="bottomSheetInput"
+          placeholder="Enter Item Name"
+        >
+      </div>
+      <div class="formRow">
+        <div class="halfWidthField">
+          <label class="formLabel">
+            Quantity
+          </label>
+          <input
+            type="number"
+            id="itemQuantityInput"
+            class="bottomSheetInput"
+            placeholder="Enter Quantity"
+          >
         </div>
-        <div class="bottomSheetBody">
+        <div class="halfWidthField">
+          <label class="formLabel">
+            Estimated Price
+          </label>
+          <div class="currencyInputWrapper">
+            <span class="currencySymbol">
+              $
+            </span>
             <input
-                type="text"
-                placeholder="Item Name"
-                class="bottomSheetInput"
-                id="itemNameInput"
+              type="number"
+              id="itemPriceInput"
+              class="
+                bottomSheetInput
+                currencyInput
+              "
+              placeholder="Enter Estimated Price"
             >
-            <input
-                type="number"
-                placeholder="Quantity"
-                class="bottomSheetInput"
-                id="itemQuantityInput"
-            >
-            <input
-                type="text"
-                placeholder="Notes"
-                class="bottomSheetInput"
-                id="itemNotesInput"
-            >
-            <input
-                type="text"
-                placeholder="Preferred Shop"
-                class="bottomSheetInput"
-                id="itemShopInput"
-            >
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="closeBottomSheet()"
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="createItem()"
-                >
-                    Add Item
-                </button>
-            </div>
+          </div>
         </div>
-    `;
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          Preferred Shop
+        </label>
+        <input
+          type="text"
+          id="itemShopInput"
+          class="bottomSheetInput"
+          placeholder="Enter Preferred Shop"
+        >
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          Notes
+        </label>
+        <input
+          type="text"
+          id="itemNotesInput"
+          class="bottomSheetInput"
+          placeholder="Enter Notes"
+        >
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="closeBottomSheet()"
+        >
+          Cancel
+        </button>
+        <button
+          class="primaryButton"
+          onclick="createItem()"
+        >
+          Add Item
+        </button>
+      </div>
+    </div>
+  `;
   openBottomSheet();
   initializeItemForm();
 }
-/* Render Edit Item Form */
-// function renderEditItemForm(itemName) {
-//   const currentCategory = getActiveCategory();
-//   if (!currentCategory) {
-//     return;
-//   }
-//   const item = currentCategory.items.find(function (item) {
-//     return item.name === itemName;
-//   });
-//   if (!item) {
-//     return;
-//   }
-//   bottomSheetContent.innerHTML = `
-//         <div class="bottomSheetHeader">
-//             <h2>
-//                 Edit Item
-//             </h2>
-//             <button
-//                 class="closeButton"
-//                 onclick="closeBottomSheet()"
-//             >
-//                 ✕
-//             </button>
-//         </div>
-//         <div class="bottomSheetBody">
-//             <input
-//                 type="text"
-//                 placeholder="Item Name"
-//                 class="bottomSheetInput"
-//                 id="editItemNameInput"
-//                 value="${item.name}"
-//             >
-//             <input
-//                 type="number"
-//                 placeholder="Quantity"
-//                 class="bottomSheetInput"
-//                 id="editItemQuantityInput"
-//                 value="${item.quantity}"
-//             >
-//             <input
-//                 type="text"
-//                 placeholder="Notes"
-//                 class="bottomSheetInput"
-//                 id="editItemNotesInput"
-//                 value="${item.notes || ""}"
-//             >
-//             <input
-//                 type="text"
-//                 placeholder="Preferred Shop"
-//                 class="bottomSheetInput"
-//                 id="editItemShopInput"
-//                 value="${item.preferredShop || ""}"
-//             >
-//             <div class="bottomSheetButtonRow">
-//                 <button
-//                     class="secondaryButton"
-//                     onclick="closeBottomSheet()"
-//                 >
-//                     Cancel
-//                 </button>
-//                 <button
-//                     class="primaryButton"
-//                     onclick="updateItem('${item.name}')"
-//                 >
-//                     Save Changes
-//                 </button>
-//             </div>
-//         </div>
-//     `;
-//   openBottomSheet();
-// }
 /* Render Edit Item Form */
 function renderEditItemForm(itemName) {
   const currentCategory = getActiveCategory();
@@ -144,62 +114,99 @@ function renderEditItemForm(itemName) {
     return;
   }
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Edit Item
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                ✕
-            </button>
+    <div class="bottomSheetHeader">
+      <h2>
+        Edit Item
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="formField">
+        <label class="formLabel">
+          Item Name
+        </label>
+        <input
+          type="text"
+          id="editItemNameInput"
+          class="bottomSheetInput"
+          value="${item.name}"
+        >
+      </div>
+      <div class="formRow">
+        <div class="halfWidthField">
+          <label class="formLabel">
+            Quantity
+          </label>
+          <input
+            type="number"
+            id="editItemQuantityInput"
+            class="bottomSheetInput"
+            value="${item.quantity}"
+          >
         </div>
-        <div class="bottomSheetBody">
+        <div class="halfWidthField">
+          <label class="formLabel">
+            Estimated Price
+          </label>
+          <div class="currencyInputWrapper">
+            <span class="currencySymbol">
+              $
+            </span>
             <input
-                type="text"
-                placeholder="Item Name"
-                class="bottomSheetInput"
-                id="editItemNameInput"
-                value="${item.name}"
+              type="number"
+              id="editItemPriceInput"
+              class="
+                bottomSheetInput
+                currencyInput
+              "
+              value="${item.estimatedPrice || 0}"
             >
-            <input
-                type="number"
-                placeholder="Quantity"
-                class="bottomSheetInput"
-                id="editItemQuantityInput"
-                value="${item.quantity}"
-            >
-            <input
-                type="text"
-                placeholder="Notes"
-                class="bottomSheetInput"
-                id="editItemNotesInput"
-                value="${item.notes || ""}"
-            >
-            <input
-                type="text"
-                placeholder="Preferred Shop"
-                class="bottomSheetInput"
-                id="editItemShopInput"
-                value="${item.preferredShop || ""}"
-            >
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="closeBottomSheet()"
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="updateItem('${item.name}')"
-                >
-                    Save Changes
-                </button>
-            </div>
+          </div>
         </div>
-    `;
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          Notes
+        </label>
+        <input
+          type="text"
+          id="editItemNotesInput"
+          class="bottomSheetInput"
+          value="${item.notes || ""}"
+        >
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          Preferred Shop
+        </label>
+        <input
+          type="text"
+          id="editItemShopInput"
+          class="bottomSheetInput"
+          value="${item.preferredShop || ""}"
+        >
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="closeBottomSheet()"
+        >
+          Cancel
+        </button>
+        <button
+          class="primaryButton"
+          onclick="updateItem('${item.name}')"
+        >
+          Save Changes
+        </button>
+      </div>
+    </div>
+  `;
   openBottomSheet();
 }
 /* Initialize Item Form */
@@ -236,43 +243,6 @@ function initializeItemForm() {
   });
 }
 /* Create Item */
-// function createItem() {
-//   const itemNameInput = document.getElementById("itemNameInput");
-//   const itemQuantityInput = document.getElementById("itemQuantityInput");
-//   const itemNotesInput = document.getElementById("itemNotesInput");
-//   const itemShopInput = document.getElementById("itemShopInput");
-//   const itemName = itemNameInput.value.trim();
-//   const itemQuantity = itemQuantityInput.value.trim();
-//   const itemNotes = itemNotesInput.value.trim();
-//   const itemShop = itemShopInput.value.trim();
-//   if (!itemName || !itemQuantity) {
-//     showSnackbar("Please enter item details");
-//     return;
-//   }
-//   const currentCategory = getActiveCategory();
-//   if (!currentCategory) {
-//     return;
-//   }
-//   const existingItem = currentCategory.items.find(function (item) {
-//     return item.name.toLowerCase() === itemName.toLowerCase();
-//   });
-//   if (existingItem) {
-//     showSnackbar("Item already exists");
-//     return;
-//   }
-//   currentCategory.items.unshift({
-//     name: itemName,
-//     quantity: itemQuantity,
-//     notes: itemNotes,
-//     preferredShop: itemShop,
-//     purchased: false,
-//   });
-//   saveAppState();
-//   renderFilteredItems();
-//   closeBottomSheet();
-//   showSnackbar("Item added");
-// }
-/* Create Item */
 function createItem() {
   const itemNameInput = document.getElementById("itemNameInput");
   const itemQuantityInput = document.getElementById("itemQuantityInput");
@@ -282,6 +252,8 @@ function createItem() {
   const itemQuantity = itemQuantityInput.value.trim();
   const itemNotes = itemNotesInput.value.trim();
   const itemShop = itemShopInput.value.trim();
+  const itemPrice =
+    Number(document.getElementById("itemPriceInput").value) || 0;
   if (!itemName || !itemQuantity) {
     showSnackbar("Please enter item details");
     return;
@@ -341,6 +313,9 @@ function createItem() {
     quantity: itemQuantity,
     notes: itemNotes,
     preferredShop: itemShop,
+    estimatedPrice: itemPrice,
+    actualPrice: 0,
+    purchaseDate: null,
     purchased: false,
   });
   saveAppState();
@@ -367,39 +342,6 @@ function updateDuplicateQuantity(itemName, newQuantity) {
   showSnackbar("Quantity updated");
 }
 /* Update Item */
-// function updateItem(originalItemName) {
-//   const currentCategory = getActiveCategory();
-//   if (!currentCategory) {
-//     return;
-//   }
-//   const item = currentCategory.items.find(function (item) {
-//     return item.name === originalItemName;
-//   });
-//   if (!item) {
-//     return;
-//   }
-//   const updatedName = document.getElementById("editItemNameInput").value.trim();
-//   const updatedQuantity = document
-//     .getElementById("editItemQuantityInput")
-//     .value.trim();
-//   const updatedNotes = document
-//     .getElementById("editItemNotesInput")
-//     .value.trim();
-//   const updatedShop = document.getElementById("editItemShopInput").value.trim();
-//   if (!updatedName || !updatedQuantity) {
-//     showSnackbar("Please enter item details");
-//     return;
-//   }
-//   item.name = updatedName;
-//   item.quantity = updatedQuantity;
-//   item.notes = updatedNotes;
-//   item.preferredShop = updatedShop;
-//   saveAppState();
-//   renderFilteredItems();
-//   closeBottomSheet();
-//   showSnackbar("Item updated");
-// }
-/* Update Item */
 function updateItem(originalItemName) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
@@ -419,6 +361,8 @@ function updateItem(originalItemName) {
     .getElementById("editItemNotesInput")
     .value.trim();
   const updatedShop = document.getElementById("editItemShopInput").value.trim();
+  const updatedPrice =
+    Number(document.getElementById("editItemPriceInput").value) || 0;
   if (!updatedName || !updatedQuantity) {
     showSnackbar("Please enter item details");
     return;
@@ -437,6 +381,7 @@ function updateItem(originalItemName) {
   item.quantity = updatedQuantity;
   item.notes = updatedNotes;
   item.preferredShop = updatedShop;
+  item.estimatedPrice = updatedPrice;
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();

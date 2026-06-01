@@ -112,7 +112,6 @@ function renderItems(items) {
                }" data-item-name="${
                  item.name
                }" onclick=" event.stopPropagation();
-
     if(appState.selectionMode){
         toggleItemSelection('${item.name}');
     }" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.name}');">
@@ -162,6 +161,10 @@ function renderItems(items) {
                     <p class="itemDetails">
                         Shop: ${item.preferredShop || "-"}
                     </p>
+                    <p class="itemDetails">
+    Est Price:
+    $${item.estimatedPrice || 0}
+</p>
                 </div>
             </div>
         `;
