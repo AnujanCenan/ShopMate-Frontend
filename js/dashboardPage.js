@@ -252,7 +252,7 @@ function createCategory() {
   if (!appState.budgets) {
     appState.budgets = {
       groupBudget: {
-        monthlyLimit: 20000,
+        monthlyLimit: 50000,
         spent: 0,
       },
       categoryBudgets: {},

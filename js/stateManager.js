@@ -9,6 +9,7 @@ const defaultAppState = {
   selectionMode: false,
   selectedItems: [],
   favoriteItems: [],
+  productCatalog: {},
   users: [
     {
       id: "user_1",
@@ -65,7 +66,7 @@ const defaultAppState = {
   ],
   budgets: {
     groupBudget: {
-      monthlyLimit: 20000,
+      monthlyLimit: 50000,
       spent: 0,
     },
     categoryBudgets: {
@@ -85,7 +86,7 @@ function loadAppState() {
   if (!parsedState.budgets) {
     parsedState.budgets = {
       groupBudget: {
-        monthlyLimit: 20000,
+        monthlyLimit: 50000,
         spent: 0,
       },
       categoryBudgets: {

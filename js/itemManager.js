@@ -241,6 +241,23 @@ function initializeItemForm() {
   const itemQuantityInput = document.getElementById("itemQuantityInput");
   const itemNotesInput = document.getElementById("itemNotesInput");
   const itemShopInput = document.getElementById("itemShopInput");
+  const itemPriceInput = document.getElementById("itemPriceInput");
+  itemNameInput.addEventListener("blur", function () {
+    const product =
+      appState.productCatalog?.[itemNameInput.value.trim().toLowerCase()];
+
+    if (!product) {
+      return;
+    }
+
+    if (!itemPriceInput.value) {
+      itemPriceInput.value = product.defaultPrice;
+    }
+
+    if (!itemShopInput.value) {
+      itemShopInput.value = product.preferredShop;
+    }
+  });
   if (!itemNameInput) {
     return;
   }
@@ -385,17 +402,29 @@ function createItem() {
         `;
     return;
   }
-  currentCategory.items.unshift({
+  const newItem = {
     name: itemName,
+
     quantity: itemQuantity,
+
     notes: itemNotes,
+
     preferredShop: itemShop,
+
     imageUrl: imageUrl,
+
     estimatedPrice: itemPrice,
+
     actualPrice: 0,
+
     purchaseDate: null,
+
     purchased: false,
-  });
+  };
+
+  currentCategory.items.unshift(newItem);
+
+  saveProductToCatalog(newItem);
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
@@ -464,10 +493,26 @@ function updateItem(originalItemName) {
   item.preferredShop = updatedShop;
   item.estimatedPrice = updatedPrice;
   item.imageUrl = updatedImage;
+  saveProductToCatalog(item);
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item updated");
+}
+
+/*Save Product to Catalog */
+function saveProductToCatalog(item) {
+  if (!appState.productCatalog) {
+    appState.productCatalog = {};
+  }
+
+  appState.productCatalog[item.name.toLowerCase()] = {
+    imageUrl: item.imageUrl || "",
+
+    defaultPrice: item.estimatedPrice || 0,
+
+    preferredShop: item.preferredShop || "",
+  };
 }
 /*  Purchase Confirmation */
 function openPurchaseConfirmation(itemName) {

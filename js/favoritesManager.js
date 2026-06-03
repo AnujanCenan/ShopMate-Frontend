@@ -37,6 +37,14 @@ function toggleFavorite(itemName) {
       notes: currentItem.notes,
 
       preferredShop: currentItem.preferredShop,
+
+      imageUrl: currentItem.imageUrl || "",
+
+      estimatedPrice: currentItem.estimatedPrice || 0,
+
+      actualPrice: currentItem.actualPrice || 0,
+
+      purchaseDate: currentItem.purchaseDate || null,
     });
   }
   saveAppState();
@@ -80,6 +88,14 @@ function addFavoriteToList(itemName) {
     notes: favoriteItem.notes,
 
     preferredShop: favoriteItem.preferredShop,
+
+    imageUrl: favoriteItem.imageUrl || "",
+
+    estimatedPrice: favoriteItem.estimatedPrice || 0,
+
+    actualPrice: 0,
+
+    purchaseDate: null,
 
     purchased: false,
   });
