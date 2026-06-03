@@ -1625,6 +1625,45 @@ body {
 .hidden {
   display: none;
 }
+/*Product Suggestion*/
+.productSuggestions {
+  margin-top: 6px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--cardColor);
+}
+.productSuggestionItem {
+  padding: 12px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.productSuggestionItem:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+/*Product Card */
+.catalogCard {
+  background: var(--cardColor);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadowMedium);
+}
+.catalogCardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+.catalogImage {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+.catalogActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
 /* PASTE ABOVE THIS FOR NORMAL CSS ATTRIBUTES */
 /* KEYFRAMES FOR ANIMATION */
 @keyframes snackbarSlideUp {

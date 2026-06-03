@@ -27,6 +27,7 @@ function renderAddItemForm() {
           class="bottomSheetInput"
           placeholder="Enter Item Name"
         >
+        <div id="productSuggestions" class="productSuggestions"></div>
       </div>
       <div class="formRow">
         <div class="halfWidthField">
@@ -106,6 +107,7 @@ function renderAddItemForm() {
   openBottomSheet();
   initializeItemForm();
   initializeImagePreview();
+  initializeProductSuggestions();
 }
 /* Render Edit Item Form */
 function renderEditItemForm(itemName) {
@@ -242,18 +244,16 @@ function initializeItemForm() {
   const itemNotesInput = document.getElementById("itemNotesInput");
   const itemShopInput = document.getElementById("itemShopInput");
   const itemPriceInput = document.getElementById("itemPriceInput");
+  const imagePreview = document.getElementById("itemImagePreview");
   itemNameInput.addEventListener("blur", function () {
     const product =
       appState.productCatalog?.[itemNameInput.value.trim().toLowerCase()];
-
     if (!product) {
       return;
     }
-
     if (!itemPriceInput.value) {
       itemPriceInput.value = product.defaultPrice;
     }
-
     if (!itemShopInput.value) {
       itemShopInput.value = product.preferredShop;
     }
@@ -284,6 +284,23 @@ function initializeItemForm() {
       createItem();
     }
   });
+  itemNameInput.addEventListener("blur", function () {
+    const product =
+      appState.productCatalog?.[itemNameInput.value.trim().toLowerCase()];
+    if (!product) {
+      return;
+    }
+    if (!itemPriceInput.value) {
+      itemPriceInput.value = product.defaultPrice;
+    }
+    if (!itemShopInput.value) {
+      itemShopInput.value = product.preferredShop;
+    }
+    if (product.imageUrl) {
+      imagePreview.src = product.imageUrl;
+      imagePreview.classList.remove("hidden");
+    }
+  });
 }
 /*Image Preview */
 function initializeImagePreview() {
@@ -305,32 +322,73 @@ function initializeImagePreview() {
     reader.readAsDataURL(file);
   });
 }
-
+/* Product Suggestion */
+function initializeProductSuggestions() {
+  const itemNameInput = document.getElementById("itemNameInput");
+  const suggestionsContainer = document.getElementById("productSuggestions");
+  if (!itemNameInput || !suggestionsContainer) {
+    return;
+  }
+  itemNameInput.addEventListener("input", function () {
+    const searchText = itemNameInput.value.trim().toLowerCase();
+    suggestionsContainer.innerHTML = "";
+    if (searchText.length < 2) {
+      return;
+    }
+    const matches = Object.keys(appState.productCatalog || {}).filter(
+      function (productName) {
+        return productName.includes(searchText);
+      },
+    );
+    matches.slice(0, 5).forEach(function (productName) {
+      suggestionsContainer.innerHTML += `
+            <div
+              class="productSuggestionItem"
+              onclick="
+                selectProductSuggestion(
+                  '${productName}'
+                )
+              "
+            >
+              ${productName}
+            </div>
+          `;
+    });
+  });
+}
+/* Select Product Suggestion */
+function selectProductSuggestion(productName) {
+  const product = appState.productCatalog[productName];
+  if (!product) {
+    return;
+  }
+  document.getElementById("itemNameInput").value = productName;
+  document.getElementById("itemPriceInput").value = product.defaultPrice || "";
+  document.getElementById("itemShopInput").value = product.preferredShop || "";
+  const preview = document.getElementById("itemImagePreview");
+  if (product.imageUrl) {
+    preview.src = product.imageUrl;
+    preview.classList.remove("hidden");
+  }
+  document.getElementById("productSuggestions").innerHTML = "";
+}
 /* Image Preview for Edit Form */
 function initializeEditImagePreview() {
   const imageInput = document.getElementById("editItemImageInput");
-
   const preview = document.getElementById("editItemImagePreview");
-
   if (!imageInput || !preview) {
     return;
   }
-
   imageInput.addEventListener("change", function (event) {
     const file = event.target.files[0];
-
     if (!file) {
       return;
     }
-
     const reader = new FileReader();
-
     reader.onload = function (e) {
       preview.src = e.target.result;
-
       preview.classList.remove("hidden");
     };
-
     reader.readAsDataURL(file);
   });
 }
@@ -404,27 +462,17 @@ function createItem() {
   }
   const newItem = {
     name: itemName,
-
     quantity: itemQuantity,
-
     notes: itemNotes,
-
     preferredShop: itemShop,
-
     imageUrl: imageUrl,
-
     estimatedPrice: itemPrice,
-
     actualPrice: 0,
-
     purchaseDate: null,
-
     purchased: false,
   };
-
   currentCategory.items.unshift(newItem);
-
-  saveProductToCatalog(newItem);
+  saveProductToCatalog(currentCategory.items[0]);
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
@@ -499,18 +547,14 @@ function updateItem(originalItemName) {
   closeBottomSheet();
   showSnackbar("Item updated");
 }
-
 /*Save Product to Catalog */
 function saveProductToCatalog(item) {
   if (!appState.productCatalog) {
     appState.productCatalog = {};
   }
-
   appState.productCatalog[item.name.toLowerCase()] = {
     imageUrl: item.imageUrl || "",
-
     defaultPrice: item.estimatedPrice || 0,
-
     preferredShop: item.preferredShop || "",
   };
 }

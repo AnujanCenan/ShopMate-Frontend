@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Product Catalog</title>
+    <link rel="stylesheet" href="../css/appStyles.css" />
+  </head>
+  <body>
+    <header class="pageHeader">
+      <button class="backButton" onclick="history.back()">←</button>
+      <h1>Product Catalog</h1>
+    </header>
+    <div class="pageContent">
+      <input
+        type="text"
+        id="productSearchInput"
+        class="bottomSheetInput"
+        placeholder="Search Products"
+      />
+      <div id="productCatalogList"></div>
+    </div>
+    <script src="../js/stateManager.js"></script>
+    <script src="../js/productCatalogPage.js"></script>
+  </body>
+</html>

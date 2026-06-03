@@ -641,6 +641,15 @@ function renderDashboardMenu() {
   class="bottomSheetActionButton"
   onclick="
     window.location.href =
+    '../pages/productCatalogPage.html'
+  "
+>
+  📦 Product Catalog
+</button>
+<button
+  class="bottomSheetActionButton"
+  onclick="
+    window.location.href =
     '../pages/settingsPage.html'
   "
 >
