@@ -1,67 +1,48 @@
 <!doctype html>
-
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Group Management</title>
-
     <link rel="stylesheet" href="../css/appStyles.css" />
   </head>
-
   <body>
     <div class="appContainer">
       <header class="modernHeader">
         <button class="modernBackButton" onclick="goBack()">←</button>
-
         <h1 class="modernPageTitle">Group Management</h1>
       </header>
-
       <main class="pageContent">
         <section class="groupManagementHero">
           <div>
             <h2 class="groupManagementTitle" id="groupManagementTitle">
               Family Group
             </h2>
-
             <p class="groupManagementSubtitle" id="groupMemberCount">
               0 Members
             </p>
           </div>
-
           <button class="inviteFloatingButton" id="inviteMemberButton">
             +
           </button>
         </section>
-
         <section class="memberList" id="memberList"></section>
-
         <section class="readOnlyBanner hidden" id="readOnlyBanner">
           You have read-only access in this group.
         </section>
-
         <button class="leaveGroupButton" onclick="openLeaveGroupDialog()">
           Leave Group
         </button>
       </main>
-
       <div class="screenOverlay hidden" id="screenOverlay"></div>
-
       <div class="bottomSheet hidden" id="bottomSheet">
         <div class="bottomSheetHandle"></div>
-
         <div class="bottomSheetContent" id="bottomSheetContent"></div>
       </div>
     </div>
-
     <script src="../js/stateManager.js"></script>
-
     <script src="../js/helpers.js"></script>
-
     <script src="../js/authManager.js"></script>
-
     <script src="../js/groupManagement.js"></script>
   </body>
 </html>
