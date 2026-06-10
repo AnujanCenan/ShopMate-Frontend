@@ -358,7 +358,6 @@ function renameCategory(categoryName) {
         </div>
     `;
 }
-
 /* Save Renamed Category */
 function saveRenamedCategory(categoryName) {
   const renameCategoryInput = document.getElementById("renameCategoryInput");
@@ -491,21 +490,83 @@ function renderGroupActions(groupName) {
 }
 /* Rename Group */
 function renameGroup(groupName) {
-  const newGroupName = alert("Enter new group name", groupName);
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>
+        Rename Group
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="formField">
+        <label class="formLabel">
+          Group Name
+        </label>
+        <input
+          id="renameGroupInput"
+          class="bottomSheetInput"
+          value="${groupName}"
+          placeholder="Enter Group Name"
+        >
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="closeBottomSheet()"
+        >
+          Cancel
+        </button>
+        <button
+          class="primaryButton"
+          onclick="
+            saveRenamedGroup(
+              '${groupName}'
+            )
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  `;
+  openBottomSheet();
+}
+/* Save Renamed Group */
+function saveRenamedGroup(oldGroupName) {
+  const newGroupName = document.getElementById("renameGroupInput").value.trim();
+
   if (!newGroupName) {
+    showDialog("Missing Name", "Please enter a group name.");
+
     return;
   }
-  appState.groups[newGroupName] = appState.groups[groupName];
-  delete appState.groups[groupName];
-  if (appState.activeGroup === groupName) {
+
+  appState.groups[newGroupName] = appState.groups[oldGroupName];
+
+  delete appState.groups[oldGroupName];
+
+  if (appState.activeGroup === oldGroupName) {
     appState.activeGroup = newGroupName;
+
     selectedGroupName.textContent = newGroupName;
+
     localStorage.setItem("activeGroup", newGroupName);
   }
+
   saveAppState();
+
   renderCategories();
+
   closeBottomSheet();
+
+  showToast("Group Renamed");
 }
+
 /* Delete Group */
 function deleteGroup(groupName) {
   const confirmation = confirm("Delete this group?");
@@ -644,54 +705,39 @@ function renderDashboardMenu() {
 }
 function renderBudgetDashboardWidget() {
   const budgetWidget = document.getElementById("budgetDashboardWidget");
-
   if (!budgetWidget || !appState.budgets) {
     return;
   }
-
   const limit = appState.budgets.groupBudget.monthlyLimit;
-
   const spent = appState.budgets.groupBudget.spent;
-
   const remaining = limit - spent;
-
   const percentUsed = Math.min(Math.round((spent / limit) * 100) || 0, 100);
-
   let progressClass = "budgetHealthy";
-
   if (percentUsed >= 80) {
     progressClass = "budgetCritical";
   } else if (percentUsed >= 50) {
     progressClass = "budgetWarning";
   }
-
   let topCategory = "No Spending Yet";
-
   let highestSpend = 0;
-
   Object.entries(appState.budgets.categoryBudgets).forEach(function ([
     name,
     budget,
   ]) {
     if (budget.spent > highestSpend) {
       highestSpend = budget.spent;
-
       topCategory = name;
     }
   });
-
   budgetWidget.innerHTML = `
-
     <div
       class="
         budgetWidgetCard
       "
     >
-
       <h3>
         💰 Budget Snapshot
       </h3>
-
       <p
         class="
           budgetWidgetAmount
@@ -701,13 +747,11 @@ function renderBudgetDashboardWidget() {
         /
         $${limit}
       </p>
-
       <div
         class="
           budgetProgressBar
         "
       >
-
         <div
           class="
             budgetProgressFill
@@ -719,9 +763,7 @@ function renderBudgetDashboardWidget() {
           "
         >
         </div>
-
       </div>
-
       <p
         class="
           budgetWidgetText
@@ -730,7 +772,6 @@ function renderBudgetDashboardWidget() {
         Remaining:
         $${remaining}
       </p>
-
       <p
         class="
           budgetWidgetText
@@ -739,9 +780,7 @@ function renderBudgetDashboardWidget() {
         Top Category:
         ${topCategory}
       </p>
-
     </div>
-
   `;
 }
 /* Export App Data */
