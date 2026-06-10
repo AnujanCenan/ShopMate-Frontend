@@ -1735,7 +1735,7 @@ body {
 /* Dialog Box */
 .appDialog {
   width: 90%;
-  max-width: 380px;
+  max-width: 300px;
   background: white;
   border-radius: 24px;
   padding: 24px;

@@ -358,23 +358,7 @@ function renameCategory(categoryName) {
         </div>
     `;
 }
-// function renameCategory(categoryName) {
-//   const newCategoryName = prompt("Enter new category name", categoryName);
-//   if (!newCategoryName) {
-//     return;
-//   }
-//   const categories = appState.groups[appState.activeGroup];
-//   const category = categories.find(function (item) {
-//     return item.name === categoryName;
-//   });
-//   if (!category) {
-//     return;
-//   }
-//   category.name = newCategoryName;
-//   saveAppState();
-//   renderCategories();
-//   closeBottomSheet();
-// }
+
 /* Save Renamed Category */
 function saveRenamedCategory(categoryName) {
   const renameCategoryInput = document.getElementById("renameCategoryInput");
@@ -507,7 +491,7 @@ function renderGroupActions(groupName) {
 }
 /* Rename Group */
 function renameGroup(groupName) {
-  const newGroupName = prompt("Enter new group name", groupName);
+  const newGroupName = alert("Enter new group name", groupName);
   if (!newGroupName) {
     return;
   }

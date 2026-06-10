@@ -1,5 +1,6 @@
 redirectIfLoggedOut();
 const memberList = document.getElementById("memberList");
+const pendingInviteList = document.getElementById("pendingInviteList");
 const groupManagementTitle = document.getElementById("groupManagementTitle");
 const groupMemberCount = document.getElementById("groupMemberCount");
 const inviteMemberButton = document.getElementById("inviteMemberButton");
@@ -11,6 +12,7 @@ const screenOverlay = document.getElementById("screenOverlay");
 function initializeGroupManagement() {
   renderGroupSwitcher();
   renderMembers();
+  renderPendingInvites();
   setupPermissions();
 }
 /* Render Group Switcher */
@@ -22,10 +24,10 @@ function renderGroupSwitcher() {
   const groups = Object.keys(appState.groups);
   let switcherHTML = `
     <div class="groupSwitcher">
-      <h3 class="groupSwitcherTitle">
-        Your Groups
-      </h3>
-  `;
+      <div class="groupSwitcherHeader">
+        <h3 class="groupSwitcherTitle">Your Groups</h3>
+        <button class="secondaryButton" onclick="renderJoinGroupForm()">Join Group</button>
+      </div>`;
   groups.forEach(function (groupName) {
     switcherHTML += `
       <button
@@ -147,6 +149,168 @@ function renderMembers() {
     `;
   });
 }
+/*Render Pending Invites */
+function renderPendingInvites() {
+  if (!pendingInviteList) {
+    return;
+  }
+  pendingInviteList.innerHTML = "";
+  const activeGroup = appState.activeGroup;
+  const invites = (appState.pendingInvites || []).filter(function (invite) {
+    return invite.groupName === activeGroup;
+  });
+  if (invites.length === 0) {
+    pendingInviteList.innerHTML = `
+      <p class="emptyStateText">
+        No Pending Invites
+      </p>
+    `;
+    return;
+  }
+  invites.forEach(function (invite) {
+    pendingInviteList.innerHTML += `
+      <div class="memberCard">
+        <div class="memberInfo">
+          <div class="memberAvatar">
+            ✉
+          </div>
+          <div>
+            <h3 class="memberName">
+              ${invite.code}
+            </h3>
+            <p class="memberRole">
+              Pending Invite
+            </p>
+            <div
+              class="
+                memberStatusBadge
+                activeStatusBadge
+              "
+            >
+              ${invite.status || "pending"}
+            </div>
+          </div>
+        </div>
+        ${
+          isAdmin()
+            ? `
+              <button
+                class="
+                  memberMoreButton
+                "
+                onclick="
+                  openInviteActions(
+                    '${invite.code}'
+                  )
+                "
+              >
+                ⋮
+              </button>
+            `
+            : ""
+        }
+      </div>
+    `;
+  });
+}
+/*Open Invite Actions */
+function openInviteActions(inviteCode) {
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>
+        Invite Actions
+      </h2>
+      <button
+        class="closeButton"
+        onclick="
+          closeBottomSheet()
+        "
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <button
+        class="secondaryButton"
+        onclick="
+          copyInviteCode(
+            '${inviteCode}'
+          )
+        "
+      >
+        Copy Invite Code
+      </button>
+      <button
+        class="dangerButton"
+        onclick="
+          revokeInvite(
+            '${inviteCode}'
+          )
+        "
+      >
+        Revoke Invite
+      </button>
+    </div>
+  `;
+  openBottomSheet();
+}
+/* Revoke Invite */
+function revokeInvite(inviteCode) {
+  appState.pendingInvites = appState.pendingInvites.filter(function (invite) {
+    return invite.code !== inviteCode;
+  });
+  saveAppState();
+  renderPendingInvites();
+  closeBottomSheet();
+  showToast("Invite Revoked");
+}
+/* Render Join Group Form */
+function renderJoinGroupForm() {
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>
+        Join Group
+      </h2>
+      <button
+        class="closeButton"
+        onclick="
+          closeBottomSheet()
+        "
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <input
+        id="joinInviteCode"
+        class="bottomSheetInput"
+        placeholder="
+          Enter Invite Code
+        "
+      >
+      <button
+        class="primaryButton"
+        onclick="
+          joinGroup()
+        "
+      >
+        Join Group
+      </button>
+    </div>
+  `;
+  openBottomSheet();
+}
+/* Join Group */
+async function joinGroup() {
+  const inviteCode = document.getElementById("joinInviteCode").value.trim();
+  if (!inviteCode) {
+    showDialog("Missing Invite Code", "Please enter an invite code.");
+    return;
+  }
+  await joinGroupByInvite(inviteCode);
+  showToast("Join request submitted");
+  closeBottomSheet();
+}
 /* Open Member Profile */
 function openMemberProfile(memberId) {
   const members = getCurrentGroupMembers();
@@ -231,7 +395,7 @@ function openMemberActions(memberId) {
   openBottomSheet();
 }
 /* Make Admin */
-function makeAdmin(memberId) {
+async function makeAdmin(memberId) {
   const members = getCurrentGroupMembers();
   const member = members.find(function (member) {
     return member.id === memberId;
@@ -239,6 +403,7 @@ function makeAdmin(memberId) {
   if (!member) {
     return;
   }
+  await updateMemberRole(memberId, "admin");
   member.role = "admin";
   saveAppState();
   closeBottomSheet();
@@ -303,7 +468,8 @@ function openRemoveMemberDialog(memberId) {
   `;
 }
 /* Remove Member */
-function removeMember(memberId) {
+async function removeMember(memberId) {
+  await removeGroupMember(memberId);
   const members = getCurrentGroupMembers();
   appState.groupMembers[appState.activeGroup] = members.filter(
     function (member) {
@@ -405,7 +571,7 @@ function openLeaveGroupDialog() {
   openBottomSheet();
 }
 /* Leave Group */
-function leaveCurrentGroup() {
+async function leaveCurrentGroup() {
   const currentUser = getCurrentUser();
   const members = getCurrentGroupMembers();
   const currentMember = members.find(function (member) {
@@ -425,6 +591,7 @@ function leaveCurrentGroup() {
     );
     return;
   }
+  await leaveGroup(appState.activeGroup);
   appState.groupMembers[appState.activeGroup] = members.filter(
     function (member) {
       return member.id !== currentUser.id;
