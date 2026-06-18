@@ -8,14 +8,19 @@ Reset * {
 :root {
   --primaryColor: #118ab2;
   --primaryDark: #0f6d8d;
-  --successColor: #10b981;
-  --dangerColor: #ef4444;
+  --successColor: #16a34a;
+  --dangerColor: #dc2626;
   --warningColor: #f59e0b;
   --backgroundColor: #f4f7fb;
   --cardColor: #ffffff;
   --textColor: #111827;
   --mutedTextColor: #6b7280;
   --borderColor: #e5e7eb;
+  --appBackground: #f7f9fc;
+  --budgetBackground: #f0f9ff;
+  --groupBackground: #f5f3ff;
+  --productBackground: #f0fdf4;
+  --notificationBackground: #fff7ed;
   --overlayColor: rgba(0, 0, 0, 0.45);
   --shadowSmall: 0 4px 12px rgba(0, 0, 0, 0.04);
   --shadowMedium: 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -48,31 +53,35 @@ body {
 }
 /* Dashboard Header */
 .dashboardHeader {
-  height: var(--headerHeight);
-  width: 100%;
-  background-color: #d8eef3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--spacingMedium);
-  border-bottom: 1px solid var(--borderColor);
+  padding: 12px 20px;
+  min-height: 84px;
+  background: white;
+  border-bottom: 1px solid #eef2f7;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 /* Header Left */
 .headerLeftSection {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  flex: 1;
 }
 /* App Logo */
 .appLogo {
-  width: 34px;
-  height: 34px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 }
 /* App Name */
 .appName {
-  font-size: 32px;
   color: #001c8f;
+  flex: 1;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 800;
 }
 /* Menu Button */
 .menuButton {
@@ -1813,7 +1822,6 @@ body {
   font-size: 12px;
   color: var(--secondaryTextColor);
 }
-
 .bottomActionBar {
   position: sticky;
   bottom: 0;
@@ -1822,9 +1830,45 @@ body {
   padding: 16px;
   background: var(--backgroundColor);
 }
-
 .bottomActionBar button {
   flex: 1;
+}
+/* Dashboard side drawer */
+.sideDrawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+.sideDrawerOverlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.sideDrawer {
+  position: fixed;
+  top: 0;
+  width: 300px;
+  height: 100vh;
+  background: white;
+  z-index: 999;
+  transition: transform 0.25s ease;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.15);
+}
+/* RIGHT MODE */
+.sideDrawerRight {
+  right: 0;
+  transform: translateX(100%);
+}
+/* LEFT MODE */
+.sideDrawerLeft {
+  left: 0;
+  transform: translateX(-100%);
+}
+.sideDrawer.active {
+  transform: translateX(0);
 }
 /* PASTE ABOVE THIS FOR NORMAL CSS ATTRIBUTES */
 /* KEYFRAMES FOR ANIMATION */

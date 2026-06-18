@@ -11,6 +11,7 @@ const defaultAppState = {
   favoriteItems: [],
   productCatalog: {},
   notifications: [],
+  dashboardBudgetExpanded: false,
   users: [
     {
       id: "user_1",

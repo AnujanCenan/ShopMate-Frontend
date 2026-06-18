@@ -588,7 +588,7 @@ async function leaveCurrentGroup() {
   if (
     (currentMember.role === "admin" || currentMember.role === "owner") &&
     adminCount === 1 &&
-    members.length > 1
+    members.length > 1 //add the functionality to check the number of members in the group, if there is only 1 member then allow them to leave without assigning a new admin
   ) {
     showDialog(
       "Cannot Leave Group",
