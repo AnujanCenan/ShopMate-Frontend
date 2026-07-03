@@ -23,7 +23,7 @@ function restoreLastGroup() {
   }
 }
 /* Render Categories */
-function renderCategories() {
+async function renderCategories() {
   if (!categoryList) {
     return;
   }
@@ -36,7 +36,24 @@ function renderCategories() {
         `;
     return;
   }
-  const categories = appState.groups[appState.activeGroup];
+  // const categories = appState.groups[appState.activeGroup];
+  const groupId = localStorage.getItem("activeGroupId");
+  if (!groupId) return;
+
+  const res = await fetch(`http://localhost:5113/api/get-lists?family_group_id=${groupId}`, {
+    method: "GET",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    // Error handle
+    const message = await res.text();
+    console.log(`get-lists request failed ${message}`);
+    return;
+  }
+    
+  const categories = await res.json();
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
             <p class="emptyStateText">
@@ -47,10 +64,12 @@ function renderCategories() {
   }
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
+    console.log(category)
     categoryList.innerHTML += `
             <div
     class="categoryCard"
-    onclick="openCategoryPage('${category.name}')"
+    data-list-id="'${category.listId}'"
+    onclick="openCategoryPage('${category.name}', '${category.listId}')"
 >
     <button
         class="categoryMoreButton"
@@ -67,17 +86,9 @@ function renderCategories() {
                     ${category.name}
                 </h2>
                 <p class="categoryInfo">
-                ${
-                  category.items.filter(function (item) {
-                    return item.purchased === false;
-                  }).length
-                }
+                ${ category.numItems - category.numPurchased }
                 Pending •
-                ${
-                  category.items.filter(function (item) {
-                    return item.purchased === true;
-                  }).length
-                }
+                ${ category.numPurchased }
                 Purchased
                 </p>
             </div>
@@ -85,34 +96,53 @@ function renderCategories() {
   });
 }
 /* Select Group */
-function selectGroup(groupName) {
+function selectGroup(groupName, groupId) {
   appState.activeGroup = groupName;
   selectedGroupName.textContent = groupName;
   localStorage.setItem("activeGroup", groupName);
+  localStorage.setItem("activeGroupId", groupId);
+  
   renderCategories();
   closeBottomSheet();
 }
 /* Open Category Page */
-function openCategoryPage(categoryName) {
+function openCategoryPage(categoryName, categoryId) {
   localStorage.setItem("activeGroup", appState.activeGroup);
   localStorage.setItem("activeCategory", categoryName);
+  localStorage.setItem("activeCategoryId", categoryId)
   window.location.href = "../pages/categoryPage.html";
 }
 /* Render Group Dropdown */
-function renderGroupDropdown() {
+async function renderGroupDropdown() {
   let groupItemsHTML = "";
-  Object.keys(appState.groups).forEach(function (groupName) {
+
+  const res = await fetch(`http://localhost:5113/api/get-groups`, {
+    method: "GET",
+    credentials: 'include',
+    headers: { "Content-Type": "application/json" }
+  })
+
+  console.log(res);
+  if (!res.ok)
+  {
+    console.log(await res.text());
+    return;
+  }
+  const groups = await res.json();
+  console.log(groups);
+
+  groups.forEach(function (group) {
     groupItemsHTML += `
     <div class="groupItemRow">
-    <div class="groupItem" onclick="selectGroup('${groupName}')">
-    ${groupName}
+    <div class="groupItem" onclick="selectGroup('${group.familyName}', '${group.familyId}')">
+    ${group.familyName}
     </div>
     <button
         class="groupMoreButton"
         onclick="
             event.stopPropagation();
             renderGroupActions(
-                '${groupName}'
+                '${group.familyName}'
             );
         "
     >
@@ -185,15 +215,30 @@ function renderCreateGroupForm() {
   openBottomSheet();
 }
 /* Create Group */
-function createGroup() {
+async function createGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
   const groupName = groupNameInput.value.trim();
   if (!groupName) {
     return;
   }
-  appState.groups[groupName] = [];
-  saveAppState();
-  selectGroup(groupName);
+
+  const res = await fetch(`http://localhost:5113/api/group-create`, {
+    method: "POST",
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: groupName
+    })
+  });
+
+  const body = await res.json();
+
+  console.log(body.familyId);
+  // appState.groups[groupName] = [];
+  // saveAppState();
+  selectGroup(groupName, body.familyId);
 }
 /* Render Create Category Form */
 function renderCreateCategoryForm() {
@@ -239,16 +284,29 @@ function renderCreateCategoryForm() {
   openBottomSheet();
 }
 /* Create Category */
-function createCategory() {
+async function createCategory() {
   const categoryNameInput = document.getElementById("categoryNameInput");
   const categoryName = categoryNameInput.value.trim();
   if (!categoryName) {
     return;
   }
-  appState.groups[appState.activeGroup].unshift({
-    name: categoryName,
-    items: [],
-  });
+
+  const res = await fetch("http://localhost:5113/api/list-create", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: categoryName,
+      familyGroupId: localStorage.getItem("activeGroupId")
+    })
+  })
+
+  console.log(res);
+
+  // appState.groups[appState.activeGroup].unshift({
+  //   name: categoryName,
+  //   items: [],
+  // });
   if (!appState.budgets) {
     appState.budgets = {
       groupBudget: {
