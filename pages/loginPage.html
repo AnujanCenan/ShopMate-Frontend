@@ -62,37 +62,45 @@
     <script src="../js/authManager.js"></script>
 
     <script>
-      function loginUser() {
+      async function loginUser() {
         const email = document.getElementById("loginEmailInput").value.trim();
 
         const password = document
           .getElementById("loginPasswordInput")
           .value.trim();
 
-        const user = appState.users.find(function (user) {
-          return user.email === email && user.password === password;
+        const response = await fetch(`http://localhost:5113/api/login`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userEmail: email,
+            userPassword: password
+          })
         });
 
-        if (!user) {
-          showDialog("Invalid Login", "Please check your email and password.");
+        console.log(response)
 
+        if (!response.ok) {
+          console.log(response.json())
+          alert('Login failed.');
           return;
         }
 
-        appState.currentUser = {
-          id: user.id,
+        // appState.currentUser = {
+        //   id: user.id,
 
-          name: user.name,
+        //   name: user.name,
 
-          email: user.email,
-          role: "admin",
-        };
+        //   email: user.email,
+        //   role: "admin",
+        // };
 
-        appState.loggedIn = true;
+        // appState.loggedIn = true;
 
-        appState.activeGroup = "Family Group";
+        // appState.activeGroup = "Family Group";
 
-        saveAppState();
+        // saveAppState();
 
         window.location.href = "./dashboardPage.html";
       }
