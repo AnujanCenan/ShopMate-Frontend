@@ -393,7 +393,7 @@ function initializeEditImagePreview() {
   });
 }
 /* Create Item */
-function createItem() {
+async function createItem() {
   const itemNameInput = document.getElementById("itemNameInput");
   const itemQuantityInput = document.getElementById("itemQuantityInput");
   const itemNotesInput = document.getElementById("itemNotesInput");
@@ -410,15 +410,45 @@ function createItem() {
     showSnackbar("Please enter item details");
     return;
   }
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
+  // const currentCategory = getActiveCategory();
+  // if (!currentCategory) {
+  //   console.log("No category given :(")
+  //   return;
+  // }
+
+  const categoryId = localStorage.getItem("activeCategoryId");
+  console.log(categoryId);
+  console.log(`name=${itemName}, shopName=${itemShop}`);
+  // const existingItem = currentCategory.items.find(function (item) {
+  //   return item.name.toLowerCase() === itemName.toLowerCase();
+  // });
+  /* Existing Item Found */
+
+  const res = await fetch("http://localhost:5113/api/item-add", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: itemName,
+      quantity: itemQuantity,
+      optionalNotes: itemNotes,
+      listId: categoryId,
+      shopName: itemShop,
+    })
+  })
+
+  if (!res.ok)
+  {
+    // error handler
     return;
   }
-  const existingItem = currentCategory.items.find(function (item) {
-    return item.name.toLowerCase() === itemName.toLowerCase();
-  });
-  /* Existing Item Found */
+
+  console.log(res);
+  const body = await res.json();
+  console.log(body);
+  const existingItem = false; // TODO: check if there is an existing item
   if (existingItem) {
+    console.log("Existing item found?")
     bottomSheetContent.innerHTML = `
             <div class="bottomSheetHeader">
                 <h2>
@@ -460,6 +490,8 @@ function createItem() {
         `;
     return;
   }
+
+  
   const newItem = {
     name: itemName,
     quantity: itemQuantity,
@@ -471,8 +503,9 @@ function createItem() {
     purchaseDate: null,
     purchased: false,
   };
-  currentCategory.items.unshift(newItem);
-  saveProductToCatalog(currentCategory.items[0]);
+
+  // currentCategory.items.unshift(newItem);
+  saveProductToCatalog(newItem);
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
