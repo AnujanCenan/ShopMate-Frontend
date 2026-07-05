@@ -118,3 +118,96 @@ function addFavoriteToList(itemName) {
 
   renderFilteredItems();
 }
+
+
+async function toggleFavorite_mysql(itemMasterId, listsState) {
+  console.log("In toggleFav_mysql");
+  const currentCategory = getActiveCategory();
+  
+  /* Existing Favorite */
+
+  const existingFavorite = state.favoriteItems.find(function (fav) {
+    return fav.ItemMasterId === itemMasterId;
+  });
+
+  /* Remove Favorite */
+
+  if (existingFavorite) {
+    // appState.favoriteItems = appState.favoriteItems.filter(function (item) {
+    //   return item.ItemMasterId !== itemMasterId;
+    // });
+
+    const index = listsState.favoriteItems.findIndex((item) => {
+      return item.ItemMasterId === itemMasterId;
+    })
+    if (index !== -1) {
+      await removeFavourite(itemMasterId);
+      const removedFavourite = listsState.favoriteItems.splice(index, 1)[0];
+    }
+
+  } else {
+    /* Add Favorite */
+    
+    console.log(listsState, itemMasterId);
+    const currentItem = listsState.listItems.find(function (item) {
+      return item.ItemMasterId === itemMasterId;
+    })
+
+    console.log(currentItem);
+
+    await addFavourite(itemMasterId);
+
+    listsState.favoriteItems.unshift({
+      ItemMasterId: currentItem.ItemMasterId,
+
+      ItemName: currentItem.ItemName,
+      Quantity: currentItem.Quantity || 0,
+      OptionalNotes: currentItem.OptionalNotes || "",
+      PreferredShop: currentItem.PreferredShop || "",
+      imageUrl: currentItem.imageUrl || "",
+      estimatedPrice: currentItem.estimatedPrice || 0,
+      actualPrice: currentItem.actualPrice || 0,
+      purchaseDate: currentItem.purchaseDate || null,
+    });
+  }
+  saveAppState();
+  renderFilteredItems();
+}
+
+async function removeFavourite(itemMasterId) {
+  console.log("Unfavouriting an item with itemMasterId = ", itemMasterId);
+  const res = await fetch("http://localhost:5113/api/unfavourite-item", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json"},
+    body: JSON.stringify({
+      itemMasterId: itemMasterId
+    })
+    
+  })
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+  }
+}
+
+async function addFavourite(itemMasterId) {
+  console.log("Favouriting item with itemMasterId = ", itemMasterId);
+  const res = await fetch("http://localhost:5113/api/favourite-item", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json"},
+    body: JSON.stringify({
+      itemMasterId: itemMasterId
+    })
+  })
+
+  console.log("Done favouriting...");
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return;
+  }
+}

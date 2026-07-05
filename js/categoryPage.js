@@ -1,11 +1,47 @@
+let state = {
+    listItems: [],
+    favoriteItems: [],
+    activeTab: 'lists'
+};
+
+async function getRenderingItems() {
+  const categoryId = localStorage.getItem("activeCategoryId")
+  const groupId = localStorage.getItem("activeGroupId");
+
+  const res = await fetch(`http://localhost:5113/api/get-rendering-items?listId=${categoryId}&familyGroupId=${groupId}`, {
+    method: 'GET',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json'},
+  })
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.log(msg);
+    return;
+  }
+
+  const all_items = await res.json();
+
+  state.listItems = all_items.ListItems;
+  state.favoriteItems = all_items.Favourites;
+}
+
 /* Initialize Category Page */
-function initializeCategoryPage() {
-  appState.activeTab = "lists";
+async function initializeCategoryPage() {
+
+  const categoryId = localStorage.getItem("activeCategoryId")
+  const groupId = localStorage.getItem("activeGroupId");
+
+  await getRenderingItems();
+
+
+  state.activeTab = "lists";
   appState.searchQuery = "";
   initializeTabs();
   activateDefaultTab();
   renderCategoryPage();
 }
+
 /* Activate Default Tab */
 function activateDefaultTab() {
   const tabButtons = document.querySelectorAll(".tabButton");
@@ -16,10 +52,12 @@ function activateDefaultTab() {
     }
   });
 }
+
 const categoryPageTitle = document.getElementById("categoryPageTitle");
 const itemList = document.getElementById("itemList");
 const itemEmptyState = document.getElementById("itemEmptyState");
 const searchInput = document.querySelector(".searchInput");
+
 /* Render Category Page */
 function renderCategoryPage() {
   if (!categoryPageTitle) {
@@ -32,22 +70,23 @@ function renderCategoryPage() {
 /* Get Filtered Items */
 function getFilteredItems() {
   let filteredItems = [];
-  if (appState.activeTab === "favorites") {
-    filteredItems = [...appState.favoriteItems];
+  if (state.activeTab === "favorites") {
+    filteredItems = [...state.favoriteItems];
   } else {
-    const currentCategory = getActiveCategory();
-    if (!currentCategory) {
-      return [];
-    }
-    filteredItems = [...currentCategory.items];
-    if (appState.activeTab === "lists") {
+    // const currentCategory = getActiveCategory();
+    // if (!currentCategory) {
+    //   return [];
+    // }
+
+    filteredItems = state.listItems;
+    if (state.activeTab === "lists") {
       filteredItems = filteredItems.filter(function (item) {
-        return item.purchased === false;
+        return item.Purchased === false;
       });
     }
-    if (appState.activeTab === "purchased") {
+    if (state.activeTab === "purchased") {
       filteredItems = filteredItems.filter(function (item) {
-        return item.purchased === true;
+        return item.Purchased === true;
       });
     }
   }
@@ -59,24 +98,28 @@ function getFilteredItems() {
   }
   return filteredItems;
 }
+
+
 /* Render Filtered Items */
-function renderFilteredItems() {
-  renderItems(getFilteredItems());
+async function renderFilteredItems() {
+  const filteredItems = await getFilteredItems()
+  renderItems(filteredItems);
   initializeSwipeGestures();
 }
 /* Render Items */
 function renderItems(items) {
+  console.log(items);
   if (!itemList) {
     return;
   }
   itemList.innerHTML = "";
   /* Empty State */
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     let emptyMessage = "No items yet";
-    if (appState.activeTab === "favorites") {
+    if (state.activeTab === "favorites") {
       emptyMessage = "No favorite items yet";
     }
-    if (appState.activeTab === "purchased") {
+    if (state.activeTab === "purchased") {
       emptyMessage = "No purchased items yet";
     }
     itemEmptyState.innerHTML = `
@@ -88,15 +131,15 @@ function renderItems(items) {
   }
   itemEmptyState.innerHTML = "";
   items.forEach(function (item) {
-    const isFavorite = appState.favoriteItems.some(function (favoriteItem) {
-      return favoriteItem.name === item.name;
+    const isFavorite = state.favoriteItems.some(function (favoriteItem) {
+      return favoriteItem.ItemName === item.ItemName;
     });
     itemList.innerHTML += `
             <div class="swipeWrapper">
                 <div class="swipeBackground">
                     <div class="swipePurchased">
                         ${
-                          appState.activeTab === "purchased"
+                          state.activeTab === "purchased"
                             ? "↺ Re-Add"
                             : "✓ Purchased"
                         }
@@ -106,64 +149,61 @@ function renderItems(items) {
                     </div>
                 </div>
                <div class="itemCard swipeCard ${
-                 appState.selectedItems.includes(item.name)
+                 appState.selectedItems.includes(item.ItemName)
                    ? "selectedItem"
                    : " "
                }" data-item-name="${
-                 item.name
+                 item.ItemName
                }" onclick=" event.stopPropagation();
-    if(appState.selectionMode){
-        toggleItemSelection('${item.name}');
-    }" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.name}');">
+            if(appState.selectionMode){
+                toggleItemSelection('${item.ItemName}');
+            }" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.ItemName}');">
                <div class="itemCardTopRow">
                <div class="itemTitleSection">
                <h2 class="itemName" onclick=" event.stopPropagation();
                if (!appState.selectionMode) {
-               renderEditItemForm('${item.name}');
+               renderEditItemForm('${item.ItemName}');
                }
-               ">${item.name}</h2>
+               ">${item.ItemName}</h2>
                <p class="itemQuantityBadge">
-               Qty: ${item.quantity}</p>
+               Qty: ${item.Quantity}</p>
                </div>
                <div class="itemActionButtons">
-               <button class="modernActionButton favoriteActionButton ${isFavorite ? "activeFavoriteButton" : ""} " onclick="event.stopPropagation(); toggleFavorite('${item.name}');">
+               <button class="modernActionButton favoriteActionButton ${isFavorite ? "activeFavoriteButton" : ""} " 
+                onclick="event.stopPropagation(); toggleFavorite_mysql(${item.ItemMasterId}, state);"
+              >
                <span class="actionButtonIcon">
                ${isFavorite ? "♥" : "♡"}
                </span>
                </button>
                ${
-                 appState.activeTab === "favorites"
-                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.name}')">+</button>
-            `
-                   : `
-            <button
-    class="
-        modernActionButton
-        purchasedActionButton
-        ${item.purchased ? "activePurchasedButton" : ""}
-    "
-    onclick="
-        event.stopPropagation();
-        openPurchaseConfirmation('${item.name}');
-    "
->
-    <span class="actionButtonIcon">
-        ${appState.activeTab === "purchased" ? "↺" : "✓"}
-    </span>
-</button>
-            `
-               }
-    </div>
-</div>
-<div class="itemCardContent">
-  <div class="itemDetailsSection">
-    <p class="itemDetails">Notes: ${item.notes || "-"}</p>
-    <p class="itemDetails">Shop: ${item.preferredShop || "-"}</p>
-    <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
-  </div>
-  <div class="itemImageContainer">${item.imageUrl ? `<img src="${item.imageUrl}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
-  </div>
-</div>`;
+                 state.activeTab === "favorites"
+                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.ItemName}')">+</button>`
+                   : `<button class="modernActionButton purchasedActionButton ${item.Purchased ? "activePurchasedButton" : ""}"
+                  onclick="event.stopPropagation(); openPurchaseConfirmation('${item.ItemName}');">
+          
+                  <span class="actionButtonIcon">
+                    ${state.activeTab === "purchased" ? "↺" : "✓"}
+                  </span>
+                  </button>
+                  `
+                }
+              </div>
+              </div>
+              <div class="itemCardContent">
+                <div class="itemDetailsSection">
+                  <p class="itemDetails">Notes: ${item.OptionalNotes || "-"}</p>
+                  <p class="itemDetails">Shop: ${item.shopName || "-"}</p>
+                  <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
+                </div>
+                <div class="itemImageContainer">
+                  ${item.imageUrl 
+                    ? `<img src="${item.imageUrl}" class="itemImage" alt="${item.name}">` 
+                    : `<div class="itemImagePlaceholder">📦</div>`}
+                </div>
+              </div>
+            </div>
+          </div>`;
   });
 }
 /* Initialize Tabs */
@@ -178,7 +218,8 @@ function initializeTabs() {
         tab.classList.remove("activeTab");
       });
       button.classList.add("activeTab");
-      appState.activeTab = button.dataset.tab;
+      state.activeTab = button.dataset.tab;
+      state.activeTab = button.dataset.tab;
       renderFilteredItems();
     });
   });
