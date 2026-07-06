@@ -1,0 +1,1 @@
+export const local_server_endpoint = "http://localhost:5113"

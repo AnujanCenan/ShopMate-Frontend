@@ -93,7 +93,7 @@ function getFilteredItems() {
   /* Search Filter */
   if (appState.searchQuery) {
     filteredItems = filteredItems.filter(function (item) {
-      return item.name.toLowerCase().includes(appState.searchQuery);
+      return item.ItemName.toLowerCase().includes(appState.searchQuery);
     });
   }
   return filteredItems;
@@ -102,6 +102,7 @@ function getFilteredItems() {
 
 /* Render Filtered Items */
 async function renderFilteredItems() {
+
   const filteredItems = await getFilteredItems()
   renderItems(filteredItems);
   initializeSwipeGestures();
@@ -180,7 +181,7 @@ function renderItems(items) {
                  state.activeTab === "favorites"
                    ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.ItemName}')">+</button>`
                    : `<button class="modernActionButton purchasedActionButton ${item.Purchased ? "activePurchasedButton" : ""}"
-                  onclick="event.stopPropagation(); openPurchaseConfirmation('${item.ItemName}');">
+                  onclick="event.stopPropagation(); openPurchaseConfirmation('${item.ItemName}', '${item.ListItemId}');">
           
                   <span class="actionButtonIcon">
                     ${state.activeTab === "purchased" ? "↺" : "✓"}
@@ -193,7 +194,7 @@ function renderItems(items) {
               <div class="itemCardContent">
                 <div class="itemDetailsSection">
                   <p class="itemDetails">Notes: ${item.OptionalNotes || "-"}</p>
-                  <p class="itemDetails">Shop: ${item.shopName || "-"}</p>
+                  <p class="itemDetails">Shop: ${item.ShopName || "-"}</p>
                   <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
                 </div>
                 <div class="itemImageContainer">

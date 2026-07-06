@@ -443,9 +443,12 @@ async function createItem() {
     return;
   }
 
-  console.log(res);
   const body = await res.json();
   console.log(body);
+  
+  const itemMasterId = body.itemMasterId;
+  const listItemId = body.listItemId;
+
   const existingItem = false; // TODO: check if there is an existing item
   if (existingItem) {
     console.log("Existing item found?")
@@ -493,18 +496,24 @@ async function createItem() {
 
   
   const newItem = {
-    name: itemName,
-    quantity: itemQuantity,
-    notes: itemNotes,
-    preferredShop: itemShop,
+    ListItemId: listItemId,
+    ItemMasterId: itemMasterId,
+
+    ItemName: itemName,
+    Quantity: itemQuantity,
+    OptionalNotes: itemNotes,
+    PreferredShop: itemShop,
     imageUrl: imageUrl,
     estimatedPrice: itemPrice,
     actualPrice: 0,
     purchaseDate: null,
-    purchased: false,
+    Purchased: false,
   };
 
   // currentCategory.items.unshift(newItem);
+  state.listItems.unshift(newItem);
+
+
   saveProductToCatalog(newItem);
   saveAppState();
   renderFilteredItems();
@@ -586,31 +595,48 @@ function saveProductToCatalog(item) {
   if (!appState.productCatalog) {
     appState.productCatalog = {};
   }
-  appState.productCatalog[item.name.toLowerCase()] = {
+  appState.productCatalog[item.ItemName.toLowerCase()] = {
     imageUrl: item.imageUrl || "",
     defaultPrice: item.estimatedPrice || 0,
-    preferredShop: item.preferredShop || "",
+    preferredShop: item.PreferredShop || "",
   };
 }
-/*  Purchase Confirmation */
-function openPurchaseConfirmation(itemName) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
-    return;
-  }
-  const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+
+
+async function unmarkPurchased(item) {
+  const listId = parseInt(localStorage.getItem("activeCategoryId"));
+
+  const res = await fetch("http://localhost:5113/api/unmark-purchase?", {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      listId: listId,
+      listItemId: item.ListItemId
+    })
   });
-  if (!item) {
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
     return;
   }
-  if (item.purchased) {
-    item.purchased = false;
-    saveAppState();
+
+}
+
+/*  Purchase Confirmation */
+async function openPurchaseConfirmation(item) {
+  console.log(item);
+
+  if (item.Purchased) {
+    await unmarkPurchased(item);
+    item.Purchased = false;
+    // saveAppState();
     renderFilteredItems();
     showSnackbar("Moved back to List");
     return;
   }
+  // Marking an item as purchased
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -628,7 +654,7 @@ function openPurchaseConfirmation(itemName) {
     <div class="bottomSheetBody">
       <div class="purchaseSummaryCard">
         <h3>
-          ${item.name}
+          ${item.ItemName}
         </h3>
         <p>
           Estimated:
