@@ -105,23 +105,12 @@ function renderGroupDropdown() {
   let groupItemsHTML = "";
   Object.keys(appState.groups).forEach(function (groupName) {
     groupItemsHTML += `
-    <div class="groupItemRow">
     <div class="groupItem" onclick="selectGroup('${groupName}')">
-    ${groupName}
-    </div>
-    <button
-        class="groupMoreButton"
-        onclick="
-            event.stopPropagation();
-            renderGroupActions(
-                '${groupName}'
-            );
-        "
-    >
-        ⋮
-    </button>
-</div>
-        `;
+      <span class="groupItemName">
+        ${groupName}
+      </span>
+      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${groupName}');">⋮</button>
+    </div>`;
   });
   bottomSheetContent.innerHTML = `
         <div class="bottomSheetHeader">
@@ -138,13 +127,17 @@ function renderGroupDropdown() {
         <div class="groupList">
             ${groupItemsHTML}
         </div>
-        <button
-            class="primaryButton"
-            onclick="renderCreateGroupForm()"
-        >
-            Create New Group
-        </button>
-    `;
+        <div class="createGroupButtonWrapper">
+          <div class="createGroupButtonWrapper">
+    <button
+        class="primaryButton createGroupButton"
+        onclick="renderCreateGroupForm()"
+    >
+        Create New Group
+    </button>
+</div>
+</div>
+        </div>`;
   openBottomSheet();
 }
 /* Render Create Group Form */
@@ -559,19 +552,22 @@ function saveRenamedGroup(oldGroupName) {
 }
 /* Delete Group */
 function deleteGroup(groupName) {
-  const confirmation = confirm("Delete this group?");
-  if (!confirmation) {
-    return;
-  }
-  delete appState.groups[groupName];
-  if (appState.activeGroup === groupName) {
-    appState.activeGroup = null;
-    selectedGroupName.textContent = "No Group Selected";
-    localStorage.removeItem("activeGroup");
-  }
-  saveAppState();
-  renderCategories();
-  closeBottomSheet();
+  showConfirmDialog(
+    "Delete Group",
+    `Are you sure you want to delete "${groupName}"?\n\nThis action cannot be undone.`,
+    function () {
+      delete appState.groups[groupName];
+      if (appState.activeGroup === groupName) {
+        appState.activeGroup = null;
+        selectedGroupName.textContent = "No Group Selected";
+        localStorage.removeItem("activeGroup");
+      }
+      saveAppState();
+      renderCategories();
+      closeBottomSheet();
+      showToast("Group deleted");
+    },
+  );
 }
 /* Sort Categories */
 function sortCategories() {
@@ -604,95 +600,6 @@ function sortCategoriesByPending() {
   closeBottomSheet();
 }
 /* Render Dashboard Menu */
-// function renderDashboardMenu() {
-//   bottomSheetContent.innerHTML = `
-//         <div class="bottomSheetHeader">
-//             <h2>
-//                 Dashboard Menu
-//             </h2>
-//             <button
-//                 class="closeButton"
-//                 onclick="closeBottomSheet()"
-//             >
-//                 ✕
-//             </button>
-//         </div>
-//         <button
-//         class="bottomSheetActionButton"
-//         onclick="window.location.href ='../pages/familyManagementPage.html'">
-//         👨‍👩‍👧 Group Management </button>
-//         <div class="bottomSheetBody">
-//             <button
-//                 class="bottomSheetActionButton"
-//                 onclick="sortCategories()"
-//             >
-//                 🔤 Sort A-Z
-//             </button>
-//             <button
-//                 class="bottomSheetActionButton"
-//                 onclick="
-//                     sortCategoriesByPending()
-//                 "
-//             >
-//                 📋 Sort By Pending
-//             </button>
-//             <button
-//     class="bottomSheetActionButton"
-//     onclick="exportAppData()"
-// >
-//     📤 Export Backup
-// </button>
-// <label
-//     class="bottomSheetActionButton importBackupButton"
-// >
-//     📥 Import Backup
-//     <input
-//         type="file"
-//         accept=".json"
-//         hidden
-//         onchange="importAppData(event)"
-//     >
-// </label>
-//         </div>
-//         <button
-//   class="bottomSheetActionButton"
-//   onclick="
-//     window.location.href =
-//     '../pages/notificationsPage.html'
-//   "
-// >
-//   🔔 Notifications
-// </button>
-// <button
-//   class="bottomSheetActionButton"
-//   onclick="
-//     window.location.href =
-//     '../pages/budgetPage.html'
-//   "
-// >
-//   💰 Budget
-// </button>
-// <button
-//   class="bottomSheetActionButton"
-//   onclick="
-//     window.location.href =
-//     '../pages/productCatalogPage.html'
-//   "
-// >
-//   📦 Product Catalog
-// </button>
-// <button
-//   class="bottomSheetActionButton"
-//   onclick="
-//     window.location.href =
-//     '../pages/settingsPage.html'
-//   "
-// >
-//   ⚙ Settings
-// </button>
-//     `;
-//   openBottomSheet();
-// }
 /* Open Side Drawer */
 function openSideDrawer() {
   renderSideDrawer();
@@ -810,58 +717,141 @@ function renderBudgetDashboardWidget() {
     }
   });
   budgetWidget.innerHTML = `
-    <div
-      class="
-        budgetWidgetCard
-      "
-    >
-      <h3>
-        💰 Budget Snapshot
-      </h3>
-      <p
-        class="
-          budgetWidgetAmount
-        "
-      >
-        $${spent}
-        /
-        $${limit}
-      </p>
-      <div
-        class="
-          budgetProgressBar
-        "
-      >
-        <div
-          class="
-            budgetProgressFill
-            ${progressClass}
-          "
-          style="
-            width:
-            ${percentUsed}%;
-          "
-        >
+<div class="budgetWidgetCard">
+    <div class="budgetWidgetHeader">
+        <div>
+            <h3 class="budgetWidgetTitle">
+                Budget Snapshot
+            </h3>
+            <p class="budgetWidgetSubtitle">
+                Family Monthly Budget
+            </p>
         </div>
-      </div>
-      <p
-        class="
-          budgetWidgetText
-        "
-      >
-        Remaining:
-        $${remaining}
-      </p>
-      <p
-        class="
-          budgetWidgetText
-        "
-      >
-        Top Category:
-        ${topCategory}
-      </p>
+        <button
+            class="budgetEditButton"
+            onclick="renderEditGroupBudgetForm()"
+        >
+            &#9998;
+        </button>
     </div>
-  `;
+    <h2 class="budgetWidgetAmount">
+        $${spent}
+        <span class="budgetAmountDivider">/</span>
+        $${limit}
+    </h2>
+    <div class="budgetProgressBar">
+        <div
+            class="
+                budgetProgressFill
+                ${progressClass}
+            "
+            style="width:${percentUsed}%"
+        ></div>
+    </div>
+    <div class="budgetWidgetSummary">
+        <div class="budgetSummaryItem">
+            <span>Remaining</span>
+            <strong>$${remaining}</strong>
+        </div>
+        <div class="budgetSummaryItem">
+            <span>Used</span>
+            <strong>${percentUsed}%</strong>
+        </div>
+    </div>
+    ${
+      appState.dashboardBudgetExpanded
+        ? `
+            <div class="budgetWidgetDetails">
+                <div class="budgetDetailRow">
+                    <span>Top Category</span>
+                    <strong>${topCategory}</strong>
+                </div>
+                <div class="budgetDetailRow">
+                    <span>Spent</span>
+                    <strong>$${spent}</strong>
+                </div>
+            </div>
+            `
+        : ""
+    }
+    <button
+        class="budgetExpandButton"
+        onclick="toggleBudgetWidget()"
+    >
+        ${appState.dashboardBudgetExpanded ? "▲ Show Less" : "▼ Show Details"}
+    </button>
+</div>
+`;
+}
+/* Render Edit Group Budget Form */
+function renderEditGroupBudgetForm() {
+  bottomSheetContent.innerHTML = `
+        <div class="bottomSheetHeader">
+            <h2>
+                Monthly Group Budget
+            </h2>
+            <button
+                class="closeButton"
+                onclick="closeBottomSheet()"
+            >
+                ✕
+            </button>
+        </div>
+        <div class="bottomSheetBody">
+            <div class="formField">
+                <label class="formLabel">
+                    Monthly Budget Limit
+                </label>
+                <div class="currencyInputWrapper">
+                    <span class="currencySymbol">$</span>
+                    <input
+                        id="groupBudgetInput"
+                        type="number"
+                        class="
+                            bottomSheetInput
+                            currencyInput
+                        "
+                        value="${appState.budgets.groupBudget.monthlyLimit}"
+                    >
+                </div>
+            </div>
+            <div class="bottomSheetButtonRow">
+                <button
+                    class="secondaryButton"
+                    onclick="closeBottomSheet()"
+                >
+                    Cancel
+                </button>
+                <button
+                    class="primaryButton"
+                    onclick="saveGroupBudget()"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
+    `;
+  openBottomSheet();
+}
+
+/* Save Group Budget */
+function saveGroupBudget() {
+  const amount = Number(document.getElementById("groupBudgetInput").value);
+  if (amount <= 0) {
+    showDialog("Please enter a valid budget.");
+    return;
+  }
+  appState.budgets.groupBudget.monthlyLimit = amount;
+  saveAppState();
+  renderBudgetDashboardWidget();
+  closeBottomSheet();
+  showToast("Budget updated.");
+}
+/* Toggle Budget Widget */
+function toggleBudgetWidget() {
+  appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
+  saveAppState();
+  renderBudgetDashboardWidget();
 }
 /* Export App Data */
 function exportAppData() {
