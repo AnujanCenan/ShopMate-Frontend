@@ -146,7 +146,7 @@ function closeDialog() {
   }
 }
 /* Confirmation Dialog */
-function showConfirmDialog(title, message, onConfirm) {
+function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
@@ -180,13 +180,14 @@ function showConfirmDialog(title, message, onConfirm) {
                 executeDialogConfirm()
               "
             >
-              Delete
+              ${window.dialogConfirmText || "Confirm"}
             </button>
           </div>
         </div>
       </div>
     `,
   );
+  window.dialogConfirmText = confirmText;
   window.dialogConfirmAction = onConfirm;
 }
 /* Execute Confirm */

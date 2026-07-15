@@ -2079,6 +2079,74 @@ body {
   width: 28px;
   height: 28px;
 }
+.groupAccordionCard {
+  margin-bottom: 16px;
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.groupAccordionHeader {
+  width: 100%;
+  border: none;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+}
+.groupAccordionTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+.groupAccordionSubtitle {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 13px;
+}
+.groupAccordionBody {
+  padding: 0 20px 20px;
+}
+.groupMemberRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+.groupMemberName {
+  font-weight: 600;
+}
+.groupMemberRole {
+  margin-top: 2px;
+  font-size: 13px;
+  color: #64748b;
+  text-transform: capitalize;
+}
+.accordionIcon {
+  font-size: 18px;
+  transition: 0.25s;
+}
+.activeGroupBadge {
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 700;
+}
+.groupAccordionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+}
+.groupAccordionBody.hidden {
+  display: none;
+}
 /* PASTE ABOVE THIS FOR NORMAL CSS ATTRIBUTES */
 /* KEYFRAMES FOR ANIMATION */
 @keyframes snackbarSlideUp {

@@ -180,13 +180,30 @@ function renderCreateGroupForm() {
   openBottomSheet();
 }
 /* Create Group */
+/* Create Group */
 function createGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
   const groupName = groupNameInput.value.trim();
   if (!groupName) {
     return;
   }
+  if (appState.groups[groupName]) {
+    showDialog("Group Exists", "A group with this name already exists.");
+    return;
+  }
   appState.groups[groupName] = [];
+  if (!appState.groupMembers) {
+    appState.groupMembers = {};
+  }
+  const currentUser = getCurrentUser();
+  appState.groupMembers[groupName] = [
+    {
+      id: currentUser.id,
+      name: currentUser.name,
+      email: currentUser.email,
+      role: "admin",
+    },
+  ];
   saveAppState();
   selectGroup(groupName);
 }
@@ -833,7 +850,6 @@ function renderEditGroupBudgetForm() {
     `;
   openBottomSheet();
 }
-
 /* Save Group Budget */
 function saveGroupBudget() {
   const amount = Number(document.getElementById("groupBudgetInput").value);
