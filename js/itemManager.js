@@ -675,27 +675,26 @@ function confirmPurchase(itemName) {
   item.purchaseDate = new Date().toISOString();
   item.purchased = !item.purchased;
   updateBudgetTracking(currentCategory.name, actualPrice);
-  saveAppState();
   calculateGroupBudget();
-  renderBudgetDashboardWidget();
-  renderItems();
-  renderFilteredItems();
+  saveAppState();
   closeBottomSheet();
-  showSnackbar("Item purchased");
+  renderItems();
+  renderBudgetDashboardWidget();
+  showSnackbar(item.purchased ? "Item purchased" : "Item restored");
   createNotification(
     "purchase",
-    "Item Purchased",
-    `${item.name} purchased for $${purchasePrice}`,
+    item.purchased ? "Item Purchased" : "Item Restored",
+    `${item.name} ${
+      item.purchased ? "purchased" : "restored"
+    } for $${actualPrice}`,
   );
 }
-/* Update Budget Tracking */
 /* Update Budget Tracking */
 function updateBudgetTracking(categoryName, amount) {
   if (!appState.budgets) {
     return;
   }
   /* Update Group Budget */
-
   const categoryBudget = appState.budgets.categoryBudgets[categoryName];
   if (categoryBudget) {
     /* Update Category Budget */

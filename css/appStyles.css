@@ -2035,6 +2035,17 @@ body {
   width: 100%;
   color: black;
 }
+.budgetAnalysisButton {
+  width: 100%;
+  margin-top: 18px;
+  border: none;
+  background: #118ab2;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 25px;
+}
 .budgetWidgetSummary {
   display: flex;
   justify-content: space-between;

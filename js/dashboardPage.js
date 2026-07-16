@@ -922,7 +922,7 @@ function renderBudgetDashboardWidget() {
             : ""
         }
         <button
-          class="secondaryButton budgetEditButton"
+          class="secondaryButton budgetAnalysisButton"
           onclick="window.location.href='../pages/budgetPage.html'"
         >
           Budget Analysis
