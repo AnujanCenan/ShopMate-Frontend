@@ -32,58 +32,86 @@ function renderCategories() {
   categoryList.innerHTML = "";
   if (!appState.activeGroup) {
     emptyStateSection.innerHTML = `
-            <p class="emptyStateText">
-                Select or create a group
-            </p>
-        `;
+      <p class="emptyStateText">
+        Select or create a group
+      </p>
+    `;
     return;
   }
   const categories = appState.groups[appState.activeGroup];
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
-            <p class="emptyStateText">
-                No categories yet
-            </p>
-        `;
+      <p class="emptyStateText">
+        No categories yet
+      </p>
+    `;
     return;
   }
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
+    const categoryBudget =
+      appState.budgets.categoryBudgets?.[appState.activeGroup]?.[category.name]
+        ?.monthlyLimit ?? 0;
+    let categorySpent = 0;
+    category.items.forEach(function (item) {
+      if (item.purchased && item.estimatedPrice) {
+        categorySpent += Number(item.estimatedPrice);
+      }
+    });
+    const categoryRemaining =
+      categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
+    const pendingCount = category.items.filter(function (item) {
+      return !item.purchased;
+    }).length;
+    const purchasedCount = category.items.filter(function (item) {
+      return item.purchased;
+    }).length;
     categoryList.innerHTML += `
-            <div
-    class="categoryCard"
-    onclick="openCategoryPage('${category.name}')"
->
-    <button
-        class="categoryMoreButton"
-        onclick="
+      <div
+        class="categoryCard"
+        onclick="openCategoryPage('${category.name}')"
+      >
+        <div class="categoryHeaderTitle">
+        <h2 class="categoryTitle">
+          ${category.name}
+        </h2>
+        <button
+          class="categoryMoreButton"
+          onclick="
             event.stopPropagation();
             renderCategoryActions(
-                '${category.name}'
+              '${category.name}'
             );
-        "
-    >
-        ⋮
-    </button>
-                <h2 class="categoryTitle">
-                    ${category.name}
-                </h2>
-                <p class="categoryInfo">
-                ${
-                  category.items.filter(function (item) {
-                    return item.purchased === false;
-                  }).length
-                }
-                Pending •
-                ${
-                  category.items.filter(function (item) {
-                    return item.purchased === true;
-                  }).length
-                }
-                Purchased
-                </p>
-            </div>
-        `;
+          "
+        >
+          ⋮
+        </button>
+        </div>
+        <div class="categoryBudgetSummary">
+  Budget
+  <strong>
+    ${categoryBudget > 0 ? "$" + categoryBudget : "Not Set"}
+  </strong>
+  &nbsp; • &nbsp;
+  Spent
+  <strong>
+    $${categorySpent}
+  </strong>
+  &nbsp; • &nbsp;
+  Left
+  <strong>
+    ${categoryBudget > 0 ? "$" + categoryRemaining : "-"}
+  </strong>
+</div>
+        <p class="categoryInfo">
+  ${pendingCount}
+  Pending
+  &nbsp; • &nbsp;
+  ${purchasedCount}
+  Purchased
+</p>
+      </div>
+    `;
   });
 }
 /* Select Group */

@@ -150,15 +150,11 @@ body {
 }
 /* Category Title */
 .categoryTitle {
-  /* font-size: 20px; */
-  margin-bottom: 10px;
-  /* font-weight: 700; */
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 2;
-  font-size: 24px;
+  margin: 0;
+  font-size: 22px;
   font-weight: 700;
-  /* margin-bottom: 18px; */
+  color: var(--textColor);
+  padding-bottom: 15px;
 }
 /* Category Info */
 .categoryInfo {
@@ -429,6 +425,14 @@ body {
   gap: 16px;
   padding: 0 var(--spacingMedium);
   border-bottom: 1px solid var(--borderColor);
+}
+/* Category Header Title */
+.categoryHeaderTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
 }
 /* Category Card */
 .categoryCard {
@@ -2325,6 +2329,21 @@ body {
   color: #b91c1c;
   font-size: 14px;
   font-weight: 600;
+}
+.categoryBudgetSummary {
+  margin-top: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+}
+.categoryBudgetSummary div {
+  display: flex;
+  justify-content: space-between;
+}
+.categoryBudgetSummary strong {
+  color: #0f172a;
+  font-weight: 700;
 }
 /* PASTE ABOVE THIS FOR NORMAL CSS ATTRIBUTES */
 /* KEYFRAMES FOR ANIMATION */
