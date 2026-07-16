@@ -22,11 +22,6 @@ function getTopSpendingCategory() {
     amount: highestSpend,
   };
 }
-/* Initialize Budget Page */
-function initializeBudgetPage() {
-  renderBudgetSummary();
-  renderCategoryBudgets();
-}
 /*Open Bottom Sheet */
 function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
@@ -41,149 +36,6 @@ function closeBottomSheet() {
   screenOverlay.classList.add("hidden");
   bottomSheet.classList.add("hidden");
   document.body.style.overflow = "";
-}
-function renderBudgetSummary() {
-  const limit = appState.budgets.groupBudget.monthlyLimit;
-  const spent = calculateTotalSpent();
-  const remaining = limit - spent;
-  const usagePercentage = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
-  const percentUsed = Math.min(Math.round((spent / limit) * 100) || 0, 100);
-  let insightTitle = "Budget Healthy";
-  let insightMessage = `You have used only ${percentUsed}% of your budget.`;
-  if (percentUsed >= 80) {
-    insightTitle = "Budget Critical";
-    insightMessage = `You have used ${percentUsed}% of your budget.`;
-  } else if (percentUsed >= 50) {
-    insightTitle = "Budget Warning";
-    insightMessage = `You have used ${percentUsed}% of your budget.`;
-  }
-  let progressClass = "budgetHealthy";
-  if (percentUsed >= 80) {
-    progressClass = "budgetCritical";
-  } else if (percentUsed >= 50) {
-    progressClass = "budgetWarning";
-  }
-  budgetHero.innerHTML = `
-      <h2
-        class="budgetAmount"
-      >
-        $${limit.toLocaleString()}
-      </h2>
-      <p
-        class="budgetSubtitle"
-      >
-        Monthly Group Budget
-      </p>
-      <div
-        class="budgetProgressBar"
-      >
-        <div
-  class="
-    budgetProgressFill
-    ${progressClass}
-  "
-          style="
-            width:${percentUsed}%
-          "
-        >
-        </div>
-      </div>
-     <p
-  class="budgetProgressText"
->
-  ${percentUsed}% Used
-</p>
-<p
-  class="budgetStatusText"
->
-  ${
-    percentUsed < 50
-      ? "Budget Healthy"
-      : percentUsed < 80
-        ? "Budget Warning"
-        : "Budget Critical"
-  }
-</p>
-  `;
-  const topCategory = getTopSpendingCategory();
-  budgetStats.innerHTML = `
-      <div class="budgetCard">
-          <h3 class="budgetCardTitle">Spent</h3>
-            <p class="budgetCardAmount">$${spent.toLocaleString()}</p>
-      </div>
-      <div class="budgetCard">
-        <h3 class="budgetCardTitle">Remaining</h3>
-          <p class="budgetCardAmount">$${remaining.toLocaleString()}</p>
-      </div>
-      <div class="budgetCard topSpendingCard">
-        <h3 class="budgetCardTitle">Top Spending Category</h3>
-          <p class="topCategoryName">${topCategory.name}</p>
-          <p class="budgetCardAmount">$${topCategory.amount.toLocaleString()}</p>
-      </div>
-      <div class="budgetCard budgetInsightCard">
-        <h3 class="budgetCardTitle">${insightTitle}</h3>
-          <p class="budgetInsightText">${insightMessage}</p>
-      </div>
-  `;
-}
-function renderCategoryBudgets() {
-  budgetCategoryList.innerHTML = "";
-  Object.keys(appState.budgets.categoryBudgets).forEach(
-    function (categoryName) {
-      const categoryBudget = appState.budgets.categoryBudgets[categoryName];
-      const percentUsed = Math.min(
-        Math.round(
-          (categoryBudget.spent / categoryBudget.monthlyLimit) * 100,
-        ) || 0,
-        100,
-      );
-      const overspendAmount =
-        categoryBudget.spent - categoryBudget.monthlyLimit;
-      const isOverspent = overspendAmount > 0;
-      budgetCategoryList.innerHTML += `
-      <div class="budgetCard ${isOverspent ? "overspendCard" : ""}">
-      <button class="budgetMenuButton" onclick="event.stopPropagation(); openBudgetMenu('${categoryName}');">⋮</button>
-        <h3
-          class="budgetCardTitle"
-        >
-          ${categoryName}
-        </h3>
-        <p
-          class="budgetCardAmount"
-        >
-          $${categoryBudget.spent}
-          /
-          $${categoryBudget.monthlyLimit}
-          ${
-            isOverspent
-              ? `
-      <p
-        class="
-          overspendText
-        "
-      >
-        ⚠ Over Budget by
-        $${overspendAmount}
-      </p>
-    `
-              : ""
-          }
-        </p>
-        <div
-          class="budgetProgressBar"
-        >
-          <div
-            class="budgetProgressFill"
-            style="
-              width:${percentUsed}%
-            "
-          >
-          </div>
-        </div>
-      </div>
-    `;
-    },
-  );
 }
 function openBudgetMenu(categoryName) {
   bottomSheetContent.innerHTML = `
@@ -224,106 +76,6 @@ function openBudgetMenu(categoryName) {
     </div>
   `;
   openBottomSheet();
-}
-function deleteCategoryBudget(categoryName) {
-  if (!canManageBudget()) {
-    showDialog("Only Admin can delete budgets.");
-    return;
-  }
-  delete appState.budgets.categoryBudgets[categoryName];
-  saveAppState();
-  renderCategoryBudgets();
-  closeBottomSheet();
-}
-function renderCreateBudgetForm() {
-  if (!canManageBudget()) {
-    showDialog("Only Admin can manage budgets.");
-    return;
-  }
-  let categoryOptions = "";
-  const categories = appState.groups[appState.activeGroup] || [];
-  categories.forEach(function (category) {
-    categoryOptions += `
-      <option>
-        ${category.name}
-      </option>
-    `;
-  });
-  bottomSheetContent.innerHTML = `
-    <div class="bottomSheetHeader">
-      <h2>
-        Category Budget
-      </h2>
-      <button
-        class="closeButton"
-        onclick="
-          closeBottomSheet()
-        "
-      >
-        ✕
-      </button>
-    </div>
-    <div class="bottomSheetBody">
-      <div class="formField">
-  <label class="formLabel">
-    Category
-  </label>
-  <select
-    id="budgetCategorySelect"
-    class="bottomSheetInput"
-  >
-    ${categoryOptions}
-  </select>
-</div>
-      <div class="formField">
-  <label class="formLabel">
-    Monthly Budget Limit
-  </label>
-  <div class="currencyInputWrapper">
-    <span class="currencySymbol">
-      $
-    </span>
-    <input
-      type="number"
-      id="budgetLimitInput"
-      class="
-        bottomSheetInput
-        currencyInput
-      "
-      placeholder="Enter Budget Limit"
-    >
-  </div>
-</div>
-      <button
-        class="primaryButton"
-        onclick="
-          saveCategoryBudget()
-        "
-      >
-        Save Budget
-      </button>
-    </div>
-  `;
-  openBottomSheet();
-}
-function saveCategoryBudget() {
-  const categoryName = document.getElementById("budgetCategorySelect").value;
-  const budgetLimit = Number(document.getElementById("budgetLimitInput").value);
-  if (!budgetLimit) {
-    return;
-  }
-  if (appState.budgets.categoryBudgets[categoryName]) {
-    closeBottomSheet();
-    return;
-  }
-  appState.budgets.categoryBudgets[categoryName] = {
-    monthlyLimit: budgetLimit,
-    spent: 0,
-  };
-  saveAppState();
-  showToast("Budget Saved");
-  renderCategoryBudgets();
-  closeBottomSheet();
 }
 function editCategoryBudget(categoryName) {
   if (!canManageBudget()) {
@@ -374,20 +126,253 @@ function saveEditedBudget(categoryName) {
   appState.budgets.categoryBudgets[categoryName].monthlyLimit = newLimit;
   saveAppState();
   showToast("Budget Updated");
-  renderCategoryBudgets();
   closeBottomSheet();
 }
-function calculateTotalSpent() {
-  let total = 0;
-  Object.values(appState.groups).forEach(function (categories) {
-    categories.forEach(function (category) {
-      category.items.forEach(function (item) {
-        if (item.purchased) {
-          total += Number(item.actualPrice) || 0;
+/*
+Backend
+GET
+/group/budget-analysis
+Returns
+{
+    monthlyLimit,
+    spent,
+    remaining,
+    highestCategory,
+    highestItem,
+    savings,
+    recommendation,
+    categoryBreakdown
+}
+*/
+/* Render Budget Analysis */
+function renderBudgetAnalysis() {
+  const container = document.getElementById("budgetAnalysisContainer");
+  const activeGroup =
+    localStorage.getItem("activeGroup") || appState.activeGroup;
+  appState.activeGroup = activeGroup;
+  if (!activeGroup) {
+    container.innerHTML = `
+      <div class="emptyState">
+        No Active Group
+      </div>
+    `;
+    return;
+  }
+  const budget = appState.budgets.groupBudgets?.[activeGroup] || {};
+  const limit = budget.monthlyLimit ?? 0;
+  const spent = calculateGroupBudget(activeGroup);
+  const remaining = Math.max(limit - spent, 0);
+  const progressWidth =
+    limit === 0 ? 0 : Math.min(Math.round((spent / limit) * 100), 100);
+  const percent = limit === 0 ? 0 : Math.round((spent / limit) * 100);
+  let highestCategory = "No Spending Yet";
+  let highestSpent = 0;
+  const categories = appState.groups?.[activeGroup] || [];
+  categories.forEach(function (category) {
+    let total = 0;
+    category.items.forEach(function (item) {
+      if (item.purchased && item.estimatedPrice) {
+        total += Number(item.estimatedPrice);
+      }
+    });
+    if (total > highestSpent) {
+      highestSpent = total;
+      highestCategory = category.name;
+    }
+  });
+  let health = "Healthy";
+  if (percent >= 50) {
+    health = "Moderate";
+  }
+  if (percent >= 80) {
+    health = "Warning";
+  }
+  if (percent >= 100) {
+    health = "Over Budget";
+  }
+  let recommendation = "Great job! Your spending is under control.";
+  if (percent >= 50) {
+    recommendation = "Keep monitoring your spending.";
+  }
+  if (percent >= 80) {
+    recommendation = "You are approaching your monthly budget.";
+  }
+  if (percent >= 100) {
+    recommendation =
+      "Budget exceeded. Consider reducing non-essential purchases.";
+  }
+  const purchasedItems = categories.reduce(function (total, category) {
+    return (
+      total +
+      category.items.filter(function (item) {
+        return item.purchased;
+      }).length
+    );
+  }, 0);
+  const savings = remaining;
+  container.innerHTML = `
+    <div class="budgetAnalysisCard">
+      <h2>
+  ${activeGroup}
+</h2>
+<p class="budgetSubtitle">
+  Monthly Budget Analysis
+</p>
+      <div class="analysisValue">
+        <span>Budget</span>
+        <span>${limit > 0 ? "$" + limit : "Not Set"}</span>
+      </div>
+      <div class="analysisValue">
+        <span>Spent</span>
+        <span>$${spent}</span>
+      </div>
+      <div class="analysisValue">
+        <span>Remaining</span>
+        <span>${limit > 0 ? "$" + remaining : "-"}</span>
+      </div>
+      <div class="analysisValue">
+        <span>Health</span>
+        <span>${health}</span>
+      </div>
+      <div class="analysisProgressBar">
+        <div
+          class="analysisProgressFill"
+          style="width:${progressWidth}%"
+        ></div>
+      </div>
+      <div class="analysisValue">
+        <span>Highest Spending</span>
+        <span>${highestCategory}</span>
+      </div>
+    </div>
+    <div class="budgetInsightCard">
+      <h3>Budget Insights</h3>
+      <div class="analysisValue">
+        <span>Savings</span>
+        <span>$${savings}</span>
+      </div>
+      <div class="analysisValue">
+        <span>Highest Spending</span>
+        <span>${highestCategory}</span>
+      </div>
+      <div class="analysisValue">
+        <span>Purchased Items</span>
+        <span>${purchasedItems}</span>
+      </div>
+      <div class="analysisValue">
+        <span>Recommendation</span>
+      </div>
+      <p class="budgetRecommendation">
+        ${recommendation}
+      </p>
+    </div>
+    <div id="categoryBudgetContainer"></div>
+  `;
+  renderCategoryBudgetCards();
+}
+/* Render Category Budget Cards */
+function renderCategoryBudgetCards() {
+  const container = document.getElementById("categoryBudgetContainer");
+  container.innerHTML = "";
+  const categories = appState.groups?.[appState.activeGroup] || [];
+  if (categories.length === 0) {
+    container.innerHTML = `
+      <div class="emptyStateCard">
+        No Categories Available
+      </div>
+    `;
+    return;
+  }
+  const categorySummary = [];
+  categories.forEach(function (category) {
+    const budget =
+      appState.budgets.categoryBudgets?.[appState.activeGroup]?.[
+        category.name
+      ] || {};
+    const limit = budget.monthlyLimit ?? 0;
+    let spent = 0;
+    let highestItem = "";
+    let highestPrice = 0;
+    category.items.forEach(function (item) {
+      if (item.purchased && item.estimatedPrice) {
+        spent += Number(item.estimatedPrice);
+        if (Number(item.estimatedPrice) > highestPrice) {
+          highestPrice = Number(item.estimatedPrice);
+          highestItem = item.name;
         }
-      });
+      }
+    });
+    categorySummary.push({
+      name: category.name,
+      spent,
+      limit,
+      highestItem,
     });
   });
-  return total;
+  categorySummary.sort(function (a, b) {
+    return b.spent - a.spent;
+  });
+  categorySummary.forEach(function (category) {
+    const percent =
+      category.limit > 0
+        ? Math.min(Math.round((category.spent / category.limit) * 100), 100)
+        : 0;
+    let status = "Healthy";
+    if (percent >= 80) {
+      status = "Warning";
+    }
+    if (percent >= 100) {
+      status = "Over Budget";
+    }
+    container.innerHTML += `
+      <div class="categoryBudgetCard">
+        <div class="analysisCardHeader">
+          <h3>
+            ${category.name}
+          </h3>
+          <span class="budgetStatusBadge">
+            ${status}
+          </span>
+        </div>
+        <div class="analysisValue">
+          <span>Budget</span>
+          <span>
+            ${category.limit > 0 ? "$" + category.limit : "Not Set"}
+          </span>
+        </div>
+        <div class="analysisValue">
+          <span>Spent</span>
+          <span>
+            $${category.spent}
+          </span>
+        </div>
+        <div class="analysisValue">
+          <span>Remaining</span>
+          <span>
+            ${
+              category.limit > 0
+                ? "$" + Math.max(category.limit - category.spent, 0)
+                : "-"
+            }
+          </span>
+        </div>
+        <div class="analysisProgressBar">
+          <div
+            class="analysisProgressFill"
+            style="width:${percent}%"
+          ></div>
+        </div>
+        <div class="analysisValue">
+          <span>Highest Item</span>
+          <span>
+            ${category.highestItem || "No Purchases"}
+          </span>
+        </div>
+      </div>
+    `;
+  });
+}
+function initializeBudgetPage() {
+  renderBudgetAnalysis();
 }
 initializeBudgetPage();

@@ -683,6 +683,9 @@ function completeLeaveGroup(currentUser, remainingMembers) {
   if (remainingMembers.length === 0) {
     delete appState.groupMembers[appState.activeGroup];
     delete appState.groups[appState.activeGroup];
+    if (appState.budgets && appState.budgets.groupBudgets) {
+      delete appState.budgets.groupBudgets[appState.activeGroup];
+    }
     if (appState.pendingInvites) {
       appState.pendingInvites = appState.pendingInvites.filter(
         function (invite) {
@@ -709,13 +712,19 @@ function completeLeaveGroup(currentUser, remainingMembers) {
     "Left Group",
     `${currentUser.name} left the group.`,
   );
+  const remainingGroups = Object.keys(appState.groups);
+  if (remainingGroups.length > 0) {
+    appState.activeGroup = remainingGroups[0];
+    localStorage.setItem("activeGroup", remainingGroups[0]);
+  } else {
+    appState.activeGroup = null;
+    localStorage.removeItem("activeGroup");
+  }
   saveAppState();
   closeBottomSheet();
   showToast(
     remainingMembers.length === 0 ? "Group deleted." : "You left the group.",
   );
-  const remainingGroups = Object.keys(appState.groups);
-  appState.activeGroup = remainingGroups.length > 0 ? remainingGroups[0] : null;
   window.location.href = "../pages/dashboardPage.html";
 }
 /* Bottom Sheet */

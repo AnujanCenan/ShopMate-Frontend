@@ -92,6 +92,8 @@ function selectGroup(groupName) {
   selectedGroupName.textContent = groupName;
   localStorage.setItem("activeGroup", groupName);
   renderCategories();
+  renderBudgetDashboardWidget();
+  renderGroupDropdown();
   closeBottomSheet();
 }
 /* Open Category Page */
@@ -180,7 +182,6 @@ function renderCreateGroupForm() {
   openBottomSheet();
 }
 /* Create Group */
-/* Create Group */
 function createGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
   const groupName = groupNameInput.value.trim();
@@ -192,6 +193,12 @@ function createGroup() {
     return;
   }
   appState.groups[groupName] = [];
+  if (!appState.budgets.groupBudgets) {
+    appState.budgets.groupBudgets = {};
+  }
+  appState.budgets.groupBudgets[groupName] = {
+    monthlyLimit: null,
+  };
   if (!appState.groupMembers) {
     appState.groupMembers = {};
   }
@@ -263,16 +270,18 @@ function createCategory() {
   });
   if (!appState.budgets) {
     appState.budgets = {
-      groupBudget: {
-        monthlyLimit: 50000,
-        spent: 0,
-      },
+      groupBudgets: {},
       categoryBudgets: {},
     };
   }
-  appState.budgets.categoryBudgets[categoryName] = {
-    monthlyLimit: 1000,
-    spent: 0,
+  if (!appState.budgets.categoryBudgets) {
+    appState.budgets.categoryBudgets = {};
+  }
+  if (!appState.budgets.categoryBudgets[appState.activeGroup]) {
+    appState.budgets.categoryBudgets[appState.activeGroup] = {};
+  }
+  appState.budgets.categoryBudgets[appState.activeGroup][categoryName] = {
+    monthlyLimit: null,
   };
   saveAppState();
   renderCategories();
@@ -303,6 +312,14 @@ function renderCategoryActions(categoryName) {
             >
                 ✏ Rename Category
             </button>
+            <button
+              class="bottomSheetActionButton"
+              onclick="
+                renderCategoryBudgetForm(
+                    '${categoryName}'
+                )
+              "
+            >Set Category Budget</button>
             <button
                 class="bottomSheetDeleteButton"
                 onclick="
@@ -396,6 +413,13 @@ function saveRenamedCategory(categoryName) {
     return;
   }
   category.name = newCategoryName;
+  if (
+    appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
+  ) {
+    appState.budgets.categoryBudgets[appState.activeGroup][newCategoryName] =
+      appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
+    delete appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
+  }
   saveAppState();
   renderCategories();
   closeBottomSheet();
@@ -456,6 +480,9 @@ function confirmDeleteCategory(categoryName) {
   ].filter(function (category) {
     return category.name !== categoryName;
   });
+  if (appState.budgets.categoryBudgets?.[appState.activeGroup]) {
+    delete appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
+  }
   saveAppState();
   renderCategories();
   closeBottomSheet();
@@ -557,6 +584,16 @@ function saveRenamedGroup(oldGroupName) {
   }
   appState.groups[newGroupName] = appState.groups[oldGroupName];
   delete appState.groups[oldGroupName];
+  if (appState.budgets.groupBudgets?.[oldGroupName]) {
+    appState.budgets.groupBudgets[newGroupName] =
+      appState.budgets.groupBudgets[oldGroupName];
+    delete appState.budgets.groupBudgets[oldGroupName];
+  }
+  if (appState.budgets.categoryBudgets?.[oldGroupName]) {
+    appState.budgets.categoryBudgets[newGroupName] =
+      appState.budgets.categoryBudgets[oldGroupName];
+    delete appState.budgets.categoryBudgets[oldGroupName];
+  }
   if (appState.activeGroup === oldGroupName) {
     appState.activeGroup = newGroupName;
     selectedGroupName.textContent = newGroupName;
@@ -574,6 +611,8 @@ function deleteGroup(groupName) {
     `Are you sure you want to delete "${groupName}"?\n\nThis action cannot be undone.`,
     function () {
       delete appState.groups[groupName];
+      delete appState.budgets.groupBudgets[groupName];
+      delete appState.budgets.categoryBudgets[groupName];
       if (appState.activeGroup === groupName) {
         appState.activeGroup = null;
         selectedGroupName.textContent = "No Group Selected";
@@ -709,96 +748,180 @@ function renderSideDrawer() {
 /* Render Budget Dashboard Widget */
 function renderBudgetDashboardWidget() {
   const budgetWidget = document.getElementById("budgetDashboardWidget");
-  if (!budgetWidget || !appState.budgets) {
+  if (!budgetWidget || !appState.activeGroup) {
     return;
   }
-  const limit = appState.budgets.groupBudget.monthlyLimit;
-  const spent = appState.budgets.groupBudget.spent;
-  const remaining = limit - spent;
-  const percentUsed = Math.min(Math.round((spent / limit) * 100) || 0, 100);
+  calculateGroupBudget();
+  if (!appState.budgets.groupBudgets) {
+    appState.budgets.groupBudgets = {};
+  }
+  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
+    appState.budgets.groupBudgets[appState.activeGroup] = {
+      monthlyLimit: null,
+    };
+  }
+  const groupBudget = appState.budgets.groupBudgets[appState.activeGroup];
+  const limit = groupBudget.monthlyLimit ?? 0;
+  const spent = calculateGroupBudget();
+  const remaining = Math.max(limit - spent, 0);
+  let allocated = 0;
+  const categoryBudgets =
+    appState.budgets.categoryBudgets?.[appState.activeGroup] || {};
+  Object.values(categoryBudgets).forEach(function (budget) {
+    allocated += budget.monthlyLimit || 0;
+  });
+  const unallocated = Math.max(limit - allocated, 0);
+  const allocationPercent =
+    limit === 0 ? 0 : Math.round((allocated / limit) * 100);
+  const percentUsed =
+    limit === 0 ? 0 : Math.min(Math.round((spent / limit) * 100), 100);
+  let budgetHealth = "Healthy";
+  let allocationHealth = "Healthy";
+  if (allocationPercent >= 80) {
+    allocationHealth = "Warning";
+  }
+  if (allocationPercent >= 100) {
+    allocationHealth = "Full";
+  }
+  let healthClass = "budgetHealthyText";
+  if (limit === 0) {
+    budgetHealth = "Unlimited";
+  } else if (percentUsed >= 90) {
+    budgetHealth = "Critical";
+    healthClass = "budgetCriticalText";
+  } else if (percentUsed >= 70) {
+    budgetHealth = "Warning";
+    healthClass = "budgetWarningText";
+  }
   let progressClass = "budgetHealthy";
   if (percentUsed >= 80) {
     progressClass = "budgetCritical";
   } else if (percentUsed >= 50) {
     progressClass = "budgetWarning";
   }
-  let topCategory = "No Spending Yet";
-  let highestSpend = 0;
-  Object.entries(appState.budgets.categoryBudgets).forEach(function ([
-    name,
-    budget,
-  ]) {
-    if (budget.spent > highestSpend) {
-      highestSpend = budget.spent;
-      topCategory = name;
-    }
-  });
   budgetWidget.innerHTML = `
-<div class="budgetWidgetCard">
-    <div class="budgetWidgetHeader">
+    <div class="budgetSummaryCard">
+      <button
+        class="budgetSummaryHeader"
+        onclick="toggleBudgetCard()"
+      >
         <div>
-            <h3 class="budgetWidgetTitle">
-                Budget Snapshot
-            </h3>
-            <p class="budgetWidgetSubtitle">
-                Family Monthly Budget
-            </p>
+          <h3>
+            Monthly Budget
+          </h3>
+          <p class="budgetGroupName">
+            ${appState.activeGroup || "No Group Selected"}
+          </p>
         </div>
-        <button
-            class="budgetEditButton"
-            onclick="renderEditGroupBudgetForm()"
-        >
-            &#9998;
-        </button>
-    </div>
-    <h2 class="budgetWidgetAmount">
-        $${spent}
-        <span class="budgetAmountDivider">/</span>
-        $${limit}
-    </h2>
-    <div class="budgetProgressBar">
-        <div
+        <span id="budgetCollapseIcon">
+          ▼
+        </span>
+      </button>
+      <div
+        id="budgetSummaryBody"
+        class="budgetSummaryBody"
+      >
+        <h2>
+          ${limit === 0 ? "Unlimited" : "$" + limit}
+        </h2>
+        <div class="analysisValue">
+          <span>Allocated</span>
+          <span>$${allocated}</span>
+        </div>
+        <div class="analysisValue">
+          <span>Spent</span>
+          <span>$${spent}</span>
+        </div>
+        <div class="analysisValue">
+          <span>Remaining</span>
+          <span>
+            ${limit === 0 ? "Unlimited" : "$" + remaining}
+          </span>
+        </div>
+        <div class="budgetProgressBar">
+          <div
             class="
-                budgetProgressFill
-                ${progressClass}
+              budgetProgressFill
+              ${progressClass}
             "
             style="width:${percentUsed}%"
-        ></div>
-    </div>
-    <div class="budgetWidgetSummary">
-        <div class="budgetSummaryItem">
-            <span>Remaining</span>
-            <strong>$${remaining}</strong>
+          ></div>
         </div>
-        <div class="budgetSummaryItem">
-            <span>Used</span>
-            <strong>${percentUsed}%</strong>
-        </div>
-    </div>
-    ${
-      appState.dashboardBudgetExpanded
-        ? `
-            <div class="budgetWidgetDetails">
-                <div class="budgetDetailRow">
-                    <span>Top Category</span>
-                    <strong>${topCategory}</strong>
-                </div>
-                <div class="budgetDetailRow">
-                    <span>Spent</span>
-                    <strong>$${spent}</strong>
-                </div>
+        <p class="budgetPercentText">
+          ${limit === 0 ? "Unlimited Budget" : percentUsed + "% Used"}
+        </p>
+        <p class="budgetAllocationText">
+          Allocation ${allocationPercent}%
+        </p>
+        <p class="${healthClass}">
+          Budget Usage • ${budgetHealth}
+        </p>
+        <p class="budgetAllocationStatus">
+          Allocation • ${allocationHealth}
+        </p>
+        ${
+          allocated > limit && limit > 0
+            ? `
+            <div class="budgetWarningBanner">
+              ⚠ Category budgets exceed the Group Budget.
             </div>
             `
-        : ""
-    }
-    <button
-        class="budgetExpandButton"
-        onclick="toggleBudgetWidget()"
-    >
-        ${appState.dashboardBudgetExpanded ? "▲ Show Less" : "▼ Show Details"}
-    </button>
-</div>
-`;
+            : ""
+        }
+        ${
+          limit === 0
+            ? ""
+            : `
+              <p class="budgetInsight">
+                ${
+                  remaining > 0
+                    ? "$" + remaining + " remaining this month."
+                    : "Budget exceeded."
+                }
+              </p>
+            `
+        }
+        ${
+          canManageBudget()
+            ? `
+              <button
+                class="primaryButton budgetEditButton"
+                onclick="renderEditGroupBudgetForm()"
+              >
+                Edit Budget
+              </button>
+            `
+            : ""
+        }
+        <button
+          class="secondaryButton budgetEditButton"
+          onclick="window.location.href='../pages/budgetPage.html'"
+        >
+          Budget Analysis
+        </button>
+      </div>
+    </div>
+  `;
+  /****************************************
+  Backend
+  GET
+  /group/budget/dashboard
+  Returns
+  {
+      monthlyLimit,
+      spent,
+      remaining,
+      percentage,
+      status
+  }
+  ****************************************/
+}
+/* Toggle Budget Card */
+function toggleBudgetCard() {
+  const body = document.getElementById("budgetSummaryBody");
+  const icon = document.getElementById("budgetCollapseIcon");
+  body.classList.toggle("hidden");
+  icon.textContent = body.classList.contains("hidden") ? "▶" : "▼";
 }
 /* Render Edit Group Budget Form */
 function renderEditGroupBudgetForm() {
@@ -828,8 +951,10 @@ function renderEditGroupBudgetForm() {
                             bottomSheetInput
                             currencyInput
                         "
-                        value="${appState.budgets.groupBudget.monthlyLimit}"
-                    >
+                        value="${
+                          appState.budgets.groupBudgets?.[appState.activeGroup]
+                            ?.monthlyLimit ?? ""
+                        }"                    >
                 </div>
             </div>
             <div class="bottomSheetButtonRow">
@@ -850,15 +975,171 @@ function renderEditGroupBudgetForm() {
     `;
   openBottomSheet();
 }
+/* Render Category Budget Form */
+function renderCategoryBudgetForm(categoryName) {
+  const currentBudget =
+    appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
+      ?.monthlyLimit ?? "";
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>
+        Category Budget
+      </h2>
+      <button
+        class="closeButton"
+        onclick="
+          closeBottomSheet()
+        "
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <label>
+        Budget Amount
+      </label>
+      <p class="budgetHelperLabel">
+Group Budget
+<span id="groupBudgetValue">
+</span>
+</p>
+<p class="budgetHelperLabel">
+Allocated
+<span id="allocatedBudgetValue">
+</span>
+</p>
+<p class="budgetHelperLabel">
+Remaining
+<span id="remainingBudgetValue">
+</span>
+</p>
+      <input
+        id="categoryBudgetInput"
+        class="bottomSheetInput"
+        type="number"
+        value="${currentBudget}"
+      >
+      <div
+        id="categoryBudgetRemaining"
+        class="budgetHelperText"
+      ></div>
+      <button
+        class="primaryButton"
+        onclick="
+          saveCategoryBudget(
+            '${categoryName}'
+          )
+        "
+      >
+        Save Budget
+      </button>
+    </div>
+  `;
+  updateCategoryBudgetRemaining(categoryName);
+  document
+    .getElementById("categoryBudgetInput")
+    .addEventListener("input", function () {
+      updateCategoryBudgetRemaining(categoryName);
+    });
+  openBottomSheet();
+}
+/* Update Remaining Budget */
+function updateCategoryBudgetRemaining(categoryName) {
+  const groupBudget =
+    appState.budgets.groupBudgets?.[appState.activeGroup]?.monthlyLimit ?? 0;
+  let allocated = 0;
+  const categoryBudgets =
+    appState.budgets.categoryBudgets?.[appState.activeGroup] || {};
+  Object.entries(categoryBudgets).forEach(function (entry) {
+    if (entry[0] !== categoryName) {
+      allocated += entry[1].monthlyLimit || 0;
+    }
+  });
+  const entered =
+    Number(document.getElementById("categoryBudgetInput").value) || 0;
+  document.getElementById("groupBudgetValue").innerHTML = "$" + groupBudget;
+  document.getElementById("allocatedBudgetValue").innerHTML = "$" + allocated;
+  const remaining = groupBudget - allocated - entered;
+  const remainingLabel = document.getElementById("remainingBudgetValue");
+  remainingLabel.innerHTML = "$" + remaining;
+  remainingLabel.style.color = remaining < 0 ? "#dc2626" : "#16a34a";
+}
+/* Save Category Budget */
+function saveCategoryBudget(categoryName) {
+  const amount = Number(document.getElementById("categoryBudgetInput").value);
+  if (amount < 0) {
+    showDialog("Invalid Budget", "Budget cannot be negative.");
+    return;
+  }
+  if (!appState.budgets.categoryBudgets) {
+    appState.budgets.categoryBudgets = {};
+  }
+  if (!appState.budgets.categoryBudgets[appState.activeGroup]) {
+    appState.budgets.categoryBudgets[appState.activeGroup] = {};
+  }
+  const groupBudget =
+    appState.budgets.groupBudgets?.[appState.activeGroup]?.monthlyLimit ?? 0;
+  let allocated = 0;
+  Object.entries(
+    appState.budgets.categoryBudgets[appState.activeGroup],
+  ).forEach(function (entry) {
+    const name = entry[0];
+    const budget = entry[1];
+    if (name !== categoryName) {
+      allocated += budget.monthlyLimit || 0;
+    }
+  });
+  const totalAllocated = allocated + amount;
+  if (groupBudget > 0 && totalAllocated > groupBudget) {
+    showDialog(
+      "Category Budget Exceeded",
+      `Total allocated budget is $${totalAllocated}.
+Group budget is only $${groupBudget}.
+Reduce another category budget or increase the group budget.`,
+    );
+    return;
+  }
+  appState.budgets.categoryBudgets[appState.activeGroup][categoryName] = {
+    monthlyLimit: amount,
+  };
+  saveAppState();
+  closeBottomSheet();
+  showToast("Category Budget Saved");
+}
 /* Save Group Budget */
 function saveGroupBudget() {
   const amount = Number(document.getElementById("groupBudgetInput").value);
-  if (amount <= 0) {
-    showDialog("Please enter a valid budget.");
+  let allocated = 0;
+  const categoryBudgets =
+    appState.budgets.categoryBudgets?.[appState.activeGroup] || {};
+  Object.values(categoryBudgets).forEach(function (budget) {
+    allocated += budget.monthlyLimit || 0;
+  });
+  if (amount < allocated) {
+    showDialog(
+      "Invalid Group Budget",
+      `Your category budgets already total $${allocated}.
+Increase the group budget or reduce category budgets first.`,
+    );
     return;
   }
-  appState.budgets.groupBudget.monthlyLimit = amount;
+  if (amount < 0) {
+    showDialog("Invalid Budget", "Budget cannot be negative.");
+    return;
+  }
+  if (!appState.budgets.groupBudgets) {
+    appState.budgets.groupBudgets = {};
+  }
+  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
+    appState.budgets.groupBudgets[appState.activeGroup] = {};
+  }
+  appState.budgets.groupBudgets[appState.activeGroup].monthlyLimit = amount;
   saveAppState();
+  createNotification(
+    "budget",
+    "Budget Updated",
+    `${appState.activeGroup || "No Group Selected"}budget updated to $${amount}.`,
+  );
   renderBudgetDashboardWidget();
   closeBottomSheet();
   showToast("Budget updated.");

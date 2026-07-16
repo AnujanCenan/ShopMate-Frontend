@@ -103,6 +103,27 @@ function canManageBudget() {
 function canManageGroup() {
   return isAdmin();
 }
+/* Calculate Group Budget */
+function calculateGroupBudget() {
+  if (!appState.budgets.groupBudgets) {
+    appState.budgets.groupBudgets = {};
+  }
+  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
+    appState.budgets.groupBudgets[appState.activeGroup] = {
+      monthlyLimit: null,
+    };
+  }
+  let spent = 0;
+  const categories = appState.groups[appState.activeGroup] || [];
+  categories.forEach(function (category) {
+    category.items.forEach(function (item) {
+      if (item.purchased && item.estimatedPrice) {
+        spent += Number(item.estimatedPrice);
+      }
+    });
+  });
+  return spent;
+}
 /* Show Dialog */
 function showDialog(title, message) {
   const existingDialog = document.getElementById("appDialogOverlay");

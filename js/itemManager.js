@@ -544,6 +544,8 @@ function updateItem(originalItemName) {
   item.imageUrl = updatedImage;
   saveProductToCatalog(item);
   saveAppState();
+  calculateGroupBudget();
+  renderBudgetDashboardWidget();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item updated");
@@ -674,6 +676,9 @@ function confirmPurchase(itemName) {
   item.purchased = !item.purchased;
   updateBudgetTracking(currentCategory.name, actualPrice);
   saveAppState();
+  calculateGroupBudget();
+  renderBudgetDashboardWidget();
+  renderItems();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item purchased");
@@ -690,7 +695,7 @@ function updateBudgetTracking(categoryName, amount) {
     return;
   }
   /* Update Group Budget */
-  appState.budgets.groupBudget.spent += amount;
+
   const categoryBudget = appState.budgets.categoryBudgets[categoryName];
   if (categoryBudget) {
     /* Update Category Budget */

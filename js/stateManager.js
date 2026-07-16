@@ -68,16 +68,8 @@ const defaultAppState = {
     },
   ],
   budgets: {
-    groupBudget: {
-      monthlyLimit: 50000,
-      spent: 0,
-    },
-    categoryBudgets: {
-      "Monthly Groceries": {
-        monthlyLimit: 8000,
-        spent: 0,
-      },
-    },
+    groupBudgets: {},
+    categoryBudgets: {},
   },
 };
 function loadAppState() {
