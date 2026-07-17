@@ -733,15 +733,7 @@ function renderSideDrawer() {
       >
         💰 Budget
       </button>
-      <button
-        class="drawerItem"
-        onclick="
-          window.location.href =
-          '../pages/productCatalogPage.html'
-        "
-      >
-        📦 Product Catalog
-      </button>
+
       <button
         class="drawerItem"
         onclick="
@@ -1236,4 +1228,7 @@ if (menuButton) {
   menuButton.addEventListener("click", openSideDrawer);
 }
 /* Initial Render */
-initializeDashboard();
+(async function () {
+  await loadProductCatalog();
+  initializeDashboard();
+})();

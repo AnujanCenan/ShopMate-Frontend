@@ -161,7 +161,7 @@ function renderItems(items) {
     <p class="itemDetails">Shop: ${item.preferredShop || "-"}</p>
     <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
   </div>
-  <div class="itemImageContainer">${item.imageUrl ? `<img src="${item.imageUrl}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
+  <div class="itemImageContainer">${getProductImage(item.name) ? `<img src="${getProductImage(item.name)}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
   </div>
 </div>`;
   });
@@ -198,4 +198,7 @@ if (backButton) {
   });
 }
 /* Initial Render */
-initializeCategoryPage();
+(async function () {
+  await loadProductCatalog();
+  initializeCategoryPage();
+})();

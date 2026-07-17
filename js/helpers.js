@@ -1,4 +1,13 @@
-/* Open Bottom Sheet */
+let productDatabase = [];
+/* Load Product Catalog */
+async function loadProductCatalog() {
+  try {
+    const response = await fetch("../data/json/products.json");
+    productDatabase = await response.json();
+  } catch {
+    productDatabase = [];
+  }
+}
 /* Open Bottom Sheet */
 function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
@@ -300,3 +309,23 @@ function createNotification(type, title, message) {
   saveAppState();
   updateNotificationBadge();
 }
+/* Get Product Image */
+function getProductImage(itemName) {
+  const product = productDatabase.find(function (product) {
+    return product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
+  });
+  if (product) {
+    return `../assets/images/products/${product.image}`;
+  }
+  return "../assets/images/products/default.png";
+}
+/***************************************
+Backend
+GET
+/products/image
+Returns
+{
+    productName,
+    imageUrl
+}
+****************************************/

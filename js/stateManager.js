@@ -9,7 +9,6 @@ const defaultAppState = {
   selectionMode: false,
   selectedItems: [],
   favoriteItems: [],
-  productCatalog: {},
   notifications: [],
   dashboardBudgetExpanded: false,
   drawerPosition: "right",

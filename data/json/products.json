@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Milk",
+    "image": "milk.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Bread",
+    "image": "bread.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Eggs",
+    "image": "eggs.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Rice",
+    "image": "rice.jpg"
+  }
+]
