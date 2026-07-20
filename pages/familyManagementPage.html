@@ -13,30 +13,12 @@
         <h1 class="modernPageTitle">Group Management</h1>
       </header>
       <main class="pageContent">
-        <section class="groupManagementHero">
-          <div>
-            <h2 class="groupManagementTitle" id="groupManagementTitle">
-              Family Group
-            </h2>
-            <p class="groupManagementSubtitle" id="groupMemberCount">
-              0 Members
-            </p>
-          </div>
-          <button class="inviteFloatingButton" id="inviteMemberButton">
-            +
-          </button>
-        </section>
-        <section class="memberList" id="memberList"></section>
-        <section class="pendingInvitesSection">
-          <h2 class="settingsSectionTitle">Pending Invites</h2>
-          <div id="pendingInviteList"></div>
-        </section>
+        <div id="groupManagementContainer"></div>
+        <div id="groupSwitcherContainer"></div>
+
         <section class="readOnlyBanner hidden" id="readOnlyBanner">
           You have read-only access in this group.
         </section>
-        <button class="leaveGroupButton" onclick="openLeaveGroupDialog()">
-          Leave Group
-        </button>
       </main>
       <div class="screenOverlay hidden" id="screenOverlay"></div>
       <div class="bottomSheet hidden" id="bottomSheet">

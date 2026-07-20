@@ -1,27 +1,42 @@
+let productDatabase = [];
+/* Load Product Catalog */
+async function loadProductCatalog() {
+  try {
+    const response = await fetch("../data/json/products.json");
+    productDatabase = await response.json();
+  } catch {
+    productDatabase = [];
+  }
+}
 /* Open Bottom Sheet */
 function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
-  if (!bottomSheet) {
+  if (!bottomSheet || !screenOverlay) {
     return;
   }
   screenOverlay.classList.remove("hidden");
   bottomSheet.classList.remove("hidden");
-  appFooter.classList.add("hiddenFooter");
+  if (appFooter) {
+    appFooter.classList.add("hiddenFooter");
+  }
   document.body.style.overflow = "hidden";
 }
+/* Close Bottom Sheet */
 /* Close Bottom Sheet */
 function closeBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
-  if (!bottomSheet) {
+  if (!bottomSheet || !screenOverlay) {
     return;
   }
   screenOverlay.classList.add("hidden");
   bottomSheet.classList.add("hidden");
-  appFooter.classList.remove("hiddenFooter");
+  if (appFooter) {
+    appFooter.classList.remove("hiddenFooter");
+  }
   document.body.style.overflow = "";
 }
 /* Close Bottom Sheet On Escape */
@@ -97,6 +112,27 @@ function canManageBudget() {
 function canManageGroup() {
   return isAdmin();
 }
+/* Calculate Group Budget */
+function calculateGroupBudget() {
+  if (!appState.budgets.groupBudgets) {
+    appState.budgets.groupBudgets = {};
+  }
+  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
+    appState.budgets.groupBudgets[appState.activeGroup] = {
+      monthlyLimit: null,
+    };
+  }
+  let spent = 0;
+  const categories = appState.groups[appState.activeGroup] || [];
+  categories.forEach(function (category) {
+    category.items.forEach(function (item) {
+      if (item.purchased && item.estimatedPrice) {
+        spent += Number(item.estimatedPrice);
+      }
+    });
+  });
+  return spent;
+}
 /* Show Dialog */
 function showDialog(title, message="") {
   const existingDialog = document.getElementById("appDialogOverlay");
@@ -140,7 +176,7 @@ function closeDialog() {
   }
 }
 /* Confirmation Dialog */
-function showConfirmDialog(title, message, onConfirm) {
+function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
@@ -174,13 +210,14 @@ function showConfirmDialog(title, message, onConfirm) {
                 executeDialogConfirm()
               "
             >
-              Delete
+              ${window.dialogConfirmText || "Confirm"}
             </button>
           </div>
         </div>
       </div>
     `,
   );
+  window.dialogConfirmText = confirmText;
   window.dialogConfirmAction = onConfirm;
 }
 /* Execute Confirm */
@@ -272,3 +309,23 @@ function createNotification(type, title, message) {
   saveAppState();
   updateNotificationBadge();
 }
+/* Get Product Image */
+function getProductImage(itemName) {
+  const product = productDatabase.find(function (product) {
+    return product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
+  });
+  if (product) {
+    return `../assets/images/products/${product.image}`;
+  }
+  return "../assets/images/products/default.png";
+}
+/***************************************
+Backend
+GET
+/products/image
+Returns
+{
+    productName,
+    imageUrl
+}
+****************************************/

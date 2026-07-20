@@ -177,33 +177,38 @@ function renderItems(items) {
                </span>
                </button>
                ${
-                 state.activeTab === "favorites"
-                   ? `<button class="modernActionButton addActionButton" onclick="toggleFavorite_mysql(${item.ListItemId}, state)">+</button>`
-                   : `<button class="modernActionButton purchasedActionButton ${item.Purchased ? "activePurchasedButton" : ""}"
-                  onclick="event.stopPropagation(); openPurchaseConfirmation(${item.ListItemId});">
-          
-                  <span class="actionButtonIcon">
-                    ${state.activeTab === "purchased" ? "↺" : "✓"}
-                  </span>
-                  </button>
-                  `
-                }
-              </div>
-              </div>
-              <div class="itemCardContent">
-                <div class="itemDetailsSection">
-                  <p class="itemDetails">Notes: ${item.OptionalNotes || "-"}</p>
-                  <p class="itemDetails">Shop: ${item.ShopName || "-"}</p>
-                  <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
-                </div>
-                <div class="itemImageContainer">
-                  ${item.imageUrl 
-                    ? `<img src="${item.imageUrl}" class="itemImage" alt="${item.name}">` 
-                    : `<div class="itemImagePlaceholder">📦</div>`}
-                </div>
-              </div>
-            </div>
-          </div>`;
+                 appState.activeTab === "favorites"
+                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.name}')">+</button>
+            `
+                   : `
+            <button
+    class="
+        modernActionButton
+        purchasedActionButton
+        ${item.purchased ? "activePurchasedButton" : ""}
+    "
+    onclick="
+        event.stopPropagation();
+        openPurchaseConfirmation('${item.name}');
+    "
+>
+    <span class="actionButtonIcon">
+        ${appState.activeTab === "purchased" ? "↺" : "✓"}
+    </span>
+</button>
+            `
+               }
+    </div>
+</div>
+<div class="itemCardContent">
+  <div class="itemDetailsSection">
+    <p class="itemDetails">Notes: ${item.notes || "-"}</p>
+    <p class="itemDetails">Shop: ${item.preferredShop || "-"}</p>
+    <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
+  </div>
+  <div class="itemImageContainer">${getProductImage(item.name) ? `<img src="${getProductImage(item.name)}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
+  </div>
+</div>`;
   });
 }
 /* Initialize Tabs */
@@ -239,4 +244,7 @@ if (backButton) {
   });
 }
 /* Initial Render */
-initializeCategoryPage();
+(async function () {
+  await loadProductCatalog();
+  initializeCategoryPage();
+})();

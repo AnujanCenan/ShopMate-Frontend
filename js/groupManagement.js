@@ -1,58 +1,172 @@
 redirectIfLoggedOut();
-const memberList = document.getElementById("memberList");
 const pendingInviteList = document.getElementById("pendingInviteList");
-const groupManagementTitle = document.getElementById("groupManagementTitle");
-const groupMemberCount = document.getElementById("groupMemberCount");
-const inviteMemberButton = document.getElementById("inviteMemberButton");
 const readOnlyBanner = document.getElementById("readOnlyBanner");
 const bottomSheet = document.getElementById("bottomSheet");
 const bottomSheetContent = document.getElementById("bottomSheetContent");
 const screenOverlay = document.getElementById("screenOverlay");
 /* Initialize */
 function initializeGroupManagement() {
-  renderGroupSwitcher();
-  renderMembers();
-  renderPendingInvites();
+  renderGroupAccordion();
   setupPermissions();
 }
-/* Render Group Switcher */
-function renderGroupSwitcher() {
-  const existingSwitcher = document.querySelector(".groupSwitcher");
-  if (existingSwitcher) {
-    existingSwitcher.remove();
-  }
-  const groups = Object.keys(appState.groups);
-  let switcherHTML = `
-    <div class="groupSwitcher">
-      <div class="groupSwitcherHeader">
-        <h3 class="groupSwitcherTitle">Your Groups</h3>
-        <button class="secondaryButton" onclick="renderJoinGroupForm()">Join Group</button>
-      </div>`;
-  groups.forEach(function (groupName) {
-    switcherHTML += `
-      <button
-        class="
-          groupSwitcherButton
+/* Render Group Accordion */
+function renderGroupAccordion() {
+  const container = document.getElementById("groupManagementContainer");
+  container.innerHTML = "";
+  Object.keys(appState.groups).forEach(function (groupName) {
+    const categories = appState.groups[groupName] || [];
+    const members =
+      appState.groupMembers && appState.groupMembers[groupName]
+        ? appState.groupMembers[groupName]
+        : [];
+    const pendingInvites = (appState.pendingInvites || []).filter(
+      function (invite) {
+        return invite.groupName === groupName;
+      },
+    );
+    container.innerHTML += `
+      <div class="groupAccordionCard">
+        <button
+          class="groupAccordionHeader"
+          onclick="
+            toggleGroupAccordion(
+              '${groupName}'
+            )
+          "
+        >
+          <div>
+            <h3 class="groupAccordionTitle">
+              ${groupName}
+            </h3>
+            <p class="groupAccordionSubtitle">
+              ${members.length} Members •
+              ${categories.length} Categories
+            </p>
+          </div>
+          <span
+            id="accordionIcon_${groupName}"
+            class="accordionIcon"
+          >
+            ▶
+          </span>
+        </button>
+        <div
+          id="accordionBody_${groupName}"
+          class="
+            groupAccordionBody
+            hidden
+          "
+        >
+          <h4 class="groupSectionTitle">
+            Members
+          </h4>
           ${
-            groupName === appState.activeGroup
-              ? "activeGroupSwitcherButton"
-              : ""
+            members.length === 0
+              ? `
+                <p class="emptyStateText">
+                  No Members
+                </p>
+              `
+              : members
+                  .map(function (member) {
+                    return `
+                  <div class="groupMemberRow">
+                    <div>
+                      <div class="groupMemberName">
+                        ${member.name}
+                      </div>
+                      <div class="groupMemberRole">
+                        ${member.role}
+                      </div>
+                    </div>
+                  </div>
+                `;
+                  })
+                  .join("")
           }
-        "
-        onclick="
-          switchGroup(
-            '${groupName}'
-          )
-        "
-      >
-        ${groupName}
-      </button>
+          <hr class="groupDivider">
+          <h4 class="groupSectionTitle">
+            Pending Invitations
+          </h4>
+          ${
+            pendingInvites.length === 0
+              ? `
+                <p class="emptyStateText">
+                  No Pending Invitations
+                </p>
+              `
+              : pendingInvites
+                  .map(function (invite) {
+                    return `
+                  <div class="groupInviteRow">
+                    <div>
+                      <div class="groupMemberName">
+                        ${invite.email}
+                      </div>
+                      <div class="groupMemberRole">
+                        Pending
+                      </div>
+                    </div>
+                  </div>
+                `;
+                  })
+                  .join("")
+          }
+          <button
+            class="primaryButton"
+            onclick="
+              appState.activeGroup='${groupName}';
+              renderInviteMemberForm();
+            "
+          >
+            Send Invitation
+          </button>
+          <button
+            class="secondaryButton"
+            onclick="
+              appState.activeGroup='${groupName}';
+              openLeaveGroupDialog();
+            "
+          >
+            Leave Group
+          </button>
+        </div>
+      </div>
     `;
   });
-  switcherHTML += `
-    </div>
-  `;
-  memberList.insertAdjacentHTML("beforebegin", switcherHTML);
+}
+/* Toggle Group Accordion */
+function toggleGroupAccordion(groupName) {
+  document.querySelectorAll(".groupAccordionBody").forEach(function (body) {
+    if (body.id !== `accordionBody_${groupName}`) {
+      body.classList.add("hidden");
+    }
+  });
+  document.querySelectorAll(".accordionIcon").forEach(function (icon) {
+    if (icon.id !== `accordionIcon_${groupName}`) {
+      icon.textContent = "▶";
+    }
+  });
+  const body = document.getElementById(`accordionBody_${groupName}`);
+  const icon = document.getElementById(`accordionIcon_${groupName}`);
+  body.classList.toggle("hidden");
+  icon.textContent = body.classList.contains("hidden") ? "▶" : "▼";
+}
+/* Toggle Group Accordion */
+function toggleGroupAccordion(groupName) {
+  const body = document.getElementById(`accordionBody_${groupName}`);
+  const icon = document.getElementById(`accordionIcon_${groupName}`);
+  const isHidden = body.classList.contains("hidden");
+  document.querySelectorAll(".groupAccordionBody").forEach(function (item) {
+    item.classList.add("hidden");
+  });
+  document.querySelectorAll(".accordionIcon").forEach(function (item) {
+    item.textContent = "▶";
+  });
+  if (isHidden) {
+    body.classList.remove("hidden");
+    icon.textContent = "▼";
+  }
 }
 /* Switch Group */
 function switchGroup(groupName) {
@@ -71,230 +185,91 @@ function setupPermissions() {
     return;
   }
   if (currentMember.role !== "admin" && currentMember.role !== "owner") {
-    inviteMemberButton.style.display = canManageGroup() ? "flex" : "none";
     readOnlyBanner.classList.remove("hidden");
   } else {
     readOnlyBanner.classList.add("hidden");
   }
 }
 /* Render Members */
-function renderMembers() {
-  const activeGroup = appState.activeGroup;
-  const members = appState.groupMembers[activeGroup];
-  groupManagementTitle.textContent = activeGroup;
-  groupMemberCount.textContent = `${members.length} Members`;
-  memberList.innerHTML = "";
-  members.forEach(function (member) {
-    let memberStatus = "Active";
-    if (member.role === "owner") {
-      memberStatus = "Owner";
-    }
-    if (member.role === "admin") {
-      memberStatus = "Admin";
-    }
-    if (member.status === "pending") {
-      memberStatus = "Pending Invite";
-    }
-    memberList.innerHTML += `
-      <div class="memberCard">
-        <div
-          class="memberInfo clickableMember"
-          onclick="
-            openMemberProfile(
-              '${member.id}'
-            )
-          "
-        >
-          <div class="memberAvatar">
-            ${member.name.charAt(0)}
-          </div>
-          <div>
-            <h3 class="memberName">
-              ${member.name}
-            </h3>
-            <p class="memberRole">
-              ${member.role || "member"}
-            </p>
-            <div
-              class="
-                memberStatusBadge
-                ${
-                  member.role === "admin" || member.role === "owner"
-                    ? "adminStatusBadge"
-                    : "activeStatusBadge"
-                }
-              "
-            >
-              ${memberStatus}
-            </div>
-          </div>
-        </div>
-        ${
-          isAdmin() && member.id !== appState.currentUser.id
-            ? `
-              <button
-                class="memberMoreButton"
-                onclick="
-                  openMemberActions(
-                    '${member.id}'
-                  )
-                "
-              >
-                ⋮
-              </button>
-            `
-            : ""
-        }
-      </div>
-    `;
-  });
-}
-/*Render Pending Invites */
-function renderPendingInvites() {
-  if (!pendingInviteList) {
-    return;
-  }
-  pendingInviteList.innerHTML = "";
-  const activeGroup = appState.activeGroup;
-  const invites = (appState.pendingInvites || []).filter(function (invite) {
-    return invite.groupName === activeGroup;
-  });
-  if (invites.length === 0) {
-    pendingInviteList.innerHTML = `
-      <p class="emptyStateText">
-        No Pending Invites
-      </p>
-    `;
-    return;
-  }
-  invites.forEach(function (invite) {
-    pendingInviteList.innerHTML += `
-      <div class="memberCard">
-        <div class="memberInfo">
-          <div class="memberAvatar">
-            ✉
-          </div>
-          <div>
-            <h3 class="memberName">
-              ${invite.code}
-            </h3>
-            <p class="memberRole">
-              Pending Invite
-            </p>
-            <div
-              class="
-                memberStatusBadge
-                activeStatusBadge
-              "
-            >
-              ${invite.status || "pending"}
-            </div>
-          </div>
-        </div>
-        ${
-          isAdmin()
-            ? `
-              <button
-                class="
-                  memberMoreButton
-                "
-                onclick="
-                  openInviteActions(
-                    '${invite.code}'
-                  )
-                "
-              >
-                ⋮
-              </button>
-            `
-            : ""
-        }
-      </div>
-    `;
-  });
-}
-/*Open Invite Actions */
-function openInviteActions(inviteCode) {
+/* Render Pending Invites */
+/* Open Invite Actions */
+function openInviteActions(email) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Invite Actions
+        Invitation
       </h2>
       <button
         class="closeButton"
-        onclick="
-          closeBottomSheet()
-        "
+        onclick="closeBottomSheet()"
       >
         ✕
       </button>
     </div>
     <div class="bottomSheetBody">
-      <button
-        class="secondaryButton"
-        onclick="
-          copyInviteCode(
-            '${inviteCode}'
-          )
-        "
-      >
-        Copy Invite Code
-      </button>
+      <p class="dialogMessage">
+        ${email}
+      </p>
       <button
         class="dangerButton"
         onclick="
           revokeInvite(
-            '${inviteCode}'
+            '${email}'
           )
         "
       >
-        Revoke Invite
+        Cancel Invitation
       </button>
     </div>
   `;
   openBottomSheet();
 }
 /* Revoke Invite */
-function revokeInvite(inviteCode) {
+function revokeInvite(email) {
   appState.pendingInvites = appState.pendingInvites.filter(function (invite) {
-    return invite.code !== inviteCode;
+    return invite.email !== email;
   });
   saveAppState();
   renderPendingInvites();
   closeBottomSheet();
-  showToast("Invite Revoked");
+  showToast("Invitation Cancelled");
+  createNotification(
+    "group",
+    "Invitation Cancelled",
+    `${email} invitation cancelled.`,
+  );
 }
 /* Render Join Group Form */
 function renderJoinGroupForm() {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Join Group
+        Accept Invitation
       </h2>
       <button
         class="closeButton"
-        onclick="
-          closeBottomSheet()
-        "
+        onclick="closeBottomSheet()"
       >
         ✕
       </button>
     </div>
     <div class="bottomSheetBody">
-      <input
-        id="joinInviteCode"
-        class="bottomSheetInput"
-        placeholder="
-          Enter Invite Code
-        "
-      >
+      <div class="formField">
+        <label class="formLabel">
+          Invitation Email
+        </label>
+        <input
+          id="joinInvitationEmail"
+          class="bottomSheetInput"
+          type="email"
+          placeholder="Enter invitation email"
+        >
+      </div>
       <button
         class="primaryButton"
-        onclick="
-          joinGroup()
-        "
+        onclick="joinGroup()"
       >
-        Join Group
+        Accept Invitation
       </button>
     </div>
   `;
@@ -302,13 +277,27 @@ function renderJoinGroupForm() {
 }
 /* Join Group */
 async function joinGroup() {
-  const inviteCode = document.getElementById("joinInviteCode").value.trim();
-  if (!inviteCode) {
-    showDialog("Missing Invite Code", "Please enter an invite code.");
+  const email = document
+    .getElementById("joinInvitationEmail")
+    .value.trim()
+    .toLowerCase();
+  if (!email) {
+    showDialog("Missing Email", "Please enter your invitation email.");
     return;
   }
-  await joinGroupByInvite(inviteCode);
+  if (!isValidEmail(email)) {
+    showDialog("Invalid Email", "Please enter a valid email address.");
+    return;
+  }
+  /*
+    Backend
+    POST /group/join
+    {
+      email
+    }
+  */
   showToast("Join request submitted");
+  createNotification("group", "Join Request", `Join request sent for ${email}`);
   closeBottomSheet();
 }
 /* Open Member Profile */
@@ -403,11 +392,21 @@ async function makeAdmin(memberId) {
   if (!member) {
     return;
   }
-  await updateMemberRole(memberId, "admin");
   member.role = "admin";
+  /*
+      Backend
+      PATCH
+      /group/member/role
+  */
   saveAppState();
+  renderGroupAccordion();
   closeBottomSheet();
-  renderMembers();
+  showToast("Member promoted");
+  createNotification(
+    "group",
+    "Member Promoted",
+    `${member.name} is now an Admin.`,
+  );
 }
 /* Transfer Ownership */
 function transferOwnership(memberId) {
@@ -424,9 +423,20 @@ function transferOwnership(memberId) {
     return;
   }
   selectedMember.role = "owner";
+  /*
+      Backend
+      PATCH
+      /group/owner
+  */
   saveAppState();
+  renderGroupAccordion();
   closeBottomSheet();
-  renderMembers();
+  showToast("Ownership transferred");
+  createNotification(
+    "group",
+    "Ownership Transferred",
+    `${selectedMember.name} is now the Owner.`,
+  );
 }
 /* Remove Dialog */
 function openRemoveMemberDialog(memberId) {
@@ -469,74 +479,121 @@ function openRemoveMemberDialog(memberId) {
 }
 /* Remove Member */
 async function removeMember(memberId) {
-  await removeGroupMember(memberId);
   const members = getCurrentGroupMembers();
+  const removedMember = members.find(function (member) {
+    return member.id === memberId;
+  });
   appState.groupMembers[appState.activeGroup] = members.filter(
     function (member) {
       return member.id !== memberId;
     },
   );
+  /*
+      Backend
+      DELETE
+      /group/member
+  */
   saveAppState();
+  renderGroupAccordion();
   closeBottomSheet();
-  renderMembers();
+  showToast("Member removed");
+  if (removedMember) {
+    createNotification(
+      "group",
+      "Member Removed",
+      `${removedMember.name} was removed from the group.`,
+    );
+  }
 }
-/* Invite */
-inviteMemberButton.addEventListener("click", function () {
-  const inviteCode =
-    "INVITE_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+/* Invite Member */
+/* Invite Member Form */
+function renderInviteMemberForm() {
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>
+        Invite Member
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="formField">
+        <label class="formLabel">
+          Email Address
+        </label>
+        <input
+          id="inviteMemberEmail"
+          type="email"
+          class="bottomSheetInput"
+          placeholder="Enter email address"
+        >
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          Role
+        </label>
+        <select
+          id="inviteMemberRole"
+          class="bottomSheetInput"
+        >
+          <option value="member">
+            Member
+          </option>
+          <option value="admin">
+            Admin
+          </option>
+        </select>
+      </div>
+      <button
+        class="primaryButton"
+        onclick="sendInvitation()"
+      >
+        Send Invitation
+      </button>
+    </div>
+  `;
+  openBottomSheet();
+}
+/* Send Invitation */
+function sendInvitation() {
+  const email = document
+    .getElementById("inviteMemberEmail")
+    .value.trim()
+    .toLowerCase();
+  const role = document.getElementById("inviteMemberRole").value;
+  if (!email) {
+    showDialog("Missing Email", "Please enter an email address.");
+    return;
+  }
+  if (!isValidEmail(email)) {
+    showDialog("Invalid Email", "Please enter a valid email address.");
+    return;
+  }
   appState.pendingInvites.push({
-    code: inviteCode,
+    email: email,
+    role: role,
     groupName: appState.activeGroup,
     status: "pending",
+    createdAt: Date.now(),
   });
+  /*
+    Backend
+    POST /group/invite
+    {
+      email,
+      role,
+      groupName
+    }
+  */
   saveAppState();
-  createNotification(
-    "group",
-    "Invite Created",
-    `Invite code ${inviteCode} was generated`,
-  );
-  bottomSheetContent.innerHTML = `
-      <div class="bottomSheetHeader">
-        <h2>
-          Invite Member
-        </h2>
-        <button
-          class="closeButton"
-          onclick="closeBottomSheet()"
-        >
-          ✕
-        </button>
-      </div>
-      <div class="bottomSheetBody">
-        <div class="inviteCodeCard">
-          <p class="inviteCodeLabel">
-            Invite Code
-          </p>
-          <h2 class="inviteCodeValue">
-            ${inviteCode}
-          </h2>
-        </div>
-        <button
-          class="primaryButton"
-          onclick="
-            copyInviteCode(
-              '${inviteCode}'
-            )
-          "
-        >
-          Copy Invite Code
-        </button>
-      </div>
-    `;
-  openBottomSheet();
-});
-/* Copy Invite */
-function copyInviteCode(inviteCode) {
-  navigator.clipboard.writeText(inviteCode);
-  showDialog(
-    "Invite code copied",
-    "The invite code has been copied to your clipboard.",
-  );
+  renderGroupAccordion();
+  closeBottomSheet();
+  showToast("Invitation Sent");
+  createNotification("group", "Invitation Sent", `${email} has been invited.`);
 }
 /* Leave Group Dialog */
 function openLeaveGroupDialog() {
@@ -576,35 +633,98 @@ function openLeaveGroupDialog() {
   openBottomSheet();
 }
 /* Leave Group */
-async function leaveCurrentGroup() {
+function leaveCurrentGroup() {
   const currentUser = getCurrentUser();
   const members = getCurrentGroupMembers();
   const currentMember = members.find(function (member) {
     return member.id === currentUser.id;
   });
+  if (!currentMember) {
+    showDialog("Cannot Leave Group", "You are not a member of this group.");
+    return;
+  }
   const adminCount = members.filter(function (member) {
-    return member.role === "admin" || member.role === "owner";
+    return member.role === "admin";
   }).length;
   if (
-    (currentMember.role === "admin" || currentMember.role === "owner") &&
+    currentMember.role === "admin" &&
     adminCount === 1 &&
-    members.length > 1 //add the functionality to check the number of members in the group, if there is only 1 member then allow them to leave without assigning a new admin
+    members.length > 1
   ) {
     showDialog(
       "Cannot Leave Group",
-      "Please assign another admin before leaving.",
+      "Please promote another member to Admin before leaving.",
     );
     return;
   }
-  await leaveGroup(appState.activeGroup);
-  appState.groupMembers[appState.activeGroup] = members.filter(
-    function (member) {
-      return member.id !== currentUser.id;
+  const remainingMembers = members.filter(function (member) {
+    return member.id !== currentUser.id;
+  });
+  if (remainingMembers.length === 0) {
+    showConfirmDialog(
+      "Delete Group?",
+      "You are the last member of this group. Leaving will permanently delete this group, its categories, budgets, pending invitations and all associated data. This action cannot be undone.",
+      function () {
+        completeLeaveGroup(currentUser, remainingMembers);
+      },
+    );
+    return;
+  }
+  showConfirmDialog(
+    "Leave Group?",
+    "Are you sure you want to leave this group?",
+    function () {
+      completeLeaveGroup(currentUser, remainingMembers);
     },
   );
+}
+/* Complete Leave Group */
+function completeLeaveGroup(currentUser, remainingMembers) {
+  if (remainingMembers.length === 0) {
+    delete appState.groupMembers[appState.activeGroup];
+    delete appState.groups[appState.activeGroup];
+    if (appState.budgets && appState.budgets.groupBudgets) {
+      delete appState.budgets.groupBudgets[appState.activeGroup];
+    }
+    if (appState.pendingInvites) {
+      appState.pendingInvites = appState.pendingInvites.filter(
+        function (invite) {
+          return invite.groupName !== appState.activeGroup;
+        },
+      );
+    }
+    if (appState.budgets && appState.budgets.categoryBudgets) {
+      delete appState.budgets.categoryBudgets[appState.activeGroup];
+    }
+  } else {
+    appState.groupMembers[appState.activeGroup] = remainingMembers;
+  }
+  /*
+      Backend
+      DELETE
+      /group/leave
+      {
+          groupId
+      }
+  */
+  createNotification(
+    "group",
+    "Left Group",
+    `${currentUser.name} left the group.`,
+  );
+  const remainingGroups = Object.keys(appState.groups);
+  if (remainingGroups.length > 0) {
+    appState.activeGroup = remainingGroups[0];
+    localStorage.setItem("activeGroup", remainingGroups[0]);
+  } else {
+    appState.activeGroup = null;
+    localStorage.removeItem("activeGroup");
+  }
   saveAppState();
-  appState.activeGroup = null;
   closeBottomSheet();
+  showToast(
+    remainingMembers.length === 0 ? "Group deleted." : "You left the group.",
+  );
   window.location.href = "../pages/dashboardPage.html";
 }
 /* Bottom Sheet */
@@ -621,5 +741,22 @@ screenOverlay.addEventListener("click", closeBottomSheet);
 function goBack() {
   window.location.href = "../pages/dashboardPage.html";
 }
+/* Validate Email */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 /* Initialize */
 initializeGroupManagement();
+/*
+========================================
+Backend Integration Points
+========================================
+POST /group/invite
+GET /group/pending-invitations
+POST /group/accept-invitation
+PATCH /group/member-role
+PATCH /group/transfer-owner
+DELETE /group/member
+DELETE /group/leave
+========================================
+*/

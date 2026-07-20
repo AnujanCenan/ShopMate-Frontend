@@ -62,8 +62,6 @@ function renderAddItemForm() {
         </div>
       </div>
       <div class="formField">
-        <label class="formLabel">Item Image</label>
-        <input type="file" id="itemImageInput" accept="image/*" class="bottomSheetInput">
         <img id="itemImagePreview" class="itemImagePreview hidden">
       </div>
       <div class="formField">
@@ -107,7 +105,6 @@ function renderAddItemForm() {
   openBottomSheet();
   initializeItemForm();
   initializeImagePreview();
-  initializeProductSuggestions();
 }
 /* Render Edit Item Form */
 function renderEditItemForm(itemName) {
@@ -181,19 +178,13 @@ function renderEditItemForm(itemName) {
   <label class="formLabel">
     Item Image
   </label>
-  <input
-    type="file"
-    id="editItemImageInput"
-    accept="image/*"
-    class="bottomSheetInput"
-  >
   <img
     id="editItemImagePreview"
     class="
       itemImagePreview
-      ${item.imageUrl ? "" : "hidden"}
+      ${getProductImage(item.name) ? "" : "hidden"}
     "
-    src="${item.imageUrl || ""}"
+    src="${getProductImage(item.name)}"
   >
 </div>
       <div class="formField">
@@ -246,17 +237,6 @@ function initializeItemForm() {
   const itemPriceInput = document.getElementById("itemPriceInput");
   const imagePreview = document.getElementById("itemImagePreview");
   itemNameInput.addEventListener("blur", function () {
-    const product =
-      appState.productCatalog?.[itemNameInput.value.trim().toLowerCase()];
-    if (!product) {
-      return;
-    }
-    if (!itemPriceInput.value) {
-      itemPriceInput.value = product.defaultPrice;
-    }
-    if (!itemShopInput.value) {
-      itemShopInput.value = product.preferredShop;
-    }
   });
   if (!itemNameInput) {
     return;
@@ -285,8 +265,6 @@ function initializeItemForm() {
     }
   });
   itemNameInput.addEventListener("blur", function () {
-    const product =
-      appState.productCatalog?.[itemNameInput.value.trim().toLowerCase()];
     if (!product) {
       return;
     }
@@ -321,56 +299,6 @@ function initializeImagePreview() {
     };
     reader.readAsDataURL(file);
   });
-}
-/* Product Suggestion */
-function initializeProductSuggestions() {
-  const itemNameInput = document.getElementById("itemNameInput");
-  const suggestionsContainer = document.getElementById("productSuggestions");
-  if (!itemNameInput || !suggestionsContainer) {
-    return;
-  }
-  itemNameInput.addEventListener("input", function () {
-    const searchText = itemNameInput.value.trim().toLowerCase();
-    suggestionsContainer.innerHTML = "";
-    if (searchText.length < 2) {
-      return;
-    }
-    const matches = Object.keys(appState.productCatalog || {}).filter(
-      function (productName) {
-        return productName.includes(searchText);
-      },
-    );
-    matches.slice(0, 5).forEach(function (productName) {
-      suggestionsContainer.innerHTML += `
-            <div
-              class="productSuggestionItem"
-              onclick="
-                selectProductSuggestion(
-                  '${productName}'
-                )
-              "
-            >
-              ${productName}
-            </div>
-          `;
-    });
-  });
-}
-/* Select Product Suggestion */
-function selectProductSuggestion(productName) {
-  const product = appState.productCatalog[productName];
-  if (!product) {
-    return;
-  }
-  document.getElementById("itemNameInput").value = productName;
-  document.getElementById("itemPriceInput").value = product.defaultPrice || "";
-  document.getElementById("itemShopInput").value = product.preferredShop || "";
-  const preview = document.getElementById("itemImagePreview");
-  if (product.imageUrl) {
-    preview.src = product.imageUrl;
-    preview.classList.remove("hidden");
-  }
-  document.getElementById("productSuggestions").innerHTML = "";
 }
 /* Image Preview for Edit Form */
 function initializeEditImagePreview() {
@@ -510,7 +438,6 @@ async function createItem() {
   // currentCategory.items.unshift(newItem);
   state.listItems.unshift(newItem);
 
-
   saveProductToCatalog(newItem);
   saveAppState();
   renderFilteredItems();
@@ -560,7 +487,7 @@ function updateItem(originalItemName) {
     Number(document.getElementById("editItemPriceInput").value) || 0;
   const imagePreview = document.getElementById("editItemImagePreview");
   const updatedImage =
-    imagePreview && imagePreview.src ? imagePreview.src : item.imageUrl || "";
+    imagePreview && imagePreview.src ? imagePreview.src : getProductImage(item.name) || "";
   if (!updatedName || !updatedQuantity) {
     showSnackbar("Please enter item details");
     return;
@@ -580,9 +507,10 @@ function updateItem(originalItemName) {
   item.notes = updatedNotes;
   item.preferredShop = updatedShop;
   item.estimatedPrice = updatedPrice;
-  item.imageUrl = updatedImage;
-  saveProductToCatalog(item);
+  getProductImage(item.name) = updatedImage;
   saveAppState();
+  calculateGroupBudget();
+  renderBudgetDashboardWidget();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item updated");
@@ -610,6 +538,17 @@ async function unmarkPurchased_mysql(item) {
       ShoppingListId: listId,
       ListItemId: item.ListItemId
     })
+  })
+}
+
+/*  Purchase Confirmation */
+function openPurchaseConfirmation(itemName) {
+  const currentCategory = getActiveCategory();
+  if (!currentCategory) {
+    return;
+  }
+  const item = currentCategory.items.find(function (item) {
+    return item.name === itemName;
   });
 
   if (!res.ok) {
@@ -694,13 +633,8 @@ async function openPurchaseConfirmation(listItemId) {
           <input
             type="number"
             id="purchasePriceInput"
-            class="
-              bottomSheetInput
-              currencyInput
-            "
-            value="
-              ${item.estimatedPrice || 0}
-            "
+            class="bottomSheetInput currencyInput"
+            value="${item.estimatedPrice || 0}"
           >
         </div>
       </div>
@@ -755,15 +689,21 @@ async function confirmPurchase(listItemId) {
     itemToUpdate.Purchased = true;
     itemToUpdate.actualPrice = actualPrice;
   }
-  // updateBudgetTracking(currentCategory.name, actualPrice);
+  updateBudgetTracking(currentCategory.name, actualPrice);
+  calculateGroupBudget();
   saveAppState();
   renderFilteredItems();
+  renderBudgetDashboardWidget();
   closeBottomSheet();
-  showSnackbar("Item purchased");
+  showSnackbar(
+      item.purchased ? "Item purchased" : "Item restored"
+    );
   createNotification(
     "purchase",
-    "Item Purchased",
-    `${item.name} purchased for $${purchasePrice}`,
+    item.purchased ? "Item Purchased" : "Item Restored",
+    `${item.name} ${
+    item.purchased ? "purchased" : "restored"
+    } for $${actualPrice}`,
   );
 }
 
@@ -773,7 +713,6 @@ function updateBudgetTracking(categoryName, amount) {
     return;
   }
   /* Update Group Budget */
-  appState.budgets.groupBudget.spent += amount;
   const categoryBudget = appState.budgets.categoryBudgets[categoryName];
   if (categoryBudget) {
     /* Update Category Budget */
