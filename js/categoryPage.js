@@ -27,6 +27,10 @@ function renderCategoryPage() {
   }
   const activeCategory = localStorage.getItem("activeCategory");
   categoryPageTitle.textContent = activeCategory;
+  const fab = document.getElementById("openItemBottomSheetButton");
+  if (fab) {
+    fab.classList.toggle("hidden", appState.activeTab !== "lists");
+  }
   renderFilteredItems();
 }
 /* Get Filtered Items */
@@ -95,14 +99,16 @@ function renderItems(items) {
             <div class="swipeWrapper">
                 <div class="swipeBackground">
                     <div class="swipePurchased">
-                        ${
-                          appState.activeTab === "purchased"
+                      ${
+                        appState.activeTab === "favorites"
+                          ? "➕ Add to List"
+                          : appState.activeTab === "purchased"
                             ? "↺ Re-Add"
                             : "✓ Purchased"
-                        }
+                      }
                     </div>
                     <div class="swipeDelete">
-                        🗑 Delete
+                      ${appState.activeTab === "favorites" ? "💔 Remove Favorite" : "🗑 Delete"}
                     </div>
                 </div>
                <div class="itemCard swipeCard ${
@@ -117,14 +123,26 @@ function renderItems(items) {
     }" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.name}');">
                <div class="itemCardTopRow">
                <div class="itemTitleSection">
-               <h2 class="itemName" onclick=" event.stopPropagation();
-               if (!appState.selectionMode) {
-               renderEditItemForm('${item.name}');
-               }
-               ">${item.name}</h2>
-               <p class="itemQuantityBadge">
-               Qty: ${item.quantity}</p>
-               </div>
+<h2
+class="itemName"
+onclick="
+event.stopPropagation();
+if(!appState.selectionMode){
+renderEditItemForm('${item.name}');
+}
+">
+${item.name}
+</h2>
+${
+  appState.activeTab === "favorites"
+    ? ""
+    : `
+<p class="itemQuantityBadge">
+Qty: ${item.quantity}
+</p>
+`
+}
+</div>
                <div class="itemActionButtons">
                <button class="modernActionButton favoriteActionButton ${isFavorite ? "activeFavoriteButton" : ""} " onclick="event.stopPropagation(); toggleFavorite('${item.name}');">
                <span class="actionButtonIcon">
@@ -156,13 +174,42 @@ function renderItems(items) {
     </div>
 </div>
 <div class="itemCardContent">
-  <div class="itemDetailsSection">
-    <p class="itemDetails">Notes: ${item.notes || "-"}</p>
-    <p class="itemDetails">Shop: ${item.preferredShop || "-"}</p>
-    <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
-  </div>
-  <div class="itemImageContainer">${getProductImage(item.name) ? `<img src="${getProductImage(item.name)}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
-  </div>
+    ${
+      appState.activeTab === "favorites"
+        ? `
+            <div class="itemImageContainer">
+                ${
+                  getProductImage(item.name)
+                    ? `<img src="${getProductImage(item.name)}"
+                            class="itemImage"
+                            alt="${item.name}">`
+                    : `<div class="itemImagePlaceholder">📦</div>`
+                }
+            </div>
+          `
+        : `
+            <div class="itemDetailsSection">
+                <p class="itemDetails">
+                    Notes: ${item.notes || "-"}
+                </p>
+                <p class="itemDetails">
+                    Shop: ${item.preferredShop || "-"}
+                </p>
+                <p class="itemDetails">
+                    Est Price: $${item.estimatedPrice || 0}
+                </p>
+            </div>
+            <div class="itemImageContainer">
+                ${
+                  getProductImage(item.name)
+                    ? `<img src="${getProductImage(item.name)}"
+                            class="itemImage"
+                            alt="${item.name}">`
+                    : `<div class="itemImagePlaceholder">📦</div>`
+                }
+            </div>
+          `
+    }
 </div>`;
   });
 }
@@ -179,6 +226,11 @@ function initializeTabs() {
       });
       button.classList.add("activeTab");
       appState.activeTab = button.dataset.tab;
+      /* Show FAB only on Lists tab */
+      const fab = document.getElementById("openItemBottomSheetButton");
+      if (fab) {
+        fab.classList.toggle("hidden", appState.activeTab !== "lists");
+      }
       renderFilteredItems();
     });
   });

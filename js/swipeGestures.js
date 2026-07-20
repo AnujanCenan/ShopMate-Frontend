@@ -21,12 +21,30 @@ function initializeSwipeGestures() {
       dragging = false;
       const diffX = currentX - startX;
       const itemName = card.dataset.itemName;
-      if (diffX > 120) {
-        openPurchaseConfirmation(itemName);
-      } else if (diffX < -120) {
-        deleteItem(itemName);
-      }
+      /* Always reset the card first */
+      card.style.transition = "transform 0.2s ease";
       card.style.transform = "translateX(0px)";
+      if (diffX > 120) {
+        if (appState.activeTab === "favorites") {
+          setTimeout(function () {
+            addFavoriteToList(itemName);
+          }, 200);
+        } else {
+          setTimeout(function () {
+            openPurchaseConfirmation(itemName);
+          }, 200);
+        }
+      } else if (diffX < -120) {
+        if (appState.activeTab === "favorites") {
+          setTimeout(function () {
+            toggleFavorite(itemName);
+          }, 200);
+        } else {
+          setTimeout(function () {
+            deleteItem(itemName);
+          }, 200);
+        }
+      }
     };
   });
 }
