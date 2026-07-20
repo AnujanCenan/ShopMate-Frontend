@@ -79,10 +79,9 @@
           })
         });
 
-        console.log(response)
 
         if (!response.ok) {
-          console.log(response.json())
+          console.error(response.json())
           alert('Login failed.');
           return;
         }

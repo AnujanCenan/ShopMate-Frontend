@@ -42,7 +42,7 @@ function toggleFavorite(itemName) {
 
       estimatedPrice: currentItem.estimatedPrice || 0,
 
-      actualPrice: currentItem.actualPrice || 0,
+      ActualPrice: currentItem.actualPrice || 0,
 
       purchaseDate: currentItem.purchaseDate || null,
     });
@@ -121,8 +121,6 @@ function addFavoriteToList(itemName) {
 
 
 async function toggleFavorite_mysql(itemMasterId, listsState) {
-  console.log("In toggleFav_mysql");
-  const currentCategory = getActiveCategory();
   
   /* Existing Favorite */
 
@@ -141,21 +139,18 @@ async function toggleFavorite_mysql(itemMasterId, listsState) {
       return item.ItemMasterId === itemMasterId;
     })
     if (index !== -1) {
-      await removeFavourite(itemMasterId);
+      await removeFavorite_mysql(itemMasterId);
       const removedFavourite = listsState.favoriteItems.splice(index, 1)[0];
     }
 
   } else {
     /* Add Favorite */
     
-    console.log(listsState, itemMasterId);
     const currentItem = listsState.listItems.find(function (item) {
       return item.ItemMasterId === itemMasterId;
     })
 
-    console.log(currentItem);
-
-    await addFavourite(itemMasterId);
+    await addFavorite_mysql(itemMasterId);
 
     listsState.favoriteItems.unshift({
       ItemMasterId: currentItem.ItemMasterId,
@@ -174,8 +169,7 @@ async function toggleFavorite_mysql(itemMasterId, listsState) {
   renderFilteredItems();
 }
 
-async function removeFavourite(itemMasterId) {
-  console.log("Unfavouriting an item with itemMasterId = ", itemMasterId);
+async function removeFavorite_mysql(itemMasterId) {
   const res = await fetch("http://localhost:5113/api/unfavourite-item", {
     method: "POST",
     credentials: "include",
@@ -192,18 +186,16 @@ async function removeFavourite(itemMasterId) {
   }
 }
 
-async function addFavourite(itemMasterId) {
-  console.log("Favouriting item with itemMasterId = ", itemMasterId);
+async function addFavorite_mysql(itemMasterId) {
   const res = await fetch("http://localhost:5113/api/favourite-item", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json"},
     body: JSON.stringify({
-      itemMasterId: itemMasterId
+      ItemMasterId: itemMasterId
     })
   })
 
-  console.log("Done favouriting...");
 
   if (!res.ok) {
     const msg = await res.text();

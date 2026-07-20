@@ -17,8 +17,7 @@ function initializeDashboard() {
 /* Restore Last Group */
 function restoreLastGroup() {
   const savedGroup = localStorage.getItem("activeGroup");
-  if (savedGroup && appState.groups[savedGroup]) {
-    appState.activeGroup = savedGroup;
+  if (savedGroup) {
     selectedGroupName.textContent = savedGroup;
   }
 }
@@ -49,7 +48,7 @@ async function renderCategories() {
   if (!res.ok) {
     // Error handle
     const message = await res.text();
-    console.log(`get-lists request failed ${message}`);
+    console.error(`get-lists request failed ${message}`);
     return;
   }
     
@@ -64,7 +63,6 @@ async function renderCategories() {
   }
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
-    console.log(category)
     categoryList.innerHTML += `
             <div
     class="categoryCard"
@@ -107,7 +105,6 @@ function selectGroup(groupName, groupId) {
 }
 /* Open Category Page */
 function openCategoryPage(categoryName, categoryId) {
-  localStorage.setItem("activeGroup", appState.activeGroup);
   localStorage.setItem("activeCategory", categoryName);
   localStorage.setItem("activeCategoryId", categoryId)
   window.location.href = "../pages/categoryPage.html";
@@ -122,14 +119,12 @@ async function renderGroupDropdown() {
     headers: { "Content-Type": "application/json" }
   })
 
-  console.log(res);
   if (!res.ok)
   {
-    console.log(await res.text());
+    console.error(await res.text());
     return;
   }
   const groups = await res.json();
-  console.log(groups);
 
   groups.forEach(function (group) {
     groupItemsHTML += `
@@ -235,7 +230,6 @@ async function createGroup() {
 
   const body = await res.json();
 
-  console.log(body.familyId);
   // appState.groups[groupName] = [];
   // saveAppState();
   selectGroup(groupName, body.familyId);
@@ -300,8 +294,6 @@ async function createCategory() {
       familyGroupId: localStorage.getItem("activeGroupId")
     })
   })
-
-  console.log(res);
 
   // appState.groups[appState.activeGroup].unshift({
   //   name: categoryName,

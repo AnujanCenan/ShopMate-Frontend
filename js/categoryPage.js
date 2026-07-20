@@ -9,14 +9,14 @@ async function getRenderingItems() {
   const groupId = localStorage.getItem("activeGroupId");
 
   const res = await fetch(`http://localhost:5113/api/get-rendering-items?listId=${categoryId}&familyGroupId=${groupId}`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json'},
+    method: "GET",
+    credentials: "include",
+    headers: { "Content-Type": "application/json"},
   })
 
   if (!res.ok) {
     const msg = await res.text();
-    console.log(msg);
+    console.error(msg);
     return;
   }
 
@@ -109,7 +109,6 @@ async function renderFilteredItems() {
 }
 /* Render Items */
 function renderItems(items) {
-  console.log(items);
   if (!itemList) {
     return;
   }
@@ -179,9 +178,9 @@ function renderItems(items) {
                </button>
                ${
                  state.activeTab === "favorites"
-                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.ItemName}')">+</button>`
+                   ? `<button class="modernActionButton addActionButton" onclick="toggleFavorite_mysql(${item.ListItemId}, state)">+</button>`
                    : `<button class="modernActionButton purchasedActionButton ${item.Purchased ? "activePurchasedButton" : ""}"
-                  onclick="event.stopPropagation(); openPurchaseConfirmation('${item.ItemName}', '${item.ListItemId}');">
+                  onclick="event.stopPropagation(); openPurchaseConfirmation(${item.ListItemId});">
           
                   <span class="actionButtonIcon">
                     ${state.activeTab === "purchased" ? "↺" : "✓"}

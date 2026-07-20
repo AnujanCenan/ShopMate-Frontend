@@ -98,7 +98,7 @@ function canManageGroup() {
   return isAdmin();
 }
 /* Show Dialog */
-function showDialog(title, message) {
+function showDialog(title, message="") {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();

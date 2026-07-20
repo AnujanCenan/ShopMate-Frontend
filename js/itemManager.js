@@ -417,8 +417,7 @@ async function createItem() {
   // }
 
   const categoryId = localStorage.getItem("activeCategoryId");
-  console.log(categoryId);
-  console.log(`name=${itemName}, shopName=${itemShop}`);
+
   // const existingItem = currentCategory.items.find(function (item) {
   //   return item.name.toLowerCase() === itemName.toLowerCase();
   // });
@@ -444,14 +443,12 @@ async function createItem() {
   }
 
   const body = await res.json();
-  console.log(body);
   
   const itemMasterId = body.itemMasterId;
   const listItemId = body.listItemId;
 
   const existingItem = false; // TODO: check if there is an existing item
   if (existingItem) {
-    console.log("Existing item found?")
     bottomSheetContent.innerHTML = `
             <div class="bottomSheetHeader">
                 <h2>
@@ -502,10 +499,10 @@ async function createItem() {
     ItemName: itemName,
     Quantity: itemQuantity,
     OptionalNotes: itemNotes,
-    PreferredShop: itemShop,
+    ShopName: itemShop,
     imageUrl: imageUrl,
     estimatedPrice: itemPrice,
-    actualPrice: 0,
+    ActualPrice: 0,
     purchaseDate: null,
     Purchased: false,
   };
@@ -603,39 +600,60 @@ function saveProductToCatalog(item) {
 }
 
 
-async function unmarkPurchased(item) {
+async function unmarkPurchased_mysql(item) {
   const listId = parseInt(localStorage.getItem("activeCategoryId"));
-
-  const res = await fetch("http://localhost:5113/api/unmark-purchase?", {
+  const res = await fetch("http://localhost:5113/api/unmark-purchase", {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      listId: listId,
-      listItemId: item.ListItemId
+      ShoppingListId: listId,
+      ListItemId: item.ListItemId
     })
   });
 
   if (!res.ok) {
     const msg = await res.text();
     console.error(msg);
-    return;
+    throw Error("Unmark Purchase route failed");
   }
 
 }
 
-/*  Purchase Confirmation */
-async function openPurchaseConfirmation(item) {
-  console.log(item);
+async function markPurchased_mysql(item, price) {
+  const listId = parseInt(localStorage.getItem("activeCategoryId"));
+  const res = await fetch("http://localhost:5113/api/mark-purchase", {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ListItemId: item.ListItemId,
+      ShoppingListId: listId,
+      Price: price
+    })
+  })
 
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return;
+  }
+}
+
+/*  Purchase Confirmation */
+async function openPurchaseConfirmation(listItemId) {
+  
+  const item = state.listItems.find(item => item.ListItemId === listItemId);
   if (item.Purchased) {
-    await unmarkPurchased(item);
+    await unmarkPurchased_mysql(item);
     item.Purchased = false;
+    item.ActualPrice = 0;
     // saveAppState();
     renderFilteredItems();
     showSnackbar("Moved back to List");
     return;
   }
+
   // Marking an item as purchased
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
@@ -703,7 +721,7 @@ async function openPurchaseConfirmation(item) {
           class="primaryButton"
           onclick="
             confirmPurchase(
-              '${item.name}'
+              ${listItemId}
             )
           "
         >
@@ -715,13 +733,10 @@ async function openPurchaseConfirmation(item) {
   openBottomSheet();
 }
 /* Confirm Purchase */
-function confirmPurchase(itemName) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
-    return;
-  }
-  const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+async function confirmPurchase(listItemId) {
+
+  const item = state.listItems.find(function (item) {
+    return item.ListItemId === listItemId;
   });
   if (!item) {
     return;
@@ -731,7 +746,16 @@ function confirmPurchase(itemName) {
   item.actualPrice = actualPrice;
   item.purchaseDate = new Date().toISOString();
   item.purchased = !item.purchased;
-  updateBudgetTracking(currentCategory.name, actualPrice);
+
+  await markPurchased_mysql(item, actualPrice);
+
+  const itemToUpdate = state.listItems.find(item => item.ListItemId === listItemId);
+    
+  if (itemToUpdate) {
+    itemToUpdate.Purchased = true;
+    itemToUpdate.actualPrice = actualPrice;
+  }
+  // updateBudgetTracking(currentCategory.name, actualPrice);
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
@@ -742,7 +766,7 @@ function confirmPurchase(itemName) {
     `${item.name} purchased for $${purchasePrice}`,
   );
 }
-/* Update Budget Tracking */
+
 /* Update Budget Tracking */
 function updateBudgetTracking(categoryName, amount) {
   if (!appState.budgets) {

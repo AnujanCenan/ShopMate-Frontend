@@ -126,34 +126,49 @@ function renderBudgetSummary() {
       </div>
   `;
 }
-function renderCategoryBudgets() {
+async function renderCategoryBudgets() {
   budgetCategoryList.innerHTML = "";
-  Object.keys(appState.budgets.categoryBudgets).forEach(
-    function (categoryName) {
-      const categoryBudget = appState.budgets.categoryBudgets[categoryName];
+  const res = await fetch("http://localhost:5113/api/get-all-groups-budgets", {
+    method: "GET",
+    credentials: "include",
+    headers: { 'Content-Type': 'application/json'},
+  })
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return;
+  }
+
+  const all_budgets = await res.json();
+  console.log(all_budgets);
+
+  all_budgets.forEach(
+    function (categoryBudget) {
+      // const categoryBudget = appState.budgets.categoryBudgets[categoryName];
       const percentUsed = Math.min(
         Math.round(
-          (categoryBudget.spent / categoryBudget.monthlyLimit) * 100,
+          (categoryBudget.budgetSpent / categoryBudget.budgetLimit) * 100,
         ) || 0,
         100,
       );
       const overspendAmount =
-        categoryBudget.spent - categoryBudget.monthlyLimit;
+        categoryBudget.budgetSpent - categoryBudget.budgetLimit;
       const isOverspent = overspendAmount > 0;
       budgetCategoryList.innerHTML += `
       <div class="budgetCard ${isOverspent ? "overspendCard" : ""}">
-      <button class="budgetMenuButton" onclick="event.stopPropagation(); openBudgetMenu('${categoryName}');">⋮</button>
+      <button class="budgetMenuButton" onclick="event.stopPropagation(); openBudgetMenu('${categoryBudget.shoppingListName}', '${categoryBudget.userType}');">⋮</button>
         <h3
           class="budgetCardTitle"
         >
-          ${categoryName}
+          ${categoryBudget.shoppingListName}
         </h3>
         <p
           class="budgetCardAmount"
         >
-          $${categoryBudget.spent}
+          $${categoryBudget.budgetSpent}
           /
-          $${categoryBudget.monthlyLimit}
+          $${categoryBudget.budgetLimit}
           ${
             isOverspent
               ? `
@@ -383,7 +398,7 @@ function calculateTotalSpent() {
     categories.forEach(function (category) {
       category.items.forEach(function (item) {
         if (item.purchased) {
-          total += Number(item.actualPrice) || 0;
+          total += Number(item.ActualPrice) || 0;
         }
       });
     });
