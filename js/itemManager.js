@@ -2,8 +2,13 @@ const openItemBottomSheetButton = document.getElementById(
   "openItemBottomSheetButton",
 );
 const bottomSheetContent = document.getElementById("bottomSheetContent");
+/* Favorite Item Being Added */
+let favoriteItemToAdd = null;
 /* Render Add Item Form */
-function renderAddItemForm() {
+/* Render Add Item Form */
+function renderAddItemForm(itemName = "") {
+  favoriteItemToAdd = itemName || null;
+  const imageUrl = itemName ? getProductImage(itemName) : "";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -11,7 +16,9 @@ function renderAddItemForm() {
       </h2>
       <button
         class="closeButton"
-        onclick="closeBottomSheet()"
+        onclick="
+          favoriteItemToAdd=null;
+          closeBottomSheet();"
       >
         ✕
       </button>
@@ -26,8 +33,16 @@ function renderAddItemForm() {
           id="itemNameInput"
           class="bottomSheetInput"
           placeholder="Enter Item Name"
+          value="${itemName}"
+          ${itemName ? "readonly" : ""}
         >
-        <div id="productSuggestions" class="productSuggestions"></div>
+        ${
+          itemName
+            ? ""
+            : `<div id="productSuggestions"
+                    class="productSuggestions">
+               </div>`
+        }
       </div>
       <div class="formRow">
         <div class="halfWidthField">
@@ -39,6 +54,7 @@ function renderAddItemForm() {
             id="itemQuantityInput"
             class="bottomSheetInput"
             placeholder="Enter Quantity"
+            value="1"
           >
         </div>
         <div class="halfWidthField">
@@ -52,17 +68,18 @@ function renderAddItemForm() {
             <input
               type="number"
               id="itemPriceInput"
-              class="
-                bottomSheetInput
-                currencyInput
-              "
+              class="bottomSheetInput currencyInput"
               placeholder="Enter Estimated Price"
             >
           </div>
         </div>
       </div>
       <div class="formField">
-        <img id="itemImagePreview" class="itemImagePreview hidden">
+        <img
+          id="itemImagePreview"
+          class="itemImagePreview ${imageUrl ? "" : "hidden"}"
+          src="${imageUrl}"
+        >
       </div>
       <div class="formField">
         <label class="formLabel">
@@ -104,7 +121,6 @@ function renderAddItemForm() {
   `;
   openBottomSheet();
   initializeItemForm();
-  initializeImagePreview();
 }
 /* Render Edit Item Form */
 function renderEditItemForm(itemName) {
@@ -236,8 +252,7 @@ function initializeItemForm() {
   const itemShopInput = document.getElementById("itemShopInput");
   const itemPriceInput = document.getElementById("itemPriceInput");
   const imagePreview = document.getElementById("itemImagePreview");
-  itemNameInput.addEventListener("blur", function () {
-  });
+  itemNameInput.addEventListener("blur", function () {});
   if (!itemNameInput) {
     return;
   }
@@ -265,17 +280,23 @@ function initializeItemForm() {
     }
   });
   itemNameInput.addEventListener("blur", function () {
+    const product = productDatabase.find(function (product) {
+      return (
+        product.name.toLowerCase() === itemNameInput.value.trim().toLowerCase()
+      );
+    });
     if (!product) {
       return;
     }
     if (!itemPriceInput.value) {
-      itemPriceInput.value = product.defaultPrice;
+      itemPriceInput.value = product.defaultPrice || 0;
     }
     if (!itemShopInput.value) {
-      itemShopInput.value = product.preferredShop;
+      itemShopInput.value = product.preferredShop || "";
     }
-    if (product.imageUrl) {
-      imagePreview.src = product.imageUrl;
+    const imageUrl = getProductImage(product.name);
+    if (imageUrl) {
+      imagePreview.src = imageUrl;
       imagePreview.classList.remove("hidden");
     }
   });
@@ -332,8 +353,9 @@ async function createItem() {
   const itemShop = itemShopInput.value.trim();
   const itemPrice =
     Number(document.getElementById("itemPriceInput").value) || 0;
-  const imagePreview = document.getElementById("itemImagePreview");
-  const imageUrl = imagePreview && imagePreview.src ? imagePreview.src : "";
+
+  /* Item added from Favorites? */
+  const openedFromFavorite = favoriteItemToAdd !== null;
   if (!itemName || !itemQuantity) {
     showSnackbar("Please enter item details");
     return;
@@ -439,11 +461,29 @@ async function createItem() {
   state.listItems.unshift(newItem);
 
   saveProductToCatalog(newItem);
+  currentCategory.items.unshift(newItem);
+  /* Added from Favorites */
+  if (openedFromFavorite) {
+    appState.activeTab = "lists";
+    const tabButtons = document.querySelectorAll(".tabButton");
+    tabButtons.forEach(function (tab) {
+      tab.classList.remove("activeTab");
+      if (tab.dataset.tab === "lists") {
+        tab.classList.add("activeTab");
+      }
+    });
+    const fab = document.getElementById("openItemBottomSheetButton");
+    if (fab) {
+      fab.classList.remove("hidden");
+    }
+    favoriteItemToAdd = null;
+  }
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item added");
   createNotification("item", "Item Added", `${itemName} was added`);
+  favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
 function updateDuplicateQuantity(itemName, newQuantity) {
@@ -485,9 +525,6 @@ function updateItem(originalItemName) {
   const updatedShop = document.getElementById("editItemShopInput").value.trim();
   const updatedPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
-  const imagePreview = document.getElementById("editItemImagePreview");
-  const updatedImage =
-    imagePreview && imagePreview.src ? imagePreview.src : getProductImage(item.name) || "";
   if (!updatedName || !updatedQuantity) {
     showSnackbar("Please enter item details");
     return;
@@ -507,10 +544,11 @@ function updateItem(originalItemName) {
   item.notes = updatedNotes;
   item.preferredShop = updatedShop;
   item.estimatedPrice = updatedPrice;
-  getProductImage(item.name) = updatedImage;
   saveAppState();
   calculateGroupBudget();
-  renderBudgetDashboardWidget();
+  if (typeof renderBudgetDashboardWidget === "function") {
+    renderBudgetDashboardWidget();
+  }
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item updated");
@@ -696,11 +734,11 @@ async function confirmPurchase(listItemId) {
   calculateGroupBudget();
   saveAppState();
   renderFilteredItems();
-  renderBudgetDashboardWidget();
+  if (typeof renderBudgetDashboardWidget === "function") {
+    renderBudgetDashboardWidget();
+  }  
   closeBottomSheet();
-  showSnackbar(
-      item.purchased ? "Item purchased" : "Item restored"
-    );
+  showSnackbar(item.purchased ? "Item purchased" : "Item restored");
   createNotification(
     "purchase",
     item.purchased ? "Item Purchased" : "Item Restored",
@@ -756,5 +794,7 @@ function deleteItem(itemName) {
 }
 /* Event Listeners */
 if (openItemBottomSheetButton) {
-  openItemBottomSheetButton.addEventListener("click", renderAddItemForm);
+  openItemBottomSheetButton.addEventListener("click", () =>
+    renderAddItemForm(""),
+  );
 }

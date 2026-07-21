@@ -317,7 +317,7 @@ function getProductImage(itemName) {
   if (product) {
     return `../assets/images/products/${product.image}`;
   }
-  return "../assets/images/products/default.png";
+  return "";
 }
 /***************************************
 Backend
