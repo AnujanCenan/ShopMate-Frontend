@@ -312,7 +312,7 @@ function createNotification(type, title, message) {
 /* Get Product Image */
 function getProductImage(itemName) {
   const product = productDatabase.find(function (product) {
-    return product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
+    return product.name && product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
   });
   if (product) {
     return `../assets/images/products/${product.image}`;

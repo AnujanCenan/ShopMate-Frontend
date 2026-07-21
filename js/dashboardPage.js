@@ -39,7 +39,10 @@ async function renderCategories() {
   }
   // const categories = appState.groups[appState.activeGroup];
   const groupId = localStorage.getItem("activeGroupId");
-  if (!groupId) return;
+  if (!groupId) {
+    console.error("GROUP ID IS UNDEFINED in RENDER CATEGORIES PAGE")
+    return;
+  }
 
   const res = await fetch(`http://localhost:5113/api/get-lists?family_group_id=${groupId}`, {
     method: "GET",
@@ -55,6 +58,7 @@ async function renderCategories() {
   }
     
   const categories = await res.json();
+  console.log(categories);
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
@@ -69,23 +73,19 @@ async function renderCategories() {
       appState.budgets.categoryBudgets?.[appState.activeGroup]?.[category.name]
         ?.monthlyLimit ?? 0;
     let categorySpent = 0;
-    category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        categorySpent += Number(item.estimatedPrice);
-      }
-    });
+    // category.items.forEach(function (item) {   // TODO: have this corrected so we know how much was spent in a category
+    //   if (item.purchased && item.estimatedPrice) {
+    //     categorySpent += Number(item.estimatedPrice);
+    //   }
+    // });
     const categoryRemaining =
       categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
-    const pendingCount = category.items.filter(function (item) {
-      return !item.purchased;
-    }).length;
-    const purchasedCount = category.items.filter(function (item) {
-      return item.purchased;
-    }).length;
+    const pendingCount = category.numItems - category.numPurchased;
+    const purchasedCount = category.numPurchased;
     categoryList.innerHTML += `
       <div
         class="categoryCard"
-        onclick="openCategoryPage('${category.name}')"
+        onclick="openCategoryPage('${category.name}', ${category.listId})"
       >
         <div class="categoryHeaderTitle">
         <h2 class="categoryTitle">
@@ -166,12 +166,13 @@ async function renderGroupDropdown() {
   const groups = await res.json();
 
   groups.forEach(function (group) {
-    groupItemsHTML += `
-    <div class="groupItem" onclick="selectGroup('${groupName}')">
+    console.log(group);
+     groupItemsHTML += `
+    <div class="groupItem" onclick="selectGroup('${group.familyName}', ${group.familyId})">
       <span class="groupItemName">
-        ${groupName}
+        ${group.familyName}
       </span>
-      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${groupName}');">⋮</button>
+      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${group.familyName}');">⋮</button>
     </div>`;
   });
   bottomSheetContent.innerHTML = `

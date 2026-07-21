@@ -541,23 +541,23 @@ async function unmarkPurchased_mysql(item) {
   })
 }
 
-/*  Purchase Confirmation */
-function openPurchaseConfirmation(itemName) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
-    return;
-  }
-  const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
-  });
+// /*  Purchase Confirmation */
+// async function openPurchaseConfirmation(itemName) {
+//   const currentCategory = getActiveCategory();
+//   if (!currentCategory) {
+//     return;
+//   }
+//   const item = currentCategory.items.find(function (item) {
+//     return item.name === itemName;
+//   });
 
-  if (!res.ok) {
-    const msg = await res.text();
-    console.error(msg);
-    throw Error("Unmark Purchase route failed");
-  }
+//   if (!res.ok) {
+//     const msg = await res.text();
+//     console.error(msg);
+//     throw Error("Unmark Purchase route failed");
+//   }
 
-}
+// }
 
 async function markPurchased_mysql(item, price) {
   const listId = parseInt(localStorage.getItem("activeCategoryId"));
@@ -583,6 +583,9 @@ async function markPurchased_mysql(item, price) {
 async function openPurchaseConfirmation(listItemId) {
   
   const item = state.listItems.find(item => item.ListItemId === listItemId);
+  console.log(listItemId);
+  console.log(state);
+  console.log(item);
   if (item.Purchased) {
     await unmarkPurchased_mysql(item);
     item.Purchased = false;
@@ -689,7 +692,7 @@ async function confirmPurchase(listItemId) {
     itemToUpdate.Purchased = true;
     itemToUpdate.actualPrice = actualPrice;
   }
-  updateBudgetTracking(currentCategory.name, actualPrice);
+  // updateBudgetTracking(currentCategory.name, actualPrice);   // TODO: rectify budget tracking
   calculateGroupBudget();
   saveAppState();
   renderFilteredItems();

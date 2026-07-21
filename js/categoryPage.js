@@ -131,6 +131,7 @@ function renderItems(items) {
   }
   itemEmptyState.innerHTML = "";
   items.forEach(function (item) {
+    console.log(item);
     const isFavorite = state.favoriteItems.some(function (favoriteItem) {
       return favoriteItem.ItemName === item.ItemName;
     });
@@ -178,7 +179,7 @@ function renderItems(items) {
                </button>
                ${
                  appState.activeTab === "favorites"
-                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.name}')">+</button>
+                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.ItemName}')">+</button>
             `
                    : `
             <button
@@ -189,7 +190,7 @@ function renderItems(items) {
     "
     onclick="
         event.stopPropagation();
-        openPurchaseConfirmation('${item.name}');
+        openPurchaseConfirmation(${item.ListItemId});
     "
 >
     <span class="actionButtonIcon">
@@ -206,7 +207,7 @@ function renderItems(items) {
     <p class="itemDetails">Shop: ${item.preferredShop || "-"}</p>
     <p class="itemDetails">Est Price: $${item.estimatedPrice || 0}</p>
   </div>
-  <div class="itemImageContainer">${getProductImage(item.name) ? `<img src="${getProductImage(item.name)}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
+  <div class="itemImageContainer">${getProductImage(item.ItemName) ? `<img src="${getProductImage(item.ItemName)}" class="itemImage" alt="${item.name}">` : `<div class="itemImagePlaceholder">📦</div>`}</div></div>
   </div>
 </div>`;
   });
