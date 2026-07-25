@@ -1,0 +1,40 @@
+.tabSection {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.activeTab {
+  background-color: var(--primaryColor);
+  color: white;
+}
+.modernTabContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0 10px;
+  /* background: white; */
+}
+.modernTabButton {
+  border: none;
+  background: #f1f1f1;
+  padding: 12px 18px;
+  border-radius: 18px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.modernTabButton.activeTab {
+  background: #118ab2;
+  color: white;
+  box-shadow: 0 4px 12px rgba(17, 138, 178, 0.25);
+}
+/* Tab Button */
+.tabButton {
+  flex: 1;
+  border: none;
+  background-color: #e4e4e4;
+  padding: 14px;
+  border-radius: var(--borderRadiusMedium);
+  font-size: 14px;
+  cursor: pointer;
+}

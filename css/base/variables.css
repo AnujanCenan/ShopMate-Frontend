@@ -1,0 +1,47 @@
+/* Rest the original layout */
+Reset * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Root Variables */
+:root {
+  --primaryColor: #118ab2;
+  --primaryDark: #0f6d8d;
+  --successColor: #16a34a;
+  --dangerColor: #dc2626;
+  --warningColor: #f59e0b;
+  --backgroundColor: #f4f7fb;
+  --cardColor: #ffffff;
+  --textColor: #111827;
+  --mutedTextColor: #6b7280;
+  --borderColor: #e5e7eb;
+  --appBackground: #f7f9fc;
+  --budgetBackground: #f0f9ff;
+  --groupBackground: #f5f3ff;
+  --productBackground: #f0fdf4;
+  --notificationBackground: #fff7ed;
+  --overlayColor: rgba(0, 0, 0, 0.45);
+  --shadowSmall: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadowMedium: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadowLarge: 0 12px 36px rgba(0, 0, 0, 0.14);
+  --radiusSmall: 14px;
+  --radiusMedium: 20px;
+  --radiusLarge: 28px;
+  --animationSpeed: 0.24s;
+}
+/* HTML */
+html {
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+}
+/* Body */
+body {
+  font-family: Arial, sans-serif;
+  background: var(--backgroundColor);
+  color: var(--textColor);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: contain;
+}

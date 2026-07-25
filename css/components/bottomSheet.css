@@ -1,0 +1,54 @@
+.bottomSheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  border-radius: 28px 28px 0 0;
+  padding: 20px;
+  z-index: 1000;
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.18);
+  transition: transform 0.25s ease;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.bottomSheetHandle {
+  width: 60px;
+  height: 5px;
+  background: #d1d5db;
+  background-color: #cccccc;
+  border-radius: 999px;
+  margin: 0 auto 20px;
+}
+
+.bottomSheetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.bottomSheetBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMedium);
+  padding-top: 12px;
+}
+
+/* Button Row */
+.bottomSheetButtonRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Close Button */
+.closeButton {
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+}

@@ -1,0 +1,30 @@
+/* Overlay */
+.screenOverlay {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  background-color: var(--overlayColor);
+  opacity: 1;
+  z-index: 999;
+  transition: 0.25s ease;
+  pointer-events: none;
+}
+
+/* Overlay */
+.screenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlayColor);
+  z-index: 40;
+  opacity: 1;
+  transition: opacity var(--animationSpeed);
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}

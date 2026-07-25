@@ -1,0 +1,43 @@
+@import url("./base/reset.css");
+@import url("./base/variables.css");
+@import url("./base/typography.css");
+@import url("./base/animations.css");
+@import url("./base/utilities.css");
+
+@import url("./layout/appLayout.css");
+@import url("./layout/header.css");
+@import url("./layout/footer.css");
+@import url("./layout/navigationDrawer.css");
+@import url("./layout/pageLayout.css");
+
+@import url("./components/icons.css");
+@import url("./components/buttons.css");
+@import url("./components/cards.css");
+@import url("./components/forms.css");
+@import url("./components/search.css");
+@import url("./components/tabs.css");
+@import url("./components/fab.css");
+@import url("./components/bottomSheet.css");
+@import url("./components/dialog.css");
+@import url("./components/snackbar.css");
+@import url("./components/accordion.css");
+@import url("./components/dropdown.css");
+@import url("./components/overlays.css");
+@import url("./components/progressBars.css");
+@import url("./components/badges.css");
+@import url("./components/toast.css");
+@import url("./components/emptyState.css");
+
+@import url("./pages/dashboard.css");
+@import url("./pages/category.css");
+@import url("./pages/item.css");
+@import url("./pages/budget.css");
+@import url("./pages/authentication.css");
+@import url("./pages/profile.css");
+@import url("./pages/settings.css");
+@import url("./pages/notifications.css");
+@import url("./pages/groupManagement.css");
+
+@import url("./themes/darkMode.css");
+
+/* @import url("../css/appStyles.css"); */

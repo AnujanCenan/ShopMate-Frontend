@@ -1,0 +1,172 @@
+.budgetHero {
+  background: linear-gradient(135deg, #118ab2, #0f6d8d);
+  border-radius: 28px;
+  padding: 32px 24px;
+  color: white;
+  margin-bottom: 24px;
+}
+.budgetAmount {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.budgetSubtitle {
+  margin-top: 6px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  color: #64748b;
+}
+.budgetStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.budgetHelperText {
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+}
+.budgetHelperLabel {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+.budgetCategorySection {
+  margin-top: 24px;
+}
+.budgetStatusText {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+.budgetProgressText {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+.budgetSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.budgetInsightText {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.overspendText {
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+.budgetPercentText {
+  margin-top: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+.budgetInsight {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 14px;
+  text-align: center;
+}
+.budgetRecommendation {
+  margin-top: 12px;
+  line-height: 1.6;
+  color: #475569;
+  font-size: 14px;
+}
+.analysisValue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  font-weight: 600;
+}
+.analysisCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.categoryBudgetSummary {
+  margin-top: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+}
+.categoryBudgetSummary div {
+  display: flex;
+  justify-content: space-between;
+}
+.categoryBudgetSummary strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+.quickPickHeading {
+  padding: 14px 16px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid #edf2f7;
+  background: #fafafa;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.topCategoryName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--secondaryTextColor);
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+.budgetSummaryHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 0px 20px;
+  border: none;
+  background: white;
+  cursor: pointer;
+}
+.budgetSummaryHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.budgetSummaryHeader p {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 13px;
+}
+.budgetSummaryBody {
+  padding: 0px 20px 20px 20px;
+}
+
+.budgetHealthyText {
+  color: #16a34a;
+  font-weight: 700;
+  margin-top: 10px;
+}
+.budgetWarningText {
+  color: #ca8a04;
+  font-weight: 700;
+  margin-top: 10px;
+}
+.budgetCriticalText {
+  color: #dc2626;
+  font-weight: 700;
+  margin-top: 10px;
+}

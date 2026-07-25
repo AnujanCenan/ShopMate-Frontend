@@ -1,0 +1,46 @@
+/* Group Dropdown Section */
+.groupDropdownSection {
+  margin-bottom: 28px;
+}
+
+/* Category List */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMedium);
+}
+
+/* Group List */
+.groupList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMedium);
+  margin-bottom: 24px;
+}
+
+/* Group Item */
+.groupItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  border-radius: 25px;
+  background: rgb(241, 241, 241);
+  cursor: pointer;
+}
+
+.groupItemName {
+  flex: 1;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* Group Item Row */
+.groupItemRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10px;
+}
