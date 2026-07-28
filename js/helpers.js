@@ -23,13 +23,15 @@ function openBottomSheet() {
   }
   document.body.style.overflow = "hidden";
 }
-/* Close Bottom Sheet */
+
 /* Close Bottom Sheet */
 function closeBottomSheet() {
+  console.log("Attempting to close bottom sheet");
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
   if (!bottomSheet || !screenOverlay) {
+    console.log("Could Not close the bottom sheet");
     return;
   }
   screenOverlay.classList.add("hidden");

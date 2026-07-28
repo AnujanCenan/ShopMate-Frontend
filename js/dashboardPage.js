@@ -25,6 +25,8 @@ function restoreLastGroup() {
 }
 /* Render Categories */
 async function renderCategories() {
+  console.log(`in dashboard: ${JSON.stringify(state, null, 2)}`);
+
   if (!categoryList) {
     return;
   }
@@ -58,7 +60,7 @@ async function renderCategories() {
   }
     
   const categories = await res.json();
-  console.log(categories);
+  console.log(`Get Lists for this family: ${JSON.stringify(categories)}`);
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
@@ -67,21 +69,19 @@ async function renderCategories() {
     `;
     return;
   }
+  state.groups[groupId] = categories;
+
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
-    const categoryBudget =
-      appState.budgets.categoryBudgets?.[appState.activeGroup]?.[category.name]
-        ?.monthlyLimit ?? 0;
-    let categorySpent = 0;
-    // category.items.forEach(function (item) {   // TODO: have this corrected so we know how much was spent in a category
-    //   if (item.purchased && item.estimatedPrice) {
-    //     categorySpent += Number(item.estimatedPrice);
-    //   }
-    // });
+
+    const categoryBudget = category.limit || 0;
+    const categorySpent = category.spent || 0;
+
     const categoryRemaining =
       categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
     const pendingCount = category.numItems - category.numPurchased;
     const purchasedCount = category.numPurchased;
+
     categoryList.innerHTML += `
       <div
         class="categoryCard"
@@ -106,17 +106,17 @@ async function renderCategories() {
         <div class="categoryBudgetSummary">
   Budget
   <strong>
-    ${categoryBudget > 0 ? "$" + categoryBudget : "Not Set"}
+    ${categoryBudget > 0 ? "$" + Number(categoryBudget).toFixed(2) : "Not Set"}
   </strong>
   &nbsp; • &nbsp;
   Spent
   <strong>
-    $${categorySpent}
+    $${Number(categorySpent).toFixed(2)}
   </strong>
   &nbsp; • &nbsp;
   Left
   <strong>
-    ${categoryBudget > 0 ? "$" + categoryRemaining : "-"}
+    ${categoryBudget > 0 ? "$" + Number(categoryRemaining).toFixed(2) : "-"}
   </strong>
 </div>
         <p class="categoryInfo">
@@ -134,12 +134,15 @@ async function renderCategories() {
 function selectGroup(groupName, groupId) {
   appState.activeGroup = groupName;
   selectedGroupName.textContent = groupName;
+  state.activeGroupId = groupId;
+  state.activeGroup = groupName;
   localStorage.setItem("activeGroup", groupName);
   localStorage.setItem("activeGroupId", groupId);
+  saveState();
   
   renderCategories();
   renderBudgetDashboardWidget();
-  renderGroupDropdown();
+  // renderGroupDropdown();
   closeBottomSheet();
 }
 /* Open Category Page */
@@ -168,7 +171,7 @@ async function renderGroupDropdown() {
   groups.forEach(function (group) {
     console.log(group);
      groupItemsHTML += `
-    <div class="groupItem" onclick="selectGroup('${group.familyName}', ${group.familyId})">
+    <div class="groupItem" onclick="event.stopPropagation(); selectGroup('${group.familyName}', ${group.familyId})">
       <span class="groupItemName">
         ${group.familyName}
       </span>
@@ -826,15 +829,33 @@ function renderSideDrawer() {
     </div>
   `;
 }
+
+async function getGroupBudgets() {
+  const res = await fetch("get-group-budgets", {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(`Failure at getGroupBudgets(): ${msg}`);
+    return;
+  }
+
+  const budgets = await res.json();
+  state.budgets.groupBudgets = budgets;
+  saveState();
+}
+
 /* Render Budget Dashboard Widget */
-function renderBudgetDashboardWidget() {
+async function renderBudgetDashboardWidget() {
   const budgetWidget = document.getElementById("budgetDashboardWidget");
   if (!budgetWidget || !appState.activeGroup) {
     return;
   }
   calculateGroupBudget();
-  if (!appState.budgets.groupBudgets) {
-    appState.budgets.groupBudgets = {};
+  if (!state.budgets.groupBudgets) {
+    state.budgets.groupBudgets = {};
   }
   if (!appState.budgets.groupBudgets[appState.activeGroup]) {
     appState.budgets.groupBudgets[appState.activeGroup] = {

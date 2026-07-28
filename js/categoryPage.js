@@ -1,8 +1,8 @@
-let state = {
-    listItems: [],
-    favoriteItems: [],
-    activeTab: 'lists'
-};
+// let state = {
+//     listItems: [],
+//     favoriteItems: [],
+//     activeTab: 'lists'
+// };
 
 async function getRenderingItems() {
   const categoryId = localStorage.getItem("activeCategoryId")
@@ -134,6 +134,8 @@ function renderItems(items) {
     return;
   }
   itemEmptyState.innerHTML = "";
+  console.log(state);
+
   items.forEach(function (item) {
     console.log(item);
     const isFavorite = state.favoriteItems.some(function (favoriteItem) {
@@ -162,7 +164,7 @@ function renderItems(items) {
                }" data-item-name="${
                  item.ItemName
                }" onclick=" event.stopPropagation();
-            if(appState.selectionMode){
+            if (appState.selectionMode){
                 toggleItemSelection('${item.ItemName}');
             }" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.ItemName}');">
                <div class="itemCardTopRow">
@@ -171,8 +173,9 @@ function renderItems(items) {
             class="itemName"
             onclick="
             event.stopPropagation();
-            if (!appState.selectionMode){
-            renderEditItemForm('${item.ItemName}');
+            
+            if (!state.selectionMode) {
+              renderEditItemForm(${item.ListItemId});
             }
             ">
             ${item.ItemName}
@@ -196,7 +199,7 @@ function renderItems(items) {
                </span>
                </button>
                ${
-                 appState.activeTab === "favorites"
+                 state.activeTab === "favorites"
                    ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.ItemName}')">+</button>
             `
                    : `
@@ -225,10 +228,10 @@ function renderItems(items) {
         ? `
             <div class="itemImageContainer">
                 ${
-                  getProductImage(item.name)
-                    ? `<img src="${getProductImage(item.name)}"
+                  getProductImage(item.ItemName)
+                    ? `<img src="${getProductImage(item.ItemName)}"
                             class="itemImage"
-                            alt="${item.name}">`
+                            alt="${item.ItemName}">`
                     : `<div class="itemImagePlaceholder">📦</div>`
                 }
             </div>
@@ -236,10 +239,10 @@ function renderItems(items) {
         : `
             <div class="itemDetailsSection">
                 <p class="itemDetails">
-                    Notes: ${item.notes || "-"}
+                    Notes: ${item.OptionalNotes || "-"}
                 </p>
                 <p class="itemDetails">
-                    Shop: ${item.preferredShop || "-"}
+                    Shop: ${item.ShopName || "-"}
                 </p>
                 <p class="itemDetails">
                     Est Price: $${item.estimatedPrice || 0}
@@ -247,10 +250,10 @@ function renderItems(items) {
             </div>
             <div class="itemImageContainer">
                 ${
-                  getProductImage(item.name)
-                    ? `<img src="${getProductImage(item.name)}"
+                  getProductImage(item.ItemName)
+                    ? `<img src="${getProductImage(item.ItemName)}"
                             class="itemImage"
-                            alt="${item.name}">`
+                            alt="${item.ItemName}">`
                     : `<div class="itemImagePlaceholder">📦</div>`
                 }
             </div>

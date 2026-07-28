@@ -123,13 +123,14 @@ function renderAddItemForm(itemName = "") {
   initializeItemForm();
 }
 /* Render Edit Item Form */
-function renderEditItemForm(itemName) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
-    return;
-  }
-  const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+function renderEditItemForm(listItemId) {
+  console.log("Rendering edit item form...")
+  // const currentCategory = getActiveCategory();
+  // if (!currentCategory) {
+  //   return;
+  // }
+  const item = state.listItems.find(function (item) {
+    return item.ListItemId === listItemId;
   });
   if (!item) {
     return;
@@ -155,7 +156,7 @@ function renderEditItemForm(itemName) {
           type="text"
           id="editItemNameInput"
           class="bottomSheetInput"
-          value="${item.name}"
+          value="${item.ItemName}"
         >
       </div>
       <div class="formRow">
@@ -167,7 +168,7 @@ function renderEditItemForm(itemName) {
             type="number"
             id="editItemQuantityInput"
             class="bottomSheetInput"
-            value="${item.quantity}"
+            value="${item.Quantity}"
           >
         </div>
         <div class="halfWidthField">
@@ -198,9 +199,9 @@ function renderEditItemForm(itemName) {
     id="editItemImagePreview"
     class="
       itemImagePreview
-      ${getProductImage(item.name) ? "" : "hidden"}
+      ${getProductImage(item.ItemName) ? "" : "hidden"}
     "
-    src="${getProductImage(item.name)}"
+    src="${getProductImage(item.ItemName)}"
   >
 </div>
       <div class="formField">
@@ -211,7 +212,7 @@ function renderEditItemForm(itemName) {
           type="text"
           id="editItemNotesInput"
           class="bottomSheetInput"
-          value="${item.notes || ""}"
+          value="${item.OptionalNotes || ""}"
         >
       </div>
       <div class="formField">
@@ -222,7 +223,7 @@ function renderEditItemForm(itemName) {
           type="text"
           id="editItemShopInput"
           class="bottomSheetInput"
-          value="${item.preferredShop || ""}"
+          value="${item.ShopName || ""}"
         >
       </div>
       <div class="bottomSheetButtonRow">
@@ -234,7 +235,7 @@ function renderEditItemForm(itemName) {
         </button>
         <button
           class="primaryButton"
-          onclick="updateItem('${item.name}')"
+          onclick="updateItem(${listItemId})"
         >
           Save Changes
         </button>
@@ -450,7 +451,7 @@ async function createItem() {
     Quantity: itemQuantity,
     OptionalNotes: itemNotes,
     ShopName: itemShop,
-    imageUrl: imageUrl,
+    // imageUrl: imageUrl,
     estimatedPrice: itemPrice,
     ActualPrice: 0,
     purchaseDate: null,
@@ -461,10 +462,9 @@ async function createItem() {
   state.listItems.unshift(newItem);
 
   saveProductToCatalog(newItem);
-  currentCategory.items.unshift(newItem);
   /* Added from Favorites */
   if (openedFromFavorite) {
-    appState.activeTab = "lists";
+    state.activeTab = "lists";
     const tabButtons = document.querySelectorAll(".tabButton");
     tabButtons.forEach(function (tab) {
       tab.classList.remove("activeTab");
@@ -504,17 +504,44 @@ function updateDuplicateQuantity(itemName, newQuantity) {
   showSnackbar("Quantity updated");
 }
 /* Update Item */
-function updateItem(originalItemName) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
+
+async function updateItemMySql(listItemId, newItem) {
+  console.log(`attempting to udpate item; active group id = ${state.activeGroupId}`)
+  const res = await fetch("http://localhost:5113/api/edit-item", {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ListItemId: listItemId,
+      ItemName: newItem.ItemName,
+      Quantity: newItem.Quantity,
+      EstimatedPrice: newItem.estimatedPrice,
+      OptionalNotes: newItem.OptionalNotes,
+      ShopName: newItem.ShopName,
+      FamilyGroupId: state.activeGroupId,
+    })
+  })
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
     return;
   }
-  const item = currentCategory.items.find(function (item) {
-    return item.name === originalItemName;
+}
+
+async function updateItem(listItemId) {
+  // const currentCategory = getActiveCategory();
+  // if (!currentCategory) {
+  //   return;
+  // }
+  const item = state.listItems.find(function (item) {
+    return item.ListItemId === listItemId;
   });
   if (!item) {
     return;
   }
+  const originalItemName = item.ItemName;
+
   const updatedName = document.getElementById("editItemNameInput").value.trim();
   const updatedQuantity = document
     .getElementById("editItemQuantityInput")
@@ -529,21 +556,25 @@ function updateItem(originalItemName) {
     showSnackbar("Please enter item details");
     return;
   }
-  const duplicateItem = currentCategory.items.find(function (existingItem) {
+  console.log(`state: ${JSON.stringify(state)}`);
+  const duplicateItem = state.listItems.find(function (existingItem) {
     return (
-      existingItem.name.toLowerCase() === updatedName.toLowerCase() &&
-      existingItem.name !== originalItemName
+      existingItem.ItemName.toLowerCase() === updatedName.toLowerCase() &&
+      existingItem.ItemName !== originalItemName
     );
   });
   if (duplicateItem) {
     showSnackbar("Another item already exists with same name");
     return;
   }
-  item.name = updatedName;
-  item.quantity = updatedQuantity;
-  item.notes = updatedNotes;
-  item.preferredShop = updatedShop;
+  item.ItemName = updatedName;
+  item.Quantity = updatedQuantity;
+  item.OptionalNotes = updatedNotes;
+  item.ShopName = updatedShop;
   item.estimatedPrice = updatedPrice;
+
+  await updateItemMySql(listItemId, item);
+
   saveAppState();
   calculateGroupBudget();
   if (typeof renderBudgetDashboardWidget === "function") {
@@ -553,6 +584,7 @@ function updateItem(originalItemName) {
   closeBottomSheet();
   showSnackbar("Item updated");
 }
+
 /*Save Product to Catalog */
 function saveProductToCatalog(item) {
   if (!appState.productCatalog) {
@@ -578,24 +610,6 @@ async function unmarkPurchased_mysql(item) {
     })
   })
 }
-
-// /*  Purchase Confirmation */
-// async function openPurchaseConfirmation(itemName) {
-//   const currentCategory = getActiveCategory();
-//   if (!currentCategory) {
-//     return;
-//   }
-//   const item = currentCategory.items.find(function (item) {
-//     return item.name === itemName;
-//   });
-
-//   if (!res.ok) {
-//     const msg = await res.text();
-//     console.error(msg);
-//     throw Error("Unmark Purchase route failed");
-//   }
-
-// }
 
 async function markPurchased_mysql(item, price) {
   const listId = parseInt(localStorage.getItem("activeCategoryId"));

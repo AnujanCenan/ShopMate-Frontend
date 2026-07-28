@@ -1,18 +1,18 @@
 /* Toggle Selection */
 function toggleItemSelection(itemName) {
-  appState.selectionMode = true;
+  state.selectionMode = true;
   /* Remove Selection */
-  if (appState.selectedItems.includes(itemName)) {
-    appState.selectedItems = appState.selectedItems.filter(function (item) {
+  if (state.selectedItems.includes(itemName)) {
+    state.selectedItems = state.selectedItems.filter(function (item) {
       return item !== itemName;
     });
   } else {
     /* Add Selection */
-    appState.selectedItems.push(itemName);
+    state.selectedItems.push(itemName);
   }
   updateBulkActionCount();
   /* Exit Selection Mode */
-  if (appState.selectedItems.length === 0) {
+  if (state.selectedItems.length === 0) {
     clearSelectionMode();
   } else {
     showBulkActionBar();
@@ -41,32 +41,32 @@ function updateBulkActionCount() {
   if (!bulkSelectionCount) {
     return;
   }
-  bulkSelectionCount.textContent = `${appState.selectedItems.length} Selected`;
+  bulkSelectionCount.textContent = `${state.selectedItems.length} Selected`;
 }
 /* Clear Selection */
 function clearSelectionMode() {
-  appState.selectionMode = false;
-  appState.selectedItems = [];
+  state.selectionMode = false;
+  state.selectedItems = [];
   hideBulkActionBar();
   renderFilteredItems();
 }
 /* Bulk Favorite */
 function bulkFavoriteItems() {
-  appState.selectedItems.forEach(function (itemName) {
+  state.selectedItems.forEach(function (itemName) {
     toggleFavorite(itemName);
   });
   clearSelectionMode();
 }
 /* Bulk Purchased */
 function bulkPurchasedItems() {
-  appState.selectedItems.forEach(function (itemName) {
+  state.selectedItems.forEach(function (itemName) {
     openPurchaseConfirmation(itemName);
   });
   clearSelectionMode();
 }
 /* Bulk Delete */
 function bulkDeleteItems() {
-  appState.selectedItems.forEach(function (itemName) {
+  state.selectedItems.forEach(function (itemName) {
     deleteItem(itemName);
   });
   clearSelectionMode();
@@ -74,7 +74,7 @@ function bulkDeleteItems() {
 /* Exit Selection On Overlay Click */
 document.addEventListener("click", function (event) {
   if (
-    appState.selectionMode &&
+    state.selectionMode &&
     !event.target.closest(".itemCard") &&
     !event.target.closest(".bulkActionBar")
   ) {
