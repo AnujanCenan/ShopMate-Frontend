@@ -1,9 +1,3 @@
-// let state = {
-//     listItems: [],
-//     favoriteItems: [],
-//     activeTab: 'lists'
-// };
-
 async function getRenderingItems() {
   const categoryId = localStorage.getItem("activeCategoryId")
   const groupId = localStorage.getItem("activeGroupId");
@@ -145,17 +139,37 @@ function renderItems(items) {
             <div class="swipeWrapper">
                 <div class="swipeBackground">
                     <div class="swipePurchased">
-                      ${
-                        state.activeTab === "favorites"
-                          ? "➕ Add to List"
-                          : state.activeTab === "purchased"
-                            ? "↺ Re-Add"
-                            : "✓ Purchased"
-                      }
-                    </div>
-                    <div class="swipeDelete">
-                      ${state.activeTab === "favorites" ? "💔 Remove Favorite" : "🗑 Delete"}
-                    </div>
+  <img
+    src="${
+      appState.activeTab === "favorites"
+        ? getIconPath("actions", "add")
+        : appState.activeTab === "purchased"
+          ? getIconPath("actions", "re-add")
+          : getIconPath("actions", "purchased")
+    }"
+    class="icon actionIcon"
+    alt=""
+  >
+  ${
+    appState.activeTab === "favorites"
+      ? "Add to List"
+      : appState.activeTab === "purchased"
+        ? "Re-Add"
+        : "Purchased"
+  }
+</div>
+<div class="swipeDelete">
+  <img
+    src="${
+      appState.activeTab === "favorites"
+        ? getIconPath("actions", "favorite")
+        : getIconPath("actions", "delete")
+    }"
+    class="icon actionIcon"
+    alt=""
+  >
+  ${appState.activeTab === "favorites" ? "Remove Favorite" : "Delete"}
+</div>
                 </div>
                <div class="itemCard swipeCard ${
                  state.selectedItems.includes(item.ItemName)
@@ -191,16 +205,30 @@ function renderItems(items) {
             }
             </div>
                <div class="itemActionButtons">
-               <button class="modernActionButton favoriteActionButton ${isFavorite ? "activeFavoriteButton" : ""} " 
-                onclick="event.stopPropagation(); toggleFavorite_mysql(${item.ItemMasterId}, state);"
-              >
-               <span class="actionButtonIcon">
-               ${isFavorite ? "♥" : "♡"}
-               </span>
-               </button>
+                <button
+  class="modernActionButton favoriteActionButton ${
+    isFavorite ? "activeFavoriteButton" : ""
+  }"
+  onclick="event.stopPropagation(); toggleFavorite_mysql('${item.ItemMasterId}');"
+>
+  <img
+    src="${getIconPath("actions", "favorite")}"
+    class="icon actionIcon"
+    alt="Favorite"
+  >
+</button>
                ${
-                 state.activeTab === "favorites"
-                   ? `<button class="modernActionButton addActionButton" onclick="addFavoriteToList('${item.ItemName}')">+</button>
+                 appState.activeTab === "favorites"
+                   ? `<button
+  class="modernActionButton addActionButton"
+  onclick="addFavoriteToList('${item.ItemName}')"
+>
+  <img
+    src="${getIconPath("actions", "add")}"
+    class="icon actionIcon"
+    alt="Add"
+  >
+</button>
             `
                    : `
             <button
@@ -215,7 +243,15 @@ function renderItems(items) {
     "
 >
     <span class="actionButtonIcon">
-        ${state.activeTab === "purchased" ? "↺" : "✓"}
+       <img
+  src="${
+    appState.activeTab === "purchased"
+      ? getIconPath("actions", "re-add")
+      : getIconPath("actions", "purchased")
+  }"
+  class="icon actionIcon"
+  alt=""
+>
     </span>
 </button>
             `
@@ -232,7 +268,13 @@ function renderItems(items) {
                     ? `<img src="${getProductImage(item.ItemName)}"
                             class="itemImage"
                             alt="${item.ItemName}">`
-                    : `<div class="itemImagePlaceholder">📦</div>`
+                    : `<div class="itemImagePlaceholder">
+  <img
+    src="${getIconPath("actions", "package")}"
+    class="icon largeIcon"
+    alt="Product"
+  >
+</div>`
                 }
             </div>
           `
@@ -254,7 +296,13 @@ function renderItems(items) {
                     ? `<img src="${getProductImage(item.ItemName)}"
                             class="itemImage"
                             alt="${item.ItemName}">`
-                    : `<div class="itemImagePlaceholder">📦</div>`
+                    : `<div class="itemImagePlaceholder">
+  <img
+    src="${getIconPath("actions", "package")}"
+    class="icon largeIcon"
+    alt="Product"
+  >
+</div>`
                 }
             </div>
           `

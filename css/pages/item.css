@@ -1,0 +1,182 @@
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 0;
+}
+.itemName {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: 10px;
+}
+.itemDetails {
+  font-size: 14px;
+  color: #777777;
+  margin-top: 4px;
+  line-height: 1.3;
+}
+.itemCardTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+/* Item Action Buttons */
+.itemActionButtons {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* Item Action Button */
+.itemActionButton {
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.itemTitleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.itemDetailsSection {
+  flex: 1;
+}
+.itemCardContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+.itemImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+.itemImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border: 2px dashed #d1d5db;
+  border-radius: 16px;
+  font-size: 32px;
+}
+.itemImagePreview {
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-top: 12px;
+}
+
+.swipeWrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  margin-bottom: 16px;
+  display: inline-block;
+  width: 100%;
+}
+.swipeBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 1;
+
+  transition: opacity 0.15s ease;
+}
+.swipePurchased {
+  flex: 1;
+  background: #16a34a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 28px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.swipeDelete {
+  flex: 1;
+  background: #ef4444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 28px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.swipeCard {
+  position: relative;
+  z-index: 2;
+  background: white;
+  border-radius: 28px;
+  transition: transform 0.2s ease;
+}
+/* Swipe Active */
+.swipeCard:active {
+  transition: none;
+  opacity: 1;
+}
+.selectedItem {
+  border: 2px solid #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
+}
+.itemTitleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.productLookupSection {
+  padding: 20px;
+}
+.productInfo {
+  flex: 1;
+}
+.productName {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.productPrice {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primaryColor);
+}
+.productStore {
+  font-size: 14px;
+  color: var(--secondaryTextColor);
+  margin-top: 4px;
+}
+.productImage {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+.productActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}

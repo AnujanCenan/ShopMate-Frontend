@@ -1,0 +1,143 @@
+.authPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.authCard {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 28px;
+  padding: 32px 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 32px;
+  padding: 32px 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+.authTitle {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.authSubtitle {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 28px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+.authLogoSection {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.authLogoPlaceholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-weight: 700;
+}
+.authLogo {
+  width: 100px;
+}
+.authBrand {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.authTagline {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.authBiometricRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.authOrText {
+  font-size: 14px;
+  color: #6b7280;
+}
+.authDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 22px 0 18px;
+}
+.authDivider::before,
+.authDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #d9e2ec;
+}
+.authDivider span {
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+.authTextButton {
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--primaryColor);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 14px;
+}
+.authInviteText {
+  margin-top: 24px;
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.authInviteSubText {
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 6px;
+}
+.forgotPasswordButton {
+  margin-bottom: 10px;
+}
+.authRegisterButton {
+  width: 100%;
+  margin: 20px 0;
+}
+.authRegisterButton {
+  width: 100%;
+  margin-bottom: 18px;
+}
+.authInviteSubText {
+  margin-top: 6px;
+  font-size: 13px;
+  text-align: center;
+  color: #64748b;
+  line-height: 1.5;
+}

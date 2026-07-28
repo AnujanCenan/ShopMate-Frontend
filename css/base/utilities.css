@@ -1,0 +1,69 @@
+/* Hidden Overlay */
+.screenOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+/* BottomSheet Hidden */
+.bottomSheet.hidden {
+  transform: translateY(100%);
+}
+
+/* Hidden Overlay */
+.screenOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Hidden Snackbar */
+.snackbar.hidden {
+  display: none !important;
+}
+/*Bulk Action Bar Hidden */
+.bulkActionBar.hidden {
+  display: none !important;
+}
+
+/* Hidden */
+.hidden {
+  display: none !important;
+}
+/* UTILITIES */
+.hidden {
+  display: none !important;
+}
+.hidden {
+  display: none;
+}
+/* Group Accordion Body Hidden */
+.groupAccordionBody.hidden {
+  display: none;
+}
+
+/* Hidden Footer */
+.appFooter.hiddenFooter {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Visible */
+.bottomSheet:not(.hidden) {
+  transform: translateY(0);
+}
+/* Hidden Footer */
+.appFooter.hiddenFooter {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*CLICKABLE - COLLECTION*/
+
+.clickableMember {
+  cursor: pointer;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/*Full Width */
+.fullWidth {
+  width: 100%;
+}

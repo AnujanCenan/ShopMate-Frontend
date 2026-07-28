@@ -100,7 +100,11 @@ async function renderCategories() {
             );
           "
         >
-          ⋮
+          <img
+    src="${getIconPath("navigation", "menu")}"
+    class="icon actionIcon"
+    alt="More"
+>
         </button>
         </div>
         <div class="categoryBudgetSummary">
@@ -175,7 +179,11 @@ async function renderGroupDropdown() {
       <span class="groupItemName">
         ${group.familyName}
       </span>
-      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${group.familyName}');">⋮</button>
+      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${group.familyName}');"><img
+    src="${getIconPath("navigation", "menu")}"
+    class="icon actionIcon"
+    alt="More"
+></button>
     </div>`;
   });
   bottomSheetContent.innerHTML = `
@@ -187,7 +195,7 @@ async function renderGroupDropdown() {
                 class="closeButton"
                 onclick="closeBottomSheet()"
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="groupList">
@@ -217,7 +225,7 @@ function renderCreateGroupForm() {
                 class="closeButton"
                 onclick="closeBottomSheet()"
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="bottomSheetBody">
@@ -310,7 +318,7 @@ function renderCreateCategoryForm() {
                 class="closeButton"
                 onclick="closeBottomSheet()"
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="bottomSheetBody">
@@ -390,7 +398,7 @@ function renderCategoryActions(categoryName) {
                 class="closeButton"
                 onclick="closeBottomSheet()"
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="bottomSheetBody">
@@ -402,7 +410,12 @@ function renderCategoryActions(categoryName) {
                     )
                 "
             >
-                ✏ Rename Category
+                <img
+    src="${getIconPath("actions", "edit")}"
+    class="icon actionIcon"
+    alt=""
+>
+Rename Category
             </button>
             <button
               class="bottomSheetActionButton"
@@ -420,7 +433,12 @@ function renderCategoryActions(categoryName) {
                     )
                 "
             >
-                🗑 Delete Category
+                <img
+    src="${getIconPath("actions", "delete")}"
+    class="icon actionIcon"
+    alt=""
+>
+Delete Category
             </button>
         </div>
     `;
@@ -444,7 +462,7 @@ function renameCategory(categoryName) {
                 class="closeButton"
                 onclick="closeBottomSheet()"
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="bottomSheetBody">
@@ -532,7 +550,7 @@ function deleteCategory(categoryName) {
                     )
                 "
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="bottomSheetBody">
@@ -584,53 +602,25 @@ function confirmDeleteCategory(categoryName) {
 function renderGroupActions(groupName) {
   bottomSheetContent.innerHTML = `
         <div class="bottomSheetHeader">
-            <h2>
-                Group Actions
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                ✕
-            </button>
+            <h2>Group Actions</h2>
+            <button class="closeButton" onclick="closeBottomSheet()"><img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close"></button>
         </div>
         <div class="bottomSheetBody">
-            <button
-                class="bottomSheetActionButton"
-                onclick="
-                    renameGroup(
-                        '${groupName}'
-                    )
-                "
-            >
-                ✏ Rename Group
-            </button>
-            <button
-                class="bottomSheetDeleteButton"
-                onclick="
-                    deleteGroup(
-                        '${groupName}'
-                    )
-                "
-            >
-                🗑 Delete Group
-            </button>
-        </div>
-    `;
+            <button class="bottomSheetActionButton" onclick="renderRenameGroupForm()"><img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt=""><span>Rename Group</span></button>
+            <button class="bottomSheetActionButton dangerAction" onclick="confirmDeleteGroup()"><img src="${getIconPath("actions", "delete")}" class="icon actionIcon" alt=""><span>Delete Group</span></button>
+        </div>`;
   openBottomSheet();
 }
 /* Rename Group */
 function renameGroup(groupName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
-      <h2>
-        Rename Group
-      </h2>
+      <h2>Rename Group</h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
-        ✕
+        <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
       </button>
     </div>
     <div class="bottomSheetBody">
@@ -762,6 +752,7 @@ function closeSideDrawer() {
   sideDrawerOverlay.classList.remove("active");
 }
 /* Render Side Drawer */
+/* Render Side Drawer */
 function renderSideDrawer() {
   sideDrawer.innerHTML = `
     <div class="drawerHeader">
@@ -772,60 +763,77 @@ function renderSideDrawer() {
     <div class="drawerMenu">
       <button
         class="drawerItem"
-        onclick="
-          window.location.href =
-          '../pages/familyManagementPage.html'
-        "
+        onclick="window.location.href='../pages/familyManagementPage.html'"
       >
-        👨‍👩‍👧 Group Management
+        <img
+          src="${getIconPath("features", "group")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>Group Management</span>
       </button>
       <button
         class="drawerItem"
-        onclick="
-          window.location.href =
-          '../pages/notificationsPage.html'
-        "
+        onclick="window.location.href='../pages/notificationsPage.html'"
       >
-        🔔 Notifications
+        <img
+          src="${getIconPath("features", "notification")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>Notifications</span>
       </button>
       <button
         class="drawerItem"
-        onclick="
-          window.location.href =
-          '../pages/budgetPage.html'
-        "
+        onclick="window.location.href='../pages/budgetPage.html'"
       >
-        💰 Budget
+        <img
+          src="${getIconPath("features", "budget")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>Budget</span>
       </button>
-
       <button
         class="drawerItem"
-        onclick="
-          window.location.href =
-          '../pages/settingsPage.html'
-        "
+        onclick="window.location.href='../pages/settingsPage.html'"
       >
-        ⚙ Settings
+        <img
+          src="${getIconPath("features", "settings")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>Settings</span>
       </button>
       <button
         class="drawerItem"
         onclick="exportAppData()"
       >
-        📤 Export Backup
-      </button>
-      <label
-        class="drawerItem"
-      >
-        📥 Import Backup
-        <input
-          type="file"
-          accept=".json"
-          hidden
-          onchange="
-            importAppData(event)
-          "
+        <img
+          src="${getIconPath("features", "export")}"
+          class="icon featureIcon"
+          alt=""
         >
-      </label>
+        <span>Export</span>
+      </button>
+      <button
+        class="drawerItem"
+        onclick="document.getElementById('importBackupInput').click()"
+      >
+        <img
+          src="${getIconPath("features", "import")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>Import</span>
+      </button>
+      <input
+        type="file"
+        id="importBackupInput"
+        accept=".json"
+        hidden
+        onchange="importAppData(event)"
+      >
     </div>
   `;
 }
@@ -916,7 +924,11 @@ async function renderBudgetDashboardWidget() {
           </p>
         </div>
         <span id="budgetCollapseIcon">
-          ▼
+          <img
+    src="${getIconPath("navigation", "collapse")}"
+    class="icon actionIcon"
+    alt=""
+>
         </span>
       </button>
       <div
@@ -1019,11 +1031,28 @@ async function renderBudgetDashboardWidget() {
   ****************************************/
 }
 /* Toggle Budget Card */
+/* Toggle Budget Card */
 function toggleBudgetCard() {
   const body = document.getElementById("budgetSummaryBody");
   const icon = document.getElementById("budgetCollapseIcon");
   body.classList.toggle("hidden");
-  icon.textContent = body.classList.contains("hidden") ? "▶" : "▼";
+  if (body.classList.contains("hidden")) {
+    icon.innerHTML = `
+      <img
+        src="${getIconPath("navigation", "expand")}"
+        class="icon actionIcon"
+        alt="Expand"
+      >
+    `;
+  } else {
+    icon.innerHTML = `
+      <img
+        src="${getIconPath("navigation", "collapse")}"
+        class="icon actionIcon"
+        alt="Collapse"
+      >
+    `;
+  }
 }
 /* Render Edit Group Budget Form */
 function renderEditGroupBudgetForm() {
@@ -1036,7 +1065,7 @@ function renderEditGroupBudgetForm() {
                 class="closeButton"
                 onclick="closeBottomSheet()"
             >
-                ✕
+                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
             </button>
         </div>
         <div class="bottomSheetBody">
@@ -1093,7 +1122,7 @@ function renderCategoryBudgetForm(categoryName) {
           closeBottomSheet()
         "
       >
-        ✕
+        <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
       </button>
     </div>
     <div class="bottomSheetBody">

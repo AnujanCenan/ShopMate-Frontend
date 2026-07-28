@@ -1,0 +1,27 @@
+.notificationTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.notificationMessage {
+  font-size: 14px;
+  color: var(--secondaryTextColor);
+  margin-bottom: 8px;
+}
+.notificationTime {
+  font-size: 12px;
+  color: var(--secondaryTextColor);
+}
+.notificationTime {
+  color: #6b7280;
+  font-size: 14px;
+}
+.unreadNotification {
+  border-left: 5px solid var(--primaryColor);
+}
+
+.notificationTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}

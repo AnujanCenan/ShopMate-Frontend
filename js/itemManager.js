@@ -17,10 +17,12 @@ function renderAddItemForm(itemName = "") {
       <button
         class="closeButton"
         onclick="
-          favoriteItemToAdd=null;
-          closeBottomSheet();"
-      >
-        ✕
+          favoriteItemToAdd = null;
+          closeBottomSheet();">
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close">
       </button>
     </div>
     <div class="bottomSheetBody">
@@ -141,11 +143,15 @@ function renderEditItemForm(listItemId) {
         Edit Item
       </h2>
       <button
-        class="closeButton"
-        onclick="closeBottomSheet()"
-      >
-        ✕
-      </button>
+  class="closeButton"
+  onclick="closeBottomSheet()"
+>
+  <img
+    src="${getIconPath("navigation", "close")}"
+    class="icon actionIcon"
+    alt="Close"
+  >
+</button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
@@ -253,10 +259,12 @@ function initializeItemForm() {
   const itemShopInput = document.getElementById("itemShopInput");
   const itemPriceInput = document.getElementById("itemPriceInput");
   const imagePreview = document.getElementById("itemImagePreview");
-  itemNameInput.addEventListener("blur", function () {});
   if (!itemNameInput) {
     return;
   }
+  itemNameInput.addEventListener("input", function () {
+    renderProductSuggestions(itemNameInput.value);
+  });
   setTimeout(function () {
     itemNameInput.focus();
   }, 200);
@@ -281,11 +289,14 @@ function initializeItemForm() {
     }
   });
   itemNameInput.addEventListener("blur", function () {
-    const product = productDatabase.find(function (product) {
-      return (
-        product.name.toLowerCase() === itemNameInput.value.trim().toLowerCase()
-      );
-    });
+    setTimeout(function () {
+      const suggestionContainer = document.getElementById("productSuggestions");
+      if (suggestionContainer) {
+        suggestionContainer.innerHTML = "";
+        suggestionContainer.classList.remove("showSuggestions");
+      }
+    }, 150);
+    const product = findProduct(itemNameInput.value);
     if (!product) {
       return;
     }
@@ -354,7 +365,6 @@ async function createItem() {
   const itemShop = itemShopInput.value.trim();
   const itemPrice =
     Number(document.getElementById("itemPriceInput").value) || 0;
-
   /* Item added from Favorites? */
   const openedFromFavorite = favoriteItemToAdd !== null;
   if (!itemName || !itemQuantity) {
@@ -406,11 +416,15 @@ async function createItem() {
                     Item Already Exists
                 </h2>
                 <button
-                    class="closeButton"
-                    onclick="closeBottomSheet()"
-                >
-                    ✕
-                </button>
+  class="closeButton"
+  onclick="closeBottomSheet()"
+>
+  <img
+    src="${getIconPath("navigation", "close")}"
+    class="icon actionIcon"
+    alt="Close"
+  >
+</button>
             </div>
             <div class="bottomSheetBody">
                 <p class="duplicateMessage">
@@ -457,11 +471,13 @@ async function createItem() {
     purchaseDate: null,
     Purchased: false,
   };
-
-  // currentCategory.items.unshift(newItem);
   state.listItems.unshift(newItem);
-
   saveProductToCatalog(newItem);
+  
+  /* Update Product Usage */
+  const productUsage = JSON.parse(localStorage.getItem("productUsage")) || {};
+  productUsage[itemName] = (productUsage[itemName] || 0) + 1;
+  localStorage.setItem("productUsage", JSON.stringify(productUsage));
   /* Added from Favorites */
   if (openedFromFavorite) {
     state.activeTab = "lists";
@@ -655,13 +671,15 @@ async function openPurchaseConfirmation(listItemId) {
         Confirm Purchase
       </h2>
       <button
-        class="closeButton"
-        onclick="
-          closeBottomSheet()
-        "
-      >
-        ✕
-      </button>
+  class="closeButton"
+  onclick="closeBottomSheet()"
+>
+  <img
+    src="${getIconPath("navigation", "close")}"
+    class="icon actionIcon"
+    alt="Close"
+  >
+</button>
     </div>
     <div class="bottomSheetBody">
       <div class="purchaseSummaryCard">
