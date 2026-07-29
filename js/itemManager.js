@@ -374,8 +374,9 @@ function createItem() {
   if (!currentCategory) {
     return;
   }
+  const normalizedItemName = itemName.trim().toLowerCase();
   const existingItem = currentCategory.items.find(function (item) {
-    return item.name.toLowerCase() === itemName.toLowerCase();
+    return item.name.trim().toLowerCase() === normalizedItemName;
   });
   /* Existing Item Found */
   if (existingItem) {
@@ -506,10 +507,12 @@ function updateItem(originalItemName) {
     showSnackbar("Please enter item details");
     return;
   }
+  const normalizedUpdatedName = updatedName.trim().toLowerCase();
+  const normalizedOriginalName = originalItemName.trim().toLowerCase();
   const duplicateItem = currentCategory.items.find(function (existingItem) {
     return (
-      existingItem.name.toLowerCase() === updatedName.toLowerCase() &&
-      existingItem.name !== originalItemName
+      existingItem.name.trim().toLowerCase() === normalizedUpdatedName &&
+      existingItem.name.trim().toLowerCase() !== normalizedOriginalName
     );
   });
   if (duplicateItem) {
@@ -567,14 +570,16 @@ function openPurchaseConfirmation(itemName) {
     </div>
     <div class="bottomSheetBody">
       <div class="purchaseSummaryCard">
-        <h3>
-          ${item.name}
-        </h3>
-        <p>
-          Estimated:
-          $${item.estimatedPrice || 0}
-        </p>
-      </div>
+    <h3 class="purchaseItemName">
+        ${item.name}
+    </h3>
+    <p class="purchaseEstimatedPrice">
+        Estimated Price
+    </p>
+    <p class="purchaseEstimatedAmount">
+        $${item.estimatedPrice || 0}
+    </p>
+</div>
       <div class="formField">
         <label class="formLabel">
           Actual Price Paid

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
+    <title>Create Shopping Group</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -36,15 +36,17 @@
         />
         <input
           type="text"
-          placeholder="Family Name"
+          placeholder="Group Name"
           class="authInput"
-          id="familyNameInput"
+          id="groupNameInput"
         />
         <label class="biometricToggle">
           <input type="checkbox" id="biometricCheckbox" />
-          Enable Fingerprint / Face ID
+          Protect ShopMate with Biometrics
         </label>
-        <button class="authButton" onclick="registerUser()">Register</button>
+        <button class="authButton" onclick="registerUser()">
+          Create Group
+        </button>
         <button
           class="authTextButton"
           onclick="window.location.href = './loginPage.html'"
@@ -54,69 +56,7 @@
       </div>
     </div>
     <script src="../js/stateManager.js"></script>
-    <script>
-      function registerUser() {
-        const name = document.getElementById("registerNameInput").value.trim();
-        const email = document
-          .getElementById("registerEmailInput")
-          .value.trim();
-        const password = document
-          .getElementById("registerPasswordInput")
-          .value.trim();
-        const confirmPassword = document
-          .getElementById("registerConfirmPasswordInput")
-          .value.trim();
-        const familyName = document
-          .getElementById("familyNameInput")
-          .value.trim();
-        const biometricEnabled =
-          document.getElementById("biometricCheckbox").checked;
-        if (!name || !email || !password || !confirmPassword || !familyName) {
-          showDialog("Please fill all fields");
-          return;
-        }
-        if (password !== confirmPassword) {
-          showDialog("Passwords do not match");
-          return;
-        }
-        const existingUser = appState.users.find(function (user) {
-          return user.email === email;
-        });
-        if (existingUser) {
-          showDialog(
-            "Account already exists",
-            "An account with this email address already exists.",
-          );
-          return;
-        }
-        const userId = "user_" + Date.now();
-        const newUser = {
-          id: userId,
-          name,
-          email,
-          password,
-          biometricEnabled,
-        };
-        appState.users.push(newUser);
-        appState.groups[familyName] = [];
-        appState.groupMembers[familyName] = [
-          {
-            id: userId,
-            name,
-            email,
-            role: "admin",
-          },
-        ];
-        appState.currentUser = {
-          id: userId,
-          name,
-          email,
-        };
-        appState.loggedIn = true;
-        appState.activeGroup = familyName;
-        saveAppState();
-        window.location.href = "./dashboardPage.html";
-      }
-    </script>
+    <script src="../js/helpers.js"></script>
+    <script src="../js/authManager.js"></script>
   </body>
 </html>

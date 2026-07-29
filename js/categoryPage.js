@@ -92,8 +92,9 @@ function renderItems(items) {
   }
   itemEmptyState.innerHTML = "";
   items.forEach(function (item) {
+    const normalizedItemName = item.name.trim().toLowerCase();
     const isFavorite = appState.favoriteItems.some(function (favoriteItem) {
-      return favoriteItem.name === item.name;
+      return favoriteItem.name.trim().toLowerCase() === normalizedItemName;
     });
     itemList.innerHTML += `
             <div class="swipeWrapper">
@@ -122,7 +123,10 @@ function renderItems(items) {
   <img
     src="${
       appState.activeTab === "favorites"
-        ? getIconPath("actions", "favorite")
+        ? getIconPath(
+            "actions",
+            item.isFavorite ? "favorite" : "favorite-outline",
+          )
         : getIconPath("actions", "delete")
     }"
     class="icon actionIcon"
@@ -173,7 +177,10 @@ Qty: ${item.quantity}
   onclick="event.stopPropagation(); toggleFavorite('${item.name}');"
 >
   <img
-    src="${getIconPath("actions", "favorite")}"
+    src="${getIconPath(
+      "actions",
+      isFavorite ? "favorite" : "favorite-outline",
+    )}"
     class="icon actionIcon"
     alt="Favorite"
   >

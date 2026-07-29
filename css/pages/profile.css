@@ -1,32 +1,52 @@
+/***************************************************************************************************
+ * FILE: profile.css
+ *
+ * PURPOSE
+ * Defines profile page components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Profile hero
+ * • Profile avatar
+ * • Profile information
+ * • Group switcher
+ *
+ * PAGES
+ * • Profile Page
+ ***************************************************************************************************/
+/* Profile Hero */
 .profileHero {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 28px;
 }
+/* Profile Avatar */
 .profileAvatar {
-  width: 110px;
-  height: 110px;
-  border-radius: 32px;
-  background: #dbeafe;
-  color: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 110px;
+  height: 110px;
+  margin-bottom: 18px;
+  background: #dbeafe;
+  color: #2563eb;
+  border-radius: 32px;
   font-size: 42px;
   font-weight: 700;
-  margin-bottom: 18px;
 }
+/* Profile Name */
 .profileName {
+  margin-bottom: 8px;
   font-size: 28px;
   font-weight: 700;
-  margin-bottom: 8px;
 }
+/* Profile Role */
 .profileRole {
   color: #6b7280;
-  font-size: 16px;
   text-transform: capitalize;
+  font-size: 16px;
 }
+/* Profile Information Row */
 .profileInfoRow {
   display: flex;
   align-items: center;
@@ -34,29 +54,34 @@
   padding: 16px 0;
   border-bottom: 1px solid #f1f5f9;
 }
+/* Last Profile Information Row */
 .profileInfoRow:last-child {
   border-bottom: none;
 }
+/* Group Switcher */
 .groupSwitcher {
   margin-bottom: 24px;
 }
+/* Group Switcher Title */
 .groupSwitcherTitle {
+  margin-bottom: 14px;
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 14px;
 }
+/* Group Switcher Button */
 .groupSwitcherButton {
   width: 100%;
   min-height: 54px;
+  margin-bottom: 12px;
+  background: white;
   border: none;
   border-radius: 18px;
-  background: white;
-  margin-bottom: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
   font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
+/* Active Group Switcher Button */
 .activeGroupSwitcherButton {
   background: #118ab2;
   color: white;

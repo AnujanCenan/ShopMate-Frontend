@@ -1,21 +1,33 @@
+/***************************************************************************************************
+ * FILE: fab.css
+ *
+ * PURPOSE
+ * Defines the floating action button used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Floating action button
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
 /* Floating Action Button */
 .floatingActionButton {
-  width: 64px;
-  height: 64px;
-  border: none;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
   position: fixed;
   right: 24px;
   bottom: 80px;
-  z-index: 20;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
   background: linear-gradient(135deg, #22c55e, #16a34a);
+  cursor: pointer;
   box-shadow: 0 12px 28px rgba(34, 197, 94, 0.28);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+  z-index: 20;
 }

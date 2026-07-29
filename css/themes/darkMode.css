@@ -1,3 +1,17 @@
+/***************************************************************************************************
+ * FILE: darkMode.css
+ *
+ * PURPOSE
+ * Defines the global dark mode theme used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Apply dark background
+ * • Apply default text color
+ *
+ * PAGES
+ * • All Pages
+ ***************************************************************************************************/
+/* Global Dark Mode */
 .darkMode {
   background: #111827;
   color: white;

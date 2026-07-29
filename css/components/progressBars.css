@@ -1,28 +1,42 @@
+/***************************************************************************************************
+ * FILE: progressBar.css
+ *
+ * PURPOSE
+ * Defines reusable progress bar components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Budget progress bar
+ * • Analysis progress bar
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
+/* Budget Progress Bar */
 .budgetProgressBar {
   width: 100%;
   height: 10px;
+  margin-top: 16px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 16px;
 }
-
+/* Budget Progress Fill */
 .budgetProgressFill {
   height: 100%;
-  border-radius: 999px;
   background: linear-gradient(90deg, #22c55e, #10b981);
+  border-radius: 999px;
   transition: width 0.4s ease;
 }
-
+/* Analysis Progress Bar */
 .analysisProgressBar {
   height: 10px;
+  margin-top: 14px;
+  margin-bottom: 14px;
   background: #e5e7eb;
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 14px;
-  margin-bottom: 14px;
 }
-
+/* Analysis Progress Fill */
 .analysisProgressFill {
   height: 100%;
   background: #2563eb;

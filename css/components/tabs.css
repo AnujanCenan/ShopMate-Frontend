@@ -1,40 +1,70 @@
+/***************************************************************************************************
+ * FILE: tab.css
+ *
+ * PURPOSE
+ * Defines reusable tab navigation components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Tab section
+ * • Active tab styling
+ * • Modern tab container
+ * • Modern tab buttons
+ * • Standard tab buttons
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
+/* Tab Section */
 .tabSection {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
 }
+/* Active Tab */
 .activeTab {
-  background-color: var(--primaryColor);
+  background: var(--primaryColor);
   color: white;
 }
+/* Modern Tab Container */
 .modernTabContainer {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0 10px;
-  /* background: white; */
+  gap: 6px;
+  padding: 6px;
+  margin-bottom: 18px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
 }
+/* Modern Tab Button */
 .modernTabButton {
+  flex: 1;
+  padding: 14px 0;
+  background: transparent;
   border: none;
-  background: #f1f1f1;
-  padding: 12px 18px;
-  border-radius: 18px;
-  font-size: 15px;
+  border-radius: 999px;
+  color: #6b7280;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 .modernTabButton.activeTab {
-  background: #118ab2;
+  background: var(--primaryColor);
   color: white;
-  box-shadow: 0 4px 12px rgba(17, 138, 178, 0.25);
+  box-shadow: 0 4px 12px rgba(17, 138, 178, 0.22);
 }
-/* Tab Button */
+/* Standard Tab Button */
 .tabButton {
   flex: 1;
+  padding: 14px 0;
+  background: transparent;
   border: none;
-  background-color: #e4e4e4;
-  padding: 14px;
-  border-radius: var(--borderRadiusMedium);
-  font-size: 14px;
+  border-radius: 999px;
   cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
 }

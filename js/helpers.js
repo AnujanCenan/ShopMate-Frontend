@@ -1,5 +1,80 @@
+/***************************************************************************************************
+ * FILE: helpers.js
+ *
+ * PURPOSE
+ * Provides reusable helper functions shared across the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Product catalog management
+ * • Product search
+ * • UI helpers
+ * • Bottom Sheet helpers
+ * • Dialog helpers
+ * • Toast helpers
+ * • Permission helpers
+ * • Notification helpers
+ * • Utility helpers
+ *
+ * FUNCTIONS IN THIS FILE
+ *
+ * Product Catalog
+ * ├── loadProductCatalog()
+ * ├── normalizeSearchText()
+ * ├── searchProducts()
+ * ├── findProduct()
+ * └── getQuickPickProducts()
+ *
+ * Product Suggestions
+ * ├── renderProductSuggestions()
+ * └── selectSuggestedProduct()
+ *
+ * UI Helpers
+ * ├── getIconPath()
+ * ├── openBottomSheet()
+ * ├── closeBottomSheet()
+ * ├── getActiveCategory()
+ * └── debugActiveCategory()
+ *
+ * Permission Helpers
+ * ├── getCurrentMember()
+ * ├── isAdmin()
+ * ├── isMember()
+ * ├── canManageBudget()
+ * └── canManageGroup()
+ *
+ * Budget Helpers
+ * └── calculateGroupBudget()
+ *
+ * Dialog Helpers
+ * ├── showDialog()
+ * ├── closeDialog()
+ * ├── showConfirmDialog()
+ * └── executeDialogConfirm()
+ *
+ * Toast Helpers
+ * └── showToast()
+ *
+ * Notification Helpers
+ * ├── createNotification()
+ * ├── markNotificationRead()
+ * ├── markAllNotificationsRead()
+ * └── updateNotificationBadge()
+ *
+ * Product Image Helpers
+ * └── getProductImage()
+ *
+ * DEPENDENCIES
+ * • stateManager.js
+ *
+ * PAGES
+ * • Shared Across All Pages
+ *
+ * NOTE
+ * This file should contain reusable helper functions only.
+ * Business logic belongs inside the appropriate manager files.
+ ***************************************************************************************************/
 let productDatabase = [];
-/* Load Product Catalog */
+/* Load Product Catalog - Loads the product catalog from the JSON file into memory. */
 async function loadProductCatalog() {
   try {
     const response = await fetch("../data/json/products.json");
@@ -8,11 +83,11 @@ async function loadProductCatalog() {
     productDatabase = [];
   }
 }
-/* Normalize Search Text */
+/* Normalize Search Text - Normalizes text to improve search consistency. */
 function normalizeSearchText(text) {
   return text.trim().toLowerCase().replace(/\s+/g, " ");
 }
-/* Smart Product Search */
+/* Search Products - Searches the product catalog and returns matching products. */
 function searchProducts(searchText, maxResults = 8) {
   if (!searchText) {
     return [];
@@ -32,7 +107,24 @@ function searchProducts(searchText, maxResults = 8) {
   });
   return [...startsWithMatches, ...containsMatches].slice(0, maxResults);
 }
-/* Render Product Suggestions */
+/* Find Product - Finds a product by name from the loaded product catalog. */
+function findProduct(productName) {
+  return productDatabase.find(function (product) {
+    return (
+      normalizeSearchText(product.name) === normalizeSearchText(productName)
+    );
+  });
+}
+/* Get Quick Pick Products - Returns the user's most frequently used products. */
+function getQuickPickProducts(maxResults = 5) {
+  const usage = JSON.parse(localStorage.getItem("productUsage")) || {};
+  return [...productDatabase]
+    .sort(function (a, b) {
+      return (usage[b.name] || 0) - (usage[a.name] || 0);
+    })
+    .slice(0, maxResults);
+}
+/* Product Suggestions - Renders matching products below the search box as the user types. */
 function renderProductSuggestions(searchText) {
   const suggestionContainer = document.getElementById("productSuggestions");
   if (!suggestionContainer) {
@@ -54,10 +146,10 @@ function renderProductSuggestions(searchText) {
   const heading =
     search === ""
       ? `
-            <div class="quickPickHeading">
-                ⭐ Quick Picks
-            </div>
-        `
+        <div class="quickPickHeading">
+          ⭐ Quick Picks
+        </div>
+      `
       : "";
   suggestionContainer.innerHTML =
     heading +
@@ -73,27 +165,29 @@ function renderProductSuggestions(searchText) {
           );
         }
         return `
-<div
-class="productSuggestionItem"
-onclick="selectSuggestedProduct('${product.name}')">
-<div class="productSuggestionImage">
-${image ? `<img src="${image}">` : "📦"}
-</div>
-<div class="productSuggestionName">
-${displayName}
-</div>
-</div>
-`;
+          <div
+            class="productSuggestionItem"
+            onclick="selectSuggestedProduct('${product.name}')"
+          >
+            <div class="productSuggestionImage">
+              ${image ? `<img src="${image}">` : "📦"}
+            </div>
+            <div class="productSuggestionName">
+              ${displayName}
+            </div>
+          </div>
+        `;
       })
       .join("");
 }
-/* Select Suggested Product */
+/* Select Suggested Product - Populates the item form using the selected product details. */
 function selectSuggestedProduct(productName) {
   const product = findProduct(productName);
   if (!product) {
     return;
   }
   const itemNameInput = document.getElementById("itemNameInput");
+  const itemQuantityInput = document.getElementById("itemQuantityInput");
   const itemPriceInput = document.getElementById("itemPriceInput");
   const itemShopInput = document.getElementById("itemShopInput");
   const imagePreview = document.getElementById("itemImagePreview");
@@ -112,32 +206,14 @@ function selectSuggestedProduct(productName) {
   }
   suggestionContainer.innerHTML = "";
   suggestionContainer.classList.remove("showSuggestions");
-  document.getElementById("itemQuantityInput").focus();
+  itemQuantityInput.focus();
 }
-/* Icon Path Helper */
 const ICON_BASE_PATH = "../assets/icons";
-/* Returns icon path */
+/* Get Icon Path - Returns the full path of an SVG icon from the assets folder. */
 function getIconPath(folder, iconName) {
   return `${ICON_BASE_PATH}/${folder}/${iconName}.svg`;
 }
-/* Find Product */
-function findProduct(productName) {
-  return productDatabase.find(function (product) {
-    return (
-      normalizeSearchText(product.name) === normalizeSearchText(productName)
-    );
-  });
-}
-/* Get Quick Pick Products */
-function getQuickPickProducts(maxResults = 5) {
-  const usage = JSON.parse(localStorage.getItem("productUsage")) || {};
-  return [...productDatabase]
-    .sort(function (a, b) {
-      return (usage[b.name] || 0) - (usage[a.name] || 0);
-    })
-    .slice(0, maxResults);
-}
-/* Open Bottom Sheet */
+/* Open Bottom Sheet - Displays the bottom sheet and prevents background interaction. */
 function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
@@ -152,8 +228,7 @@ function openBottomSheet() {
   }
   document.body.style.overflow = "hidden";
 }
-/* Close Bottom Sheet */
-/* Close Bottom Sheet */
+/* Close Bottom Sheet - Hides the bottom sheet and restores page interaction. */
 function closeBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
@@ -168,12 +243,15 @@ function closeBottomSheet() {
   }
   document.body.style.overflow = "";
 }
-/* Close Bottom Sheet On Escape */
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape") {
-    closeBottomSheet();
-  }
-});
+/* Initialize Bottom Sheet Events - Registers global events used by the bottom sheet. */
+function initializeBottomSheetEvents() {
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      closeBottomSheet();
+    }
+  });
+}
+/* Get Active Category - Returns the currently selected category object. */
 function getActiveCategory() {
   const activeGroup = localStorage.getItem("activeGroup");
   const activeCategory = localStorage.getItem("activeCategory");
@@ -188,11 +266,11 @@ function getActiveCategory() {
     return category.name === activeCategory;
   });
 }
+/* Debug Active Category - Logs the active category to the browser console. */
 function debugActiveCategory() {
-  const activeCategory = getActiveCategory();
-  console.log("ACTIVE CATEGORY:", activeCategory);
+  console.log("ACTIVE CATEGORY:", getActiveCategory());
 }
-/* Permission Checks */
+/* Get Current Member - Returns the current user's membership details for the active group. */
 function getCurrentMember() {
   const groupName = appState.activeGroup;
   if (!groupName || !appState.currentUser) {
@@ -203,45 +281,25 @@ function getCurrentMember() {
     return member.email === appState.currentUser.email;
   });
 }
+/* Is Admin - Determines whether the current user is an administrator of the active group. */
 function isAdmin() {
   const member = getCurrentMember();
-  return member && member.role === "admin";
+  return member ? member.role === "admin" : false;
 }
+/* Is Member - Determines whether the current user is a standard member of the active group. */
 function isMember() {
   const member = getCurrentMember();
-  return member && member.role === "member";
+  return member ? member.role === "member" : false;
 }
+/* Can Manage Budget - Determines whether the current user can manage group budgets. */
 function canManageBudget() {
   return isAdmin();
 }
+/* Can Manage Group - Determines whether the current user can manage the active group. */
 function canManageGroup() {
   return isAdmin();
 }
-function getCurrentMember() {
-  const groupName = appState.activeGroup;
-  if (!groupName || !appState.currentUser) {
-    return null;
-  }
-  const members = appState.groupMembers[groupName] || [];
-  return members.find(function (member) {
-    return member.email === appState.currentUser.email;
-  });
-}
-function isAdmin() {
-  const member = getCurrentMember();
-  return member && member.role === "admin";
-}
-function isMember() {
-  const member = getCurrentMember();
-  return member && member.role === "member";
-}
-function canManageBudget() {
-  return isAdmin();
-}
-function canManageGroup() {
-  return isAdmin();
-}
-/* Calculate Group Budget */
+/* Calculate Group Budget - Calculates the total amount spent for the active shopping group. */
 function calculateGroupBudget() {
   if (!appState.budgets.groupBudgets) {
     appState.budgets.groupBudgets = {};
@@ -262,7 +320,7 @@ function calculateGroupBudget() {
   });
   return spent;
 }
-/* Show Dialog */
+/* Show Dialog - Displays a simple information dialog with a single confirmation button. */
 function showDialog(title, message) {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
@@ -285,9 +343,7 @@ function showDialog(title, message) {
           <div class="dialogActions">
             <button
               class="primaryButton"
-              onclick="
-                closeDialog()
-              "
+              onclick="closeDialog()"
             >
               OK
             </button>
@@ -297,19 +353,20 @@ function showDialog(title, message) {
     `,
   );
 }
-/* Close Dialog */
+/* Close Dialog - Closes the currently displayed dialog. */
 function closeDialog() {
   const dialog = document.getElementById("appDialogOverlay");
   if (dialog) {
     dialog.remove();
   }
 }
-/* Confirmation Dialog */
+/* Show Confirmation Dialog - Displays a confirmation dialog and executes the supplied callback when confirmed. */
 function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
   }
+  window.dialogConfirmAction = onConfirm;
   document.body.insertAdjacentHTML(
     "beforeend",
     `
@@ -327,36 +384,30 @@ function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
           <div class="dialogActions">
             <button
               class="secondaryButton"
-              onclick="
-                closeDialog()
-              "
+              onclick="closeDialog()"
             >
               Cancel
             </button>
             <button
               class="dangerButton"
-              onclick="
-                executeDialogConfirm()
-              "
+              onclick="executeDialogConfirm()"
             >
-              ${window.dialogConfirmText || "Confirm"}
+              ${confirmText}
             </button>
           </div>
         </div>
       </div>
     `,
   );
-  window.dialogConfirmText = confirmText;
-  window.dialogConfirmAction = onConfirm;
 }
-/* Execute Confirm */
+/* Execute Dialog Confirmation - Executes the stored confirmation callback and closes the dialog. */
 function executeDialogConfirm() {
   if (typeof window.dialogConfirmAction === "function") {
     window.dialogConfirmAction();
   }
   closeDialog();
 }
-/* Show Toast */
+/* Show Toast - Displays a temporary toast notification to provide user feedback. */
 function showToast(message, type = "success") {
   const existingToast = document.getElementById("appToast");
   if (existingToast) {
@@ -389,43 +440,7 @@ function showToast(message, type = "success") {
     }
   }, 2500);
 }
-/* Mark Read */
-function markNotificationRead(notificationId) {
-  const notification = appState.notifications.find(function (notification) {
-    return notification.id === notificationId;
-  });
-  if (notification) {
-    notification.read = true;
-    saveAppState();
-    renderNotifications();
-    updateNotificationBadge();
-  }
-}
-/* Notification Badge */
-function updateNotificationBadge() {
-  const badge = document.getElementById("notificationBadge");
-  if (!badge) {
-    return;
-  }
-  const unreadCount = appState.notifications.filter(function (notification) {
-    return !notification.read;
-  }).length;
-  badge.textContent = unreadCount;
-  badge.classList.toggle("hidden", unreadCount === 0);
-}
-/* Mark All Read */
-function markAllNotificationsRead() {
-  appState.notifications.forEach(function (notification) {
-    notification.read = true;
-  });
-  saveAppState();
-  if (typeof renderNotifications === "function") {
-    renderNotifications();
-  }
-  updateNotificationBadge();
-  showToast("All Notifications Read");
-}
-/* Create Notification */
+/* Create Notification - Creates a new notification and updates the notification badge. */
 function createNotification(type, title, message) {
   appState.notifications.unshift({
     id: "notif_" + Date.now(),
@@ -438,23 +453,73 @@ function createNotification(type, title, message) {
   saveAppState();
   updateNotificationBadge();
 }
-/* Get Product Image */
+/* Mark Notification Read - Marks a notification as read and refreshes the notification UI. */
+function markNotificationRead(notificationId) {
+  const notification = appState.notifications.find(function (notification) {
+    return notification.id === notificationId;
+  });
+  if (!notification) {
+    return;
+  }
+  notification.read = true;
+  saveAppState();
+  if (typeof renderNotifications === "function") {
+    renderNotifications();
+  }
+  updateNotificationBadge();
+}
+/* Mark All Notifications Read - Marks every notification as read and refreshes the notification UI. */
+function markAllNotificationsRead() {
+  appState.notifications.forEach(function (notification) {
+    notification.read = true;
+  });
+  saveAppState();
+  if (typeof renderNotifications === "function") {
+    renderNotifications();
+  }
+  updateNotificationBadge();
+  showToast("All Notifications Read");
+}
+/* Update Notification Badge - Updates the unread notification count displayed in the application header. */
+function updateNotificationBadge() {
+  const badge = document.getElementById("notificationBadge");
+  if (!badge) {
+    return;
+  }
+  const unreadCount = appState.notifications.filter(function (notification) {
+    return !notification.read;
+  }).length;
+  badge.textContent = unreadCount;
+  badge.classList.toggle("hidden", unreadCount === 0);
+}
+const PRODUCT_IMAGE_PATH = "../assets/images/products";
+/* Get Product Image - Returns the image path for the specified product. */
 function getProductImage(itemName) {
   const product = productDatabase.find(function (product) {
     return product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
   });
-  if (product) {
-    return `../assets/images/products/${product.image}`;
+  if (!product) {
+    return "";
   }
-  return "";
+  return `${PRODUCT_IMAGE_PATH}/${product.image}`;
 }
-/***************************************
-Backend
-GET
-/products/image
-Returns
-{
-    productName,
-    imageUrl
+/***************************************************************************************************
+ * Backend
+ *
+ * GET /products/image
+ *
+ * Returns
+ * {
+ *   productName,
+ *   imageUrl
+ * }
+ ***************************************************************************************************/
+/* Normalize Item Name */
+function normalizeItemName(itemName) {
+  return itemName.trim().toLowerCase();
 }
-****************************************/
+/* Initialize Helpers - Registers helper event listeners and shared helper functionality. */
+function initializeHelpers() {
+  initializeBottomSheetEvents();
+}
+initializeHelpers();

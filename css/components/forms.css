@@ -1,13 +1,36 @@
+/***************************************************************************************************
+ * FILE: forms.css
+ *
+ * PURPOSE
+ * Defines reusable form components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Form layouts
+ * • Authentication inputs
+ * • Bottom sheet inputs
+ * • Search inputs
+ * • Currency inputs
+ * • Form labels
+ * • Biometric controls
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
+/* Form Field */
 .formField {
-  margin-bottom: 12px;
-  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
 }
+/* Form Row */
 .formRow {
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
   width: 90%;
+  margin-bottom: 12px;
 }
+/* Authentication Input */
 .authInput {
   width: 90%;
   height: 56px;
@@ -21,75 +44,79 @@
 .authInput:focus {
   border-color: #118ab2;
 }
-
 /* Bottom Sheet Input */
 .bottomSheetInput {
   width: 90%;
+  min-height: 40px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
   border: 1px solid var(--borderColor);
   border-radius: 25px;
-  padding: 12px 14px;
   font-size: 16px;
   outline: none;
-  margin-bottom: 20px;
-  min-height: 40px;
 }
 /* Search Input */
 .searchInput {
   width: 100%;
+  padding: 18px;
   border: 1px solid var(--borderColor);
   border-radius: var(--borderRadiusMedium);
-  padding: 18px;
   font-size: 16px;
   outline: none;
 }
+/* Modern Search Input */
 .modernSearchInput {
+  box-sizing: border-box;
   width: 100%;
   height: 48px;
+  padding: 0 18px 0 48px;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
-  padding: 0 18px 0 48px;
+  background: white;
   font-size: 15px;
   outline: none;
-  background: white;
-  box-sizing: border-box;
   transition: all 0.2s ease;
 }
 .modernSearchInput:focus {
   border-color: #118ab2;
   box-shadow: 0 0 0 4px rgba(17, 138, 178, 0.08);
 }
+/* Currency Input */
 .currencyInputWrapper {
   position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
 .currencyInput {
   padding-left: 30px;
 }
+.currencySymbol {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-100%);
+  color: #334155;
+  font-size: 18px;
+  font-weight: 700;
+  pointer-events: none;
+}
+/* Form Label */
 .formLabel {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
   margin-bottom: 4px;
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
 }
-
+/* Half Width Field */
 .halfWidthField {
   flex: 1;
   padding-right: 25px;
 }
-.currencySymbol {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-100%);
-  color: #334155;
-  pointer-events: none;
-  font-size: 18px;
-  font-weight: 700;
-}
-
+/* Biometric Toggle */
 .biometricToggle {
   display: flex;
   align-items: center;

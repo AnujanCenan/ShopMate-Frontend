@@ -1,50 +1,370 @@
-/* Authentication Foundation */
+/***************************************************************************************************
+ * FILE: authManager.js
+ *
+ * PURPOSE
+ * Manages authentication, user sessions, account registration, authorization,
+ * password recovery, invite management, and logout for the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Authenticate users
+ * • Register new accounts
+ * • Manage user sessions
+ * • Control page access
+ * • Manage group invitations
+ * • Handle password recovery
+ * • Manage biometric authentication
+ * • Manage user logout
+ *
+ * FUNCTIONS IN THIS FILE
+ authManager.js
+│
+├── Authentication Helpers
+│   ├── getCurrentUser()
+│   ├── isUserLoggedIn()
+│   ├── redirectIfLoggedOut()
+│   └── redirectIfLoggedIn()
+│
+├── Login Management
+│   ├── loginUser()
+│   ├── validateLoginCredentials()
+│   └── findUserByCredentials()
+│
+├── Registration Management
+│   ├── registerUser()
+│   ├── validateRegistrationDetails()
+│   ├── isEmailRegistered()
+│   ├── createUserAccount()
+│   └── createGroup()
+│
+├── Session Management
+│   ├── createUserSession()
+│   ├── restoreUserSession()
+│   ├── refreshUserSession()
+│   ├── clearUserSession()
+│   └── getUserPrimaryGroup()
+│
+├── Authorization Helpers
+│   ├── isAdmin()
+│   ├── getCurrentGroupMembers()
+│   ├── getCurrentUserRole()
+│   └── isGroupMember()
+│
+├── Invite Management
+│   ├── validateInvite()
+│   └── joinGroupFromInvite()
+│
+├── Password Recovery
+│   ├── renderForgotPasswordForm()
+│   ├── sendPasswordResetLink()
+│   └── validatePasswordRecoveryEmail()
+│
+├── Biometric Authentication
+│   ├── isBiometricEnabled()
+│   ├── enableBiometricAuthentication()
+│   ├── disableBiometricAuthentication()
+│   ├── authenticateWithBiometrics()
+│   └── unlockApplication()
+│
+└── Logout
+    └── logoutUser()
+ *
+ * DEPENDENCIES
+ * • stateManager.js
+ * • helpers.js
+ *
+ * PAGES
+ * • loginPage.html
+ * • registerPage.html
+ * • forgotPassword.html
+ * • resetPassword.html
+ * • verifyEmail.html
+ *
+ * NOTE
+ * Authentication is currently handled using local storage. Backend integration
+ * points are documented inside the relevant functions for future implementation.
+ ***************************************************************************************************/
+/* Get Current User - Returns the currently logged-in user. */
+function getCurrentUser() {
+  return appState.currentUser || null;
+}
+/* Check Login Status - Returns whether a valid user session currently exists. */
+function isUserLoggedIn() {
+  return appState.loggedIn && getCurrentUser() !== null;
+}
+/* Redirect Logged-Out Users - Redirects unauthenticated users to the login page. */
 function redirectIfLoggedOut() {
-  if (!appState.loggedIn) {
+  if (!isUserLoggedIn()) {
     window.location.href = "../pages/loginPage.html";
   }
 }
-/* Logout User */
-function logoutUser() {
+/* Redirect Logged-In Users - Prevents authenticated users from accessing authentication pages. */
+function redirectIfLoggedIn() {
+  if (isUserLoggedIn()) {
+    window.location.href = "../pages/dashboardPage.html";
+  }
+}
+/* Login User - Authenticates the user using their email address and password. */
+function loginUser() {
+  const email = document.getElementById("loginEmailInput").value.trim();
+  const password = document.getElementById("loginPasswordInput").value.trim();
+  if (!validateLoginCredentials(email, password)) {
+    return;
+  }
+  const user = findUserByCredentials(email, password);
+  if (!user) {
+    showDialog(
+      "Invalid Login",
+      "Please check your email address and password.",
+    );
+    return;
+  }
+  createUserSession(user);
+  window.location.href = "./dashboardPage.html";
+  /*
+    Backend
+    POST /auth/login
+    Request
+    {
+      email,
+      password
+    }
+    Response
+    {
+      accessToken,
+      refreshToken,
+      user,
+      groups
+    }
+  */
+}
+/* Validate Login Credentials - Checks whether the required login fields are completed. */
+function validateLoginCredentials(email, password) {
+  if (!email || !password) {
+    showDialog(
+      "Missing Information",
+      "Please enter your email address and password.",
+    );
+    return false;
+  }
+  return true;
+}
+/* Find User By Credentials - Returns the matching user for the supplied login credentials. */
+function findUserByCredentials(email, password) {
+  return appState.users.find(function (user) {
+    return (
+      user.email.toLowerCase() === email.toLowerCase() &&
+      user.password === password
+    );
+  });
+}
+/* Register User - Creates a new ShopMate account and signs the user into the application. */
+function registerUser() {
+  const name = document.getElementById("registerNameInput").value.trim();
+  const email = document.getElementById("registerEmailInput").value.trim();
+  const password = document
+    .getElementById("registerPasswordInput")
+    .value.trim();
+  const confirmPassword = document
+    .getElementById("registerConfirmPasswordInput")
+    .value.trim();
+  const groupName = document.getElementById("groupNameInput").value.trim();
+  const biometricEnabled = document.getElementById("biometricCheckbox").checked;
+  if (
+    !validateRegistrationDetails(
+      name,
+      email,
+      password,
+      confirmPassword,
+      groupName,
+    )
+  ) {
+    return;
+  }
+  if (isEmailRegistered(email)) {
+    showDialog(
+      "Account Already Exists",
+      "An account with this email address already exists.",
+    );
+    return;
+  }
+  const user = createUserAccount(name, email, password, biometricEnabled);
+  createGroup(groupName, user);
+  createUserSession(user);
+  window.location.href = "./dashboardPage.html";
+  /*
+    Backend
+    POST /auth/register
+    Request
+    {
+      name,
+      email,
+      password,
+      groupName,
+      biometricEnabled
+    }
+    Response
+    {
+      user,
+      accessToken,
+      refreshToken,
+      group
+    }
+  */
+}
+/* Validate Registration Details - Validates all information required to register a new account. */
+function validateRegistrationDetails(
+  name,
+  email,
+  password,
+  confirmPassword,
+  groupName,
+) {
+  if (!name || !email || !password || !confirmPassword || !groupName) {
+    showDialog(
+      "Missing Information",
+      "Please complete all registration fields.",
+    );
+    return false;
+  }
+  if (password !== confirmPassword) {
+    showDialog("Password Mismatch", "Passwords do not match.");
+    return false;
+  }
+  return true;
+}
+/* Check Email Registration - Returns whether the supplied email address is already registered. */
+function isEmailRegistered(email) {
+  return appState.users.some(function (user) {
+    return user.email.toLowerCase() === email.toLowerCase();
+  });
+}
+/* Create User Account - Creates and stores a new user account. */
+function createUserAccount(name, email, password, biometricEnabled) {
+  const user = {
+    id: "user_" + Date.now(),
+    name,
+    email,
+    password,
+    biometricEnabled,
+  };
+  appState.users.push(user);
+  saveAppState();
+  return user;
+}
+/* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
+function createGroup(groupName, user) {
+  appState.groups[groupName] = [];
+  appState.groupMembers[groupName] = [
+    {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: "admin",
+    },
+  ];
+  appState.activeGroup = groupName;
+  saveAppState();
+}
+/* Create User Session - Creates a new authenticated session for the specified user. */
+function createUserSession(user) {
+  appState.loggedIn = true;
+  appState.currentUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    biometricEnabled: user.biometricEnabled,
+  };
+  appState.activeGroup = getUserPrimaryGroup(user.id);
+  saveAppState();
+}
+/* Restore User Session - Restores the user's existing session when the application loads. */
+function restoreUserSession() {
+  if (!appState.loggedIn || !appState.currentUser) {
+    return false;
+  }
+  refreshUserSession();
+  return true;
+}
+/* Refresh User Session - Updates the current session with the latest user information. */
+function refreshUserSession() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return;
+  }
+  const user = appState.users.find(function (user) {
+    return user.id === currentUser.id;
+  });
+  if (!user) {
+    clearUserSession();
+    return;
+  }
+  appState.currentUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    biometricEnabled: user.biometricEnabled,
+  };
+  appState.activeGroup = getUserPrimaryGroup(user.id);
+  saveAppState();
+}
+/* Clear User Session - Removes all information associated with the current session. */
+function clearUserSession() {
   appState.loggedIn = false;
   appState.currentUser = null;
+  appState.activeGroup = null;
   saveAppState();
-  window.location.href = "../pages/loginPage.html";
 }
-/* Get Current User */
-function getCurrentUser() {
-  return appState.currentUser;
+/* Get User Primary Group - Returns the first group associated with the specified user. */
+function getUserPrimaryGroup(userId) {
+  return (
+    Object.keys(appState.groupMembers).find(function (groupName) {
+      return appState.groupMembers[groupName].some(function (member) {
+        return member.id === userId;
+      });
+    }) || null
+  );
 }
-/* Check if Current User is Admin */
+/* Check Administrator Access - Returns whether the current user has administrator privileges. */
 function isAdmin() {
-  const members = getCurrentGroupMembers();
   const currentUser = getCurrentUser();
   if (!currentUser) {
     return false;
   }
-  const currentMember = members.find(function (member) {
-    return member.id === currentUser.id;
+  return getCurrentGroupMembers().some(function (member) {
+    return member.id === currentUser.id && member.role === "admin";
   });
-  if (!currentMember) {
-    return false;
-  }
-  return currentMember.role === "admin";
 }
-/* Get Current Group Members */
+/* Get Current Group Members - Returns all members belonging to the active group. */
 function getCurrentGroupMembers() {
-  const activeGroup = appState.activeGroup;
-  if (!activeGroup) {
+  if (!appState.activeGroup) {
     return [];
   }
-  return appState.groupMembers[activeGroup] || [];
+  return appState.groupMembers[appState.activeGroup] || [];
 }
-/* Invite Validation */
+/* Get Current User Role - Returns the current user's role within the active group. */
+function getCurrentUserRole() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return null;
+  }
+  const member = getCurrentGroupMembers().find(function (member) {
+    return member.id === currentUser.id;
+  });
+  return member ? member.role : null;
+}
+/* Check Group Membership - Returns whether the specified user belongs to the active group. */
+function isGroupMember(userId) {
+  return getCurrentGroupMembers().some(function (member) {
+    return member.id === userId;
+  });
+}
+/* Validate Invite - Returns the invite matching the supplied invite code. */
 function validateInvite(inviteCode) {
   return appState.pendingInvites.find(function (invite) {
     return invite.code === inviteCode;
   });
 }
-/* Join Group From Invite */
+/* Join Group From Invite - Adds the current user to the invited group. */
 function joinGroupFromInvite(inviteCode) {
   const invite = validateInvite(inviteCode);
   if (!invite) {
@@ -52,11 +372,19 @@ function joinGroupFromInvite(inviteCode) {
     return;
   }
   const currentUser = getCurrentUser();
+  if (!currentUser) {
+    showDialog(
+      "Authentication Required",
+      "Please sign in before joining a group.",
+    );
+    return;
+  }
   const groupMembers = appState.groupMembers[invite.groupName];
-  const alreadyMember = groupMembers.find(function (member) {
-    return member.id === currentUser.id;
-  });
-  if (alreadyMember) {
+  if (!groupMembers) {
+    showDialog("Group Not Found", "The invited group no longer exists.");
+    return;
+  }
+  if (isGroupMember(currentUser.id)) {
     showDialog("Already a Member", "You are already a member of this group.");
     return;
   }
@@ -66,53 +394,63 @@ function joinGroupFromInvite(inviteCode) {
     email: currentUser.email,
     role: "member",
   });
-  saveAppState();
   appState.activeGroup = invite.groupName;
-  localStorage.setItem("activeGroup", invite.groupName);
+  saveAppState();
   window.location.href = "../pages/dashboardPage.html";
+  /*
+    Backend
+    POST /groups/join
+    Request
+    {
+      inviteCode,
+      userId
+    }
+    Response
+    {
+      group,
+      members
+    }
+  */
 }
-/* Forgot Password */
+/* Render Forgot Password Form - Displays the password recovery form in the bottom sheet. */
 function renderForgotPasswordForm() {
   const bottomSheetContent = document.getElementById("bottomSheetContent");
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Forgot Password
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                ✕
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <p class="bottomSheetDescription">
-                Enter your registered email address.
-            </p>
-            <div class="formField">
-                <input
-                    id="forgotPasswordEmail"
-                    type="email"
-                    class="bottomSheetInput"
-                    placeholder="Email Address"
-                >
-            </div>
-            <button
-                class="primaryButton"
-                onclick="sendPasswordResetLink()"
-            >
-                Send Reset Link
-            </button>
-        </div>
-    `;
+    <div class="bottomSheetHeader">
+      <h2>Forgot Password</h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <p class="bottomSheetDescription">
+        Enter your registered email address to receive a password reset link.
+      </p>
+      <div class="formField">
+        <input
+          id="forgotPasswordEmail"
+          type="email"
+          class="bottomSheetInput"
+          placeholder="Email Address"
+        >
+      </div>
+      <button
+        class="primaryButton"
+        onclick="sendPasswordResetLink()"
+      >
+        Send Reset Link
+      </button>
+    </div>
+  `;
   openBottomSheet();
 }
-/* Send Password Reset Link */
+/* Send Password Reset Link - Validates the email address and initiates password recovery. */
 function sendPasswordResetLink() {
   const email = document.getElementById("forgotPasswordEmail").value.trim();
-  if (!email) {
-    showDialog("Missing Email", "Please enter your registered email address.");
+  if (!validatePasswordRecoveryEmail(email)) {
     return;
   }
   closeBottomSheet();
@@ -121,11 +459,104 @@ function sendPasswordResetLink() {
     "If an account exists with this email address, a password reset link has been sent.",
   );
   /*
-        Backend Integration
-        POST
-        /auth/forgot-password
-        {
-            email
-        }
-    */
+    Backend
+    POST /auth/forgot-password
+    Request
+    {
+      email
+    }
+    Response
+    {
+      success,
+      message
+    }
+  */
+}
+/* Validate Password Recovery Email - Ensures a valid email address has been entered. */
+function validatePasswordRecoveryEmail(email) {
+  if (!email) {
+    showDialog("Missing Email", "Please enter your registered email address.");
+    return false;
+  }
+  return true;
+}
+/* Check Biometric Status - Returns whether biometric authentication is enabled for the current user. */
+function isBiometricEnabled() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return false;
+  }
+  return currentUser.biometricEnabled || false;
+}
+/* Enable Biometric Authentication - Enables biometric authentication for the current user. */
+function enableBiometricAuthentication() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return;
+  }
+  const user = appState.users.find(function (user) {
+    return user.id === currentUser.id;
+  });
+  if (!user) {
+    return;
+  }
+  user.biometricEnabled = true;
+  refreshUserSession();
+  /*
+    Backend
+    PATCH /users/preferences
+    Request
+    {
+      biometricEnabled: true
+    }
+  */
+}
+/* Disable Biometric Authentication - Disables biometric authentication for the current user. */
+function disableBiometricAuthentication() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    return;
+  }
+  const user = appState.users.find(function (user) {
+    return user.id === currentUser.id;
+  });
+  if (!user) {
+    return;
+  }
+  user.biometricEnabled = false;
+  refreshUserSession();
+  /*
+    Backend
+    PATCH /users/preferences
+    Request
+    {
+      biometricEnabled: false
+    }
+  */
+}
+/* Authenticate With Biometrics - Attempts to unlock the application using biometric authentication. */
+async function authenticateWithBiometrics() {
+  if (!isBiometricEnabled()) {
+    return false;
+  }
+  /*
+    Mobile Integration
+    Replace this section with the platform's biometric API.
+    Android
+    • Fingerprint
+    • Face Unlock
+    iOS
+    • Face ID
+    • Touch ID
+  */
+  return true;
+}
+/* Unlock Application - Unlocks the application after successful biometric authentication. */
+async function unlockApplication() {
+  const authenticated = await authenticateWithBiometrics();
+  if (!authenticated) {
+    window.location.href = "../pages/loginPage.html";
+    return;
+  }
+  window.location.href = "../pages/dashboardPage.html";
 }
