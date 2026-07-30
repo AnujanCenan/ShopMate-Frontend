@@ -19,6 +19,44 @@
         <h1 class="modernPageTitle">Notifications</h1>
       </header>
       <main class="pageContent">
+        <div class="notificationFilterBar">
+          <button
+            class="notificationFilterButton activeNotificationFilter"
+            onclick="filterNotifications('all', this)"
+          >
+            All
+          </button>
+          <button
+            class="notificationFilterButton"
+            onclick="filterNotifications('unread', this)"
+          >
+            Unread
+          </button>
+          <button
+            class="notificationFilterButton"
+            onclick="filterNotifications('item', this)"
+          >
+            Items
+          </button>
+          <button
+            class="notificationFilterButton"
+            onclick="filterNotifications('budget', this)"
+          >
+            Budget
+          </button>
+          <button
+            class="notificationFilterButton"
+            onclick="filterNotifications('group', this)"
+          >
+            Groups
+          </button>
+          <button
+            class="notificationFilterButton"
+            onclick="filterNotifications('system', this)"
+          >
+            System
+          </button>
+        </div>
         <div id="notificationList"></div>
         <div class="bottomActionBar">
           <button class="secondaryButton" onclick="markAllNotificationsRead()">

@@ -1187,7 +1187,8 @@ Increase the group budget or reduce category budgets first.`,
   createNotification(
     "budget",
     "Budget Updated",
-    `${appState.activeGroup || "No Group Selected"}budget updated to $${amount}.`,
+    `${appState.activeGroup || "No Group Selected"} budget updated to $${amount}.`,
+    "budget",
   );
   renderBudgetDashboardWidget();
   closeBottomSheet();

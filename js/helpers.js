@@ -441,7 +441,26 @@ function showToast(message, type = "success") {
   }, 2500);
 }
 /* Create Notification - Creates a new notification and updates the notification badge. */
-function createNotification(type, title, message) {
+function createNotification(
+  type,
+  title,
+  message,
+  action = null,
+  actionData = null,
+) {
+  const duplicateNotification = appState.notifications.find(
+    function (notification) {
+      return (
+        notification.type === type &&
+        notification.title === title &&
+        notification.message === message &&
+        Date.now() - notification.createdAt < 30000
+      );
+    },
+  );
+  if (duplicateNotification) {
+    return;
+  }
   appState.notifications.unshift({
     id: "notif_" + Date.now(),
     type,
@@ -449,7 +468,13 @@ function createNotification(type, title, message) {
     message,
     createdAt: Date.now(),
     read: false,
+    action,
+    actionData,
   });
+  const MAX_NOTIFICATIONS = 100;
+  if (appState.notifications.length > MAX_NOTIFICATIONS) {
+    appState.notifications = appState.notifications.slice(0, MAX_NOTIFICATIONS);
+  }
   saveAppState();
   updateNotificationBadge();
 }
