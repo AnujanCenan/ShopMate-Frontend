@@ -109,3 +109,64 @@
 .destructiveAction {
   color: #ef4444;
 }
+.inviteGroupInformation {
+  margin-bottom: 24px;
+}
+.inviteGroupName {
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surfaceSecondary);
+  border: 0px solid var(--borderColor);
+  font-weight: 600;
+  color: var(--primaryText);
+}
+.groupMemberRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.groupMemberInformation {
+  flex: 1;
+  min-width: 0;
+}
+.groupMemberRow .groupMoreButton {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.memberRoleAdmin {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+}
+.memberRoleMember {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: rgba(107, 114, 128, 0.12);
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+.emptyPendingInvitationState {
+  padding: 18px 0;
+  text-align: center;
+}
+.emptyStateTitle {
+  font-weight: 600;
+}
+.emptyStateSubtitle {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #777;
+}

@@ -460,7 +460,10 @@ function createItem() {
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item added");
-  createNotification("item", "Item Added", `${itemName} was added`);
+  createNotification("item", "Item Added", `${item.name} added.`, "category", {
+    group: appState.activeGroup,
+    category: getActiveCategory().name,
+  });
   favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
@@ -656,10 +659,13 @@ function confirmPurchase(itemName) {
   showSnackbar(item.purchased ? "Item purchased" : "Item restored");
   createNotification(
     "purchase",
-    item.purchased ? "Item Purchased" : "Item Restored",
-    `${item.name} ${
-      item.purchased ? "purchased" : "restored"
-    } for $${actualPrice}`,
+    "Item Purchased",
+    `${item.name} purchased.`,
+    "category",
+    {
+      group: appState.activeGroup,
+      category: getActiveCategory().name,
+    },
   );
 }
 /* Update Budget Tracking */

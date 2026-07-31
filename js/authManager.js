@@ -252,8 +252,12 @@ function createUserAccount(name, email, password, biometricEnabled) {
   return user;
 }
 /* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
+
 function createGroup(groupName, user) {
   appState.groups[groupName] = [];
+  if (!appState.groupMembers) {
+    appState.groupMembers = {};
+  }
   appState.groupMembers[groupName] = [
     {
       id: user.id,
@@ -333,6 +337,10 @@ function isAdmin() {
   return getCurrentGroupMembers().some(function (member) {
     return member.id === currentUser.id && member.role === "admin";
   });
+}
+/* Can Manage Group - Returns whether the current user can manage the active group. */
+function canManageGroup() {
+  return isAdmin();
 }
 /* Get Current Group Members - Returns all members belonging to the active group. */
 function getCurrentGroupMembers() {

@@ -86,15 +86,12 @@ const defaultAppState = {
         name: "ShopMate Admin",
         email: "admin@shopmate.app",
         role: "admin",
+        joinedAt: new Date().toISOString(),
+        invitedBy: null,
       },
     ],
   },
-  pendingInvites: [
-    {
-      code: "INVITE123",
-      groupName: "My Shopping Group",
-    },
-  ],
+  pendingInvitations: [],
   budgets: {
     groupBudgets: {},
     categoryBudgets: {},
@@ -137,6 +134,16 @@ function loadAppState() {
       });
     });
   });
+  /* Upgrade Pending Invitations */
+  if (!parsedState.pendingInvitations) {
+    parsedState.pendingInvitations = [];
+    stateUpdated = true;
+  }
+  /* Upgrade Group Members */
+  if (!parsedState.groupMembers) {
+    parsedState.groupMembers = {};
+    stateUpdated = true;
+  }
   if (stateUpdated) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(parsedState));
   }

@@ -143,11 +143,22 @@ function renderGroupDropdown() {
       <span class="groupItemName">
         ${groupName}
       </span>
-      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${groupName}');"><img
-    src="${getIconPath("navigation", "menu")}"
-    class="icon actionIcon"
-    alt="More"
-></button>
+      ${
+        canManageGroup()
+          ? `
+      <button
+        class="groupMoreButton"
+        onclick="event.stopPropagation(); renderGroupActions('${groupName}');"
+      >
+        <img
+          src="${getIconPath("navigation", "more")}"
+          class="icon actionIcon"
+          alt="More"
+        >
+      </button>
+    `
+          : ""
+      }
     </div>`;
   });
   bottomSheetContent.innerHTML = `
@@ -181,54 +192,142 @@ function renderGroupDropdown() {
 /* Render Create Group Form */
 function renderCreateGroupForm() {
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Create Group
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <input
-                type="text"
-                placeholder="Group Name"
-                class="bottomSheetInput"
-                id="groupNameInput"
-            >
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="renderGroupDropdown()"
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="createGroup()"
-                >
-                    Create
-                </button>
-            </div>
-        </div>
-    `;
+    <div class="bottomSheetHeader">
+      <h2>
+        Create Group
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="formField">
+        <label class="formLabel">
+          Group Name
+        </label>
+        <input
+          id="groupNameInput"
+          type="text"
+          class="bottomSheetInput"
+          placeholder="Enter Group Name"
+          oninput="clearGroupValidation()"
+        >
+        <div
+          id="groupNameError"
+          class="validationMessage"
+        ></div>
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="renderGroupDropdown()"
+        >
+          Cancel
+        </button>
+        <button
+          class="primaryButton"
+          onclick="createGroup()"
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  `;
   openBottomSheet();
+  setTimeout(function () {
+    document.getElementById("groupNameInput").focus();
+  }, 100);
+}
+/* Clear Group Validation */
+function clearGroupValidation() {
+  const groupNameInput = document.getElementById("groupNameInput");
+  const groupNameError = document.getElementById("groupNameError");
+  if (!groupNameInput || !groupNameError) {
+    return;
+  }
+  let groupName = groupNameInput.value;
+  groupName = groupName.replace(/^\s+/, "");
+  groupName = groupName.replace(/\s{2,}/g, " ");
+  groupName = groupName.replace(/\b[a-z]/g, function (letter) {
+    return letter.toUpperCase();
+  });
+  groupNameInput.value = groupName;
+  groupNameInput.classList.remove("formInputError");
+  groupNameError.textContent = "";
+}
+/* Clear Rename Group Validation */
+function clearRenameGroupValidation() {
+  const renameGroupInput = document.getElementById("renameGroupInput");
+  const renameGroupError = document.getElementById("renameGroupError");
+  if (!renameGroupInput || !renameGroupError) {
+    return;
+  }
+  let groupName = renameGroupInput.value;
+  groupName = groupName.replace(/^\s+/, "");
+  groupName = groupName.replace(/\s{2,}/g, " ");
+  groupName = groupName.replace(/\b[a-z]/g, function (letter) {
+    return letter.toUpperCase();
+  });
+  renameGroupInput.value = groupName;
+  renameGroupInput.classList.remove("formInputError");
+  renameGroupError.textContent = "";
 }
 /* Create Group */
 function createGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
-  const groupName = groupNameInput.value.trim();
-  if (!groupName) {
+  const groupNameError = document.getElementById("groupNameError");
+  const groupName = groupNameInput.value.trim().replace(/\s+/g, " ");
+  if (groupName.length < 2) {
+    groupNameInput.classList.add("formInputError");
+    groupNameError.textContent =
+      "Group name must contain at least 2 characters.";
+    groupNameInput.focus();
     return;
   }
-  if (appState.groups[groupName]) {
-    showDialog("Group Exists", "A group with this name already exists.");
+  if (groupName.length > 40) {
+    groupNameInput.classList.add("formInputError");
+    groupNameError.textContent = "Group name cannot exceed 40 characters.";
+    groupNameInput.focus();
+    return;
+  }
+  const validGroupName = /^[A-Za-z0-9\s'-]+$/;
+  if (!validGroupName.test(groupName)) {
+    groupNameInput.classList.add("formInputError");
+    groupNameError.textContent =
+      "Only letters, numbers, spaces, apostrophes and hyphens are allowed.";
+    groupNameInput.focus();
+    return;
+  }
+  clearGroupValidation();
+  if (!groupName) {
+    groupNameInput.classList.add("formInputError");
+    groupNameError.textContent = "Please enter a group name.";
+    groupNameInput.focus();
+    return;
+  }
+  const groupExists = Object.keys(appState.groups).some(
+    function (existingGroup) {
+      return existingGroup.toLowerCase() === groupName.toLowerCase();
+    },
+  );
+  if (groupExists) {
+    groupNameInput.classList.add("formInputError");
+    groupNameError.textContent = "A group with this name already exists.";
+    groupNameInput.focus();
+    groupNameInput.select();
     return;
   }
   appState.groups[groupName] = [];
+  if (!appState.budgets) {
+    appState.budgets = {};
+  }
   if (!appState.budgets.groupBudgets) {
     appState.budgets.groupBudgets = {};
   }
@@ -249,6 +348,7 @@ function createGroup() {
   ];
   saveAppState();
   selectGroup(groupName);
+  showSnackbar("Group created successfully.");
 }
 /* Render Create Category Form */
 function renderCreateCategoryForm() {
@@ -537,26 +637,203 @@ function confirmDeleteCategory(categoryName) {
 /* Render Group Actions */
 function renderGroupActions(groupName) {
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>Group Actions</h2>
-            <button class="closeButton" onclick="closeBottomSheet()"><img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close"></button>
-        </div>
-        <div class="bottomSheetBody">
-            <button class="bottomSheetActionButton" onclick="renderRenameGroupForm()"><img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt=""><span>Rename Group</span></button>
-            <button class="bottomSheetActionButton dangerAction" onclick="confirmDeleteGroup()"><img src="${getIconPath("actions", "delete")}" class="icon actionIcon" alt=""><span>Delete Group</span></button>
-        </div>`;
+    <div class="bottomSheetHeader">
+      <h2>
+        Group Actions
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <button
+        class="bottomSheetActionButton"
+        onclick="renameGroup('${groupName}')"
+      >
+        <img
+          src="${getIconPath("actions", "edit")}"
+          class="icon actionIcon"
+          alt=""
+        >
+        <span>
+          Rename Group
+        </span>
+      </button>
+     <button
+  class="bottomSheetActionButton"
+  onclick="renderInviteMemberForm('${groupName}')"
+>
+  <img
+    src="${getIconPath("actions", "add")}"
+    class="icon actionIcon"
+    alt=""
+  >
+  <span>
+    Invite Member
+  </span>
+</button>
+<button
+  class="bottomSheetDeleteButton"
+  onclick="deleteGroup('${groupName}')"
+>
+  <img
+    src="${getIconPath("actions", "delete")}"
+    class="icon actionIcon"
+    alt=""
+  >
+  <span>
+    Delete Group
+  </span>
+</button>
+    </div>
+  `;
   openBottomSheet();
+}
+/* Render Invite Member Form */
+function renderInviteMemberForm(groupName) {
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>Invite Member</h2>
+      <button class="closeButton" onclick="closeBottomSheet()">
+        <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+    <div class="inviteGroupInformation">
+  <label class="formLabel">
+    Inviting Member To
+  </label>
+  <div class="inviteGroupName">
+    ${groupName}
+  </div>
+</div>
+      <div class="formField">
+        <label class="formLabel">
+          Email Address
+        </label>
+        <input id="inviteMemberEmailInput" type="email" class="bottomSheetInput" placeholder="Enter Email Address" oninput="clearInviteMemberValidation()">
+          <div id="inviteMemberEmailError" class="validationMessage"></div>
+      </div>
+        <div class="bottomSheetButtonRow">
+          <button class="secondaryButton" onclick="renderGroupActions('${groupName}')">
+            Cancel
+          </button>
+          <button class="primaryButton" onclick="sendMemberInvitation('${groupName}')">
+            Send Invitation
+          </button>
+      </div>
+    </div>
+  `;
+  openBottomSheet();
+  setTimeout(function () {
+    const emailInput = document.getElementById("inviteMemberEmailInput");
+    if (!emailInput) {
+      return;
+    }
+    emailInput.focus();
+  }, 100);
+}
+/* Clear Invite Member Validation */
+function clearInviteMemberValidation() {
+  const emailInput = document.getElementById("inviteMemberEmailInput");
+  const emailError = document.getElementById("inviteMemberEmailError");
+  if (!emailInput || !emailError) {
+    return;
+  }
+  emailInput.classList.remove("formInputError");
+  emailError.textContent = "";
+}
+/* Send Member Invitation */
+function sendMemberInvitation(groupName) {
+  const emailInput = document.getElementById("inviteMemberEmailInput");
+  const emailError = document.getElementById("inviteMemberEmailError");
+  if (!emailInput || !emailError) {
+    return;
+  }
+  const email = emailInput.value.trim().toLowerCase();
+  emailInput.classList.remove("formInputError");
+  emailError.textContent = "";
+  if (!email) {
+    emailInput.classList.add("formInputError");
+    emailError.textContent = "Please enter an email address.";
+    emailInput.focus();
+    return;
+  }
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    emailInput.classList.add("formInputError");
+    emailError.textContent = "Please enter a valid email address.";
+    emailInput.focus();
+    return;
+  }
+  const members = appState.groupMembers[groupName] || [];
+  const memberExists = members.some(function (member) {
+    return member.email.toLowerCase() === email;
+  });
+  if (memberExists) {
+    emailInput.classList.add("formInputError");
+    emailError.textContent = "This user is already a member of the group.";
+    emailInput.focus();
+    return;
+  }
+  const invitationExists = appState.pendingInvitations.some(
+    function (invitation) {
+      return (
+        invitation.groupName === groupName &&
+        invitation.email.toLowerCase() === email &&
+        invitation.status === "pending"
+      );
+    },
+  );
+  if (invitationExists) {
+    emailInput.classList.add("formInputError");
+    emailError.textContent = "A pending invitation already exists.";
+    emailInput.focus();
+    return;
+  }
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    showToast("Unable to determine the current user.", "info");
+    return;
+  }
+  const invitation = {
+    id: crypto.randomUUID(),
+    groupId: groupName,
+    groupName: groupName,
+    email: email,
+    invitedBy: currentUser.email,
+    invitedAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "pending",
+  };
+  appState.pendingInvitations.push(invitation);
+  saveAppState();
+  closeBottomSheet();
+  showToast("Invitation sent successfully.");
 }
 /* Rename Group */
 function renameGroup(groupName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
-      <h2>Rename Group</h2>
+      <h2>
+        Rename Group
+      </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
-        <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
@@ -569,22 +846,24 @@ function renameGroup(groupName) {
           class="bottomSheetInput"
           value="${groupName}"
           placeholder="Enter Group Name"
+          maxlength="40"
+          oninput="clearRenameGroupValidation()"
         >
+        <div
+          id="renameGroupError"
+          class="validationMessage"
+        ></div>
       </div>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="closeBottomSheet()"
+          onclick="renderGroupActions('${groupName}')"
         >
           Cancel
         </button>
         <button
           class="primaryButton"
-          onclick="
-            saveRenamedGroup(
-              '${groupName}'
-            )
-          "
+          onclick="saveRenamedGroup('${groupName}')"
         >
           Save
         </button>
@@ -592,16 +871,61 @@ function renameGroup(groupName) {
     </div>
   `;
   openBottomSheet();
+  setTimeout(function () {
+    const renameGroupInput = document.getElementById("renameGroupInput");
+    if (!renameGroupInput) {
+      return;
+    }
+    renameGroupInput.focus();
+    renameGroupInput.select();
+  }, 100);
 }
 /* Save Renamed Group */
 function saveRenamedGroup(oldGroupName) {
-  const newGroupName = document.getElementById("renameGroupInput").value.trim();
-  if (!newGroupName) {
-    showDialog("Missing Name", "Please enter a group name.");
+  const renameGroupInput = document.getElementById("renameGroupInput");
+  const renameGroupError = document.getElementById("renameGroupError");
+  const newGroupName = renameGroupInput.value.trim().replace(/\s+/g, " ");
+  renameGroupInput.value = newGroupName;
+  if (newGroupName.length < 2) {
+    renameGroupInput.classList.add("formInputError");
+    renameGroupError.textContent =
+      "Group name must contain at least 2 characters.";
+    renameGroupInput.focus();
+    return;
+  }
+  if (newGroupName.length > 40) {
+    renameGroupInput.classList.add("formInputError");
+    renameGroupError.textContent = "Group name cannot exceed 40 characters.";
+    renameGroupInput.focus();
+    return;
+  }
+  const validGroupName = /^[A-Za-z0-9\s'-]+$/;
+  if (!validGroupName.test(newGroupName)) {
+    renameGroupInput.classList.add("formInputError");
+    renameGroupError.textContent =
+      "Only letters, numbers, spaces, apostrophes and hyphens are allowed.";
+    renameGroupInput.focus();
+    return;
+  }
+  const duplicateGroup = Object.keys(appState.groups).some(function (group) {
+    return (
+      group.toLowerCase() === newGroupName.toLowerCase() &&
+      group !== oldGroupName
+    );
+  });
+  if (duplicateGroup) {
+    renameGroupInput.classList.add("formInputError");
+    renameGroupError.textContent = "A group with this name already exists.";
+    renameGroupInput.focus();
+    renameGroupInput.select();
     return;
   }
   appState.groups[newGroupName] = appState.groups[oldGroupName];
   delete appState.groups[oldGroupName];
+  if (appState.groupMembers?.[oldGroupName]) {
+    appState.groupMembers[newGroupName] = appState.groupMembers[oldGroupName];
+    delete appState.groupMembers[oldGroupName];
+  }
   if (appState.budgets.groupBudgets?.[oldGroupName]) {
     appState.budgets.groupBudgets[newGroupName] =
       appState.budgets.groupBudgets[oldGroupName];
@@ -619,6 +943,8 @@ function saveRenamedGroup(oldGroupName) {
   }
   saveAppState();
   renderCategories();
+  renderGroupDropdown();
+  renderBudgetDashboardWidget();
   closeBottomSheet();
   showToast("Group Renamed");
 }
@@ -626,20 +952,38 @@ function saveRenamedGroup(oldGroupName) {
 function deleteGroup(groupName) {
   showConfirmDialog(
     "Delete Group",
-    `Are you sure you want to delete "${groupName}"?\n\nThis action cannot be undone.`,
+    `Are you sure you want to delete "${groupName}"?
+All categories, shopping items, budgets and members in this group will also be permanently deleted.
+This action cannot be undone.`,
     function () {
       delete appState.groups[groupName];
-      delete appState.budgets.groupBudgets[groupName];
-      delete appState.budgets.categoryBudgets[groupName];
+      if (appState.groupMembers?.[groupName]) {
+        delete appState.groupMembers[groupName];
+      }
+      if (appState.budgets.groupBudgets?.[groupName]) {
+        delete appState.budgets.groupBudgets[groupName];
+      }
+      if (appState.budgets.categoryBudgets?.[groupName]) {
+        delete appState.budgets.categoryBudgets[groupName];
+      }
       if (appState.activeGroup === groupName) {
-        appState.activeGroup = null;
-        selectedGroupName.textContent = "No Group Selected";
-        localStorage.removeItem("activeGroup");
+        const remainingGroups = Object.keys(appState.groups);
+        if (remainingGroups.length > 0) {
+          appState.activeGroup = remainingGroups[0];
+          selectedGroupName.textContent = appState.activeGroup;
+          localStorage.setItem("activeGroup", appState.activeGroup);
+        } else {
+          appState.activeGroup = null;
+          selectedGroupName.textContent = "No Group Selected";
+          localStorage.removeItem("activeGroup");
+        }
       }
       saveAppState();
       renderCategories();
+      renderGroupDropdown();
+      renderBudgetDashboardWidget();
       closeBottomSheet();
-      showToast("Group deleted");
+      showToast("Group deleted.");
     },
   );
 }
@@ -948,7 +1292,6 @@ function renderBudgetDashboardWidget() {
   }
   ****************************************/
 }
-/* Toggle Budget Card */
 /* Toggle Budget Card */
 function toggleBudgetCard() {
   const body = document.getElementById("budgetSummaryBody");
