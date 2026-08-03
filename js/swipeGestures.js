@@ -21,6 +21,9 @@ function initializeSwipeGestures() {
       dragging = false;
       const diffX = currentX - startX;
       const itemName = card.dataset.itemName;
+      const listItemId = card.dataset.listItemId;
+      const itemMasterId = card.dataset.itemMasterId;
+
       /* Always reset the card first */
       card.style.transition = "transform 0.2s ease";
       card.style.transform = "translateX(0px)";
@@ -41,7 +44,7 @@ function initializeSwipeGestures() {
           }, 200);
         } else {
           setTimeout(function () {
-            deleteItem(itemName);
+            deleteItem(listItemId);
           }, 200);
         }
       }

@@ -37,7 +37,7 @@ function addFavoriteToList(itemName) {
 }
 
 
-async function toggleFavorite_mysql(itemMasterId, listsState) {
+async function toggleFavorite_mysql(itemMasterId) {
   
   /* Existing Favorite */
 
@@ -52,24 +52,24 @@ async function toggleFavorite_mysql(itemMasterId, listsState) {
     //   return item.ItemMasterId !== itemMasterId;
     // });
 
-    const index = listsState.favoriteItems.findIndex((item) => {
+    const index = state.favoriteItems.findIndex((item) => {
       return item.ItemMasterId === itemMasterId;
     })
     if (index !== -1) {
       await removeFavorite_mysql(itemMasterId);
-      const removedFavourite = listsState.favoriteItems.splice(index, 1)[0];
+      const removedFavourite = state.favoriteItems.splice(index, 1)[0];
     }
 
   } else {
     /* Add Favorite */
     
-    const currentItem = listsState.listItems.find(function (item) {
+    const currentItem = state.listItems.find(function (item) {
       return item.ItemMasterId === itemMasterId;
     })
 
     await addFavorite_mysql(itemMasterId);
 
-    listsState.favoriteItems.unshift({
+    state.favoriteItems.unshift({
       ItemMasterId: currentItem.ItemMasterId,
 
       ItemName: currentItem.ItemName,

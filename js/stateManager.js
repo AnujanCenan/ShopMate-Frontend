@@ -185,14 +185,26 @@ const defaultState = {
     },
   ],
   budgets: {
-    groupBudgets: {},
-    categoryBudgets: {},
+    groupBudgets: [
+      {
+        // groupId: 0
+        // limit: 0
+      }
+    ],
+    categoryBudgets: [
+      {
+        // shoppingListId: 0
+        // shoppingListName: ""
+        // limit: 0,
+        // spent: 0
+      }
+    ],
   },
 };
 
 
 function loadState() {
-    const savedState = localStorage.getItem(STORAGE_KEY);
+    const savedState = localStorage.getItem(STATE_KEY);
   if (!savedState) {
     return structuredClone(defaultState);
   }

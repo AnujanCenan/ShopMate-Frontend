@@ -128,11 +128,8 @@ function renderItems(items) {
     return;
   }
   itemEmptyState.innerHTML = "";
-  console.log(state);
-
   items.forEach(function (item) {
-    console.log(item);
-    const isFavorite = state.favoriteItems.some(function (favoriteItem) {
+     const isFavorite = state.favoriteItems.some(function (favoriteItem) {
       return favoriteItem.ItemName === item.ItemName;
     });
     itemList.innerHTML += `
@@ -169,18 +166,23 @@ function renderItems(items) {
     alt=""
   >
   ${appState.activeTab === "favorites" ? "Remove Favorite" : "Delete"}
+  </div>
 </div>
-                </div>
                <div class="itemCard swipeCard ${
-                 state.selectedItems.includes(item.ItemName)
+                 state.selectedItems.includes(item.ListItemId)
                    ? "selectedItem"
                    : " "
                }" data-item-name="${
                  item.ItemName
-               }" onclick=" event.stopPropagation();
+               }" data-list-item-id="${
+                 item.ListItemId
+               }" data-item-master-id="${
+                item.ItemMasterId
+               }"
+               onclick=" event.stopPropagation();
             if (appState.selectionMode){
-                toggleItemSelection('${item.ItemName}');
-            }" oncontextmenu=" event.preventDefault(); toggleItemSelection('${item.ItemName}');">
+                toggleItemSelection(${item.ListItemId});
+            }" oncontextmenu=" event.preventDefault(); toggleItemSelection(${item.ListItemId});">
                <div class="itemCardTopRow">
                <div class="itemTitleSection">
             <h2
@@ -209,7 +211,7 @@ function renderItems(items) {
   class="modernActionButton favoriteActionButton ${
     isFavorite ? "activeFavoriteButton" : ""
   }"
-  onclick="event.stopPropagation(); toggleFavorite_mysql('${item.ItemMasterId}');"
+  onclick="event.stopPropagation(); toggleFavorite_mysql(${item.ItemMasterId});"
 >
   <img
     src="${getIconPath("actions", "favorite")}"

@@ -25,7 +25,6 @@ function restoreLastGroup() {
 }
 /* Render Categories */
 async function renderCategories() {
-  console.log(`in dashboard: ${JSON.stringify(state, null, 2)}`);
 
   if (!categoryList) {
     return;
@@ -60,7 +59,6 @@ async function renderCategories() {
   }
     
   const categories = await res.json();
-  console.log(`Get Lists for this family: ${JSON.stringify(categories)}`);
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
@@ -70,6 +68,7 @@ async function renderCategories() {
     return;
   }
   state.groups[groupId] = categories;
+  saveState();
 
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
@@ -153,6 +152,9 @@ function selectGroup(groupName, groupId) {
 function openCategoryPage(categoryName, categoryId) {
   localStorage.setItem("activeCategory", categoryName);
   localStorage.setItem("activeCategoryId", categoryId)
+  state.activeCategory = categoryName;
+  state.activeCategoryId = categoryId;
+  saveState();
   window.location.href = "../pages/categoryPage.html";
 }
 /* Render Group Dropdown */
@@ -173,7 +175,6 @@ async function renderGroupDropdown() {
   const groups = await res.json();
 
   groups.forEach(function (group) {
-    console.log(group);
      groupItemsHTML += `
     <div class="groupItem" onclick="event.stopPropagation(); selectGroup('${group.familyName}', ${group.familyId})">
       <span class="groupItemName">
@@ -857,11 +858,35 @@ async function getGroupBudgets() {
 
 /* Render Budget Dashboard Widget */
 async function renderBudgetDashboardWidget() {
-  const budgetWidget = document.getElementById("budgetDashboardWidget");
-  if (!budgetWidget || !appState.activeGroup) {
+
+  const res = await fetch("http://localhost:5113/api/get-budgets-and-expenditure", {
+    method: "GET",
+    credentials: "include",
+    headers: { "Content-Type": "application/json"},
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
     return;
   }
-  calculateGroupBudget();
+
+  const budgets = await res.json();
+  state.budgets.groupBudgets = budgets;
+  saveState();
+
+  const currBudget = state.budgets.groupBudgets.find(b => b.familyGroupId === state.activeGroupId);
+
+  if (!currBudget) {
+    return
+  };
+
+  const budgetWidget = document.getElementById("budgetDashboardWidget");
+  if (!budgetWidget) {
+    return;
+  }
+  
+  // calculateGroupBudget();
   if (!state.budgets.groupBudgets) {
     state.budgets.groupBudgets = {};
   }
@@ -871,8 +896,8 @@ async function renderBudgetDashboardWidget() {
     };
   }
   const groupBudget = appState.budgets.groupBudgets[appState.activeGroup];
-  const limit = groupBudget.monthlyLimit ?? 0;
-  const spent = calculateGroupBudget();
+  const limit = currBudget.monthlyLimit ?? 0;
+  const spent = currBudget.spendingThisMonth;
   const remaining = Math.max(limit - spent, 0);
   let allocated = 0;
   const categoryBudgets =

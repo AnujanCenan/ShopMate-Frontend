@@ -22,7 +22,44 @@ function getTopSpendingCategory() {
     amount: highestSpend,
   };
 }
-/*Open Bottom Sheet */
+
+async function getFamilyBudgetMySql() {
+  const groupId = state.activeGroupId;
+  const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${groupId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return null;
+  }
+  const body = await res.json();
+
+  state.groupBudgets = [];
+
+  state.groupBudgets.push({
+    groupId: groupId,
+    limit: body.budgetValue
+  })
+
+  state.categoryBudgets = [];
+
+  for (budget of body.shoppingListBudgets)
+  state.categoryBudgets.push({
+    shoppingListId: budget.shoppingListId,
+    shoppingListName: budget.shoppingListName,
+    limit: budget.budgetLimit,
+    spent: budget.budgetSpent
+  })
+
+  saveState();
+
+  return body;
+}
+
+/* Open Bottom Sheet */
 function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const bottomSheetContent = document.getElementById("bottomSheetContent");
@@ -159,7 +196,7 @@ Returns
 }
 */
 /* Render Budget Analysis */
-function renderBudgetAnalysis() {
+async function renderBudgetAnalysis() {
   const container = document.getElementById("budgetAnalysisContainer");
   const activeGroup =
     localStorage.getItem("activeGroup") || appState.activeGroup;
@@ -172,26 +209,27 @@ function renderBudgetAnalysis() {
     `;
     return;
   }
-  const budget = appState.budgets.groupBudgets?.[activeGroup] || {};
-  const limit = budget.monthlyLimit ?? 0;
-  const spent = calculateGroupBudget(activeGroup);
+
+  const groupBudgetingInfo = await getFamilyBudgetMySql();
+  const limit = groupBudgetingInfo.budgetValue ? groupBudgetingInfo.budgetValue : 0;
+  const shoppingListBudgets = groupBudgetingInfo.shoppingListBudgets;
+
+  const spent = shoppingListBudgets.reduce((accumulator, currList) => accumulator + currList.budgetSpent, 0);
+
+  // const spent = calculateGroupBudget(activeGroup);
   const remaining = Math.max(limit - spent, 0);
   const progressWidth =
     limit === 0 ? 0 : Math.min(Math.round((spent / limit) * 100), 100);
   const percent = limit === 0 ? 0 : Math.round((spent / limit) * 100);
   let highestCategory = "No Spending Yet";
   let highestSpent = 0;
+  let purchasedItems = 0;
   const categories = appState.groups?.[activeGroup] || [];
-  categories.forEach(function (category) {
-    let total = 0;
-    category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        total += Number(item.estimatedPrice);
-      }
-    });
-    if (total > highestSpent) {
-      highestSpent = total;
-      highestCategory = category.name;
+  shoppingListBudgets.forEach(function (budget) {
+    if (budget.budgetSpent > highestSpent) {
+      highestSpent = budget.budgetSpent;
+      highestCategory = budget.shoppingListName;
+      purchasedItems = budget.numPurchased;
     }
   });
   let health = "Healthy";
@@ -215,14 +253,14 @@ function renderBudgetAnalysis() {
     recommendation =
       "Budget exceeded. Consider reducing non-essential purchases.";
   }
-  const purchasedItems = categories.reduce(function (total, category) {
-    return (
-      total +
-      category.items.filter(function (item) {
-        return item.purchased;
-      }).length
-    );
-  }, 0);
+  // const purchasedItems = categories.reduce(function (total, category) {
+  //   return (
+  //     total +
+  //     category.items.filter(function (item) {
+  //       return item.purchased;
+  //     }).length
+  //   );
+  // }, 0);
   const savings = remaining;
   container.innerHTML = `
     <div class="budgetAnalysisCard">
@@ -288,8 +326,8 @@ function renderBudgetAnalysis() {
 function renderCategoryBudgetCards() {
   const container = document.getElementById("categoryBudgetContainer");
   container.innerHTML = "";
-  const categories = appState.groups?.[appState.activeGroup] || [];
-  if (categories.length === 0) {
+  const categoryBudgets = state.categoryBudgets || [];
+  if (categoryBudgets.length === 0) {
     container.innerHTML = `
       <div class="emptyStateCard">
         No Categories Available
@@ -298,26 +336,26 @@ function renderCategoryBudgetCards() {
     return;
   }
   const categorySummary = [];
-  categories.forEach(function (category) {
-    const budget =
-      appState.budgets.categoryBudgets?.[appState.activeGroup]?.[
-        category.name
-      ] || {};
-    const limit = budget.monthlyLimit ?? 0;
-    let spent = 0;
+  categoryBudgets.forEach(function (budget) {
+    // const budget =
+    //   appState.budgets.categoryBudgets?.[appState.activeGroup]?.[
+    //     category.name
+    //   ] || {};
+    const limit = budget.limit ?? 0;
+    let spent = budget.spent;
     let highestItem = "";
     let highestPrice = 0;
-    category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        spent += Number(item.estimatedPrice);
-        if (Number(item.estimatedPrice) > highestPrice) {
-          highestPrice = Number(item.estimatedPrice);
-          highestItem = item.name;
-        }
-      }
-    });
+    // category.items.forEach(function (item) {
+    //   if (item.purchased && item.estimatedPrice) {
+    //     spent += Number(item.estimatedPrice);
+    //     if (Number(item.estimatedPrice) > highestPrice) {
+    //       highestPrice = Number(item.estimatedPrice);
+    //       highestItem = item.name;
+    //     }
+    //   }
+    // });
     categorySummary.push({
-      name: category.name,
+      name: budget.shoppingListName,
       spent,
       limit,
       highestItem,
@@ -390,3 +428,4 @@ function initializeBudgetPage() {
   renderBudgetAnalysis();
 }
 initializeBudgetPage();
+

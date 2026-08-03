@@ -126,7 +126,6 @@ function renderAddItemForm(itemName = "") {
 }
 /* Render Edit Item Form */
 function renderEditItemForm(listItemId) {
-  console.log("Rendering edit item form...")
   // const currentCategory = getActiveCategory();
   // if (!currentCategory) {
   //   return;
@@ -371,11 +370,6 @@ async function createItem() {
     showSnackbar("Please enter item details");
     return;
   }
-  // const currentCategory = getActiveCategory();
-  // if (!currentCategory) {
-  //   console.log("No category given :(")
-  //   return;
-  // }
 
   const categoryId = localStorage.getItem("activeCategoryId");
 
@@ -522,7 +516,6 @@ function updateDuplicateQuantity(itemName, newQuantity) {
 /* Update Item */
 
 async function updateItemMySql(listItemId, newItem) {
-  console.log(`attempting to udpate item; active group id = ${state.activeGroupId}`)
   const res = await fetch("http://localhost:5113/api/edit-item", {
     method: "PUT",
     credentials: "include",
@@ -572,7 +565,6 @@ async function updateItem(listItemId) {
     showSnackbar("Please enter item details");
     return;
   }
-  console.log(`state: ${JSON.stringify(state)}`);
   const duplicateItem = state.listItems.find(function (existingItem) {
     return (
       existingItem.ItemName.toLowerCase() === updatedName.toLowerCase() &&
@@ -651,9 +643,6 @@ async function markPurchased_mysql(item, price) {
 async function openPurchaseConfirmation(listItemId) {
   
   const item = state.listItems.find(item => item.ListItemId === listItemId);
-  console.log(listItemId);
-  console.log(state);
-  console.log(item);
   if (item.Purchased) {
     await unmarkPurchased_mysql(item);
     item.Purchased = false;
@@ -806,23 +795,40 @@ function updateBudgetTracking(categoryName, amount) {
   }
   saveAppState();
 }
-/* Delete Item */
-function deleteItem(itemName) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
-    return;
-  }
-  const itemIndex = currentCategory.items.findIndex(function (item) {
-    return item.name === itemName;
+
+
+
+async function deleteItemMySql(listItemId) {
+  const res = await fetch(`http://localhost:5113/api/delete-item?listItemId=${listItemId}`, {
+    method: "DELETE",
+    credentials: "include"
   });
-  if (itemIndex === -1) {
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
     return;
   }
-  const deletedItem = currentCategory.items[itemIndex];
-  currentCategory.items.splice(itemIndex, 1);
+
+  console.log("About to clean up the local data...");
+  console.log("BEFORE");
+  console.log(state.listItems);
+  state.listItems = state.listItems.filter((item) => item.ListItemId != listItemId);
+  state.selectedItems = state.selectedItems.filter((itemId) => itemId != listItemId);
+  saveState();
+  console.log("AFTER");
+  console.log(state.listItems);
+}
+
+/* Delete Item */
+async function deleteItem(listItemId) {
+  const activeCategoryId = state.activeCategoryId; 
+
+  await deleteItemMySql(listItemId);
+
   saveAppState();
   renderFilteredItems();
-  showUndoSnackbar(deletedItem, itemIndex);
+  // showUndoSnackbar(deletedItem, itemIndex);    // to do
 }
 /* Event Listeners */
 if (openItemBottomSheetButton) {

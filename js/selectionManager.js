@@ -1,14 +1,16 @@
 /* Toggle Selection */
-function toggleItemSelection(itemName) {
+function toggleItemSelection(listItemId) {
+  console.log("Toggling selection: item.ListItemId = ");
+  console.log(listItemId);
   state.selectionMode = true;
   /* Remove Selection */
-  if (state.selectedItems.includes(itemName)) {
-    state.selectedItems = state.selectedItems.filter(function (item) {
-      return item !== itemName;
+  if (state.selectedItems.some(other => listItemId === other)) {
+    state.selectedItems = state.selectedItems.filter(function (other) {
+      return listItemId !== other;
     });
   } else {
     /* Add Selection */
-    state.selectedItems.push(itemName);
+    state.selectedItems.push(listItemId);
   }
   updateBulkActionCount();
   /* Exit Selection Mode */
@@ -66,8 +68,8 @@ function bulkPurchasedItems() {
 }
 /* Bulk Delete */
 function bulkDeleteItems() {
-  state.selectedItems.forEach(function (itemName) {
-    deleteItem(itemName);
+  state.selectedItems.forEach(function (itemId) {
+    deleteItem(itemId);
   });
   clearSelectionMode();
 }
