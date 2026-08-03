@@ -180,13 +180,6 @@ async function renderGroupDropdown() {
       <span class="groupItemName">
         ${group.familyName}
       </span>
-<<<<<<< HEAD
-      <button class="groupMoreButton" onclick="event.stopPropagation(); renderGroupActions('${group.familyName}');"><img
-    src="${getIconPath("navigation", "menu")}"
-    class="icon actionIcon"
-    alt="More"
-></button>
-=======
       ${
         canManageGroup()
           ? `
@@ -203,7 +196,6 @@ async function renderGroupDropdown() {
     `
           : ""
       }
->>>>>>> upstream/master
     </div>`;
   });
   bottomSheetContent.innerHTML = `
@@ -336,27 +328,8 @@ async function createGroup() {
     groupNameInput.focus();
     return;
   }
-<<<<<<< HEAD
 
-  const res = await fetch(`http://localhost:5113/api/group-create`, {
-    method: "POST",
-    credentials: 'include',
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: groupName
-    })
-  });
-
-  const body = await res.json();
-
-  // appState.groups[groupName] = [];
-  // saveAppState();
-  selectGroup(groupName, body.familyId);
-  if (appState.groups[groupName]) {
-    showDialog("Group Exists", "A group with this name already exists.");
-=======
+  
   if (groupName.length > 40) {
     groupNameInput.classList.add("formInputError");
     groupNameError.textContent = "Group name cannot exceed 40 characters.";
@@ -378,6 +351,7 @@ async function createGroup() {
     groupNameInput.focus();
     return;
   }
+  
   const groupExists = Object.keys(appState.groups).some(
     function (existingGroup) {
       return existingGroup.toLowerCase() === groupName.toLowerCase();
@@ -388,7 +362,28 @@ async function createGroup() {
     groupNameError.textContent = "A group with this name already exists.";
     groupNameInput.focus();
     groupNameInput.select();
->>>>>>> upstream/master
+
+    return;
+  }
+
+  const res = await fetch(`http://localhost:5113/api/group-create`, {
+    method: "POST",
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: groupName
+    })
+  });
+
+  const body = await res.json();
+
+  // appState.groups[groupName] = [];
+  // saveAppState();
+  selectGroup(groupName, body.familyId);
+  if (appState.groups[groupName]) {
+    showDialog("Group Exists", "A group with this name already exists.");
     return;
   }
   appState.groups[groupName] = [];

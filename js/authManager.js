@@ -137,6 +137,52 @@ function loginUser() {
     }
   */
 }
+
+async function loginUserMySQL() {
+  const email = document.getElementById("loginEmailInput").value.trim();
+  const password = document
+    .getElementById("loginPasswordInput")
+    .value.trim();
+
+  const response = await fetch(`http://localhost:5113/api/login`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      userEmail: email,
+      userPassword: password
+    })
+  });
+
+
+  if (!response.ok) {
+    console.error(response.json())
+    showDialog("Invalid Login", "Please check your email and password.");
+    return;
+  }
+
+  appState.loggedIn = true;
+  appState.activeGroup = "Family Group";
+  saveAppState();
+
+  // appState.currentUser = {
+  //   id: user.id,
+
+  //   name: user.name,
+
+  //   email: user.email,
+  //   role: "admin",
+  // };
+
+  // appState.loggedIn = true;
+
+  // appState.activeGroup = "Family Group";
+
+  // saveAppState();
+
+  window.location.href = "./dashboardPage.html";
+}
+
 /* Validate Login Credentials - Checks whether the required login fields are completed. */
 function validateLoginCredentials(email, password) {
   if (!email || !password) {
