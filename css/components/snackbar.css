@@ -1,60 +1,71 @@
+/***************************************************************************************************
+ * FILE: snackBar.css
+ *
+ * PURPOSE
+ * Defines reusable snackbar and bulk action components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Snackbar
+ * • Snackbar undo button
+ * • Bulk action bar
+ * • Bulk selection count
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
+/* Snackbar */
 .snackbar {
   position: fixed;
   left: 50%;
   bottom: 90px;
-  transform: translateX(-50%);
-  width: calc(100% - 40px);
-  max-width: 80%;
-  background: #111827;
-  color: white;
-  border-radius: 22px;
-  padding: 18px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  width: calc(100% - 40px);
+  max-width: 80%;
+  padding: 18px 20px;
+  background: #111827;
+  color: white;
+  border-radius: 22px;
   box-shadow: var(--shadowLarge);
-  z-index: 9999;
+  transform: translateX(-50%);
   animation: snackbarSlideUp 0.22s ease;
+  z-index: 9999;
 }
-
 /* Snackbar Undo Button */
 .snackbarUndoButton {
-  background: transparent;
-  border: none;
-  color: #4fc3f7;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
+  min-width: fit-content;
   padding: 0;
   margin: 0;
-  min-width: fit-content;
+  background: transparent;
+  color: #4fc3f7;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
 }
-
+/* Bulk Action Bar */
 .bulkActionBar {
   position: fixed;
-  bottom: 150px;
   left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 32px);
-  max-width: 80%;
-  background: white;
-  border-radius: 22px;
-  padding: 14px 18px;
+  bottom: 150px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: calc(100% - 32px);
+  max-width: 80%;
+  padding: 14px 18px;
+  background: white;
+  border-radius: 22px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  transform: translateX(-50%);
   z-index: 9999;
 }
-
 /* Bulk Selection Count */
 .bulkSelectionCount {
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
   padding-right: 8px;
+  color: #111827;
   font-size: 15px;
   font-weight: 600;
-  color: #111827;
 }

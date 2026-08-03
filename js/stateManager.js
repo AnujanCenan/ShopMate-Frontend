@@ -1,3 +1,34 @@
+/***************************************************************************************************
+ * FILE: stateManager.js
+ *
+ * PURPOSE
+ * Stores, retrieves and manages the application's persistent state.
+ *
+ * RESPONSIBILITIES
+ * • Define the default application state
+ * • Load application state
+ * • Save application state
+ * • Maintain backward compatibility
+ *
+ * FUNCTIONS IN THIS FILE
+ *
+ * State Initialization
+ * ├── defaultAppState
+ *
+ * State Management
+ * ├── loadAppState()
+ * └── saveAppState()
+ *
+ * DEPENDENCIES
+ * • Local Storage
+ *
+ * PAGES
+ * • All Pages
+ *
+ * NOTE
+ * This file is responsible only for storing application data.
+ * Business logic belongs in the respective manager files.
+ ***************************************************************************************************/
 const STORAGE_KEY = "shopMateData";
 const defaultAppState = {
   loggedIn: false,
@@ -10,19 +41,17 @@ const defaultAppState = {
   selectedItems: [],
   favoriteItems: [],
   notifications: [],
-  dashboardBudgetExpanded: false,
-  drawerPosition: "right",
   users: [
     {
       id: "user_1",
-      name: "Admin",
+      name: "ShopMate Admin",
       email: "admin@shopmate.app",
       password: "123456",
       biometricEnabled: true,
     },
   ],
   groups: {
-    "Family Group": [
+    "My Shopping Group": [
       {
         name: "Monthly Groceries",
         items: [
@@ -51,65 +80,77 @@ const defaultAppState = {
     ],
   },
   groupMembers: {
-    "Family Group": [
+    "My Shopping Group": [
       {
         id: "user_1",
-        name: "Hari",
+        name: "ShopMate Admin",
         email: "admin@shopmate.app",
         role: "admin",
+        joinedAt: new Date().toISOString(),
+        invitedBy: null,
       },
     ],
   },
-  pendingInvites: [
-    {
-      code: "INVITE123",
-      groupName: "Family Group",
-    },
-  ],
+  pendingInvitations: [],
   budgets: {
     groupBudgets: {},
     categoryBudgets: {},
   },
+  dashboardBudgetExpanded: false,
+  drawerPosition: "right",
 };
+/* Load Application State - Loads the saved application state from Local Storage and upgrades older data structures if required. */
 function loadAppState() {
   const savedState = localStorage.getItem(STORAGE_KEY);
   if (!savedState) {
     return structuredClone(defaultAppState);
   }
   const parsedState = JSON.parse(savedState);
+  let stateUpdated = false;
+  /* Backward Compatibility */
   if (!parsedState.budgets) {
     parsedState.budgets = {
-      groupBudget: {
-        // monthlyLimit: 50000,
-        // spent: 0,
-      },
-      categoryBudgets: {
-        // "Monthly Groceries": {
-        //   monthlyLimit: 8000,
-        //   spent: 0,
-        // },
-      },
+      groupBudgets: {},
+      categoryBudgets: {},
     };
+    stateUpdated = true;
   }
-  Object.values(parsedState.groups).forEach(function (categories) {
+  /* Upgrade Existing Item Structure */
+  Object.values(parsedState.groups || {}).forEach(function (categories) {
     categories.forEach(function (category) {
       category.items.forEach(function (item) {
         if (item.estimatedPrice === undefined) {
           item.estimatedPrice = 0;
+          stateUpdated = true;
         }
         if (item.actualPrice === undefined) {
           item.actualPrice = 0;
+          stateUpdated = true;
         }
         if (item.purchaseDate === undefined) {
           item.purchaseDate = null;
+          stateUpdated = true;
         }
       });
     });
   });
+  /* Upgrade Pending Invitations */
+  if (!parsedState.pendingInvitations) {
+    parsedState.pendingInvitations = [];
+    stateUpdated = true;
+  }
+  /* Upgrade Group Members */
+  if (!parsedState.groupMembers) {
+    parsedState.groupMembers = {};
+    stateUpdated = true;
+  }
+  if (stateUpdated) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsedState));
+  }
   return parsedState;
 }
 const appState = loadAppState();
-
+/* Save Application State - Saves the current application state to Local Storage. */
 function saveAppState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
 }

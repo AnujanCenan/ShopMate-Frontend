@@ -1,106 +1,143 @@
+/***************************************************************************************************
+ * FILE: budget.css
+ *
+ * PURPOSE
+ * Defines budget and financial analysis components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Budget hero section
+ * • Budget summaries
+ * • Budget statistics
+ * • Budget insights
+ * • Budget recommendations
+ * • Category budget summaries
+ * • Analysis components
+ * • Quick pick heading
+ *
+ * PAGES
+ * • Budget Page
+ ***************************************************************************************************/
+/* Budget Hero */
 .budgetHero {
-  background: linear-gradient(135deg, #118ab2, #0f6d8d);
-  border-radius: 28px;
   padding: 32px 24px;
-  color: white;
   margin-bottom: 24px;
+  background: linear-gradient(135deg, #118ab2, #0f6d8d);
+  color: white;
+  border-radius: 28px;
 }
+/* Budget Amount */
 .budgetAmount {
+  margin-bottom: 10px;
   font-size: 30px;
   font-weight: 700;
-  margin-bottom: 10px;
 }
+/* Budget Subtitle */
 .budgetSubtitle {
   margin-top: 6px;
   margin-bottom: 18px;
-  font-size: 14px;
   color: #64748b;
+  font-size: 14px;
 }
+/* Budget Statistics */
 .budgetStats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
+/* Budget Helper Text */
 .budgetHelperText {
   margin-top: 14px;
+  color: #2563eb;
   font-size: 14px;
   font-weight: 600;
-  color: #2563eb;
 }
+/* Budget Helper Label */
 .budgetHelperLabel {
   display: flex;
   justify-content: space-between;
   margin-top: 12px;
+  color: #475569;
   font-size: 14px;
   font-weight: 600;
-  color: #475569;
 }
+/* Budget Category Section */
 .budgetCategorySection {
   margin-top: 24px;
 }
+/* Budget Status Text */
 .budgetStatusText {
   margin-top: 10px;
+  opacity: 0.95;
   font-size: 13px;
   font-weight: 600;
-  opacity: 0.95;
 }
+/* Budget Progress Text */
 .budgetProgressText {
   margin-top: 12px;
-  font-size: 14px;
   opacity: 0.9;
+  font-size: 14px;
 }
+/* Budget Section Header */
 .budgetSectionHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 16px;
 }
+/* Budget Insight Text */
 .budgetInsightText {
   margin-top: 8px;
   font-size: 14px;
   line-height: 1.5;
 }
+/* Overspend Text */
 .overspendText {
+  margin-top: 10px;
   color: #ef4444;
   font-size: 13px;
   font-weight: 700;
-  margin-top: 10px;
 }
+/* Budget Percent Text */
 .budgetPercentText {
   margin-top: 12px;
-  font-weight: 600;
   text-align: center;
+  font-weight: 600;
 }
+/* Budget Insight */
 .budgetInsight {
   margin-top: 8px;
   color: #64748b;
-  font-size: 14px;
   text-align: center;
+  font-size: 14px;
 }
+/* Budget Recommendation */
 .budgetRecommendation {
   margin-top: 12px;
-  line-height: 1.6;
   color: #475569;
   font-size: 14px;
+  line-height: 1.6;
 }
+/* Analysis Value */
 .analysisValue {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-top: 14px;
   font-weight: 600;
 }
+/* Analysis Card Header */
 .analysisCardHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 16px;
 }
+/* Category Budget Summary */
 .categoryBudgetSummary {
   margin-top: 8px;
   margin-bottom: 10px;
-  font-size: 13px;
   color: #64748b;
+  font-size: 13px;
   line-height: 1.6;
 }
 .categoryBudgetSummary div {
@@ -111,34 +148,37 @@
   color: #0f172a;
   font-weight: 700;
 }
+/* Quick Pick Heading */
 .quickPickHeading {
-  padding: 14px 16px 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: #64748b;
-  text-transform: uppercase;
-  border-bottom: 1px solid #edf2f7;
-  background: #fafafa;
   position: sticky;
   top: 0;
+  padding: 14px 16px 10px;
+  background: #fafafa;
+  color: #64748b;
+  border-bottom: 1px solid #edf2f7;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 13px;
+  font-weight: 700;
   z-index: 2;
 }
+/* Top Category Name */
 .topCategoryName {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--secondaryTextColor);
   margin-top: 6px;
   margin-bottom: 6px;
+  color: var(--secondaryTextColor);
+  font-size: 14px;
+  font-weight: 600;
 }
+/* Budget Summary Header */
 .budgetSummaryHeader {
-  width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px 20px 0px 20px;
-  border: none;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px 15px 15px;
   background: white;
+  border: none;
   cursor: pointer;
 }
 .budgetSummaryHeader h3 {
@@ -147,26 +187,29 @@
   font-weight: 700;
 }
 .budgetSummaryHeader p {
-  margin-top: 4px;
+  margin-top: 10px;
   color: #64748b;
   font-size: 13px;
 }
+/* Budget Summary Body */
 .budgetSummaryBody {
-  padding: 0px 20px 20px 20px;
+  padding: 0 20px 20px;
 }
-
+/* Budget Healthy Text */
 .budgetHealthyText {
+  margin-top: 10px;
   color: #16a34a;
   font-weight: 700;
-  margin-top: 10px;
 }
+/* Budget Warning Text */
 .budgetWarningText {
+  margin-top: 10px;
   color: #ca8a04;
   font-weight: 700;
-  margin-top: 10px;
 }
+/* Budget Critical Text */
 .budgetCriticalText {
+  margin-top: 10px;
   color: #dc2626;
   font-weight: 700;
-  margin-top: 10px;
 }

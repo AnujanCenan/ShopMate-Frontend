@@ -1,17 +1,30 @@
+/***************************************************************************************************
+ * FILE: dropDown.css
+ *
+ * PURPOSE
+ * Defines reusable dropdown components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Group dropdown button
+ * • Dropdown arrow
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
 /* Group Dropdown Button */
 .groupDropdownButton {
-  width: 100%;
-  background-color: var(--cardColor);
-  border: 1px solid var(--borderColor);
-  border-radius: var(--borderRadiusMedium);
-  padding: 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--borderColor);
+  border-radius: var(--borderRadiusMedium);
+  background: var(--cardColor);
   font-size: 18px;
   cursor: pointer;
 }
-
+/* Dropdown Arrow */
 .dropdownArrow {
   color: #7cc242;
   font-size: 16px;

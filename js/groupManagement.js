@@ -19,9 +19,11 @@ function renderGroupAccordion() {
       appState.groupMembers && appState.groupMembers[groupName]
         ? appState.groupMembers[groupName]
         : [];
-    const pendingInvites = (appState.pendingInvites || []).filter(
-      function (invite) {
-        return invite.groupName === groupName;
+    const pendingInvitations = (appState.pendingInvitations || []).filter(
+      function (invitation) {
+        return (
+          invitation.groupName === groupName && invitation.status === "pending"
+        );
       },
     );
     container.innerHTML += `
@@ -75,15 +77,41 @@ function renderGroupAccordion() {
                   .map(function (member) {
                     return `
                   <div class="groupMemberRow">
-                    <div>
-                      <div class="groupMemberName">
-                        ${member.name}
-                      </div>
-                      <div class="groupMemberRole">
-                        ${member.role}
-                      </div>
-                    </div>
-                  </div>
+  <div class="groupMemberInformation">
+    <div class="groupMemberName">
+      ${member.name}
+    </div>
+    <div
+      class="
+        groupMemberRole
+        ${member.role === "admin" ? "memberRoleAdmin" : "memberRoleMember"}
+      "
+    >
+      ${member.role === "admin" ? "Admin" : "Member"}
+    </div>
+  </div>
+  ${
+    canManageGroup() && member.id !== getCurrentUser().id
+      ? `
+        <button
+          class="groupMoreButton"
+          onclick="
+            event.stopPropagation();
+            openMemberActions(
+              '${member.id}'
+            );
+          "
+        >
+          <img
+            src="${getIconPath("navigation", "more")}"
+            class="icon actionIcon"
+            alt="More"
+          >
+        </button>
+      `
+      : ""
+  }
+</div>
                 `;
                   })
                   .join("")
@@ -93,26 +121,52 @@ function renderGroupAccordion() {
             Pending Invitations
           </h4>
           ${
-            pendingInvites.length === 0
+            pendingInvitations.length === 0
               ? `
-                <p class="emptyStateText">
-                  No Pending Invitations
-                </p>
-              `
-              : pendingInvites
-                  .map(function (invite) {
-                    return `
-                  <div class="groupInviteRow">
-                    <div>
-                      <div class="groupMemberName">
-                        ${invite.email}
-                      </div>
-                      <div class="groupMemberRole">
-                        Pending
-                      </div>
-                    </div>
+               <div class="emptyPendingInvitationState">
+                  <div class="emptyStateTitle">
+                      No Pending Invitations
                   </div>
-                `;
+                  <div class="emptyStateSubtitle">
+                      Invite members to start collaborating.
+                  </div>
+                </div>
+              `
+              : pendingInvitations
+                  .map(function (invitation) {
+                    return `
+      <div class="groupInviteRow">
+        <div class="groupInviteInformation">
+          <div class="groupMemberName">
+            ${invitation.email}
+          </div>
+          <div class="groupMemberRole">
+             ${
+               new Date(invitation.expiresAt) < new Date()
+                 ? "Expired"
+                 : `Invited ${new Date(invitation.invitedAt).toLocaleDateString(
+                     "en-GB",
+                   )}`
+             }
+          </div>
+        </div>
+        <button
+          class="groupMoreButton"
+          onclick="
+            event.stopPropagation();
+            openInviteActions(
+              '${invitation.id}'
+            );
+          "
+        >
+          <img
+            src="${getIconPath("navigation", "more")}"
+            class="icon actionIcon"
+            alt="More"
+          >
+        </button>
+      </div>
+    `;
                   })
                   .join("")
           }
@@ -192,54 +246,140 @@ function setupPermissions() {
 /* Render Members */
 /* Render Pending Invites */
 /* Open Invite Actions */
-function openInviteActions(email) {
+function openInviteActions(invitationId) {
+  if (!canManageGroup()) {
+    return;
+  }
+  const invitation = (appState.pendingInvitations || []).find(
+    function (invitation) {
+      return invitation.id === invitationId;
+    },
+  );
+  if (!invitation) {
+    return;
+  }
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Invitation
+        Pending Invitation
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
         <img
-  src="${getIconPath("navigation", "close")}"
-  class="icon actionIcon"
-  alt="Close"
->
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
-      <p class="dialogMessage">
-        ${email}
-      </p>
-      <button
-        class="dangerButton"
-        onclick="
-          revokeInvite(
-            '${email}'
-          )
-        "
-      >
-        Cancel Invitation
-      </button>
+      <div class="formField">
+        <label class="formLabel">
+          Email Address
+        </label>
+        <div class="bottomSheetStaticValue">
+          ${invitation.email}
+        </div>
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          Invited On
+        </label>
+        <div class="bottomSheetStaticValue">
+          ${new Date(invitation.invitedAt).toLocaleDateString("en-GB")}
+        </div>
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="resendInvitation('${invitation.id}')"
+        >
+          Resend
+        </button>
+        <button
+          class="bottomSheetDeleteButton"
+          onclick="cancelInvitation('${invitation.id}')"
+        >
+          Cancel Invitation
+        </button>
+      </div>
     </div>
   `;
   openBottomSheet();
 }
-/* Revoke Invite */
-function revokeInvite(email) {
-  appState.pendingInvites = appState.pendingInvites.filter(function (invite) {
-    return invite.email !== email;
-  });
+/* Resend Invitation */
+function resendInvitation(invitationId) {
+  if (!canManageGroup()) {
+    showDialog(
+      "Permission Denied",
+      "Only group administrators can resend invitations.",
+    );
+    return;
+  }
+  const invitation = (appState.pendingInvitations || []).find(
+    function (invitation) {
+      return invitation.id === invitationId;
+    },
+  );
+  if (!invitation) {
+    return;
+  }
+  invitation.invitedAt = new Date().toISOString();
+  invitation.expiresAt = new Date(
+    Date.now() + 7 * 24 * 60 * 60 * 1000,
+  ).toISOString();
   saveAppState();
-  renderPendingInvites();
+  renderGroupAccordion();
+  closeBottomSheet();
+  showToast("Invitation Resent");
+  createNotification(
+    "group",
+    "Invitation Resent",
+    `Invitation resent to ${invitation.email}.`,
+  );
+}
+/* Cancel Invitation */
+function cancelInvitation(invitationId) {
+  showConfirmDialog(
+    "Cancel Invitation",
+    "Are you sure you want to cancel this invitation?",
+    function () {
+      revokeInvite(invitationId);
+    },
+  );
+}
+/* Revoke Invitation */
+function revokeInvite(invitationId) {
+  if (!canManageGroup()) {
+    showDialog(
+      "Permission Denied",
+      "Only group administrators can cancel invitations.",
+    );
+    return;
+  }
+  const invitation = (appState.pendingInvitations || []).find(
+    function (invitation) {
+      return invitation.id === invitationId;
+    },
+  );
+  if (!invitation) {
+    return;
+  }
+  appState.pendingInvitations = appState.pendingInvitations.filter(
+    function (pendingInvitation) {
+      return pendingInvitation.id !== invitationId;
+    },
+  );
+  saveAppState();
+  renderGroupAccordion();
   closeBottomSheet();
   showToast("Invitation Cancelled");
   createNotification(
     "group",
     "Invitation Cancelled",
-    `${email} invitation cancelled.`,
+    `${invitation.email} invitation cancelled.`,
   );
 }
 /* Render Join Group Form */
@@ -321,6 +461,9 @@ function openMemberProfile(memberId) {
 }
 /* Member Actions */
 function openMemberActions(memberId) {
+  if (!canManageGroup()) {
+    return;
+  }
   const members = getCurrentGroupMembers();
   const member = members.find(function (member) {
     return member.id === memberId;
@@ -411,6 +554,13 @@ function openMemberActions(memberId) {
 }
 /* Make Admin */
 async function makeAdmin(memberId) {
+  if (!canManageGroup()) {
+    showDialog(
+      "Permission Denied",
+      "Only group administrators can change member roles.",
+    );
+    return;
+  }
   const members = getCurrentGroupMembers();
   const member = members.find(function (member) {
     return member.id === memberId;
@@ -436,6 +586,13 @@ async function makeAdmin(memberId) {
 }
 /* Transfer Ownership */
 function transferOwnership(memberId) {
+  if (!canManageGroup()) {
+    showDialog(
+      "Permission Denied",
+      "Only group administrators can transfer ownership.",
+    );
+    return;
+  }
   const members = getCurrentGroupMembers();
   members.forEach(function (member) {
     if (member.role === "owner") {
@@ -509,6 +666,13 @@ function openRemoveMemberDialog(memberId) {
 }
 /* Remove Member */
 async function removeMember(memberId) {
+  if (!canManageGroup()) {
+    showDialog(
+      "Permission Denied",
+      "Only group administrators can remove members.",
+    );
+    return;
+  }
   const members = getCurrentGroupMembers();
   const removedMember = members.find(function (member) {
     return member.id === memberId;
@@ -594,6 +758,13 @@ function renderInviteMemberForm() {
 }
 /* Send Invitation */
 function sendInvitation() {
+  if (!canManageGroup()) {
+    showDialog(
+      "Permission Denied",
+      "Only group administrators can invite members.",
+    );
+    return;
+  }
   const email = document
     .getElementById("inviteMemberEmail")
     .value.trim()
@@ -607,7 +778,7 @@ function sendInvitation() {
     showDialog("Invalid Email", "Please enter a valid email address.");
     return;
   }
-  appState.pendingInvites.push({
+  appState.pendingInvitations.push({
     email: email,
     role: role,
     groupName: appState.activeGroup,
@@ -724,8 +895,8 @@ function completeLeaveGroup(currentUser, remainingMembers) {
     if (appState.budgets && appState.budgets.groupBudgets) {
       delete appState.budgets.groupBudgets[appState.activeGroup];
     }
-    if (appState.pendingInvites) {
-      appState.pendingInvites = appState.pendingInvites.filter(
+    if (appState.pendingInvitations) {
+      appState.pendingInvitations = appState.pendingInvitations.filter(
         function (invite) {
           return invite.groupName !== appState.activeGroup;
         },

@@ -492,7 +492,10 @@ async function createItem() {
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar("Item added");
-  createNotification("item", "Item Added", `${itemName} was added`);
+  createNotification("item", "Item Added", `${item.name} added.`, "category", {
+    group: appState.activeGroup,
+    category: getActiveCategory().name,
+  });
   favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
@@ -549,7 +552,7 @@ async function updateItem(listItemId) {
   if (!item) {
     return;
   }
-  const originalItemName = item.ItemName;
+  const originalItemName = item.ItemName.trim().toLowerCase();
 
   const updatedName = document.getElementById("editItemNameInput").value.trim();
   const updatedQuantity = document
@@ -567,7 +570,7 @@ async function updateItem(listItemId) {
   }
   const duplicateItem = state.listItems.find(function (existingItem) {
     return (
-      existingItem.ItemName.toLowerCase() === updatedName.toLowerCase() &&
+      existingItem.ItemName.toLowerCase() === updatedName.trim().toLowerCase() &&
       existingItem.ItemName !== originalItemName
     );
   });
@@ -762,10 +765,13 @@ async function confirmPurchase(listItemId) {
   showSnackbar(item.purchased ? "Item purchased" : "Item restored");
   createNotification(
     "purchase",
-    item.purchased ? "Item Purchased" : "Item Restored",
-    `${item.name} ${
-    item.purchased ? "purchased" : "restored"
-    } for $${actualPrice}`,
+    "Item Purchased",
+    `${item.name} purchased.`,
+    "category",
+    {
+      group: state.activeGroupId,
+      category: state.activeCategoryId,
+    },
   );
 }
 

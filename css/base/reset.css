@@ -1,0 +1,20 @@
+/***************************************************************************************************
+ * FILE: reset.css
+ *
+ * PURPOSE
+ * Provides a consistent baseline for all browsers before application styles are applied.
+ *
+ * RESPONSIBILITIES
+ * • Reset default browser spacing
+ * • Standardize box sizing
+ *
+ * PAGES
+ * • Shared Across All Pages
+ ***************************************************************************************************/
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

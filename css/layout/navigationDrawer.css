@@ -1,38 +1,61 @@
+/***************************************************************************************************
+ * FILE: navigationDrawer.css
+ *
+ * PURPOSE
+ * Defines reusable navigation drawer components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Side drawer
+ * • Drawer overlay
+ * • Left and right drawer positioning
+ * • Drawer header
+ * • Drawer menu
+ * • Drawer items
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
+/* Side Drawer Overlay */
 .sideDrawerOverlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
-  z-index: 998;
   opacity: 0;
   visibility: hidden;
   transition: all 0.25s ease;
+  z-index: 998;
 }
-
 .sideDrawerOverlay.active {
   opacity: 1;
   visibility: visible;
 }
+/* Side Drawer */
 .sideDrawer {
   position: fixed;
   top: 0;
-  width: 300px;
+  width: 320px;
+  max-width: 85vw;
   height: 100vh;
+  overflow-y: auto;
   background: white;
-  z-index: 999;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
   transition: transform 0.25s ease;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.15);
+  z-index: 999;
 }
-/* RIGHT MODE */
+.sideDrawer.active {
+  transform: translateX(0);
+}
+/* Right Drawer */
 .sideDrawerRight {
   right: 0;
   transform: translateX(100%);
 }
-/* LEFT MODE */
+/* Left Drawer */
 .sideDrawerLeft {
   left: 0;
   transform: translateX(-100%);
 }
-/* Right Mode */
+/* Right Drawer Mode */
 .sideDrawer.right {
   right: 0;
   transform: translateX(100%);
@@ -40,7 +63,7 @@
 .sideDrawer.right.active {
   transform: translateX(0);
 }
-/* Left Mode */
+/* Left Drawer Mode */
 .sideDrawer.left {
   left: 0;
   transform: translateX(-100%);
@@ -48,58 +71,34 @@
 .sideDrawer.left.active {
   transform: translateX(0);
 }
-
+/* Drawer Header */
 .drawerHeader {
   padding: 24px;
   border-bottom: 1px solid #eef2f7;
 }
+/* Drawer Title */
 .drawerTitle {
   font-size: 22px;
   font-weight: 700;
 }
+/* Drawer Menu */
 .drawerMenu {
   padding: 12px;
 }
+/* Drawer Item */
 .drawerItem {
   width: 100%;
-  border: none;
-  background: transparent;
-  text-align: left;
+  display: flex;
+  gap: 14px;
   padding: 16px;
+  margin-bottom: 8px;
+  background: transparent;
+  border: none;
   border-radius: 12px;
   cursor: pointer;
+  text-align: left;
   font-size: 16px;
-  margin-bottom: 8px;
-  gap: 14px;
 }
 .drawerItem:hover {
   background: #f7f9fc;
-}
-.sideDrawer.active {
-  transform: translateX(0);
-}
-.sideDrawerOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.25s ease;
-  z-index: 998;
-}
-.sideDrawerOverlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-.sideDrawer {
-  position: fixed;
-  top: 0;
-  width: 320px;
-  max-width: 85vw;
-  height: 100vh;
-  background: white;
-  z-index: 999;
-  overflow-y: auto;
-  transition: transform 0.25s ease;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
 }

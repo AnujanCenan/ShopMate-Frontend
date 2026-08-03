@@ -1,29 +1,34 @@
+/***************************************************************************************************
+ * FILE: category.css
+ *
+ * PURPOSE
+ * Defines category-related typography used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Category title
+ * • Category information
+ * • Category page title
+ *
+ * PAGES
+ * • Category Page
+ ***************************************************************************************************/
+/* Category Title */
 .categoryTitle {
   margin: 0;
+  padding-bottom: 15px;
+  color: var(--textColor);
   font-size: 22px;
   font-weight: 700;
-  color: var(--textColor);
-  padding-bottom: 15px;
 }
+/* Category Information */
 .categoryInfo {
+  margin-top: 6px;
   color: #777777;
-  font-size: 14px;
-  margin-top: 6px;
-  font-size: 13px;
   opacity: 0.7;
-  margin-top: 6px;
   font-size: 13px;
-  opacity: 0.7;
 }
-.categoryInfo {
-  color: #777777;
-  font-size: 14px;
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: 0.7;
-}
-
+/* Category Page Title */
 .categoryPageTitle {
-  font-size: 24px;
   color: #001c8f;
+  font-size: 24px;
 }

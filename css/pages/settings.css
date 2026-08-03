@@ -1,23 +1,42 @@
+/***************************************************************************************************
+ * FILE: settings.css
+ *
+ * PURPOSE
+ * Defines settings page components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Settings sections
+ * • Section titles
+ * • Settings cards
+ *
+ * PAGES
+ * • Settings Page
+ ***************************************************************************************************/
+/* Settings Section */
 .settingsSection {
   margin-bottom: 28px;
 }
+/* Settings Section Title */
 .settingsSectionTitle {
+  margin-bottom: 14px;
   font-size: 20px;
   font-weight: 700;
-  margin-bottom: 14px;
 }
+/* Settings Card */
 .settingsCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   width: 100%;
   min-height: 58px;
-  border: none;
-  border-radius: 20px;
-  background: white;
   margin-bottom: 14px;
   padding: 0 18px;
+  background: white;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
   text-align: left;
   font-size: 16px;
   font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-  gap: 14px;
 }

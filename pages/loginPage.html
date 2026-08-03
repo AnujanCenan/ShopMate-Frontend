@@ -14,10 +14,10 @@
             <img
               class="authLogo"
               src="../assets/logos/shopMateLogo.png"
-              alt=""
+              alt="ShopMate Logo"
             />
           </div>
-          <p class="authTagline">Manage family shopping together</p>
+          <p class="authTagline">Manage your shopping together</p>
         </div>
         <input
           type="email"
@@ -32,7 +32,7 @@
           id="loginPasswordInput"
         />
         <div class="authBiometricRow">
-          <button class="biometricButton">
+          <button class="biometricButton" onclick="unlockApplication()">
             <img
               src="../assets/icons/biometric/fingerprint.svg"
               class="actionIcon"
@@ -40,7 +40,7 @@
             />
           </button>
           <span class="authOrText"> OR </span>
-          <button class="biometricButton">
+          <button class="biometricButton" onclick="unlockApplication()">
             <img
               src="../assets/icons/biometric/faceid.svg"
               class="actionIcon"
@@ -62,10 +62,10 @@
           class="secondaryButton authRegisterButton"
           onclick="window.location.href = './registerPage.html'"
         >
-          Create Family Account
+          Create Shopping Group
         </button>
 
-        <p class="authInviteText">Already invited by your Group Admin?</p>
+        <p class="authInviteText">Been invited to join a shopping group?</p>
         <p class="authInviteSubText">
           Use the invitation email sent to your registered email address.
         </p>
@@ -80,51 +80,5 @@
     <script src="../js/helpers.js"></script>
     <!-- <script src="../js/bottomSheet.js"></script> -->
     <script src="../js/authManager.js"></script>
-    <script>
-      async function loginUser() {
-        const email = document.getElementById("loginEmailInput").value.trim();
-        const password = document
-          .getElementById("loginPasswordInput")
-          .value.trim();
-
-        const response = await fetch(`http://localhost:5113/api/login`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            userEmail: email,
-            userPassword: password
-          })
-        });
-
-
-        if (!response.ok) {
-          console.error(response.json())
-          showDialog("Invalid Login", "Please check your email and password.");
-          return;
-        }
-
-        appState.loggedIn = true;
-        appState.activeGroup = "Family Group";
-        saveAppState();
-
-        // appState.currentUser = {
-        //   id: user.id,
-
-        //   name: user.name,
-
-        //   email: user.email,
-        //   role: "admin",
-        // };
-
-        // appState.loggedIn = true;
-
-        // appState.activeGroup = "Family Group";
-
-        // saveAppState();
-
-        window.location.href = "./dashboardPage.html";
-      }
-    </script>
   </body>
 </html>

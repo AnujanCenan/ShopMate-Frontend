@@ -1,4 +1,18 @@
-/* KEYFRAMES FOR ANIMATION */
+/***************************************************************************************************
+ * FILE: animations.css
+ *
+ * PURPOSE
+ * Defines reusable CSS animations shared across the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Snackbar animations
+ * • Dialog animations
+ * • Toast animations
+ *
+ * PAGES
+ * • Shared Across All Pages
+ ***************************************************************************************************/
+/* Snackbar Animation */
 @keyframes snackbarSlideUp {
   from {
     opacity: 0;
@@ -9,16 +23,18 @@
     transform: translateX(-50%) translateY(0);
   }
 }
+/* Dialog Animation */
 @keyframes dialogPop {
   from {
-    transform: scale(0.92);
     opacity: 0;
+    transform: scale(0.92);
   }
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
   }
 }
+/* Toast Animation */
 @keyframes toastSlideUp {
   from {
     opacity: 0;

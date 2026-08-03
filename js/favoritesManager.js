@@ -1,19 +1,60 @@
-/* Toggle Favorite */
+/***************************************************************************************************
+ * PURPOSE
+ * Manages favorite items for the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * - Toggle favorite status of shopping items
+ * - Add favorite items to the shopping list
+ * - Launch the Add Item form from Favorites
+ *
+ * FUNCTIONS IN THIS FILE
+ * - toggleFavorite()
+ * - addFavorite()
+ * - addFavoriteToList()
+ *
+ * DEPENDENCIES
+ * - appState
+ * - saveAppState()
+ * - getActiveCategory()
+ * - renderFilteredItems()
+ * - updateNotificationBadge()
+ * - renderAddItemForm()
+ * - showSnackbar()
+ *
+ * PAGES
+ * - categoryPage.html
+ *
+ * NOTE
+ * This file manages the user's favorite items only.
+ ***************************************************************************************************/
+/* Toggle Favorite - Toggles the favorite status of an item. */
 function toggleFavorite(itemName) {
-  /* Already exists -> Remove */
-  const existingFavorite = appState.favoriteItems.find(function (item) {
-    return item.name === itemName;
-  });
-  if (existingFavorite) {
-    appState.favoriteItems = appState.favoriteItems.filter(function (item) {
-      return item.name !== itemName;
-    });
-    saveAppState();
-    renderFilteredItems();
-    showSnackbar("Removed from Favorites");
+  const category = getActiveCategory();
+  if (!category) {
     return;
   }
-  /* Add from current shopping list */
+  const item = category.items.find(function (item) {
+    return item.name === itemName;
+  });
+  if (!item) {
+    return;
+  }
+  item.isFavorite = !item.isFavorite;
+  if (item.isFavorite) {
+    addFavorite(item.name);
+  } else {
+    appState.favoriteItems = appState.favoriteItems.filter(
+      function (favoriteItem) {
+        return favoriteItem.name !== item.name;
+      },
+    );
+    saveAppState();
+  }
+  renderFilteredItems();
+  updateNotificationBadge();
+}
+/* Add Favorite - Adds an item from the current shopping list to the Favorites list. */
+function addFavorite(itemName) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
@@ -24,6 +65,14 @@ function toggleFavorite(itemName) {
   if (!currentItem) {
     return;
   }
+  const normalizedName = currentItem.name.trim().toLowerCase();
+  const alreadyExists = appState.favoriteItems.some(function (favoriteItem) {
+    return favoriteItem.name.trim().toLowerCase() === normalizedName;
+  });
+  if (alreadyExists) {
+    showSnackbar("Item already exists in Favorites");
+    return;
+  }
   appState.favoriteItems.unshift({
     name: currentItem.name,
   });
@@ -31,7 +80,7 @@ function toggleFavorite(itemName) {
   renderFilteredItems();
   showSnackbar("Added to Favorites");
 }
-/* Add Favorite To List */
+/* Add Favorite To List - Opens the Add Item form using a favorite item. */
 function addFavoriteToList(itemName) {
   renderAddItemForm(itemName);
 }

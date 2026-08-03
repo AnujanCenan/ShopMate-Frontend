@@ -1,180 +1,225 @@
+/***************************************************************************************************
+ * FILE: item.css
+ *
+ * PURPOSE
+ * Defines item and product display components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Item list
+ * • Item cards
+ * • Item actions
+ * • Item images
+ * • Swipe actions
+ * • Product lookup
+ * • Product information
+ *
+ * PAGES
+ * • Category Page
+ * • Product Lookup
+ ***************************************************************************************************/
+/* Item List */
 .itemList {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-top: 0;
 }
+/* Item Name */
 .itemName {
+  margin: 0;
+  letter-spacing: -0.4px;
+  color: var(--textColor);
   font-size: 22px;
   font-weight: 700;
-  letter-spacing: -0.4px;
-  margin-bottom: 10px;
+  line-height: 1.2;
 }
+/* Item Details */
 .itemDetails {
+  margin: 4px 0 0;
+  color: #6b7280;
   font-size: 14px;
-  color: #777777;
-  margin-top: 4px;
-  line-height: 1.3;
+  line-height: 1.5;
 }
+/* Item Card Top Row */
 .itemCardTopRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 /* Item Action Buttons */
 .itemActionButtons {
   display: flex;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 8px;
   position: relative;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 /* Item Action Button */
 .itemActionButton {
-  border: none;
-  background: none;
-  font-size: 22px;
-  cursor: pointer;
   position: relative;
-  z-index: 30;
+  background: none;
+  border: none;
+  cursor: pointer;
   pointer-events: auto;
+  font-size: 22px;
+  z-index: 30;
 }
-
+/* Item Title Section */
 .itemTitleSection {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
-
+/* Item Details Section */
 .itemDetailsSection {
   flex: 1;
+  min-width: 0;
 }
+/* Item Card Content */
 .itemCardContent {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
+  gap: 18px;
+  margin-top: 6px;
 }
-.itemImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 16px;
-}
-.itemImagePlaceholder {
-  width: 100%;
-  height: 100%;
+/* Item Image Container */
+.itemImageContainer {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  margin-left: 12px;
+}
+/* Item Image */
+.itemImage {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 18px;
+  display: block;
+}
+/* Item Image Placeholder */
+.itemImagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
   background: #f3f4f6;
   border: 2px dashed #d1d5db;
-  border-radius: 16px;
+  border-radius: 18px;
   font-size: 32px;
 }
+/* Item Image Preview */
 .itemImagePreview {
   width: 100%;
   max-height: 140px;
+  margin-top: 12px;
   object-fit: cover;
   border-radius: 14px;
-  margin-top: 12px;
 }
-
+/* Swipe Wrapper */
 .swipeWrapper {
   position: relative;
-  overflow: hidden;
-  border-radius: 28px;
-  margin-bottom: 16px;
   display: inline-block;
   width: 100%;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border-radius: 28px;
 }
+/* Swipe Background */
 .swipeBackground {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   display: flex;
-  border-radius: inherit;
   overflow: hidden;
-  z-index: 1;
-
+  border-radius: inherit;
   transition: opacity 0.15s ease;
+  z-index: 1;
 }
+/* Swipe Purchased */
 .swipePurchased {
-  flex: 1;
-  background: #16a34a;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  flex: 1;
   padding-left: 28px;
+  background: #16a34a;
+  color: white;
   font-size: 15px;
   font-weight: 700;
 }
+/* Swipe Delete */
 .swipeDelete {
-  flex: 1;
-  background: #ef4444;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex: 1;
   padding-right: 28px;
+  background: #ef4444;
+  color: white;
   font-size: 15px;
   font-weight: 700;
 }
+/* Swipe Card */
 .swipeCard {
   position: relative;
-  z-index: 2;
   background: white;
   border-radius: 28px;
   transition: transform 0.2s ease;
+  z-index: 2;
 }
 /* Swipe Active */
 .swipeCard:active {
-  transition: none;
   opacity: 1;
+  transition: none;
 }
+/* Selected Item */
 .selectedItem {
-  border: 2px solid #2563eb;
   background: #eff6ff;
+  border: 2px solid #2563eb;
   box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
 }
-.itemTitleSection {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+/* Product Lookup Section */
 .productLookupSection {
   padding: 20px;
 }
+/* Product Information */
 .productInfo {
   flex: 1;
 }
+/* Product Name */
 .productName {
+  margin-bottom: 8px;
   font-size: 20px;
   font-weight: 700;
-  margin-bottom: 8px;
 }
+/* Product Price */
 .productPrice {
+  color: var(--primaryColor);
   font-size: 18px;
   font-weight: 600;
-  color: var(--primaryColor);
 }
+/* Product Store */
 .productStore {
-  font-size: 14px;
-  color: var(--secondaryTextColor);
   margin-top: 4px;
+  color: var(--secondaryTextColor);
+  font-size: 14px;
 }
+/* Product Image */
 .productImage {
   width: 90px;
   height: 90px;
   object-fit: cover;
   border-radius: 16px;
 }
+/* Product Actions */
 .productActions {
   display: flex;
   gap: 12px;

@@ -1,10 +1,22 @@
-/* Rest the original layout */
-Reset * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-/* Root Variables */
+/***************************************************************************************************
+ * FILE: variables.css
+ *
+ * PURPOSE
+ * Defines global CSS custom properties and application-wide default styles.
+ *
+ * RESPONSIBILITIES
+ * • Theme colors
+ * • Background colors
+ * • Typography colors
+ * • Shadows
+ * • Border radius
+ * • Animation timing
+ * • Global HTML and Body styles
+ *
+ * PAGES
+ * • Shared Across All Pages
+ ***************************************************************************************************/
+/* Color Palette */
 :root {
   --primaryColor: #118ab2;
   --primaryDark: #0f6d8d;
@@ -30,16 +42,16 @@ Reset * {
   --radiusLarge: 28px;
   --animationSpeed: 0.24s;
 }
-/* HTML */
+/* HTML Defaults */
 html {
-  overscroll-behavior-y: contain;
   scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
 }
-/* Body */
+/* Body Defaults */
 body {
-  font-family: Arial, sans-serif;
   background: var(--backgroundColor);
   color: var(--textColor);
+  font-family: Arial, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;

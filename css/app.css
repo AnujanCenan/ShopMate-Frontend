@@ -1,15 +1,30 @@
+/***************************************************************************************************
+ * FILE: app.css
+ *
+ * PURPOSE
+ * Master stylesheet for the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Imports all global styles
+ * • Controls stylesheet loading order
+ * • Acts as the single CSS entry point
+ *
+ * PAGES
+ * • Shared Across All Pages
+ ***************************************************************************************************/
+/* Base Styles */
 @import url("./base/reset.css");
 @import url("./base/variables.css");
 @import url("./base/typography.css");
 @import url("./base/animations.css");
 @import url("./base/utilities.css");
-
+/* Layout */
 @import url("./layout/appLayout.css");
 @import url("./layout/header.css");
 @import url("./layout/footer.css");
 @import url("./layout/navigationDrawer.css");
 @import url("./layout/pageLayout.css");
-
+/* Reusable Components */
 @import url("./components/icons.css");
 @import url("./components/buttons.css");
 @import url("./components/cards.css");
@@ -27,7 +42,7 @@
 @import url("./components/badges.css");
 @import url("./components/toast.css");
 @import url("./components/emptyState.css");
-
+/* Page Styles */
 @import url("./pages/dashboard.css");
 @import url("./pages/category.css");
 @import url("./pages/item.css");
@@ -37,7 +52,5 @@
 @import url("./pages/settings.css");
 @import url("./pages/notifications.css");
 @import url("./pages/groupManagement.css");
-
+/* Themes */
 @import url("./themes/darkMode.css");
-
-/* @import url("../css/appStyles.css"); */

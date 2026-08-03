@@ -1,66 +1,93 @@
+/***************************************************************************************************
+ * FILE: dashBoard.css
+ *
+ * PURPOSE
+ * Defines dashboard budget widget components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Budget widget header
+ * • Budget widget summary
+ * • Budget widget details
+ * • Budget allocation
+ * • Budget warning banner
+ *
+ * PAGES
+ * • Dashboard Page
+ ***************************************************************************************************/
+/* Budget Widget Header */
 .budgetWidgetHeader {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   margin-bottom: 14px;
 }
-
+/* Budget Widget Title */
 .budgetWidgetTitle {
   margin: 0;
 }
+/* Budget Widget Subtitle */
 .budgetWidgetSubtitle {
   margin-top: 4px;
   color: #64748b;
   font-size: 13px;
 }
+/* Budget Widget Summary */
 .budgetWidgetSummary {
   display: flex;
   justify-content: space-between;
   margin-top: 18px;
 }
+/* Budget Summary Item */
 .budgetSummaryItem {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+/* Budget Widget Details */
 .budgetWidgetDetails {
   margin-top: 18px;
-  border-top: 1px solid #eef2f7;
   padding-top: 16px;
+  border-top: 1px solid #eef2f7;
 }
+/* Budget Detail Row */
 .budgetDetailRow {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
 }
+/* Budget Widget Amount */
 .budgetWidgetAmount {
+  margin: 12px 0;
   font-size: 24px;
   font-weight: 700;
-  margin: 12px 0;
 }
+/* Budget Widget Text */
 .budgetWidgetText {
   margin-top: 10px;
   font-size: 14px;
 }
+/* Budget Allocation Text */
 .budgetAllocationText {
   margin-top: 10px;
+  color: #64748b;
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
 }
+/* Budget Allocation Status */
 .budgetAllocationStatus {
   margin-top: 6px;
+  color: #2563eb;
   font-size: 14px;
   font-weight: 700;
-  color: #2563eb;
 }
+/* Budget Warning Banner */
 .budgetWarningBanner {
   margin-top: 18px;
   padding: 12px;
-  border-radius: 12px;
   background: #fef2f2;
-  border: 1px solid #fecaca;
   color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
 }

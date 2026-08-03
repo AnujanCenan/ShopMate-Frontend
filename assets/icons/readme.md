@@ -110,14 +110,14 @@ All icons are named based on **their purpose inside ShopMate**, not based on the
 
 Examples:
 
-| Purpose      | File Name        |
-| ------------ | ---------------- |
-| Add Item     | add.svg          |
-| Delete Item  | delete.svg       |
-| Favorite     | favorite.svg     |
-| Notification | notification.svg |
-| Group        | group.svg        |
-| Budget       | budget.svg       |
+| Purpose      | File Name            |
+| ------------ | -------------------- |
+| Add Item     | add.svg              |
+| Delete Item  | delete.svg           |
+| Favorite     | favorite-outline.svg |
+| Notification | notification.svg     |
+| Group        | group.svg            |
+| Budget       | budget.svg           |
 
 This makes the project easier to understand for future developers.
 

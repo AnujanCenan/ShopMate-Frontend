@@ -1,13 +1,39 @@
+/***************************************************************************************************
+ * FILE: appLayout.css
+ *
+ * PURPOSE
+ * Defines the primary application layout structure used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Application container
+ * • Page content layout
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
+/* Application Container */
 .appContainer {
-  min-height: 100vh;
   position: relative;
+  min-height: 100vh;
   padding-top: 0;
   padding-bottom: 100px;
 }
+/* Page Content */
 .pageContent {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px 20px 120px;
   animation: fadePageIn 0.24s ease;
+}
+.inputError {
+  border: 2px solid #dc2626 !important;
+  background: #fff5f5;
+}
+.formError {
+  min-height: 18px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #dc2626;
 }

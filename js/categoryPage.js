@@ -129,8 +129,9 @@ function renderItems(items) {
   }
   itemEmptyState.innerHTML = "";
   items.forEach(function (item) {
-     const isFavorite = state.favoriteItems.some(function (favoriteItem) {
-      return favoriteItem.ItemName === item.ItemName;
+    const normalizedItemName = item.ItemName.trim().toLowerCase();
+    const isFavorite = state.favoriteItems.some(function (favoriteItem) {
+      return favoriteItem.ItemName.trim().toLowerCase() === normalizedItemName;
     });
     itemList.innerHTML += `
             <div class="swipeWrapper">
@@ -159,7 +160,10 @@ function renderItems(items) {
   <img
     src="${
       appState.activeTab === "favorites"
-        ? getIconPath("actions", "favorite")
+        ? getIconPath(
+            "actions",
+            item.isFavorite ? "favorite" : "favorite-outline",
+          )
         : getIconPath("actions", "delete")
     }"
     class="icon actionIcon"
@@ -214,7 +218,10 @@ function renderItems(items) {
   onclick="event.stopPropagation(); toggleFavorite_mysql(${item.ItemMasterId});"
 >
   <img
-    src="${getIconPath("actions", "favorite")}"
+    src="${getIconPath(
+      "actions",
+      isFavorite ? "favorite" : "favorite-outline",
+    )}"
     class="icon actionIcon"
     alt="Favorite"
   >

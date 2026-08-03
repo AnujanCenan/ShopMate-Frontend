@@ -1,3 +1,20 @@
+/***************************************************************************************************
+ * FILE: accordion.css
+ *
+ * PURPOSE
+ * Defines reusable accordion components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Accordion container
+ * • Accordion header
+ * • Accordion body
+ * • Member list rows
+ * • Active group badge
+ *
+ * PAGES
+ * • Group Management
+ ***************************************************************************************************/
+/* Accordion Container */
 .groupAccordionCard {
   margin-bottom: 16px;
   background: white;
@@ -5,18 +22,17 @@
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
-
+/* Accordion Header */
 .groupAccordionHeader {
-  width: 100%;
-  border: none;
-  background: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   padding: 18px 20px;
+  border: none;
+  background: white;
   cursor: pointer;
 }
-
 .groupAccordionTitle {
   margin: 0;
   font-size: 17px;
@@ -27,21 +43,18 @@
   color: #64748b;
   font-size: 13px;
 }
-.groupAccordionBody {
-  padding: 0 20px 20px;
+.accordionIcon {
+  font-size: 18px;
+  transition: 0.25s;
 }
+/* Accordion Body */
 .groupAccordionBody {
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 18px 20px;
 }
-
-.accordionIcon {
-  font-size: 18px;
-  transition: 0.25s;
-}
-
+/* Group Members */
 .groupMemberRow {
   display: flex;
   justify-content: space-between;
@@ -52,14 +65,13 @@
 .groupMemberName {
   font-weight: 600;
 }
-
 .groupMemberRole {
   margin-top: 2px;
-  font-size: 13px;
   color: #64748b;
+  font-size: 13px;
   text-transform: capitalize;
 }
-
+/* Badges */
 .activeGroupBadge {
   margin-left: 8px;
   padding: 3px 8px;

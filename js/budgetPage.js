@@ -1,10 +1,72 @@
-function goBack() {
-  window.location.href = "../pages/dashboardPage.html";
-}
+/***************************************************************************************************
+ * FILE: budgetPage.js
+ *
+ * PURPOSE
+ * Displays and manages group and category budgets, spending analysis,
+ * budget insights, and budget administration.
+ *
+ * RESPONSIBILITIES
+ * • Display budget overview
+ * • Calculate budget summaries
+ * • Calculate budget insights
+ * • Display spending analysis
+ * • Manage category budgets
+ * • Edit budget limits
+ * • Delete budgets
+ * • Manage budget bottom sheets
+ *
+ * FUNCTIONS IN THIS FILE
+ *
+ * budgetPage.js
+ * │
+ * ├── Navigation
+ * │   └── goBack()
+ * │
+ * ├── Business Logic
+ * │   ├── getTopSpendingCategory()
+ * │   ├── getBudgetSummary()
+ * │   └── getBudgetInsights()
+ * │
+ * ├── Render Functions
+ * │   ├── renderBudgetAnalysis()
+ * │   └── renderCategoryBudgetCards()
+ * │
+ * ├── Budget Management
+ * │   ├── openBudgetMenu()
+ * │   ├── editCategoryBudget()
+ * │   ├── saveEditedBudget()
+ * │   └── deleteCategoryBudget()
+ * │
+ * ├── Bottom Sheet
+ * │   ├── openBottomSheet()
+ * │   └── closeBottomSheet()
+ * │
+ * └── Initialization
+ *     └── initializeBudgetPage()
+ *
+ * DEPENDENCIES
+ * • stateManager.js
+ * • helpers.js
+ *
+ * PAGES
+ * • budgetPage.html
+ *
+ * NOTE
+ * Budget calculations and business rules are separated from rendering logic
+ * to improve readability, maintenance, and future backend integration.
+ ***************************************************************************************************/
+/* Variable Declarations */
 const budgetHero = document.getElementById("budgetHero");
 const budgetStats = document.getElementById("budgetStats");
 const budgetCategoryList = document.getElementById("budgetCategoryList");
-/*Get Top Spending Category */
+const bottomSheet = document.getElementById("bottomSheet");
+const bottomSheetContent = document.getElementById("bottomSheetContent");
+const screenOverlay = document.getElementById("screenOverlay");
+/* Navigate Back - Returns the user to the dashboard page. */
+function goBack() {
+  window.location.href = "../pages/dashboardPage.html";
+}
+/* Get Top Spending Category - Returns the category with the highest spending. */
 function getTopSpendingCategory() {
   let topCategory = null;
   let highestSpend = 0;
@@ -68,12 +130,19 @@ function openBottomSheet() {
   bottomSheet.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
+
 /* Close Bottom Sheet */
 function closeBottomSheet() {
   screenOverlay.classList.add("hidden");
   bottomSheet.classList.add("hidden");
   document.body.style.overflow = "";
 }
+
+/* Close Bottom Sheet When Overlay Is Clicked */
+if (screenOverlay) {
+  screenOverlay.addEventListener("click", closeBottomSheet);
+}
+/* Open Budget Menu - Displays the available actions for the selected budget category. */
 function openBudgetMenu(categoryName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
@@ -81,15 +150,15 @@ function openBudgetMenu(categoryName) {
         Budget Options
       </h2>
       <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
+      </button>
     </div>
     <div class="bottomSheetBody">
       <button
@@ -101,11 +170,11 @@ function openBudgetMenu(categoryName) {
         "
       >
         <img
-  src="${getIconPath("actions", "edit")}"
-  class="icon actionIcon"
-  alt=""
->
-<span>Edit Budget</span>
+          src="${getIconPath("actions", "edit")}"
+          class="icon actionIcon"
+          alt=""
+        >
+        <span>Edit Budget</span>
       </button>
       <button
         class="bottomSheetActionButton destructiveAction"
@@ -116,16 +185,17 @@ function openBudgetMenu(categoryName) {
         "
       >
         <img
-  src="${getIconPath("actions", "delete")}"
-  class="icon actionIcon"
-  alt=""
->
-<span>Delete Budget</span>
+          src="${getIconPath("actions", "delete")}"
+          class="icon actionIcon"
+          alt=""
+        >
+        <span>Delete Budget</span>
       </button>
     </div>
   `;
   openBottomSheet();
 }
+/* Edit Category Budget - Opens the form to update the monthly budget limit. */
 function editCategoryBudget(categoryName) {
   if (!canManageBudget()) {
     showDialog("Only Admin can edit budgets.");
@@ -138,15 +208,15 @@ function editCategoryBudget(categoryName) {
         Edit Budget
       </h2>
       <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
+      </button>
     </div>
     <div class="bottomSheetBody">
       <input
@@ -169,9 +239,7 @@ function editCategoryBudget(categoryName) {
   `;
   openBottomSheet();
 }
-if (screenOverlay) {
-  screenOverlay.addEventListener("click", closeBottomSheet);
-}
+/* Save Edited Budget - Updates the monthly budget limit for the selected category. */
 function saveEditedBudget(categoryName) {
   const newLimit = Number(document.getElementById("editBudgetLimit").value);
   appState.budgets.categoryBudgets[categoryName].monthlyLimit = newLimit;
@@ -179,24 +247,86 @@ function saveEditedBudget(categoryName) {
   showToast("Budget Updated");
   closeBottomSheet();
 }
-/*
-Backend
-GET
-/group/budget-analysis
-Returns
-{
-    monthlyLimit,
+
+/* Open Bottom Sheet - Displays the bottom sheet and locks page scrolling. */
+function openBottomSheet() {
+  screenOverlay.classList.remove("hidden");
+  bottomSheet.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+/* Close Bottom Sheet - Hides the bottom sheet and restores page scrolling. */
+function closeBottomSheet() {
+  screenOverlay.classList.add("hidden");
+  bottomSheet.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+/* Get Budget Summary - Calculates the budget summary for the selected group. */
+function getBudgetSummary(groupName) {
+  const budget = appState.budgets.groupBudgets?.[groupName] || {};
+  const limit = budget.monthlyLimit ?? 0;
+  const spent = calculateGroupBudget(groupName);
+  const remaining = Math.max(limit - spent, 0);
+  const progressWidth =
+    limit === 0 ? 0 : Math.min(Math.round((spent / limit) * 100), 100);
+  const percent = limit === 0 ? 0 : Math.round((spent / limit) * 100);
+  const categories = appState.groups?.[groupName] || [];
+  let highestCategory = "No Spending Yet";
+  let highestSpent = 0;
+  categories.forEach(function (category) {
+    let total = 0;
+    category.items.forEach(function (item) {
+      if (item.purchased && item.estimatedPrice) {
+        total += Number(item.estimatedPrice);
+      }
+    });
+    if (total > highestSpent) {
+      highestSpent = total;
+      highestCategory = category.name;
+    }
+  });
+  const purchasedItems = categories.reduce(function (total, category) {
+    return (
+      total +
+      category.items.filter(function (item) {
+        return item.purchased;
+      }).length
+    );
+  }, 0);
+  return {
+    limit,
     spent,
     remaining,
+    percent,
+    progressWidth,
     highestCategory,
-    highestItem,
-    savings,
-    recommendation,
-    categoryBreakdown
+    purchasedItems,
+    savings: remaining,
+  };
 }
-*/
-/* Render Budget Analysis */
-async function renderBudgetAnalysis() {
+/* Get Budget Insights - Returns the budget health and recommendation based on spending. */
+function getBudgetInsights(percent) {
+  let health = "Healthy";
+  let recommendation = "Great job! Your spending is under control.";
+  if (percent >= 50) {
+    health = "Moderate";
+    recommendation = "Keep monitoring your spending.";
+  }
+  if (percent >= 80) {
+    health = "Warning";
+    recommendation = "You are approaching your monthly budget.";
+  }
+  if (percent >= 100) {
+    health = "Over Budget";
+    recommendation =
+      "Budget exceeded. Consider reducing non-essential purchases.";
+  }
+  return {
+    health,
+    recommendation,
+  };
+}
+/* Render Budget Analysis - Displays the budget summary and insights for the active group. */
+function renderBudgetAnalysis() {
   const container = document.getElementById("budgetAnalysisContainer");
   const activeGroup =
     localStorage.getItem("activeGroup") || appState.activeGroup;
@@ -209,120 +339,87 @@ async function renderBudgetAnalysis() {
     `;
     return;
   }
-
-  const groupBudgetingInfo = await getFamilyBudgetMySql();
-  const limit = groupBudgetingInfo.budgetValue ? groupBudgetingInfo.budgetValue : 0;
-  const shoppingListBudgets = groupBudgetingInfo.shoppingListBudgets;
-
-  const spent = shoppingListBudgets.reduce((accumulator, currList) => accumulator + currList.budgetSpent, 0);
-
-  // const spent = calculateGroupBudget(activeGroup);
-  const remaining = Math.max(limit - spent, 0);
-  const progressWidth =
-    limit === 0 ? 0 : Math.min(Math.round((spent / limit) * 100), 100);
-  const percent = limit === 0 ? 0 : Math.round((spent / limit) * 100);
-  let highestCategory = "No Spending Yet";
-  let highestSpent = 0;
-  let purchasedItems = 0;
-  const categories = appState.groups?.[activeGroup] || [];
-  shoppingListBudgets.forEach(function (budget) {
-    if (budget.budgetSpent > highestSpent) {
-      highestSpent = budget.budgetSpent;
-      highestCategory = budget.shoppingListName;
-      purchasedItems = budget.numPurchased;
-    }
-  });
-  let health = "Healthy";
-  if (percent >= 50) {
-    health = "Moderate";
-  }
-  if (percent >= 80) {
-    health = "Warning";
-  }
-  if (percent >= 100) {
-    health = "Over Budget";
-  }
-  let recommendation = "Great job! Your spending is under control.";
-  if (percent >= 50) {
-    recommendation = "Keep monitoring your spending.";
-  }
-  if (percent >= 80) {
-    recommendation = "You are approaching your monthly budget.";
-  }
-  if (percent >= 100) {
-    recommendation =
-      "Budget exceeded. Consider reducing non-essential purchases.";
-  }
-  // const purchasedItems = categories.reduce(function (total, category) {
-  //   return (
-  //     total +
-  //     category.items.filter(function (item) {
-  //       return item.purchased;
-  //     }).length
-  //   );
-  // }, 0);
-  const savings = remaining;
+  const budgetSummary = getBudgetSummary(activeGroup);
+  const budgetInsights = getBudgetInsights(budgetSummary.percent);
   container.innerHTML = `
     <div class="budgetAnalysisCard">
       <h2>
-  ${activeGroup}
-</h2>
-<p class="budgetSubtitle">
-  Monthly Budget Analysis
-</p>
+        ${activeGroup}
+      </h2>
+      <p class="budgetSubtitle">
+        Monthly Budget Analysis
+      </p>
       <div class="analysisValue">
         <span>Budget</span>
-        <span>${limit > 0 ? "$" + limit : "Not Set"}</span>
+        <span>
+          ${budgetSummary.limit > 0 ? "$" + budgetSummary.limit : "Not Set"}
+        </span>
       </div>
       <div class="analysisValue">
         <span>Spent</span>
-        <span>$${spent}</span>
+        <span>
+          $${budgetSummary.spent}
+        </span>
       </div>
       <div class="analysisValue">
         <span>Remaining</span>
-        <span>${limit > 0 ? "$" + remaining : "-"}</span>
+        <span>
+          ${budgetSummary.limit > 0 ? "$" + budgetSummary.remaining : "-"}
+        </span>
       </div>
       <div class="analysisValue">
         <span>Health</span>
-        <span>${health}</span>
+        <span>
+          ${budgetInsights.health}
+        </span>
       </div>
       <div class="analysisProgressBar">
         <div
           class="analysisProgressFill"
-          style="width:${progressWidth}%"
+          style="width:${budgetSummary.progressWidth}%"
         ></div>
       </div>
       <div class="analysisValue">
         <span>Highest Spending</span>
-        <span>${highestCategory}</span>
+        <span>
+          ${budgetSummary.highestCategory}
+        </span>
       </div>
     </div>
     <div class="budgetInsightCard">
-      <h3>Budget Insights</h3>
+      <h3>
+        Budget Insights
+      </h3>
       <div class="analysisValue">
         <span>Savings</span>
-        <span>$${savings}</span>
+        <span>
+          $${budgetSummary.savings}
+        </span>
       </div>
       <div class="analysisValue">
         <span>Highest Spending</span>
-        <span>${highestCategory}</span>
+        <span>
+          ${budgetSummary.highestCategory}
+        </span>
       </div>
       <div class="analysisValue">
         <span>Purchased Items</span>
-        <span>${purchasedItems}</span>
+        <span>
+          ${budgetSummary.purchasedItems}
+        </span>
       </div>
       <div class="analysisValue">
         <span>Recommendation</span>
       </div>
       <p class="budgetRecommendation">
-        ${recommendation}
+        ${budgetInsights.recommendation}
       </p>
     </div>
     <div id="categoryBudgetContainer"></div>
   `;
   renderCategoryBudgetCards();
 }
-/* Render Category Budget Cards */
+/* Render Category Budget Cards - Displays budget details for every category in the active group. */
 function renderCategoryBudgetCards() {
   const container = document.getElementById("categoryBudgetContainer");
   container.innerHTML = "";
@@ -424,8 +521,10 @@ function renderCategoryBudgetCards() {
     `;
   });
 }
+/* Initialize Budget Page - Loads the budget analysis when the page opens. */
 function initializeBudgetPage() {
   renderBudgetAnalysis();
 }
-initializeBudgetPage();
+
+initializeBudgetPage();     //this was not in the new merge?
 

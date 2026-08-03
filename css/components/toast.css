@@ -1,34 +1,50 @@
+/***************************************************************************************************
+ * FILE: toast.css
+ *
+ * PURPOSE
+ * Defines reusable toast notification components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Toast notification
+ * • Success toast
+ * • Information toast
+ * • Toast icon
+ * • Toast text
+ *
+ * PAGES
+ * • Shared Across Multiple Pages
+ ***************************************************************************************************/
 /* Toast */
 .toast {
   position: fixed;
-  bottom: 24px;
   left: 50%;
-  transform: translateX(-50%);
-  min-width: 260px;
-  max-width: 90%;
-  background: white;
-  border-radius: 16px;
-  padding: 14px 18px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-  z-index: 10000;
+  bottom: 24px;
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 260px;
+  max-width: 90%;
+  padding: 14px 18px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  transform: translateX(-50%);
   animation: toastSlideUp 0.25s ease;
+  z-index: 10000;
 }
-
+/* Success Toast */
 .toastSuccess {
   border-left: 5px solid #16a34a;
 }
-
+/* Information Toast */
 .toastInfo {
   border-left: 5px solid var(--primaryColor);
 }
-/*Toast Icon */
+/* Toast Icon */
 .toastIcon {
   font-size: 20px;
 }
-
+/* Toast Text */
 .toastText {
   font-size: 14px;
   font-weight: 600;

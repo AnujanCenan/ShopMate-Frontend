@@ -1,69 +1,58 @@
-/* Hidden Overlay */
+/***************************************************************************************************
+ * FILE: utilities.css
+ *
+ * PURPOSE
+ * Provides reusable utility classes shared across the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Visibility utilities
+ * • Cursor utilities
+ * • Width utilities
+ * • Shared helper classes
+ *
+ * PAGES
+ * • Shared Across All Pages
+ ***************************************************************************************************/
+/* Hidden Elements */
+.hidden {
+  display: none !important;
+}
+/* Hidden Screen Overlay */
 .screenOverlay.hidden {
   opacity: 0;
   pointer-events: none;
 }
-/* BottomSheet Hidden */
+/* Hidden Bottom Sheet */
 .bottomSheet.hidden {
   transform: translateY(100%);
 }
-
-/* Hidden Overlay */
-.screenOverlay.hidden {
-  opacity: 0;
-  pointer-events: none;
+/* Visible Bottom Sheet */
+.bottomSheet:not(.hidden) {
+  transform: translateY(0);
 }
 /* Hidden Snackbar */
 .snackbar.hidden {
   display: none !important;
 }
-/*Bulk Action Bar Hidden */
+/* Hidden Bulk Action Bar */
 .bulkActionBar.hidden {
   display: none !important;
 }
-
-/* Hidden */
-.hidden {
-  display: none !important;
-}
-/* UTILITIES */
-.hidden {
-  display: none !important;
-}
-.hidden {
-  display: none;
-}
-/* Group Accordion Body Hidden */
+/* Hidden Group Accordion Body */
 .groupAccordionBody.hidden {
   display: none;
 }
-
 /* Hidden Footer */
 .appFooter.hiddenFooter {
   opacity: 0;
   pointer-events: none;
 }
-/* Visible */
-.bottomSheet:not(.hidden) {
-  transform: translateY(0);
-}
-/* Hidden Footer */
-.appFooter.hiddenFooter {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/*CLICKABLE - COLLECTION*/
-
+/* Clickable Elements */
+.clickable,
 .clickableMember {
   cursor: pointer;
 }
-
-.clickable {
-  cursor: pointer;
-}
-
-/*Full Width */
+/* Full Width */
 .fullWidth {
   width: 100%;
 }

@@ -1,81 +1,172 @@
+/***************************************************************************************************
+ * FILE: groupManagement.css
+ *
+ * PURPOSE
+ * Defines group management components used throughout the ShopMate application.
+ *
+ * RESPONSIBILITIES
+ * • Group management header
+ * • Group management hero
+ * • Member list
+ * • Member information
+ * • Member actions
+ * • Invite code
+ * • Invite button
+ * • Destructive actions
+ *
+ * PAGES
+ * • Group Management Page
+ ***************************************************************************************************/
+/* Group Management Header */
 .groupManagementHeader {
   margin-bottom: 20px;
 }
-
+/* Group Management Title */
 .groupManagementTitle {
+  margin-bottom: 8px;
   font-size: 28px;
   font-weight: 700;
-  margin-bottom: 8px;
 }
+/* Group Management Subtitle */
 .groupManagementSubtitle {
   color: #6b7280;
   font-size: 15px;
 }
+/* Group Management Hero */
 .groupManagementHero {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
+/* Member List */
 .memberList {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 28px;
 }
+/* Member Information */
 .memberInfo {
   display: flex;
   align-items: center;
   gap: 14px;
 }
+/* Member Avatar */
 .memberAvatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
-  background: #dbeafe;
-  color: #2563eb;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: #dbeafe;
+  color: #2563eb;
+  border-radius: 18px;
   font-size: 20px;
   font-weight: 700;
 }
+/* Member Name */
 .memberName {
-  font-size: 17px;
   margin-bottom: 4px;
+  font-size: 17px;
 }
+/* Member Role */
 .memberRole {
-  font-size: 14px;
   color: #6b7280;
   text-transform: capitalize;
+  font-size: 14px;
 }
+/* Member Actions */
 .memberActions {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+/* Invite Floating Button */
 .inviteFloatingButton {
   width: 52px;
   height: 52px;
-  border: none;
-  border-radius: 18px;
   background: #118ab2;
   color: white;
-  font-size: 28px;
-  cursor: pointer;
+  border: none;
+  border-radius: 18px;
   box-shadow: 0 8px 24px rgba(17, 138, 178, 0.25);
-}
-
-.inviteCodeLabel {
-  color: #6b7280;
-  margin-bottom: 10px;
-}
-
-.inviteCodeValue {
+  cursor: pointer;
   font-size: 28px;
+}
+/* Invite Code Label */
+.inviteCodeLabel {
+  margin-bottom: 10px;
+  color: #6b7280;
+}
+/* Invite Code Value */
+.inviteCodeValue {
   letter-spacing: 2px;
+  font-size: 28px;
   font-weight: 700;
 }
+/* Destructive Action */
 .destructiveAction {
   color: #ef4444;
+}
+.inviteGroupInformation {
+  margin-bottom: 24px;
+}
+.inviteGroupName {
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surfaceSecondary);
+  border: 0px solid var(--borderColor);
+  font-weight: 600;
+  color: var(--primaryText);
+}
+.groupMemberRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.groupMemberInformation {
+  flex: 1;
+  min-width: 0;
+}
+.groupMemberRow .groupMoreButton {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.memberRoleAdmin {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+}
+.memberRoleMember {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: rgba(107, 114, 128, 0.12);
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+.emptyPendingInvitationState {
+  padding: 18px 0;
+  text-align: center;
+}
+.emptyStateTitle {
+  font-weight: 600;
+}
+.emptyStateSubtitle {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #777;
 }
