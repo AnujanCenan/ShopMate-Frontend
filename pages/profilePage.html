@@ -3,11 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Member Profile</title>
+    <title>My Profile</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <div
+      id="screenOverlay"
+      class="screenOverlay hidden"
+      onclick="closeBottomSheet()"
+    ></div>
     <div class="appContainer">
+      <!-- Header -->
       <header class="modernHeader">
         <button class="modernBackButton" onclick="goBack()">
           <img
@@ -16,27 +22,89 @@
             alt="Back"
           />
         </button>
-        <h1 class="modernPageTitle">Member Profile</h1>
+        <h1 class="modernPageTitle">My Profile</h1>
       </header>
+      <!-- Main Content -->
       <main class="pageContent">
-        <section class="profileHero">
-          <div class="profileAvatar" id="profileAvatar">H</div>
-          <h2 class="profileName" id="profileName">Hari</h2>
-          <p class="profileRole" id="profileRole">Admin</p>
+        <!-- Hero Card -->
+        <section class="profileHeroCard">
+          <div
+            id="profileAvatar"
+            class="profileAvatar clickableAvatar"
+            onclick="renderChangeProfilePhotoForm()"
+          >
+            H
+          </div>
+          <h2 id="profileName" class="profileName">Hari</h2>
+          <p id="profileEmail" class="profileEmail">hari@email.com</p>
+          <button class="primaryButton" onclick="renderEditProfileForm()">
+            Edit Profile
+          </button>
         </section>
-        <section class="profileInfoCard">
+        <!-- Group Summary -->
+        <section class="profileSummaryCard">
+          <p class="profileSummaryDescription">You're currently a member of</p>
+          <div id="profileGroups" class="profileSummaryValue">0</div>
+          <div class="profileSummaryLabel">Groups</div>
+        </section>
+        <!-- Account Information -->
+        <section class="modernCard profileSecurityCard">
+          <h3 class="sectionTitle">Account Information</h3>
           <div class="profileInfoRow">
-            <span>Email</span>
-            <span id="profileEmail"> hari@shopmate.app </span>
+            <span> Email </span>
+            <span id="profileEmailDisplay"> - </span>
           </div>
           <div class="profileInfoRow">
-            <span>Status</span>
-            <span id="profileStatus"> Active </span>
+            <span> Mobile </span>
+            <span id="profilePhone"> - </span>
           </div>
+          <div class="profileInfoRow">
+            <span> Gender </span>
+            <span id="profileGender"> - </span>
+          </div>
+          <div class="profileInfoRow">
+            <span> Date of Birth </span>
+            <span id="profileDob"> - </span>
+          </div>
+          <div class="profileInfoRow">
+            <span> Member Since </span>
+            <span id="profileMemberSince"> - </span>
+          </div>
+        </section>
+        <!-- Security -->
+        <section class="modernCard profileSecurityCard">
+          <h3 class="sectionTitle">Security</h3>
+          <button class="secondaryButton" onclick="changePassword()">
+            Change Password
+          </button>
+          <button
+            class="secondaryButton"
+            onclick="toggleBiometricAuthentication()"
+          >
+            <span id="biometricButtonText"> Biometric Login </span>
+          </button>
         </section>
       </main>
+      <!-- Bottom Sheet -->
+      <div id="bottomSheet" class="bottomSheet hidden">
+        <div id="bottomSheetContent" class="bottomSheetContent"></div>
+      </div>
+      <div class="snackbar hidden" id="snackbar">
+        <span class="snackbarText" id="snackbarText"></span>
+        <button class="snackbarButton" id="snackbarUndoButton">Undo</button>
+      </div>
+      <input
+        type="file"
+        id="profilePhotoInput"
+        accept="image/*"
+        hidden
+        onchange="previewProfilePhoto(event)"
+      />
+      <script src="../js/stateManager.js"></script>
+      <script src="../js/helpers.js"></script>
+      <script src="../js/authManager.js"></script>
+      <script src="../js/profilePage.js"></script>
+      <script src="../js/snackbarManager.js"></script>
     </div>
-    <script src="../js/stateManager.js"></script>
-    <script src="../js/profilePage.js"></script>
   </body>
 </html>

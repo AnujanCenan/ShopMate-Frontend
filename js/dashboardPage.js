@@ -1032,57 +1032,50 @@ function closeSideDrawer() {
   sideDrawerOverlay.classList.remove("active");
 }
 /* Render Side Drawer */
-/* Render Side Drawer */
 function renderSideDrawer() {
   sideDrawer.innerHTML = `
     <div class="drawerHeader">
-      <div class="drawerTitle">
-        ShopMate
-      </div>
+  <div
+    class="drawerProfile"
+    onclick="window.location.href='../pages/profilePage.html'"
+  >
+    <div class="drawerAvatar">
+      ${
+        getCurrentUser().profilePhoto
+          ? `
+            <img
+              src="${getCurrentUser().profilePhoto}"
+              class="drawerAvatarImage"
+              alt="Profile"
+            >
+          `
+          : getCurrentUser().name.charAt(0).toUpperCase()
+      }
     </div>
+    <div class="drawerProfileDetails">
+      <div class="drawerProfileName">
+        ${getCurrentUser().name}
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
     <div class="drawerMenu">
-      <button
-        class="drawerItem"
-        onclick="window.location.href='../pages/familyManagementPage.html'"
-      >
-        <img
-          src="${getIconPath("features", "group")}"
-          class="icon featureIcon"
-          alt=""
-        >
+      <button class="drawerItem" onclick="window.location.href='../pages/familyManagementPage.html'">
+        <img src="${getIconPath("features", "group")}" class="icon featureIcon"alt="">
         <span>Group Management</span>
       </button>
-      <button
-        class="drawerItem"
-        onclick="window.location.href='../pages/notificationsPage.html'"
-      >
-        <img
-          src="${getIconPath("features", "notification")}"
-          class="icon featureIcon"
-          alt=""
-        >
+      <button class="drawerItem" onclick="window.location.href='../pages/notificationsPage.html'">
+        <img src="${getIconPath("features", "notification")}" class="icon featureIcon" alt="">
         <span>Notifications</span>
       </button>
-      <button
-        class="drawerItem"
-        onclick="window.location.href='../pages/budgetPage.html'"
-      >
-        <img
-          src="${getIconPath("features", "budget")}"
-          class="icon featureIcon"
-          alt=""
-        >
+      <button class="drawerItem" onclick="window.location.href='../pages/budgetPage.html'">
+        <img src="${getIconPath("features", "budget")}" class="icon featureIcon" alt="">
         <span>Budget</span>
       </button>
-      <button
-        class="drawerItem"
-        onclick="window.location.href='../pages/settingsPage.html'"
-      >
-        <img
-          src="${getIconPath("features", "settings")}"
-          class="icon featureIcon"
-          alt=""
-        >
+      <button class="drawerItem" onclick="window.location.href='../pages/settingsPage.html'">
+        <img src="${getIconPath("features", "settings")}" class="icon featureIcon"alt="">
         <span>Settings</span>
       </button>
       <button
@@ -1117,6 +1110,12 @@ function renderSideDrawer() {
     </div>
   `;
 }
+/* Open Profile Page - Opens the logged-in user's profile page. */
+function openProfilePage() {
+  closeSideDrawer();
+  window.location.href = "../pages/profilePage.html";
+}
+
 /* Render Budget Dashboard Widget */
 function renderBudgetDashboardWidget() {
   const budgetWidget = document.getElementById("budgetDashboardWidget");
@@ -1292,6 +1291,7 @@ function renderBudgetDashboardWidget() {
   }
   ****************************************/
 }
+
 /* Toggle Budget Card */
 function toggleBudgetCard() {
   const body = document.getElementById("budgetSummaryBody");

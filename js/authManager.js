@@ -158,8 +158,20 @@ function findUserByCredentials(email, password) {
   });
 }
 /* Register User - Creates a new ShopMate account and signs the user into the application. */
-function registerUser() {
-  const name = document.getElementById("registerNameInput").value.trim();
+async function registerUser() {
+  const firstName = document
+    .getElementById("registerFirstNameInput")
+    .value.trim();
+  const lastName = document
+    .getElementById("registerLastNameInput")
+    .value.trim();
+  const name = `${firstName} ${lastName}`.trim();
+  const phone = document.getElementById("registerPhoneInput").value.trim();
+  const gender = document.getElementById("registerGenderInput").value;
+  const dateOfBirth = document.getElementById("registerDobInput").value;
+  const profilePhotoInput = document.getElementById(
+    "registerProfilePhotoInput",
+  );
   const email = document.getElementById("registerEmailInput").value.trim();
   const password = document
     .getElementById("registerPasswordInput")
@@ -171,7 +183,8 @@ function registerUser() {
   const biometricEnabled = document.getElementById("biometricCheckbox").checked;
   if (
     !validateRegistrationDetails(
-      name,
+      firstName,
+      lastName,
       email,
       password,
       confirmPassword,
@@ -187,7 +200,27 @@ function registerUser() {
     );
     return;
   }
-  const user = createUserAccount(name, email, password, biometricEnabled);
+  let profilePhoto = "";
+  if (profilePhotoInput.files && profilePhotoInput.files.length > 0) {
+    profilePhoto = await new Promise(function (resolve) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(profilePhotoInput.files[0]);
+    });
+  }
+  const user = createUserAccount(
+    firstName,
+    lastName,
+    email,
+    phone,
+    password,
+    biometricEnabled,
+    gender,
+    dateOfBirth,
+    profilePhoto,
+  );
   createGroup(groupName, user);
   createUserSession(user);
   window.location.href = "./dashboardPage.html";
@@ -196,8 +229,13 @@ function registerUser() {
     POST /auth/register
     Request
     {
-      name,
+      firstName,
+      lastName,
       email,
+      phone,
+      gender,
+      dateOfBirth,
+      profilePhoto,
       password,
       groupName,
       biometricEnabled
@@ -213,13 +251,21 @@ function registerUser() {
 }
 /* Validate Registration Details - Validates all information required to register a new account. */
 function validateRegistrationDetails(
-  name,
+  firstName,
+  lastName,
   email,
   password,
   confirmPassword,
   groupName,
 ) {
-  if (!name || !email || !password || !confirmPassword || !groupName) {
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !password ||
+    !confirmPassword ||
+    !groupName
+  ) {
     showDialog(
       "Missing Information",
       "Please complete all registration fields.",
@@ -239,11 +285,25 @@ function isEmailRegistered(email) {
   });
 }
 /* Create User Account - Creates and stores a new user account. */
-function createUserAccount(name, email, password, biometricEnabled) {
+function createUserAccount(
+  firstName,
+  lastName,
+  email,
+  password,
+  biometricEnabled,
+) {
   const user = {
     id: "user_" + Date.now(),
-    name,
+    firstName,
+    lastName,
+    name: `${firstName} ${lastName}`.trim(),
     email,
+    phone: "",
+    gender: "",
+    dateOfBirth: "",
+    profilePhoto: "",
+    profileCompleted: false,
+    memberSince: new Date().toISOString().split("T")[0],
     password,
     biometricEnabled,
   };
@@ -252,7 +312,6 @@ function createUserAccount(name, email, password, biometricEnabled) {
   return user;
 }
 /* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
-
 function createGroup(groupName, user) {
   appState.groups[groupName] = [];
   if (!appState.groupMembers) {
@@ -274,8 +333,11 @@ function createUserSession(user) {
   appState.loggedIn = true;
   appState.currentUser = {
     id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     name: user.name,
     email: user.email,
+    memberSince: user.memberSince,
     biometricEnabled: user.biometricEnabled,
   };
   appState.activeGroup = getUserPrimaryGroup(user.id);
@@ -304,8 +366,11 @@ function refreshUserSession() {
   }
   appState.currentUser = {
     id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     name: user.name,
     email: user.email,
+    memberSince: user.memberSince,
     biometricEnabled: user.biometricEnabled,
   };
   appState.activeGroup = getUserPrimaryGroup(user.id);

@@ -12,9 +12,15 @@
         <h1 class="authTitle">Register</h1>
         <input
           type="text"
-          placeholder="Full Name"
+          placeholder="First Name"
           class="authInput"
-          id="registerNameInput"
+          id="registerFirstNameInput"
+        />
+        <input
+          type="text"
+          placeholder="Last Name"
+          class="authInput"
+          id="registerLastNameInput"
         />
         <input
           type="email"
@@ -47,6 +53,7 @@
         <button class="authButton" onclick="registerUser()">
           Create Group
         </button>
+
         <button
           class="authTextButton"
           onclick="window.location.href = './loginPage.html'"

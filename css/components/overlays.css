@@ -18,7 +18,12 @@
   height: 100%;
   background: var(--overlayColor);
   opacity: 1;
-  pointer-events: none;
+  pointer-events: auto;
   transition: opacity 0.2s ease;
-  z-index: 40;
+  z-index: 998;
+}
+/* Hidden Screen Overlay */
+.screenOverlay.hidden {
+  opacity: 0;
+  pointer-events: none;
 }

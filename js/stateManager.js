@@ -44,8 +44,15 @@ const defaultAppState = {
   users: [
     {
       id: "user_1",
+      firstName: "ShopMate",
+      lastName: "Admin",
       name: "ShopMate Admin",
       email: "admin@shopmate.app",
+      phone: "",
+      gender: "",
+      dateOfBirth: "",
+      profilePhoto: "",
+      memberSince: new Date().toISOString().split("T")[0],
       password: "123456",
       biometricEnabled: true,
     },

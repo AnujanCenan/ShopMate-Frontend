@@ -94,7 +94,11 @@
         <button class="snackbarButton" id="snackbarUndoButton">Undo</button>
       </div>
       <!-- OVERLAY -->
-      <div class="screenOverlay hidden" id="screenOverlay"></div>
+      <div
+        id="screenOverlay"
+        class="screenOverlay hidden"
+        onclick="closeBottomSheet()"
+      ></div>
       <!-- BOTTOM SHEET -->
       <div class="bottomSheet hidden" id="bottomSheet">
         <div class="bottomSheetHandle"></div>

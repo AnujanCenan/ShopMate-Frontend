@@ -17,6 +17,7 @@
           />
           <h1 class="appName">ShopMate</h1>
         </div>
+
         <button class="menuButton">
           <img
             src="../assets/icons/navigation/menu.svg"
@@ -58,7 +59,11 @@
         onclick="closeSideDrawer()"
       ></div>
       <div class="sideDrawer right" id="sideDrawer"></div>
-      <div class="screenOverlay hidden" id="screenOverlay"></div>
+      <div
+        id="screenOverlay"
+        class="screenOverlay hidden"
+        onclick="closeBottomSheet()"
+      ></div>
       <div class="bottomSheet hidden" id="bottomSheet">
         <div class="bottomSheetHandle"></div>
         <div class="bottomSheetContent" id="bottomSheetContent"></div>

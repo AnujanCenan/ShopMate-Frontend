@@ -5,8 +5,13 @@ let undoItem = null;
 let undoIndex = null;
 let timeout = null;
 function showSnackbar(message) {
+  if (!snackbar || !snackbarText) {
+    return;
+  }
   snackbarText.textContent = message;
-  snackbarUndoButton.style.display = "none";
+  if (snackbarUndoButton) {
+    snackbarUndoButton.style.display = "none";
+  }
   snackbar.classList.remove("hidden");
   clearTimeout(timeout);
   timeout = setTimeout(function () {
@@ -14,6 +19,9 @@ function showSnackbar(message) {
   }, 3000);
 }
 function showUndoSnackbar(item, index) {
+  if (!snackbar || !snackbarText || !snackbarUndoButton) {
+    return;
+  }
   undoItem = item;
   undoIndex = index;
   snackbarText.textContent = `${item.name} deleted`;
@@ -31,9 +39,16 @@ function undoDelete() {
     return;
   }
   const category = getActiveCategory();
+  if (!category) {
+    return;
+  }
   category.items.splice(undoIndex, 0, undoItem);
   saveAppState();
   renderFilteredItems();
-  snackbar.classList.add("hidden");
+  if (snackbar) {
+    snackbar.classList.add("hidden");
+  }
 }
-snackbarUndoButton.addEventListener("click", undoDelete);
+if (snackbarUndoButton) {
+  snackbarUndoButton.addEventListener("click", undoDelete);
+}
