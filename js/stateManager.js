@@ -105,6 +105,18 @@ const defaultAppState = {
   },
   dashboardBudgetExpanded: false,
   drawerPosition: "right",
+  settings: {
+    theme: "system",
+    language: "english",
+    currency: "AUD",
+    measurementUnit: "metric",
+    notifications: {
+      group: true,
+      shopping: true,
+      budget: true,
+      general: true,
+    },
+  },
 };
 /* Load Application State - Loads the saved application state from Local Storage and upgrades older data structures if required. */
 function loadAppState() {
@@ -149,6 +161,35 @@ function loadAppState() {
   /* Upgrade Group Members */
   if (!parsedState.groupMembers) {
     parsedState.groupMembers = {};
+    stateUpdated = true;
+  }
+  /* Upgrade Application Settings */
+  if (!parsedState.settings) {
+    parsedState.settings = {
+      theme: "system",
+      language: "english",
+      currency: "AUD",
+      measurementUnit: "metric",
+      notifications: {
+        group: true,
+        shopping: true,
+        budget: true,
+        general: true,
+      },
+    };
+    stateUpdated = true;
+  }
+  /* Upgrade Notification Settings Structure */
+  if (
+    parsedState.settings &&
+    typeof parsedState.settings.notifications === "boolean"
+  ) {
+    parsedState.settings.notifications = {
+      group: true,
+      shopping: true,
+      budget: true,
+      general: true,
+    };
     stateUpdated = true;
   }
   if (stateUpdated) {

@@ -5,7 +5,62 @@ function initializeNotifications() {
     appState.notifications = [];
     saveAppState();
   }
+  applyNotificationPreferences();
   renderNotifications();
+}
+/* Apply Notification Preferences - Shows only enabled notification filter tabs. */
+function applyNotificationPreferences() {
+  const notificationButtons = document.querySelectorAll(
+    ".notificationFilterButton",
+  );
+  const notificationSettings = appState.settings.notifications;
+  let activeFilterAvailable = true;
+  notificationButtons.forEach(function (button) {
+    const filterType = button.textContent.trim().toLowerCase();
+    let visible = true;
+    switch (filterType) {
+      case "all":
+      case "unread":
+        visible = true;
+        break;
+      case "items":
+        visible = notificationSettings.shopping;
+        if (activeNotificationFilter === "item" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+      case "budget":
+        visible = notificationSettings.budget;
+        if (activeNotificationFilter === "budget" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+      case "groups":
+        visible = notificationSettings.group;
+        if (activeNotificationFilter === "group" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+      case "system":
+        visible = notificationSettings.general;
+        if (activeNotificationFilter === "system" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+    }
+    button.style.display = visible ? "" : "none";
+  });
+  if (!activeFilterAvailable) {
+    activeNotificationFilter = "all";
+    document
+      .querySelectorAll(".notificationFilterButton")
+      .forEach(function (button) {
+        button.classList.remove("activeNotificationFilter");
+        if (button.textContent.trim() === "All") {
+          button.classList.add("activeNotificationFilter");
+        }
+      });
+  }
 }
 /* Format Time */
 function formatNotificationTime(timestamp) {
@@ -43,10 +98,25 @@ function getNotificationIcon(notificationType) {
       return "🔔";
   }
 }
-/* Render */
+/* Render Notifications - Displays notifications based on the selected filter and user preferences. */
 function renderNotifications() {
   notificationList.innerHTML = "";
-  let notifications = appState.notifications;
+  const notificationSettings = appState.settings.notifications;
+  let notifications = appState.notifications.filter(function (notification) {
+    if (notification.type === "group" && !notificationSettings.group) {
+      return false;
+    }
+    if (notification.type === "item" && !notificationSettings.shopping) {
+      return false;
+    }
+    if (notification.type === "budget" && !notificationSettings.budget) {
+      return false;
+    }
+    if (notification.type === "system" && !notificationSettings.general) {
+      return false;
+    }
+    return true;
+  });
   switch (activeNotificationFilter) {
     case "unread":
       notifications = notifications.filter(function (notification) {
@@ -73,50 +143,50 @@ function renderNotifications() {
   }
   notifications.forEach(function (notification) {
     notificationList.innerHTML += `
-  <div
-    class="
-      notificationCard
-      ${notification.read ? "" : "unreadNotification"}
-    "
-    onclick="
-      openNotification(
-        '${notification.id}'
-      )
-    "
-  >
-    <div class="notificationHeader">
-  <div class="notificationTitleWrapper">
-    <span class="notificationTypeIcon">
-      ${getNotificationIcon(notification.type)}
-    </span>
-    <h3 class="notificationTitle">
-      ${notification.title}
-    </h3>
-  </div>
-      <button
-        class="notificationDeleteButton"
+      <div
+        class="
+          notificationCard
+          ${notification.read ? "" : "unreadNotification"}
+        "
         onclick="
-          event.stopPropagation();
-          deleteNotification(
+          openNotification(
             '${notification.id}'
-          );
+          )
         "
       >
-        <img
-          src="${getIconPath("actions", "delete")}"
-          class="icon actionIcon"
-          alt="Delete"
-        >
-      </button>
-    </div>
-    <p class="notificationMessage">
-      ${notification.message || ""}
-    </p>
-    <p class="notificationTime">
-      ${formatNotificationTime(notification.createdAt)}
-    </p>
-  </div>
-`;
+        <div class="notificationHeader">
+          <div class="notificationTitleWrapper">
+            <span class="notificationTypeIcon">
+              ${getNotificationIcon(notification.type)}
+            </span>
+            <h3 class="notificationTitle">
+              ${notification.title}
+            </h3>
+          </div>
+          <button
+            class="notificationDeleteButton"
+            onclick="
+              event.stopPropagation();
+              deleteNotification(
+                '${notification.id}'
+              );
+            "
+          >
+            <img
+              src="${getIconPath("actions", "delete")}"
+              class="icon actionIcon"
+              alt="Delete"
+            >
+          </button>
+        </div>
+        <p class="notificationMessage">
+          ${notification.message || ""}
+        </p>
+        <p class="notificationTime">
+          ${formatNotificationTime(notification.createdAt)}
+        </p>
+      </div>
+    `;
   });
 }
 /* Open Notification */

@@ -138,3 +138,77 @@
   font-weight: 500;
   line-height: 1.4;
 }
+/* Toggle Row */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--borderColor);
+}
+.toggleRow:last-child {
+  border-bottom: none;
+}
+.toggleContent {
+  flex: 1;
+}
+.toggleTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--textPrimary);
+}
+.toggleDescription {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--textSecondary);
+}
+/* Toggle Switch */
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 30px;
+}
+/* Hide native checkbox */
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+/* Toggle Background */
+.toggleSlider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #d6d9df; /* OFF colour */
+  border-radius: 999px;
+  transition: 0.25s ease;
+}
+/* Toggle Circle */
+.toggleSlider::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 4px;
+  top: 4px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+/* ON State */
+.toggleSwitch input:checked + .toggleSlider {
+  background: var(--primaryColor);
+}
+/* Move Circle */
+.toggleSwitch input:checked + .toggleSlider::before {
+  transform: translateX(22px);
+}
+/* Focus */
+.toggleSwitch input:focus + .toggleSlider {
+  outline: 2px solid rgba(0, 137, 186, 0.25);
+  outline-offset: 2px;
+}

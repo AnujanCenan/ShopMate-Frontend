@@ -19,56 +19,163 @@
         <h1 class="modernPageTitle">Settings</h1>
       </header>
       <main class="pageContent">
+        <!-- Account -->
         <section class="settingsSection">
           <h2 class="settingsSectionTitle">Account</h2>
           <button class="settingsCard" onclick="openProfilePage()">
             <img
               src="../assets/icons/features/profile.svg"
               class="icon featureIcon"
-              alt="Profile"
+              alt=""
             />
-            <span>Profile</span>
+            <span> My Profile </span>
           </button>
-          <button class="settingsCard" onclick="toggleBiometric()">
+          <button class="settingsCard" onclick="openSecuritySettings()">
             <img
               src="../assets/icons/biometric/fingerprint.svg"
               class="icon featureIcon"
-              alt="Biometrics"
+              alt=""
             />
-            <span>Biometrics</span>
-          </button>
-          <button class="settingsCard" onclick="logoutUser()">
-            <img
-              src="../assets/icons/actions/logout.svg"
-              class="icon actionIcon"
-              alt="Logout"
-            />
-            <span>Logout</span>
+            <span> Security </span>
           </button>
         </section>
+        <!-- Preferences -->
         <section class="settingsSection">
           <h2 class="settingsSectionTitle">Preferences</h2>
-          <button class="settingsCard" onclick="toggleDarkMode()">
+          <button class="settingsCard" onclick="openThemeSettings()">
             <img
               src="../assets/icons/features/dark-mode.svg"
               class="icon featureIcon"
-              alt="Dark Mode"
+              alt=""
             />
-            <span>Dark Mode</span>
+            <span> Theme </span>
           </button>
-          <button class="settingsCard" onclick="toggleNotifications()">
+          <button class="settingsCard" onclick="openNotificationSettings()">
             <img
               src="../assets/icons/features/notification.svg"
               class="icon featureIcon"
-              alt="Notifications"
+              alt=""
             />
-            <span>Notifications</span>
+            <span> Notifications </span>
+          </button>
+          <button class="settingsCard" onclick="openLanguageSettings()">
+            <img
+              src="../assets/icons/features/language.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Language </span>
+          </button>
+        </section>
+        <!-- Shopping -->
+        <section class="settingsSection">
+          <h2 class="settingsSectionTitle">Shopping</h2>
+          <button class="settingsCard" onclick="openCurrencySettings()">
+            <img
+              src="../assets/icons/features/budget.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Currency </span>
+          </button>
+          <button class="settingsCard" onclick="openMeasurementSettings()">
+            <img
+              src="../assets/icons/features/measurement.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Measurement Units </span>
+          </button>
+        </section>
+        <!-- Data -->
+        <section class="settingsSection">
+          <h2 class="settingsSectionTitle">Data</h2>
+          <button class="settingsCard" onclick="exportAppData()">
+            <img
+              src="../assets/icons/features/export.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Export Data </span>
+          </button>
+          <button
+            class="settingsCard"
+            onclick="document.getElementById('importBackupInput').click()"
+          >
+            <img
+              src="../assets/icons/features/import.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Import Data </span>
+          </button>
+          <button
+            class="settingsCard dangerSettingsCard"
+            onclick="clearLocalData()"
+          >
+            <img
+              src="../assets/icons/actions/delete.svg"
+              class="icon actionIcon"
+              alt=""
+            />
+            <span> Clear Local Data </span>
+          </button>
+          <input
+            type="file"
+            id="importBackupInput"
+            accept=".json"
+            hidden
+            onchange="importAppData(event)"
+          />
+        </section>
+        <!-- Support -->
+        <section class="settingsSection">
+          <h2 class="settingsSectionTitle">Support</h2>
+          <button class="settingsCard" onclick="openAboutPage()">
+            <img
+              src="../assets/icons/features/about.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> About ShopMate </span>
+          </button>
+          <button class="settingsCard" onclick="openPrivacyPolicy()">
+            <img
+              src="../assets/icons/features/privacy.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Privacy Policy </span>
+          </button>
+          <button class="settingsCard" onclick="openTermsConditions()">
+            <img
+              src="../assets/icons/features/document.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Terms & Conditions </span>
+          </button>
+          <button class="settingsCard" onclick="sendFeedback()">
+            <img
+              src="../assets/icons/features/feedback.svg"
+              class="icon featureIcon"
+              alt=""
+            />
+            <span> Send Feedback </span>
           </button>
         </section>
       </main>
     </div>
+    <!-- Screen Overlay -->
+    <div class="screenOverlay hidden" id="screenOverlay"></div>
+    <!-- Bottom Sheet -->
+    <div class="bottomSheet hidden" id="bottomSheet">
+      <div class="bottomSheetHandle"></div>
+      <div id="bottomSheetContent"></div>
+    </div>
     <script src="../js/stateManager.js"></script>
     <script src="../js/authManager.js"></script>
+    <script src="../js/helpers.js"></script>
     <script src="../js/settingsPage.js"></script>
   </body>
 </html>
