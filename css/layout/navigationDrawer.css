@@ -37,7 +37,7 @@
   max-width: 85vw;
   height: 100vh;
   overflow-y: auto;
-  background: white;
+  background: var(--cardColor);
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
   transition: transform 0.25s ease;
   z-index: 999;
@@ -96,7 +96,7 @@
   height: 34px;
   border-radius: 50%;
   background: var(--primaryColor);
-  color: white;
+  color: var(--textPrimary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +114,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 20px;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid var(--borderColor);
 }
 /* Drawer Title */
 .drawerTitle {
@@ -140,7 +140,7 @@
   font-size: 16px;
 }
 .drawerItem:hover {
-  background: #f7f9fc;
+  background: var(--surfaceColor);
 }
 /* Drawer Profile */
 .drawerProfile {
@@ -155,7 +155,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--primaryColor);
-  color: white;
+  color: var(--textPrimary);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -173,11 +173,7 @@
   display: flex;
   flex-direction: column;
 }
-.drawerProfileName {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--textPrimary);
-}
+
 .drawerProfileSubtitle {
   font-size: 14px;
   color: var(--textSecondary);
@@ -187,6 +183,6 @@
 .drawerProfileName {
   font-size: 15px;
   font-weight: 600;
-  color: #222;
+  color: var(--textPrimary);
   white-space: nowrap;
 }

@@ -29,7 +29,7 @@
 }
 /* Group Management Subtitle */
 .groupManagementSubtitle {
-  color: #6b7280;
+  color: var(--mutedTextColor);
   font-size: 15px;
 }
 /* Group Management Hero */
@@ -72,7 +72,7 @@
 }
 /* Member Role */
 .memberRole {
-  color: #6b7280;
+  color: var(--mutedTextColor);
   text-transform: capitalize;
   font-size: 14px;
 }
@@ -87,7 +87,7 @@
   width: 52px;
   height: 52px;
   background: #118ab2;
-  color: white;
+  color: var(--textPrimary);
   border: none;
   border-radius: 18px;
   box-shadow: 0 8px 24px rgba(17, 138, 178, 0.25);
@@ -97,7 +97,7 @@
 /* Invite Code Label */
 .inviteCodeLabel {
   margin-bottom: 10px;
-  color: #6b7280;
+  color: var(--mutedTextColor);
 }
 /* Invite Code Value */
 .inviteCodeValue {
@@ -154,7 +154,7 @@
   margin-top: 6px;
   border-radius: 999px;
   background: rgba(107, 114, 128, 0.12);
-  color: #6b7280;
+  color: var(--mutedTextColor);
   font-size: 12px;
   font-weight: 600;
 }

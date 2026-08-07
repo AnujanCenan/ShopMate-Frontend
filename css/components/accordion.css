@@ -17,10 +17,10 @@
 /* Accordion Container */
 .groupAccordionCard {
   margin-bottom: 16px;
-  background: white;
+  background: var(--cardColor);
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 18px var(--shadowMedium);
 }
 /* Accordion Header */
 .groupAccordionHeader {
@@ -30,7 +30,7 @@
   width: 100%;
   padding: 18px 20px;
   border: none;
-  background: white;
+  background: var(--cardColor);
   cursor: pointer;
 }
 .groupAccordionTitle {
@@ -40,7 +40,7 @@
 }
 .groupAccordionSubtitle {
   margin-top: 4px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 13px;
 }
 .accordionIcon {
@@ -60,14 +60,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 0;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--borderColor);
 }
 .groupMemberName {
   font-weight: 600;
 }
 .groupMemberRole {
   margin-top: 2px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 13px;
   text-transform: capitalize;
 }

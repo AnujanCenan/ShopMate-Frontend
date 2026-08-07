@@ -114,7 +114,7 @@ function openThemeSettings() {
   `;
   openBottomSheet();
 }
-/* Save Theme Preference - Saves the selected application theme. */
+/* Save Theme Preference - Saves and immediately applies the selected application theme. */
 function saveThemePreference() {
   const selectedTheme = document.querySelector('input[name="theme"]:checked');
   if (!selectedTheme) {
@@ -122,15 +122,12 @@ function saveThemePreference() {
   }
   appState.settings.theme = selectedTheme.value;
   saveAppState();
+  applyTheme();
   closeBottomSheet();
   showDialog(
     "Theme Updated",
     "Your preferred application theme has been saved.",
   );
-  /*
-        Part 9
-        Apply Light / Dark Theme
-      */
 }
 /* Open Notification Settings - Displays notification preferences. */
 function openNotificationSettings() {

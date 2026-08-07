@@ -16,19 +16,19 @@
 .categoryTitle {
   margin: 0;
   padding-bottom: 15px;
-  color: var(--textColor);
+  color: var(--textPrimary);
   font-size: 22px;
   font-weight: 700;
 }
 /* Category Information */
 .categoryInfo {
   margin-top: 6px;
-  color: #777777;
+  color: var(--mutedTextColor);
   opacity: 0.7;
   font-size: 13px;
 }
 /* Category Page Title */
 .categoryPageTitle {
-  color: #001c8f;
+  color: var(--primaryColor);
   font-size: 24px;
 }

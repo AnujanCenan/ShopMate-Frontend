@@ -58,7 +58,7 @@
 }
 /* Profile Role */
 .profileRole {
-  color: #6b7280;
+  color: var(--mutedTextColor);
   text-transform: capitalize;
   font-size: 16px;
 }
@@ -68,7 +68,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--borderColor);
 }
 /* Profile Email */
 .profileEmail {
@@ -93,8 +93,8 @@
   margin: 20px 0;
   padding: 24px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #f8f9fc, #ffffff);
-  border: 1px solid #e9ecf2;
+  background: var(--cardColor);
+  border: 1px solid var(--borderColor);
 }
 /* Profile Summary Value */
 .profileSummaryValue {
@@ -141,7 +141,7 @@
   width: 100%;
   min-height: 54px;
   margin-bottom: 12px;
-  background: white;
+  background: var(--cardColor);
   border: none;
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
@@ -152,7 +152,7 @@
 /* Active Group Switcher Button */
 .activeGroupSwitcherButton {
   background: #118ab2;
-  color: white;
+  color: var(--textPrimary);
 }
 /* Profile Hero Card */
 .profileHeroCard {

@@ -633,3 +633,14 @@ async function unlockApplication() {
   }
   window.location.href = "../pages/dashboardPage.html";
 }
+/* Initialize Login Page - Loads biometric icons based on the selected theme. */
+document.addEventListener("DOMContentLoaded", function () {
+  const fingerprintIcon = document.getElementById("fingerprintIcon");
+  const faceIdIcon = document.getElementById("faceIdIcon");
+  if (fingerprintIcon) {
+    fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+  }
+  if (faceIdIcon) {
+    faceIdIcon.src = getIconPath("biometric", "faceid");
+  }
+});

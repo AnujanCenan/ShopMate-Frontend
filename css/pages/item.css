@@ -28,7 +28,7 @@
 .itemName {
   margin: 0;
   letter-spacing: -0.4px;
-  color: var(--textColor);
+  color: var(--textPrimary);
   font-size: 22px;
   font-weight: 700;
   line-height: 1.2;
@@ -36,7 +36,7 @@
 /* Item Details */
 .itemDetails {
   margin: 4px 0 0;
-  color: #6b7280;
+  color: var(--mutedTextColor);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -111,7 +111,7 @@
   justify-content: center;
   width: 90px;
   height: 90px;
-  background: #f3f4f6;
+  background: var(--surfaceColor);
   border: 2px dashed #d1d5db;
   border-radius: 18px;
   font-size: 32px;
@@ -151,7 +151,7 @@
   flex: 1;
   padding-left: 28px;
   background: #16a34a;
-  color: white;
+  color: var(--textPrimary);
   font-size: 15px;
   font-weight: 700;
 }
@@ -163,14 +163,14 @@
   flex: 1;
   padding-right: 28px;
   background: #ef4444;
-  color: white;
+  color: var(--textPrimary);
   font-size: 15px;
   font-weight: 700;
 }
 /* Swipe Card */
 .swipeCard {
   position: relative;
-  background: white;
+  background: var(--cardColor);
   border-radius: 28px;
   transition: transform 0.2s ease;
   z-index: 2;

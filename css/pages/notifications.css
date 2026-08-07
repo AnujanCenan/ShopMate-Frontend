@@ -27,7 +27,7 @@
 }
 /* Notification Time */
 .notificationTime {
-  color: #6b7280;
+  color: var(--mutedTextColor);
   font-size: 14px;
 }
 /* Unread Notification */
@@ -52,7 +52,7 @@
   padding: 10px 18px;
   border: 1px solid var(--borderColor);
   border-radius: 24px;
-  background: white;
+  background: var(--cardColor);
   color: var(--secondaryTextColor);
   font-size: 14px;
   font-weight: 600;
@@ -62,7 +62,7 @@
 /* Active Filter */
 .activeNotificationFilter {
   background: var(--primaryColor);
-  color: white;
+  color: var(--textPrimary);
   border-color: var(--primaryColor);
 }
 /* Notification Card */
@@ -71,13 +71,13 @@
   padding: 18px;
   border: 1px solid var(--borderColor);
   border-radius: 18px;
-  background: white;
+  background: var(--cardColor);
   transition: 0.2s ease;
 }
 /* Notification Card Hover */
 .notificationCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 22px var(--shadowMedium);
 }
 /* Notification Header */
 .notificationHeader {

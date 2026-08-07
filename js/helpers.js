@@ -209,9 +209,38 @@ function selectSuggestedProduct(productName) {
   itemQuantityInput.focus();
 }
 const ICON_BASE_PATH = "../assets/icons";
-/* Get Icon Path - Returns the full path of an SVG icon from the assets folder. */
+/* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {
-  return `${ICON_BASE_PATH}/${folder}/${iconName}.svg`;
+  let themeFolder = "light";
+  if (appState.settings.theme === "dark") {
+    themeFolder = "dark";
+  } else if (appState.settings.theme === "system") {
+    themeFolder = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return `${ICON_BASE_PATH}/${themeFolder}/${folder}/${iconName}.svg`;
+}
+/* Refresh Icons - Reloads all application icons after the theme changes. */
+function refreshIcons() {
+  document.querySelectorAll("img.icon").forEach(function (icon) {
+    const source = icon.getAttribute("src");
+    if (!source) {
+      return;
+    }
+    const parts = source.split("/");
+    const iconFile = parts.pop();
+    const folder = parts.pop();
+    icon.src = getIconPath(folder, iconFile.replace(".svg", ""));
+    const fingerprintIcon = document.getElementById("fingerprintIcon");
+    if (fingerprintIcon) {
+      fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+    }
+    const faceIdIcon = document.getElementById("faceIdIcon");
+    if (faceIdIcon) {
+      faceIdIcon.src = getIconPath("biometric", "faceid");
+    }
+  });
 }
 /* Open Bottom Sheet - Displays the bottom sheet and prevents background interaction. */
 function openBottomSheet() {
@@ -543,8 +572,32 @@ function getProductImage(itemName) {
 function normalizeItemName(itemName) {
   return itemName.trim().toLowerCase();
 }
+/* Apply Theme - Applies the user's selected theme throughout the application. */
+function applyTheme() {
+  const selectedTheme = appState.settings.theme;
+  document.body.classList.remove("darkMode");
+  if (selectedTheme === "dark") {
+    document.body.classList.add("darkMode");
+  } else if (selectedTheme === "system") {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.body.classList.add("darkMode");
+    }
+  }
+  refreshIcons();
+}
+/* Initialize Theme Listener - Updates the application theme when the operating system theme changes. */
+function initializeThemeListener() {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  mediaQuery.addEventListener("change", function () {
+    if (appState.settings.theme === "system") {
+      applyTheme();
+    }
+  });
+}
 /* Initialize Helpers - Registers helper event listeners and shared helper functionality. */
 function initializeHelpers() {
   initializeBottomSheetEvents();
+  applyTheme();
+  initializeThemeListener();
 }
 initializeHelpers();

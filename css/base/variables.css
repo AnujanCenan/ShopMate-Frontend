@@ -25,9 +25,15 @@
   --warningColor: #f59e0b;
   --backgroundColor: #f4f7fb;
   --cardColor: #ffffff;
-  --textColor: #111827;
-  --mutedTextColor: #6b7280;
+  --surfaceColor: #ffffff;
+  --headerBackground: #ffffff;
+  --drawerBackground: #ffffff;
+  --textPrimary: #111827;
+  --textSecondary: #475569;
+  --iconColor: #111827;
+  --mutedTextColor: #64748b;
   --borderColor: #e5e7eb;
+  --dividerColor: #e5e7eb;
   --appBackground: #f7f9fc;
   --budgetBackground: #f0f9ff;
   --groupBackground: #f5f3ff;
@@ -49,8 +55,8 @@ html {
 }
 /* Body Defaults */
 body {
-  background: var(--backgroundColor);
-  color: var(--textColor);
+  background: var(--appBackground);
+  color: var(--textPrimary);
   font-family: Arial, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
