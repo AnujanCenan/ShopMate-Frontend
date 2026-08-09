@@ -124,21 +124,21 @@ function loginUser() {
   createUserSession(user);
   window.location.href = "./dashboardPage.html";
   /*
-    Backend
-    POST /auth/login
-    Request
-    {
-      email,
-      password
-    }
-    Response
-    {
-      accessToken,
-      refreshToken,
-      user,
-      groups
-    }
-  */
+      Backend
+      POST /auth/login
+      Request
+      {
+        email,
+        password
+      }
+      Response
+      {
+        accessToken,
+        refreshToken,
+        user,
+        groups
+      }
+    */
 }
 /* Validate Login Credentials - Checks whether the required login fields are completed. */
 function validateLoginCredentials(email, password) {
@@ -226,25 +226,25 @@ async function registerUser(event) {
     },
   );
   /*
-    Backend
-    POST /auth/register
-    Request
-    {
-      firstName,
-      lastName,
-      email,
-      password,
-      groupName,
-      biometricEnabled
-    }
-    Response
-    {
-      user,
-      accessToken,
-      refreshToken,
-      group
-    }
-  */
+      Backend
+      POST /auth/register
+      Request
+      {
+        firstName,
+        lastName,
+        email,
+        password,
+        groupName,
+        biometricEnabled
+      }
+      Response
+      {
+        user,
+        accessToken,
+        refreshToken,
+        group
+      }
+    */
 }
 /* Validate Registration Details - Validates all information required to register a new account. */
 function validateRegistrationDetails(
@@ -468,50 +468,53 @@ function joinGroupFromInvite(inviteCode) {
   saveAppState();
   window.location.href = "../pages/dashboardPage.html";
   /*
-    Backend
-    POST /groups/join
-    Request
-    {
-      inviteCode,
-      userId
-    }
-    Response
-    {
-      group,
-      members
-    }
-  */
+      Backend
+      POST /groups/join
+      Request
+      {
+        inviteCode,
+        userId
+      }
+      Response
+      {
+        group,
+        members
+      }
+    */
 }
 /* Render Forgot Password Form - Displays the password recovery form in the bottom sheet. */
 function renderForgotPasswordForm() {
   const bottomSheetContent = document.getElementById("bottomSheetContent");
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
-      <h2>Forgot Password</h2>
+      <h2>
+        ${t("forgotPassword.title")}
+      </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
       >
         ✕
       </button>
     </div>
     <div class="bottomSheetBody">
       <p class="bottomSheetDescription">
-        Enter your registered email address to receive a password reset link.
+        ${t("forgotPassword.description")}
       </p>
       <div class="formField">
         <input
           id="forgotPasswordEmail"
           type="email"
           class="bottomSheetInput"
-          placeholder="Email Address"
-        >
+          placeholder="${t("forgotPassword.emailPlaceholder")}"
+        />
       </div>
       <button
         class="primaryButton"
         onclick="sendPasswordResetLink()"
       >
-        Send Reset Link
+        ${t("forgotPassword.sendButton")}
       </button>
     </div>
   `;
@@ -524,10 +527,7 @@ function sendPasswordResetLink() {
     return;
   }
   closeBottomSheet();
-  showDialog(
-    "Password Reset",
-    "If an account exists with this email address, a password reset link has been sent.",
-  );
+  showDialog(t("forgotPassword.resetTitle"), t("forgotPassword.resetMessage"));
   /*
     Backend
     POST /auth/forgot-password
@@ -542,12 +542,18 @@ function sendPasswordResetLink() {
     }
   */
 }
+
 /* Validate Password Recovery Email - Ensures a valid email address has been entered. */
 function validatePasswordRecoveryEmail(email) {
   if (!email) {
-    showDialog("Missing Email", "Please enter your registered email address.");
+    showDialog(
+      t("forgotPassword.missingEmailTitle"),
+      t("forgotPassword.missingEmailMessage"),
+    );
+
     return false;
   }
+
   return true;
 }
 /* Check Biometric Status - Returns whether biometric authentication is enabled for the current user. */
@@ -573,13 +579,13 @@ function enableBiometricAuthentication() {
   user.biometricEnabled = true;
   refreshUserSession();
   /*
-    Backend
-    PATCH /users/preferences
-    Request
-    {
-      biometricEnabled: true
-    }
-  */
+      Backend
+      PATCH /users/preferences
+      Request
+      {
+        biometricEnabled: true
+      }
+    */
 }
 /* Disable Biometric Authentication - Disables biometric authentication for the current user. */
 function disableBiometricAuthentication() {
@@ -596,13 +602,13 @@ function disableBiometricAuthentication() {
   user.biometricEnabled = false;
   refreshUserSession();
   /*
-    Backend
-    PATCH /users/preferences
-    Request
-    {
-      biometricEnabled: false
-    }
-  */
+      Backend
+      PATCH /users/preferences
+      Request
+      {
+        biometricEnabled: false
+      }
+    */
 }
 /* Authenticate With Biometrics - Attempts to unlock the application using biometric authentication. */
 async function authenticateWithBiometrics() {
@@ -610,15 +616,15 @@ async function authenticateWithBiometrics() {
     return false;
   }
   /*
-    Mobile Integration
-    Replace this section with the platform's biometric API.
-    Android
-    • Fingerprint
-    • Face Unlock
-    iOS
-    • Face ID
-    • Touch ID
-  */
+      Mobile Integration
+      Replace this section with the platform's biometric API.
+      Android
+      • Fingerprint
+      • Face Unlock
+      iOS
+      • Face ID
+      • Touch ID
+    */
   return true;
 }
 /* Unlock Application - Unlocks the application after successful biometric authentication. */

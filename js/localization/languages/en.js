@@ -119,4 +119,16 @@ const translationsEn = {
     successMessage:
       "Your shopping group has been created successfully.\n\nYou can complete your personal profile later from Profile Management.",
   },
+  forgotPassword: {
+    title: "Forgot Password",
+    description:
+      "Enter your registered email address to receive a password reset link.",
+    emailPlaceholder: "Email Address",
+    sendButton: "Send Reset Link",
+    resetTitle: "Password Reset",
+    resetMessage:
+      "If an account exists with this email address, a password reset link has been sent.",
+    missingEmailTitle: "Missing Email",
+    missingEmailMessage: "Please enter your registered email address.",
+  },
 };

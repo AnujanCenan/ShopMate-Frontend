@@ -117,4 +117,16 @@ const translationsFr = {
     successMessage:
       "Votre groupe d'achats a été créé avec succès.\n\nVous pourrez compléter votre profil plus tard depuis la gestion du profil.",
   },
+  forgotPassword: {
+    title: "Mot de passe oublié",
+    description:
+      "Saisissez votre adresse e-mail enregistrée pour recevoir un lien de réinitialisation du mot de passe.",
+    emailPlaceholder: "Adresse e-mail",
+    sendButton: "Envoyer le lien de réinitialisation",
+    resetTitle: "Réinitialisation du mot de passe",
+    resetMessage:
+      "Si un compte existe avec cette adresse e-mail, un lien de réinitialisation du mot de passe a été envoyé.",
+    missingEmailTitle: "Adresse e-mail manquante",
+    missingEmailMessage: "Veuillez saisir votre adresse e-mail enregistrée.",
+  },
 };
