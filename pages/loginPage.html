@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopMate Login</title>
+    <title data-i18n="auth.login">ShopMate Login</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -17,57 +17,77 @@
               alt="ShopMate Logo"
             />
           </div>
-          <p class="authTagline">Manage your shopping together</p>
+          <p class="authTagline" data-i18n="auth.tagline">
+            Manage your shopping together
+          </p>
         </div>
-        <input
-          type="email"
-          placeholder="Email Address"
-          class="authInput"
-          id="loginEmailInput"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          class="authInput"
-          id="loginPasswordInput"
-        />
-        <div class="authBiometricRow">
-          <button class="biometricButton" onclick="unlockApplication()">
-            <img
-              id="fingerprintIcon"
-              src="../assets/icons/light/biometric/fingerprint.svg"
-              class="icon actionIcon"
-              alt="Fingerprint"
-            />
+        <form id="loginForm" onsubmit="loginUser(event)">
+          <input
+            type="email"
+            data-i18n-placeholder="auth.emailAddress"
+            placeholder="Email Address"
+            class="authInput"
+            id="loginEmailInput"
+          />
+          <input
+            type="password"
+            data-i18n-placeholder="auth.password"
+            placeholder="Password"
+            class="authInput"
+            id="loginPasswordInput"
+          />
+          <div class="authBiometricRow">
+            <button
+              type="button"
+              class="biometricButton"
+              onclick="unlockApplication()"
+            >
+              <img
+                id="fingerprintIcon"
+                src="../assets/icons/light/biometric/fingerprint.svg"
+                class="icon actionIcon"
+                alt="Fingerprint"
+              />
+            </button>
+            <span class="authOrText">OR</span>
+            <button
+              type="button"
+              class="biometricButton"
+              onclick="unlockApplication()"
+            >
+              <img
+                id="faceIdIcon"
+                src="../assets/icons/light/biometric/faceid.svg"
+                class="icon actionIcon"
+                alt="Face ID"
+              />
+            </button>
+          </div>
+          <button type="submit" class="authButton" data-i18n="auth.login">
+            LOGIN
           </button>
-          <span class="authOrText"> OR </span>
-          <button class="biometricButton" onclick="unlockApplication()">
-            <img
-              id="faceIdIcon"
-              src="../assets/icons/light/biometric/faceid.svg"
-              class="icon actionIcon"
-              alt="Face ID"
-            />
-          </button>
-        </div>
-        <button class="authButton" onclick="loginUser()">LOGIN</button>
+        </form>
         <button
           class="authTextButton forgotPasswordButton"
           onclick="renderForgotPasswordForm()"
         >
-          Forgot Password?
+          <span data-i18n="auth.forgotPassword"> Forgot Password? </span>
         </button>
         <div class="authDivider">
-          <span>OR</span>
+          <span data-i18n="common.or"> OR </span>
         </div>
         <button
           class="secondaryButton authRegisterButton"
           onclick="window.location.href = './registerPage.html'"
         >
-          Create Shopping Group
+          <span data-i18n="auth.createShoppingGroup">
+            Create Shopping Group
+          </span>
         </button>
-        <p class="authInviteText">Been invited to join a shopping group?</p>
-        <p class="authInviteSubText">
+        <p class="authInviteText" data-i18n="auth.invitedText">
+          Been invited to join a shopping group?
+        </p>
+        <p class="authInviteSubText" data-i18n="auth.invitedSubText">
           Use the invitation email sent to your registered email address.
         </p>
       </div>
@@ -83,8 +103,12 @@
     </div>
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
-    <!-- <script src="../js/bottomSheet.js"></script> -->
     <script src="../js/authManager.js"></script>
+    <script src="../js/localization/localizationBootstrap.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <script>
+      initializeApplication();
+    </script>
     <script>
       document.getElementById("fingerprintIcon").src = getIconPath(
         "biometric",

@@ -105,6 +105,9 @@ function redirectIfLoggedIn() {
 }
 /* Login User - Authenticates the user using their email address and password. */
 function loginUser() {
+  if (event) {
+    event.preventDefault();
+  }
   const email = document.getElementById("loginEmailInput").value.trim();
   const password = document.getElementById("loginPasswordInput").value.trim();
   if (!validateLoginCredentials(email, password)) {

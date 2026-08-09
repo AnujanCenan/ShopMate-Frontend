@@ -228,8 +228,91 @@ function saveNotificationSettings() {
     "Your notification preferences have been updated successfully.",
   );
 }
-/* Open Language Settings */
-function openLanguageSettings() {}
+/* Open Language Settings - Displays available application languages. */
+function openLanguageSettings() {
+  const selectedLanguage = appState.settings.language;
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader">
+      <h2>Language</h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="Close"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="settingsDescription">
+        Select your preferred application language.
+      </div>
+      <label class="radioOption">
+        <input
+          type="radio"
+          name="language"
+          value="english"
+          ${selectedLanguage === "english" ? "checked" : ""}
+        >
+        🇺🇸 English
+      </label>
+      <label class="radioOption">
+        <input
+          type="radio"
+          name="language"
+          value="french"
+          ${selectedLanguage === "french" ? "checked" : ""}
+        >
+        🇫🇷 French
+      </label>
+      <label class="radioOption">
+        <input
+          type="radio"
+          name="language"
+          value="tamil"
+          ${selectedLanguage === "tamil" ? "checked" : ""}
+        >
+        🇮🇳 Tamil
+      </label>
+      <div class="settingsDescription">
+        More languages will be available in future updates.
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="closeBottomSheet()"
+        >
+          Cancel
+        </button>
+        <button
+          class="primaryButton"
+          onclick="saveLanguagePreference()"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  `;
+  openBottomSheet();
+}
+/* Save Language Preference - Saves the user's preferred application language. */
+function saveLanguagePreference() {
+  const selectedLanguage = document.querySelector(
+    'input[name="language"]:checked',
+  );
+  if (!selectedLanguage) {
+    return;
+  }
+  appState.settings.language = selectedLanguage.value;
+  saveAppState();
+  closeBottomSheet();
+  showDialog(
+    "Language Updated",
+    "Your preferred language has been saved. Full language support will be available in a future update.",
+  );
+}
 /* Open Currency Settings */
 function openCurrencySettings() {}
 /* Open Measurement Settings */

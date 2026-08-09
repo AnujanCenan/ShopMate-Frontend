@@ -107,7 +107,7 @@ const defaultAppState = {
   drawerPosition: "right",
   settings: {
     theme: "system",
-    language: "english",
+    language: "en",
     currency: "AUD",
     measurementUnit: "metric",
     notifications: {
@@ -118,6 +118,7 @@ const defaultAppState = {
     },
   },
 };
+/* Load Application State - Loads the saved application state from Local Storage and upgrades older data structures if required. */
 /* Load Application State - Loads the saved application state from Local Storage and upgrades older data structures if required. */
 function loadAppState() {
   const savedState = localStorage.getItem(STORAGE_KEY);
@@ -167,7 +168,7 @@ function loadAppState() {
   if (!parsedState.settings) {
     parsedState.settings = {
       theme: "system",
-      language: "english",
+      language: "en",
       currency: "AUD",
       measurementUnit: "metric",
       notifications: {
@@ -177,6 +178,19 @@ function loadAppState() {
         general: true,
       },
     };
+    stateUpdated = true;
+  }
+  /* Upgrade Language Codes */
+  if (parsedState.settings.language === "english") {
+    parsedState.settings.language = "en";
+    stateUpdated = true;
+  }
+  if (parsedState.settings.language === "french") {
+    parsedState.settings.language = "fr";
+    stateUpdated = true;
+  }
+  if (parsedState.settings.language === "tamil") {
+    parsedState.settings.language = "ta";
     stateUpdated = true;
   }
   /* Upgrade Notification Settings Structure */
