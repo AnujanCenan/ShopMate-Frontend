@@ -349,12 +349,13 @@ function calculateGroupBudget() {
   });
   return spent;
 }
-/* Show Dialog - Displays a simple information dialog with a single confirmation button. */
-function showDialog(title, message) {
+/* Show Dialog - Displays a simple information dialog with an optional confirmation callback. */
+function showDialog(title, message, onConfirm = null) {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
   }
+  window.dialogConfirmCallback = onConfirm;
   document.body.insertAdjacentHTML(
     "beforeend",
     `
@@ -372,7 +373,7 @@ function showDialog(title, message) {
           <div class="dialogActions">
             <button
               class="primaryButton"
-              onclick="closeDialog()"
+              onclick="confirmDialog()"
             >
               OK
             </button>
@@ -381,6 +382,15 @@ function showDialog(title, message) {
       </div>
     `,
   );
+}
+/* Confirm Dialog - Closes the dialog and executes the confirmation callback if one exists. */
+function confirmDialog() {
+  closeDialog();
+  if (typeof window.dialogConfirmCallback === "function") {
+    const callback = window.dialogConfirmCallback;
+    window.dialogConfirmCallback = null;
+    callback();
+  }
 }
 /* Close Dialog - Closes the currently displayed dialog. */
 function closeDialog() {

@@ -102,4 +102,21 @@ const translationsEn = {
     notificationUpdatedMessage:
       "Your notification preferences have been updated successfully.",
   },
+  register: {
+    title: "Register",
+    firstName: "First Name",
+    lastName: "Last Name",
+    email: "Email Address",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+    groupName: "Group Name",
+    biometric: "Protect ShopMate with Biometrics",
+    createGroup: "Create Shopping Group",
+    alreadyHaveAccount: "Already have an account? Login",
+    accountExistsTitle: "Account Already Exists",
+    accountExistsMessage: "An account with this email address already exists.",
+    successTitle: "Welcome to ShopMate!",
+    successMessage:
+      "Your shopping group has been created successfully.\n\nYou can complete your personal profile later from Profile Management.",
+  },
 };

@@ -100,4 +100,21 @@ const translationsFr = {
     notificationUpdatedMessage:
       "Vos préférences de notification ont été mises à jour.",
   },
+  register: {
+    title: "S'inscrire",
+    firstName: "Prénom",
+    lastName: "Nom",
+    email: "Adresse e-mail",
+    password: "Mot de passe",
+    confirmPassword: "Confirmer le mot de passe",
+    groupName: "Nom du groupe",
+    biometric: "Protéger ShopMate avec la biométrie",
+    createGroup: "Créer un groupe",
+    alreadyHaveAccount: "Vous avez déjà un compte ? Se connecter",
+    accountExistsTitle: "Le compte existe déjà",
+    accountExistsMessage: "Un compte avec cette adresse e-mail existe déjà.",
+    successTitle: "Bienvenue sur ShopMate !",
+    successMessage:
+      "Votre groupe d'achats a été créé avec succès.\n\nVous pourrez compléter votre profil plus tard depuis la gestion du profil.",
+  },
 };

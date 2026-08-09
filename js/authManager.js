@@ -161,20 +161,16 @@ function findUserByCredentials(email, password) {
   });
 }
 /* Register User - Creates a new ShopMate account and signs the user into the application. */
-async function registerUser() {
+async function registerUser(event) {
+  if (event) {
+    event.preventDefault();
+  }
   const firstName = document
     .getElementById("registerFirstNameInput")
     .value.trim();
   const lastName = document
     .getElementById("registerLastNameInput")
     .value.trim();
-  const name = `${firstName} ${lastName}`.trim();
-  const phone = document.getElementById("registerPhoneInput").value.trim();
-  const gender = document.getElementById("registerGenderInput").value;
-  const dateOfBirth = document.getElementById("registerDobInput").value;
-  const profilePhotoInput = document.getElementById(
-    "registerProfilePhotoInput",
-  );
   const email = document.getElementById("registerEmailInput").value.trim();
   const password = document
     .getElementById("registerPasswordInput")
@@ -184,6 +180,7 @@ async function registerUser() {
     .value.trim();
   const groupName = document.getElementById("groupNameInput").value.trim();
   const biometricEnabled = document.getElementById("biometricCheckbox").checked;
+  /* Validate Registration Details */
   if (
     !validateRegistrationDetails(
       firstName,
@@ -196,37 +193,38 @@ async function registerUser() {
   ) {
     return;
   }
+  /* Check Whether Email Already Exists */
   if (isEmailRegistered(email)) {
     showDialog(
-      "Account Already Exists",
-      "An account with this email address already exists.",
+      t("register.accountExistsTitle"),
+      t("register.accountExistsMessage"),
     );
     return;
   }
-  let profilePhoto = "";
-  if (profilePhotoInput.files && profilePhotoInput.files.length > 0) {
-    profilePhoto = await new Promise(function (resolve) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(profilePhotoInput.files[0]);
-    });
-  }
+  /* Create User Account */
   const user = createUserAccount(
     firstName,
     lastName,
     email,
-    phone,
+    "",
     password,
     biometricEnabled,
-    gender,
-    dateOfBirth,
-    profilePhoto,
+    "",
+    "",
+    "",
   );
+  /* Create Shopping Group */
   createGroup(groupName, user);
+  /* Start User Session */
   createUserSession(user);
-  window.location.href = "./dashboardPage.html";
+  /* Welcome New User */
+  showDialog(
+    t("register.successTitle"),
+    t("register.successMessage"),
+    function () {
+      window.location.href = "./dashboardPage.html";
+    },
+  );
   /*
     Backend
     POST /auth/register
@@ -235,10 +233,6 @@ async function registerUser() {
       firstName,
       lastName,
       email,
-      phone,
-      gender,
-      dateOfBirth,
-      profilePhoto,
       password,
       groupName,
       biometricEnabled

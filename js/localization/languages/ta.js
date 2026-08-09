@@ -101,4 +101,22 @@ const translationsTa = {
     notificationUpdatedMessage:
       "உங்கள் அறிவிப்பு விருப்பங்கள் வெற்றிகரமாக புதுப்பிக்கப்பட்டன.",
   },
+  register: {
+    title: "பதிவு செய்யவும்",
+    firstName: "முதல் பெயர்",
+    lastName: "கடைசி பெயர்",
+    email: "மின்னஞ்சல் முகவரி",
+    password: "கடவுச்சொல்",
+    confirmPassword: "கடவுச்சொல்லை உறுதிப்படுத்தவும்",
+    groupName: "குழு பெயர்",
+    biometric: "பயோமெட்ரிக் மூலம் ShopMate-ஐ பாதுகாக்கவும்",
+    createGroup: "கடையாடல் குழுவை உருவாக்கவும்",
+    alreadyHaveAccount: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
+    accountExistsTitle: "கணக்கு ஏற்கனவே உள்ளது",
+    accountExistsMessage:
+      "இந்த மின்னஞ்சல் முகவரியுடன் ஏற்கனவே ஒரு கணக்கு உள்ளது.",
+    successTitle: "ShopMate-க்கு வரவேற்கிறோம்!",
+    successMessage:
+      "உங்கள் கடையாடல் குழு வெற்றிகரமாக உருவாக்கப்பட்டது.\n\nஉங்கள் தனிப்பட்ட சுயவிவரத்தை பின்னர் Profile Management பகுதியில் பூர்த்தி செய்யலாம்.",
+  },
 };

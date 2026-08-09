@@ -9,61 +9,82 @@
   <body>
     <div class="authPage">
       <div class="authCard">
-        <h1 class="authTitle">Register</h1>
-        <input
-          type="text"
-          placeholder="First Name"
-          class="authInput"
-          id="registerFirstNameInput"
-        />
-        <input
-          type="text"
-          placeholder="Last Name"
-          class="authInput"
-          id="registerLastNameInput"
-        />
-        <input
-          type="email"
-          placeholder="Email Address"
-          class="authInput"
-          id="registerEmailInput"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          class="authInput"
-          id="registerPasswordInput"
-        />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          class="authInput"
-          id="registerConfirmPasswordInput"
-        />
-        <input
-          type="text"
-          placeholder="Group Name"
-          class="authInput"
-          id="groupNameInput"
-        />
-        <label class="biometricToggle">
-          <input type="checkbox" id="biometricCheckbox" />
-          Protect ShopMate with Biometrics
-        </label>
-        <button class="authButton" onclick="registerUser()">
-          Create Group
-        </button>
-
-        <button
-          class="authTextButton"
-          onclick="window.location.href = './loginPage.html'"
-        >
-          Already have an account? Login
-        </button>
+        <h1 class="authTitle" data-i18n="register.title">Register</h1>
+        <form id="registerForm" onsubmit="registerUser(event)">
+          <input
+            type="text"
+            class="authInput"
+            id="registerFirstNameInput"
+            placeholder="First Name"
+            data-i18n-placeholder="register.firstName"
+          />
+          <input
+            type="text"
+            class="authInput"
+            id="registerLastNameInput"
+            placeholder="Last Name"
+            data-i18n-placeholder="register.lastName"
+          />
+          <input
+            type="email"
+            class="authInput"
+            id="registerEmailInput"
+            placeholder="Email Address"
+            data-i18n-placeholder="register.email"
+          />
+          <input
+            type="password"
+            class="authInput"
+            id="registerPasswordInput"
+            placeholder="Password"
+            data-i18n-placeholder="register.password"
+          />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            class="authInput"
+            id="registerConfirmPasswordInput"
+            data-i18n-placeholder="register.confirmPassword"
+          />
+          <input
+            type="text"
+            class="authInput"
+            id="groupNameInput"
+            placeholder="Group Name"
+            data-i18n-placeholder="register.groupName"
+          />
+          <label class="biometricToggle">
+            <input type="checkbox" id="biometricCheckbox" />
+            <span data-i18n="register.biometric">
+              Protect ShopMate with Biometrics
+            </span>
+          </label>
+          <button
+            type="submit"
+            class="authButton"
+            onclick="registerUser()"
+            data-i18n="register.createGroup"
+          >
+            Create Group
+          </button>
+          <button
+            class="authTextButton"
+            onclick="window.location.href = './loginPage.html'"
+          >
+            <span data-i18n="register.alreadyHaveAccount">
+              Already have an account? Login
+            </span>
+          </button>
+        </form>
       </div>
     </div>
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
+    <script src="../js/localization/localizationBootstrap.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <script>
+      initializeApplication();
+    </script>
   </body>
 </html>
