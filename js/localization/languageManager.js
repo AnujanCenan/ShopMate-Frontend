@@ -2,59 +2,219 @@
  * FILE: languageManager.js
  *
  * PURPOSE
- * Handles application localization and language switching.
+ * Handles ShopMate localization without language-specific application code.
  *
- * RESPONSIBILITIES
- * • Load the selected language
- * • Retrieve translated text
- * • Translate page elements
- * • Translate placeholders
- * • Translate page title
- *
- * DEPENDENCIES
- * • stateManager.js
- * • en.js
- * • fr.js
- * • ta.js
+ * IMPORTANT
+ * Adding a new language only requires adding its dictionary file to this folder.
  ***************************************************************************************************/
-/* Current Translation Dictionary */
+/* Active Translation Dictionary */
 let currentTranslations = {};
-/* Load Language - Loads the active translation dictionary. */
-function loadLanguage() {
-  currentTranslations = activeTranslations;
+/* English Fallback Dictionary */
+let fallbackTranslations = {};
+/* Current Language */
+let currentLanguage = "en";
+/* Loaded Dictionary Promises */
+const dictionaryLoadPromises = {};
+/* Get Language Code */
+function getCurrentLanguageCode() {
+  if (
+    typeof appState === "undefined" ||
+    !appState.settings ||
+    !appState.settings.language
+  ) {
+    return "en";
+  }
+  return appState.settings.language;
 }
-/* Get Translation - Returns translated text from a translation key. */
-function t(key) {
+/* Get Dictionary Base URL */
+function getDictionaryBaseUrl() {
+  const languageManagerScript = Array.from(
+    document.querySelectorAll("script"),
+  ).find(function (script) {
+    return script.src.includes("languageManager.js");
+  });
+  if (!languageManagerScript) {
+    return "../js/localization/";
+  }
+  return new URL("./", languageManagerScript.src).href;
+}
+/* Validate Language Code */
+function isValidLanguageCode(languageCode) {
+  return typeof languageCode === "string" && /^[a-z]{2}$/i.test(languageCode);
+}
+/* Load Dictionary File */
+function loadDictionaryFile(languageCode) {
+  const normalizedLanguageCode = String(languageCode || "en").toLowerCase();
+  if (!isValidLanguageCode(normalizedLanguageCode)) {
+    return Promise.reject(
+      new Error("Invalid language code: " + normalizedLanguageCode),
+    );
+  }
+  if (isLanguageRegistered(normalizedLanguageCode)) {
+    return Promise.resolve(getRegisteredLanguage(normalizedLanguageCode));
+  }
+  if (dictionaryLoadPromises[normalizedLanguageCode]) {
+    return dictionaryLoadPromises[normalizedLanguageCode];
+  }
+  dictionaryLoadPromises[normalizedLanguageCode] = new Promise(function (
+    resolve,
+    reject,
+  ) {
+    const script = document.createElement("script");
+    script.src = getDictionaryBaseUrl() + normalizedLanguageCode + ".js";
+    script.async = false;
+    script.onload = function () {
+      if (isLanguageRegistered(normalizedLanguageCode)) {
+        resolve(getRegisteredLanguage(normalizedLanguageCode));
+        return;
+      }
+      reject(
+        new Error(
+          "Language dictionary did not register: " + normalizedLanguageCode,
+        ),
+      );
+    };
+    script.onerror = function () {
+      reject(
+        new Error(
+          "Unable to load language dictionary: " + normalizedLanguageCode,
+        ),
+      );
+    };
+    document.head.appendChild(script);
+  }).catch(function (error) {
+    delete dictionaryLoadPromises[normalizedLanguageCode];
+    throw error;
+  });
+  return dictionaryLoadPromises[normalizedLanguageCode];
+}
+/* Load Language */
+async function loadLanguage(languageCode) {
+  let requestedLanguage = (
+    languageCode ||
+    getCurrentLanguageCode() ||
+    "en"
+  ).toLowerCase();
+  if (!isValidLanguageCode(requestedLanguage)) {
+    requestedLanguage = "en";
+  }
+  try {
+    currentTranslations = await loadDictionaryFile(requestedLanguage);
+    currentLanguage = requestedLanguage;
+  } catch (error) {
+    console.warn("Unable to load language:", requestedLanguage, error);
+    if (requestedLanguage !== "en") {
+      try {
+        currentTranslations = await loadDictionaryFile("en");
+      } catch (fallbackError) {
+        console.error(
+          "Unable to load English fallback dictionary.",
+          fallbackError,
+        );
+        currentTranslations = {};
+      }
+    } else {
+      currentTranslations = {};
+    }
+    currentLanguage = "en";
+  }
+  if (currentLanguage === "en") {
+    fallbackTranslations = currentTranslations;
+  } else {
+    try {
+      fallbackTranslations = await loadDictionaryFile("en");
+    } catch (error) {
+      console.warn("Unable to load English fallback dictionary.", error);
+      fallbackTranslations = {};
+    }
+  }
+  return currentTranslations;
+}
+/* Get Nested Translation Value */
+function getTranslationValue(dictionary, key) {
+  if (!dictionary || !key) {
+    return null;
+  }
   const keys = key.split(".");
-  let value = currentTranslations;
+  let value = dictionary;
   for (const item of keys) {
-    if (!value[item]) {
-      return key;
+    if (
+      value === null ||
+      value === undefined ||
+      typeof value !== "object" ||
+      !Object.prototype.hasOwnProperty.call(value, item)
+    ) {
+      return null;
     }
     value = value[item];
   }
   return value;
 }
-/* Translate Page - Translates all registered page elements. */
+/* Get Translation */
+function t(key) {
+  if (!key) {
+    return "";
+  }
+  const translatedValue = getTranslationValue(currentTranslations, key);
+  if (translatedValue !== null && translatedValue !== undefined) {
+    return translatedValue;
+  }
+  const fallbackValue = getTranslationValue(fallbackTranslations, key);
+  if (fallbackValue !== null && fallbackValue !== undefined) {
+    return fallbackValue;
+  }
+  return key;
+}
+/* Translate Page */
 function translatePage() {
-  /* Translate Text */
   document.querySelectorAll("[data-i18n]").forEach(function (element) {
     element.textContent = t(element.dataset.i18n);
   });
-  /* Translate Placeholders */
   document
     .querySelectorAll("[data-i18n-placeholder]")
     .forEach(function (element) {
       element.placeholder = t(element.dataset.i18nPlaceholder);
     });
-  /* Translate Page Title */
   const pageTitle = document.querySelector("title[data-i18n]");
   if (pageTitle) {
     pageTitle.textContent = t(pageTitle.dataset.i18n);
   }
+  document.documentElement.lang = currentLanguage;
 }
-/* Initialize Localization - Loads the current language and translates the page. */
-function initializeLocalization() {
-  loadLanguage();
+/* Notify Application About Language Change */
+function notifyLanguageChanged() {
+  window.dispatchEvent(
+    new CustomEvent("shopMateLanguageChanged", {
+      detail: {
+        language: currentLanguage,
+      },
+    }),
+  );
+}
+/* Initialize Localization */
+async function initializeLocalization() {
+  await loadLanguage();
   translatePage();
+}
+/* Change Language */
+async function changeLanguage(languageCode) {
+  if (!languageCode) {
+    return;
+  }
+  await loadLanguage(languageCode);
+  if (typeof appState !== "undefined") {
+    if (!appState.settings) {
+      appState.settings = {};
+    }
+    appState.settings.language = currentLanguage;
+    if (typeof saveAppState === "function") {
+      saveAppState();
+    }
+  }
+  translatePage();
+  notifyLanguageChanged();
+}
+/* Compatibility Function */
+async function initializeLocalizationFramework() {
+  return initializeLocalization();
 }

@@ -2,25 +2,37 @@
  * FILE: bootstrap.js
  *
  * PURPOSE
- * Initializes the ShopMate application.
+ * Initializes ShopMate application services in the correct order.
  *
- * RESPONSIBILITIES
- * • Apply Theme
- * • Load Localization Framework
- * • Initialize Localization
- * • Refresh Theme Icons
+ * INITIALIZATION ORDER
+ * 1. Theme
+ * 2. Localization
+ * 3. Icons
+ * 4. Dashboard
  *
- * NOTE
- * This file is the application bootstrapper.
+ * This prevents dashboard functions from calling t() before
+ * the translation dictionary has been loaded.
  ***************************************************************************************************/
-/* Initialize Application - Initializes global application services. */
+
+/* Initialize Application */
 async function initializeApplication() {
-  /* Apply Theme */
-  applyTheme();
-  /* Load Localization Framework */
-  await initializeLocalizationFramework();
-  /* Initialize Localization */
-  initializeLocalization();
-  /* Refresh Theme Icons */
-  refreshIcons();
+  try {
+    if (typeof applyTheme === "function") {
+      applyTheme();
+    }
+
+    if (typeof initializeLocalization === "function") {
+      await initializeLocalization();
+    }
+
+    if (typeof refreshIcons === "function") {
+      refreshIcons();
+    }
+
+    if (typeof initializeDashboard === "function") {
+      initializeDashboard();
+    }
+  } catch (error) {
+    console.error("ShopMate application initialization failed.", error);
+  }
 }

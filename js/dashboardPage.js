@@ -10,7 +10,7 @@ const screenOverlay = document.getElementById("screenOverlay");
 const menuButton = document.querySelector(".menuButton");
 const sideDrawer = document.getElementById("sideDrawer");
 const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
-/* Initialize Dashboard */
+/* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 function initializeDashboard() {
   restoreLastGroup();
   renderCategories();
@@ -18,11 +18,29 @@ function initializeDashboard() {
 }
 /* Restore Last Group */
 function restoreLastGroup() {
-  const savedGroup = localStorage.getItem("activeGroup");
-  if (savedGroup && appState.groups[savedGroup]) {
-    appState.activeGroup = savedGroup;
-    selectedGroupName.textContent = savedGroup;
+  if (
+    !selectedGroupName ||
+    !appState.groups ||
+    typeof appState.groups !== "object"
+  ) {
+    return;
   }
+  const savedGroup = localStorage.getItem("activeGroup");
+  const stateGroup =
+    appState.activeGroup && appState.groups[appState.activeGroup]
+      ? appState.activeGroup
+      : null;
+  const groupToRestore =
+    savedGroup && appState.groups[savedGroup] ? savedGroup : stateGroup;
+  if (groupToRestore) {
+    appState.activeGroup = groupToRestore;
+    selectedGroupName.textContent = groupToRestore;
+    localStorage.setItem("activeGroup", groupToRestore);
+    return;
+  }
+  appState.activeGroup = null;
+  selectedGroupName.textContent = t("dashboard.noGroupSelected");
+  localStorage.removeItem("activeGroup");
 }
 /* Render Categories */
 function renderCategories() {
@@ -33,7 +51,7 @@ function renderCategories() {
   if (!appState.activeGroup) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
-        Select or create a group
+        ${t("dashboard.selectOrCreateGroup")}
       </p>
     `;
     return;
@@ -42,7 +60,7 @@ function renderCategories() {
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
-        No categories yet
+        ${t("dashboard.noCategories")}
       </p>
     `;
     return;
@@ -72,48 +90,46 @@ function renderCategories() {
         onclick="openCategoryPage('${category.name}')"
       >
         <div class="categoryHeaderTitle">
-        <h2 class="categoryTitle">
-          ${category.name}
-        </h2>
-        <button
-          class="categoryMoreButton"
-          onclick="
-            event.stopPropagation();
-            renderCategoryActions(
-              '${category.name}'
-            );
-          "
-        >
-          <img
-    src="${getIconPath("navigation", "menu")}"
-    class="icon actionIcon"
-    alt="More"
->
-        </button>
+          <h2 class="categoryTitle">
+            ${category.name}
+          </h2>
+          <button
+            class="categoryMoreButton"
+            onclick="
+              event.stopPropagation();
+              renderCategoryActions('${category.name}');
+            "
+          >
+            <img
+              src="${getIconPath("navigation", "menu")}"
+              class="icon actionIcon"
+              alt="${t("common.more")}"
+            />
+          </button>
         </div>
         <div class="categoryBudgetSummary">
-  Budget
-  <strong>
-    ${categoryBudget > 0 ? "$" + categoryBudget : "Not Set"}
-  </strong>
-  &nbsp; • &nbsp;
-  Spent
-  <strong>
-    $${categorySpent}
-  </strong>
-  &nbsp; • &nbsp;
-  Left
-  <strong>
-    ${categoryBudget > 0 ? "$" + categoryRemaining : "-"}
-  </strong>
-</div>
+          ${t("dashboard.budget")}
+          <strong>
+            ${categoryBudget > 0 ? "$" + categoryBudget : t("dashboard.notSet")}
+          </strong>
+          &nbsp; • &nbsp;
+          ${t("dashboard.spent")}
+          <strong>
+            $${categorySpent}
+          </strong>
+          &nbsp; • &nbsp;
+          ${t("dashboard.left")}
+          <strong>
+            ${categoryBudget > 0 ? "$" + categoryRemaining : "-"}
+          </strong>
+        </div>
         <p class="categoryInfo">
-  ${pendingCount}
-  Pending
-  &nbsp; • &nbsp;
-  ${purchasedCount}
-  Purchased
-</p>
+          ${pendingCount}
+          ${t("dashboard.pending")}
+          &nbsp; • &nbsp;
+          ${purchasedCount}
+          ${t("dashboard.purchased")}
+        </p>
       </div>
     `;
   });
@@ -139,54 +155,64 @@ function renderGroupDropdown() {
   let groupItemsHTML = "";
   Object.keys(appState.groups).forEach(function (groupName) {
     groupItemsHTML += `
-    <div class="groupItem" onclick="selectGroup('${groupName}')">
-      <span class="groupItemName">
-        ${groupName}
-      </span>
-      ${
-        canManageGroup()
-          ? `
-      <button
-        class="groupMoreButton"
-        onclick="event.stopPropagation(); renderGroupActions('${groupName}');"
+      <div
+        class="groupItem"
+        onclick="selectGroup('${groupName}')"
       >
-        <img
-          src="${getIconPath("navigation", "more")}"
-          class="icon actionIcon"
-          alt="More"
-        >
-      </button>
-    `
-          : ""
-      }
-    </div>`;
+        <span class="groupItemName">
+          ${groupName}
+        </span>
+        ${
+          canManageGroup()
+            ? `
+              <button
+                class="groupMoreButton"
+                onclick="
+                  event.stopPropagation();
+                  renderGroupActions('${groupName}');
+                "
+              >
+                <img
+                  src="${getIconPath("navigation", "more")}"
+                  class="icon actionIcon"
+                  alt="${t("common.more")}"
+                />
+              </button>
+            `
+            : ""
+        }
+      </div>
+    `;
   });
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Select Group
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="groupList">
-            ${groupItemsHTML}
-        </div>
-        <div class="createGroupButtonWrapper">
-          <div class="createGroupButtonWrapper">
-    <button
+    <div class="bottomSheetHeader">
+      <h2>
+        ${t("dashboard.selectGroup")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        />
+      </button>
+    </div>
+    <div class="groupList">
+      ${groupItemsHTML}
+    </div>
+    <div class="createGroupButtonWrapper">
+      <button
         class="primaryButton createGroupButton"
         onclick="renderCreateGroupForm()"
-    >
-        Create New Group
-    </button>
-</div>
-</div>
-        </div>`;
+      >
+        ${t("dashboard.createNewGroup")}
+      </button>
+    </div>
+  `;
   openBottomSheet();
 }
 /* Render Create Group Form */
@@ -194,29 +220,32 @@ function renderCreateGroupForm() {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Create Group
+        ${t("dashboard.createGroupTitle")}
       </h2>
       <button
+        type="button"
         class="closeButton"
         onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
       >
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close"
+          alt="${t("common.close")}"
         >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Group Name
+          ${t("dashboard.groupName")}
         </label>
         <input
           id="groupNameInput"
-          type="text"
           class="bottomSheetInput"
-          placeholder="Enter Group Name"
+          type="text"
+          placeholder="${t("dashboard.groupNamePlaceholder")}"
+          maxlength="40"
           oninput="clearGroupValidation()"
         >
         <div
@@ -226,23 +255,29 @@ function renderCreateGroupForm() {
       </div>
       <div class="bottomSheetButtonRow">
         <button
+          type="button"
           class="secondaryButton"
-          onclick="renderGroupDropdown()"
+          onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
+          type="button"
           class="primaryButton"
           onclick="createGroup()"
         >
-          Create
+          ${t("dashboard.createGroupButton")}
         </button>
       </div>
     </div>
   `;
   openBottomSheet();
   setTimeout(function () {
-    document.getElementById("groupNameInput").focus();
+    const groupNameInput = document.getElementById("groupNameInput");
+    if (!groupNameInput) {
+      return;
+    }
+    groupNameInput.focus();
   }, 100);
 }
 /* Clear Group Validation */
@@ -279,36 +314,34 @@ function clearRenameGroupValidation() {
   renameGroupInput.classList.remove("formInputError");
   renameGroupError.textContent = "";
 }
-/* Create Group */
+/* Create Group - Creates a new shopping group after validating the group name. */
 function createGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
   const groupNameError = document.getElementById("groupNameError");
   const groupName = groupNameInput.value.trim().replace(/\s+/g, " ");
   if (groupName.length < 2) {
     groupNameInput.classList.add("formInputError");
-    groupNameError.textContent =
-      "Group name must contain at least 2 characters.";
+    groupNameError.textContent = t("dashboard.groupNameMinLength");
     groupNameInput.focus();
     return;
   }
   if (groupName.length > 40) {
     groupNameInput.classList.add("formInputError");
-    groupNameError.textContent = "Group name cannot exceed 40 characters.";
+    groupNameError.textContent = t("dashboard.groupNameMaxLength");
     groupNameInput.focus();
     return;
   }
   const validGroupName = /^[A-Za-z0-9\s'-]+$/;
   if (!validGroupName.test(groupName)) {
     groupNameInput.classList.add("formInputError");
-    groupNameError.textContent =
-      "Only letters, numbers, spaces, apostrophes and hyphens are allowed.";
+    groupNameError.textContent = t("dashboard.groupNameInvalidCharacters");
     groupNameInput.focus();
     return;
   }
   clearGroupValidation();
   if (!groupName) {
     groupNameInput.classList.add("formInputError");
-    groupNameError.textContent = "Please enter a group name.";
+    groupNameError.textContent = t("dashboard.groupNameRequired");
     groupNameInput.focus();
     return;
   }
@@ -319,7 +352,7 @@ function createGroup() {
   );
   if (groupExists) {
     groupNameInput.classList.add("formInputError");
-    groupNameError.textContent = "A group with this name already exists.";
+    groupNameError.textContent = t("dashboard.groupAlreadyExists");
     groupNameInput.focus();
     groupNameInput.select();
     return;
@@ -348,49 +381,57 @@ function createGroup() {
   ];
   saveAppState();
   selectGroup(groupName);
-  showSnackbar("Group created successfully.");
+  showSnackbar(t("dashboard.groupCreated"));
 }
 /* Render Create Category Form */
 function renderCreateCategoryForm() {
   if (!appState.activeGroup) {
-    showDialog("Please select a group first");
+    showDialog(
+      t("dashboard.selectGroupTitle"),
+      t("dashboard.selectGroupMessage"),
+    );
     return;
   }
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Create Category
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <input
-                type="text"
-                placeholder="Category Name"
-                class="bottomSheetInput"
-                id="categoryNameInput"
-            >
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="closeBottomSheet()"
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="createCategory()"
-                >
-                    Create
-                </button>
-            </div>
-        </div>
-    `;
+    <div class="bottomSheetHeader">
+      <h2>
+        ${t("dashboard.createCategoryTitle")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        />
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <input
+        id="categoryNameInput"
+        type="text"
+        class="bottomSheetInput"
+        placeholder="${t("dashboard.categoryNamePlaceholder")}"
+      />
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="closeBottomSheet()"
+        >
+          ${t("common.cancel")}
+        </button>
+        <button
+          class="primaryButton"
+          onclick="createCategory()"
+        >
+          ${t("common.create")}
+        </button>
+      </div>
+    </div>
+  `;
   openBottomSheet();
 }
 /* Create Category */
@@ -398,6 +439,22 @@ function createCategory() {
   const categoryNameInput = document.getElementById("categoryNameInput");
   const categoryName = categoryNameInput.value.trim();
   if (!categoryName) {
+    showDialog(
+      t("dashboard.categoryNameRequiredTitle"),
+      t("dashboard.categoryNameRequiredMessage"),
+    );
+    return;
+  }
+  const categoryExists = appState.groups[appState.activeGroup].some(
+    function (category) {
+      return category.name.toLowerCase() === categoryName.toLowerCase();
+    },
+  );
+  if (categoryExists) {
+    showDialog(
+      t("dashboard.categoryExistsTitle"),
+      t("dashboard.categoryExistsMessage"),
+    );
     return;
   }
   appState.groups[appState.activeGroup].unshift({
@@ -422,62 +479,58 @@ function createCategory() {
   saveAppState();
   renderCategories();
   closeBottomSheet();
+  showSnackbar(t("dashboard.categoryCreated"));
 }
 /* Render Category Actions */
 function renderCategoryActions(categoryName) {
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Category Actions
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <button
-                class="bottomSheetActionButton"
-                onclick="
-                    renameCategory(
-                        '${categoryName}'
-                    )
-                "
-            >
-                <img
-    src="${getIconPath("actions", "edit")}"
-    class="icon actionIcon"
-    alt=""
->
-Rename Category
-            </button>
-            <button
-              class="bottomSheetActionButton"
-              onclick="
-                renderCategoryBudgetForm(
-                    '${categoryName}'
-                )
-              "
-            >Set Category Budget</button>
-            <button
-                class="bottomSheetDeleteButton"
-                onclick="
-                    deleteCategory(
-                        '${categoryName}'
-                    )
-                "
-            >
-                <img
-    src="${getIconPath("actions", "delete")}"
-    class="icon actionIcon"
-    alt=""
->
-Delete Category
-            </button>
-        </div>
-    `;
+    <div class="bottomSheetHeader">
+      <h2>
+        ${t("dashboard.categoryActions")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <button
+        class="bottomSheetActionButton"
+        onclick="renameCategory('${categoryName}')"
+      >
+        <img
+          src="${getIconPath("actions", "edit")}"
+          class="icon actionIcon"
+          alt="${t("common.edit")}"
+        >
+        ${t("dashboard.renameCategory")}
+      </button>
+      <button
+        class="bottomSheetActionButton"
+        onclick="renderCategoryBudgetForm('${categoryName}')"
+      >
+        ${t("dashboard.setCategoryBudget")}
+      </button>
+      <button
+        class="bottomSheetDeleteButton"
+        onclick="deleteCategory('${categoryName}')"
+      >
+        <img
+          src="${getIconPath("actions", "delete")}"
+          class="icon actionIcon"
+          alt="${t("common.delete")}"
+        >
+        ${t("dashboard.deleteCategory")}
+      </button>
+    </div>
+  `;
   openBottomSheet();
 }
 /* Rename Category */
@@ -490,55 +543,52 @@ function renameCategory(categoryName) {
     return;
   }
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Rename Category
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <input
-                type="text"
-                class="bottomSheetInput"
-                id="renameCategoryInput"
-                value="${category.name}"
-            >
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="
-                        renderCategoryActions(
-                            '${categoryName}'
-                        )
-                    "
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="
-                        saveRenamedCategory(
-                            '${categoryName}'
-                        )
-                    "
-                >
-                    Save
-                </button>
-            </div>
-        </div>
-    `;
+    <div class="bottomSheetHeader">
+      <h2>
+        ${t("dashboard.renameCategory")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <input
+        type="text"
+        class="bottomSheetInput"
+        id="renameCategoryInput"
+        value="${category.name}"
+      >
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="renderCategoryActions('${categoryName}')"
+        >
+          ${t("common.cancel")}
+        </button>
+        <button
+          class="primaryButton"
+          onclick="saveRenamedCategory('${categoryName}')"
+        >
+          ${t("common.save")}
+        </button>
+      </div>
+    </div>
+  `;
 }
 /* Save Renamed Category */
 function saveRenamedCategory(categoryName) {
   const renameCategoryInput = document.getElementById("renameCategoryInput");
   const newCategoryName = renameCategoryInput.value.trim();
   if (!newCategoryName) {
-    showSnackbar("Enter category name");
+    showSnackbar(t("dashboard.enterCategoryName"));
     return;
   }
   const categories = appState.groups[appState.activeGroup];
@@ -549,7 +599,7 @@ function saveRenamedCategory(categoryName) {
     );
   });
   if (duplicateCategory) {
-    showSnackbar("Category already exists");
+    showSnackbar(t("dashboard.categoryAlreadyExists"));
     return;
   }
   const category = categories.find(function (category) {
@@ -569,55 +619,48 @@ function saveRenamedCategory(categoryName) {
   saveAppState();
   renderCategories();
   closeBottomSheet();
-  showSnackbar("Category renamed");
+  showSnackbar(t("dashboard.categoryRenamed"));
 }
 /* Delete Category */
 function deleteCategory(categoryName) {
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Delete Category
-            </h2>
-            <button
-                class="closeButton"
-                onclick="
-                    renderCategoryActions(
-                        '${categoryName}'
-                    )
-                "
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <p class="deleteMessage">
-                Are you sure you want to delete
-                "${categoryName}"?
-            </p>
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="
-                        renderCategoryActions(
-                            '${categoryName}'
-                        )
-                    "
-                >
-                    Cancel
-                </button>
-                <button
-                    class="bottomSheetDeleteButton"
-                    onclick="
-                        confirmDeleteCategory(
-                            '${categoryName}'
-                        )
-                    "
-                >
-                    Delete
-                </button>
-            </div>
-        </div>
-    `;
+    <div class="bottomSheetHeader">
+      <h2>
+        ${t("dashboard.deleteCategory")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="renderCategoryActions('${categoryName}')"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <p class="deleteMessage">
+        ${t("dashboard.deleteCategoryConfirmation")}
+        <strong>"${categoryName}"</strong>?
+      </p>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="renderCategoryActions('${categoryName}')"
+        >
+          ${t("common.cancel")}
+        </button>
+        <button
+          class="bottomSheetDeleteButton"
+          onclick="confirmDeleteCategory('${categoryName}')"
+        >
+          ${t("common.delete")}
+        </button>
+      </div>
+    </div>
+  `;
 }
 /* Confirm Delete Category */
 function confirmDeleteCategory(categoryName) {
@@ -632,23 +675,24 @@ function confirmDeleteCategory(categoryName) {
   saveAppState();
   renderCategories();
   closeBottomSheet();
-  showSnackbar("Category deleted");
+  showSnackbar(t("dashboard.categoryDeleted"));
 }
 /* Render Group Actions */
 function renderGroupActions(groupName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Group Actions
+        ${t("dashboard.groupActions")}
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
       >
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close"
+          alt="${t("common.close")}"
         >
       </button>
     </div>
@@ -660,38 +704,38 @@ function renderGroupActions(groupName) {
         <img
           src="${getIconPath("actions", "edit")}"
           class="icon actionIcon"
-          alt=""
+          alt="${t("common.edit")}"
         >
         <span>
-          Rename Group
+          ${t("dashboard.renameGroup")}
         </span>
       </button>
-     <button
-  class="bottomSheetActionButton"
-  onclick="renderInviteMemberForm('${groupName}')"
->
-  <img
-    src="${getIconPath("actions", "add")}"
-    class="icon actionIcon"
-    alt=""
-  >
-  <span>
-    Invite Member
-  </span>
-</button>
-<button
-  class="bottomSheetDeleteButton"
-  onclick="deleteGroup('${groupName}')"
->
-  <img
-    src="${getIconPath("actions", "delete")}"
-    class="icon actionIcon"
-    alt=""
-  >
-  <span>
-    Delete Group
-  </span>
-</button>
+      <button
+        class="bottomSheetActionButton"
+        onclick="renderInviteMemberForm('${groupName}')"
+      >
+        <img
+          src="${getIconPath("actions", "add")}"
+          class="icon actionIcon"
+          alt="${t("dashboard.inviteMember")}"
+        >
+        <span>
+          ${t("dashboard.inviteMember")}
+        </span>
+      </button>
+      <button
+        class="bottomSheetDeleteButton"
+        onclick="deleteGroup('${groupName}')"
+      >
+        <img
+          src="${getIconPath("actions", "delete")}"
+          class="icon actionIcon"
+          alt="${t("common.delete")}"
+        >
+        <span>
+          ${t("dashboard.deleteGroup")}
+        </span>
+      </button>
     </div>
   `;
   openBottomSheet();
@@ -700,34 +744,59 @@ function renderGroupActions(groupName) {
 function renderInviteMemberForm(groupName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
-      <h2>Invite Member</h2>
-      <button class="closeButton" onclick="closeBottomSheet()">
-        <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
+      <h2>
+        ${t("dashboard.inviteMember")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
-    <div class="inviteGroupInformation">
-  <label class="formLabel">
-    Inviting Member To
-  </label>
-  <div class="inviteGroupName">
-    ${groupName}
-  </div>
-</div>
+      <div class="inviteGroupInformation">
+        <label class="formLabel">
+          ${t("dashboard.invitingMemberTo")}
+        </label>
+        <div class="inviteGroupName">
+          ${groupName}
+        </div>
+      </div>
       <div class="formField">
         <label class="formLabel">
-          Email Address
+          ${t("common.emailAddress")}
         </label>
-        <input id="inviteMemberEmailInput" type="email" class="bottomSheetInput" placeholder="Enter Email Address" oninput="clearInviteMemberValidation()">
-          <div id="inviteMemberEmailError" class="validationMessage"></div>
+        <input
+          id="inviteMemberEmailInput"
+          type="email"
+          class="bottomSheetInput"
+          placeholder="${t("dashboard.enterEmailAddress")}"
+          oninput="clearInviteMemberValidation()"
+        >
+        <div
+          id="inviteMemberEmailError"
+          class="validationMessage"
+        ></div>
       </div>
-        <div class="bottomSheetButtonRow">
-          <button class="secondaryButton" onclick="renderGroupActions('${groupName}')">
-            Cancel
-          </button>
-          <button class="primaryButton" onclick="sendMemberInvitation('${groupName}')">
-            Send Invitation
-          </button>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="renderGroupActions('${groupName}')"
+        >
+          ${t("common.cancel")}
+        </button>
+        <button
+          class="primaryButton"
+          onclick="sendMemberInvitation('${groupName}')"
+        >
+          ${t("dashboard.sendInvitation")}
+        </button>
       </div>
     </div>
   `;
@@ -762,14 +831,14 @@ function sendMemberInvitation(groupName) {
   emailError.textContent = "";
   if (!email) {
     emailInput.classList.add("formInputError");
-    emailError.textContent = "Please enter an email address.";
+    emailError.textContent = t("dashboard.emailRequired");
     emailInput.focus();
     return;
   }
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(email)) {
     emailInput.classList.add("formInputError");
-    emailError.textContent = "Please enter a valid email address.";
+    emailError.textContent = t("dashboard.invalidEmail");
     emailInput.focus();
     return;
   }
@@ -779,7 +848,7 @@ function sendMemberInvitation(groupName) {
   });
   if (memberExists) {
     emailInput.classList.add("formInputError");
-    emailError.textContent = "This user is already a member of the group.";
+    emailError.textContent = t("dashboard.memberAlreadyExists");
     emailInput.focus();
     return;
   }
@@ -794,13 +863,13 @@ function sendMemberInvitation(groupName) {
   );
   if (invitationExists) {
     emailInput.classList.add("formInputError");
-    emailError.textContent = "A pending invitation already exists.";
+    emailError.textContent = t("dashboard.pendingInvitationExists");
     emailInput.focus();
     return;
   }
   const currentUser = getCurrentUser();
   if (!currentUser) {
-    showToast("Unable to determine the current user.", "info");
+    showToast(t("dashboard.currentUserUnavailable"), "info");
     return;
   }
   const invitation = {
@@ -816,36 +885,37 @@ function sendMemberInvitation(groupName) {
   appState.pendingInvitations.push(invitation);
   saveAppState();
   closeBottomSheet();
-  showToast("Invitation sent successfully.");
+  showToast(t("dashboard.invitationSent"));
 }
 /* Rename Group */
 function renameGroup(groupName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Rename Group
+        ${t("dashboard.renameGroup")}
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
       >
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close"
+          alt="${t("common.close")}"
         >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Group Name
+          ${t("dashboard.groupName")}
         </label>
         <input
           id="renameGroupInput"
           class="bottomSheetInput"
           value="${groupName}"
-          placeholder="Enter Group Name"
+          placeholder="${t("dashboard.enterGroupName")}"
           maxlength="40"
           oninput="clearRenameGroupValidation()"
         >
@@ -859,13 +929,13 @@ function renameGroup(groupName) {
           class="secondaryButton"
           onclick="renderGroupActions('${groupName}')"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
           onclick="saveRenamedGroup('${groupName}')"
         >
-          Save
+          ${t("common.save")}
         </button>
       </div>
     </div>
@@ -888,22 +958,20 @@ function saveRenamedGroup(oldGroupName) {
   renameGroupInput.value = newGroupName;
   if (newGroupName.length < 2) {
     renameGroupInput.classList.add("formInputError");
-    renameGroupError.textContent =
-      "Group name must contain at least 2 characters.";
+    renameGroupError.textContent = t("dashboard.groupNameMinLength");
     renameGroupInput.focus();
     return;
   }
   if (newGroupName.length > 40) {
     renameGroupInput.classList.add("formInputError");
-    renameGroupError.textContent = "Group name cannot exceed 40 characters.";
+    renameGroupError.textContent = t("dashboard.groupNameMaxLength");
     renameGroupInput.focus();
     return;
   }
   const validGroupName = /^[A-Za-z0-9\s'-]+$/;
   if (!validGroupName.test(newGroupName)) {
     renameGroupInput.classList.add("formInputError");
-    renameGroupError.textContent =
-      "Only letters, numbers, spaces, apostrophes and hyphens are allowed.";
+    renameGroupError.textContent = t("dashboard.groupNameInvalidCharacters");
     renameGroupInput.focus();
     return;
   }
@@ -915,7 +983,7 @@ function saveRenamedGroup(oldGroupName) {
   });
   if (duplicateGroup) {
     renameGroupInput.classList.add("formInputError");
-    renameGroupError.textContent = "A group with this name already exists.";
+    renameGroupError.textContent = t("dashboard.groupAlreadyExists");
     renameGroupInput.focus();
     renameGroupInput.select();
     return;
@@ -946,15 +1014,15 @@ function saveRenamedGroup(oldGroupName) {
   renderGroupDropdown();
   renderBudgetDashboardWidget();
   closeBottomSheet();
-  showToast("Group Renamed");
+  showToast(t("dashboard.groupRenamed"));
 }
 /* Delete Group */
 function deleteGroup(groupName) {
   showConfirmDialog(
-    "Delete Group",
-    `Are you sure you want to delete "${groupName}"?
-All categories, shopping items, budgets and members in this group will also be permanently deleted.
-This action cannot be undone.`,
+    t("dashboard.deleteGroup"),
+    `${t("dashboard.deleteGroupConfirmationStart")} "${groupName}"?
+${t("dashboard.deleteGroupConfirmationDetails")}
+${t("dashboard.deleteGroupConfirmationWarning")}`,
     function () {
       delete appState.groups[groupName];
       if (appState.groupMembers?.[groupName]) {
@@ -974,7 +1042,7 @@ This action cannot be undone.`,
           localStorage.setItem("activeGroup", appState.activeGroup);
         } else {
           appState.activeGroup = null;
-          selectedGroupName.textContent = "No Group Selected";
+          selectedGroupName.textContent = t("dashboard.noGroupSelected");
           localStorage.removeItem("activeGroup");
         }
       }
@@ -983,7 +1051,7 @@ This action cannot be undone.`,
       renderGroupDropdown();
       renderBudgetDashboardWidget();
       closeBottomSheet();
-      showToast("Group deleted.");
+      showToast(t("dashboard.groupDeleted"));
     },
   );
 }
@@ -1027,56 +1095,84 @@ function openSideDrawer() {
   sideDrawer.classList.add("active");
   sideDrawerOverlay.classList.add("active");
 }
+/* Close Side Drawer */
 function closeSideDrawer() {
   sideDrawer.classList.remove("active");
   sideDrawerOverlay.classList.remove("active");
 }
 /* Render Side Drawer */
 function renderSideDrawer() {
+  const currentUser = getCurrentUser();
   sideDrawer.innerHTML = `
     <div class="drawerHeader">
-  <div
-    class="drawerProfile"
-    onclick="window.location.href='../pages/profilePage.html'"
-  >
-    <div class="drawerAvatar">
-      ${
-        getCurrentUser().profilePhoto
-          ? `
-            <img
-              src="${getCurrentUser().profilePhoto}"
-              class="drawerAvatarImage"
-              alt="Profile"
-            >
-          `
-          : getCurrentUser().name.charAt(0).toUpperCase()
-      }
-    </div>
-    <div class="drawerProfileDetails">
-      <div class="drawerProfileName">
-        ${getCurrentUser().name}
+      <div
+        class="drawerProfile"
+        onclick="window.location.href='../pages/profilePage.html'"
+      >
+        <div class="drawerAvatar">
+          ${
+            currentUser.profilePhoto
+              ? `
+                <img
+                  src="${currentUser.profilePhoto}"
+                  class="drawerAvatarImage"
+                  alt="${t("common.profile")}"
+                >
+              `
+              : currentUser.name.charAt(0).toUpperCase()
+          }
+        </div>
+        <div class="drawerProfileDetails">
+          <div class="drawerProfileName">
+            ${currentUser.name}
+          </div>
+        </div>
       </div>
-
     </div>
-  </div>
-</div>
-</div>
     <div class="drawerMenu">
-      <button class="drawerItem" onclick="window.location.href='../pages/familyManagementPage.html'">
-        <img src="${getIconPath("features", "group")}" class="icon featureIcon"alt="">
-        <span>Group Management</span>
+      <button
+        class="drawerItem"
+        onclick="window.location.href='../pages/familyManagementPage.html'"
+      >
+        <img
+          src="${getIconPath("features", "group")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>${t("dashboard.groupManagement")}</span>
       </button>
-      <button class="drawerItem" onclick="window.location.href='../pages/notificationsPage.html'">
-        <img src="${getIconPath("features", "notification")}" class="icon featureIcon" alt="">
-        <span>Notifications</span>
+      <button
+        class="drawerItem"
+        onclick="window.location.href='../pages/notificationsPage.html'"
+      >
+        <img
+          src="${getIconPath("features", "notification")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>${t("dashboard.notifications")}</span>
       </button>
-      <button class="drawerItem" onclick="window.location.href='../pages/budgetPage.html'">
-        <img src="${getIconPath("features", "budget")}" class="icon featureIcon" alt="">
-        <span>Budget</span>
+      <button
+        class="drawerItem"
+        onclick="window.location.href='../pages/budgetPage.html'"
+      >
+        <img
+          src="${getIconPath("features", "budget")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>${t("dashboard.budget")}</span>
       </button>
-      <button class="drawerItem" onclick="window.location.href='../pages/settingsPage.html'">
-        <img src="${getIconPath("features", "settings")}" class="icon featureIcon"alt="">
-        <span>Settings</span>
+      <button
+        class="drawerItem"
+        onclick="window.location.href='../pages/settingsPage.html'"
+      >
+        <img
+          src="${getIconPath("features", "settings")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>${t("dashboard.settings")}</span>
       </button>
       <button
         class="drawerItem"
@@ -1087,7 +1183,7 @@ function renderSideDrawer() {
           class="icon featureIcon"
           alt=""
         >
-        <span>Export</span>
+        <span>${t("dashboard.export")}</span>
       </button>
       <button
         class="drawerItem"
@@ -1098,7 +1194,7 @@ function renderSideDrawer() {
           class="icon featureIcon"
           alt=""
         >
-        <span>Import</span>
+        <span>${t("dashboard.import")}</span>
       </button>
       <input
         type="file"
@@ -1115,7 +1211,6 @@ function openProfilePage() {
   closeSideDrawer();
   window.location.href = "../pages/profilePage.html";
 }
-
 /* Render Budget Dashboard Widget */
 function renderBudgetDashboardWidget() {
   const budgetWidget = document.getElementById("budgetDashboardWidget");
@@ -1178,18 +1273,18 @@ function renderBudgetDashboardWidget() {
       >
         <div>
           <h3>
-            Monthly Budget
+            ${t("dashboard.monthlyBudget")}
           </h3>
           <p class="budgetGroupName">
-            ${appState.activeGroup || "No Group Selected"}
+            ${appState.activeGroup || t("dashboard.noGroupSelected")}
           </p>
         </div>
         <span id="budgetCollapseIcon">
           <img
-    src="${getIconPath("navigation", "collapse")}"
-    class="icon actionIcon"
-    alt=""
->
+            src="${getIconPath("navigation", "collapse")}"
+            class="icon actionIcon"
+            alt=""
+          >
         </span>
       </button>
       <div
@@ -1197,20 +1292,30 @@ function renderBudgetDashboardWidget() {
         class="budgetSummaryBody"
       >
         <h2>
-          ${limit === 0 ? "Unlimited" : "$" + limit}
+          ${limit === 0 ? t("dashboard.unlimited") : "$" + limit}
         </h2>
         <div class="analysisValue">
-          <span>Allocated</span>
-          <span>$${allocated}</span>
-        </div>
-        <div class="analysisValue">
-          <span>Spent</span>
-          <span>$${spent}</span>
-        </div>
-        <div class="analysisValue">
-          <span>Remaining</span>
           <span>
-            ${limit === 0 ? "Unlimited" : "$" + remaining}
+            ${t("dashboard.allocated")}
+          </span>
+          <span>
+            $${allocated}
+          </span>
+        </div>
+        <div class="analysisValue">
+          <span>
+            ${t("dashboard.spent")}
+          </span>
+          <span>
+            $${spent}
+          </span>
+        </div>
+        <div class="analysisValue">
+          <span>
+            ${t("dashboard.remaining")}
+          </span>
+          <span>
+            ${limit === 0 ? t("dashboard.unlimited") : "$" + remaining}
           </span>
         </div>
         <div class="budgetProgressBar">
@@ -1223,23 +1328,32 @@ function renderBudgetDashboardWidget() {
           ></div>
         </div>
         <p class="budgetPercentText">
-          ${limit === 0 ? "Unlimited Budget" : percentUsed + "% Used"}
+          ${
+            limit === 0
+              ? t("dashboard.unlimitedBudget")
+              : percentUsed + "% " + t("dashboard.used")
+          }
         </p>
         <p class="budgetAllocationText">
-          Allocation ${allocationPercent}%
+          ${t("dashboard.allocation")}
+          ${allocationPercent}%
         </p>
         <p class="${healthClass}">
-          Budget Usage • ${budgetHealth}
+          ${t("dashboard.budgetUsage")}
+          •
+          ${t("dashboard.budgetHealth." + budgetHealth.toLowerCase())}
         </p>
         <p class="budgetAllocationStatus">
-          Allocation • ${allocationHealth}
+          ${t("dashboard.allocationStatus")}
+          •
+          ${t("dashboard.budgetHealth." + allocationHealth.toLowerCase())}
         </p>
         ${
           allocated > limit && limit > 0
             ? `
-            <div class="budgetWarningBanner">
-              ⚠ Category budgets exceed the Group Budget.
-            </div>
+              <div class="budgetWarningBanner">
+                ⚠ ${t("dashboard.categoryBudgetsExceedGroupBudget")}
+              </div>
             `
             : ""
         }
@@ -1250,8 +1364,8 @@ function renderBudgetDashboardWidget() {
               <p class="budgetInsight">
                 ${
                   remaining > 0
-                    ? "$" + remaining + " remaining this month."
-                    : "Budget exceeded."
+                    ? "$" + remaining + " " + t("dashboard.remainingThisMonth")
+                    : t("dashboard.budgetExceeded")
                 }
               </p>
             `
@@ -1263,7 +1377,7 @@ function renderBudgetDashboardWidget() {
                 class="primaryButton budgetEditButton"
                 onclick="renderEditGroupBudgetForm()"
               >
-                Edit Budget
+                ${t("dashboard.editBudget")}
               </button>
             `
             : ""
@@ -1272,26 +1386,25 @@ function renderBudgetDashboardWidget() {
           class="secondaryButton budgetAnalysisButton"
           onclick="window.location.href='../pages/budgetPage.html'"
         >
-          Budget Analysis
+          ${t("dashboard.budgetAnalysis")}
         </button>
       </div>
     </div>
   `;
   /****************************************
-  Backend
-  GET
-  /group/budget/dashboard
-  Returns
-  {
+    Backend
+    GET
+    /group/budget/dashboard
+    Returns
+    {
       monthlyLimit,
       spent,
       remaining,
       percentage,
       status
-  }
-  ****************************************/
+    }
+    ****************************************/
 }
-
 /* Toggle Budget Card */
 function toggleBudgetCard() {
   const body = document.getElementById("budgetSummaryBody");
@@ -1302,7 +1415,7 @@ function toggleBudgetCard() {
       <img
         src="${getIconPath("navigation", "expand")}"
         class="icon actionIcon"
-        alt="Expand"
+        alt="${t("common.expand")}"
       >
     `;
   } else {
@@ -1310,7 +1423,7 @@ function toggleBudgetCard() {
       <img
         src="${getIconPath("navigation", "collapse")}"
         class="icon actionIcon"
-        alt="Collapse"
+        alt="${t("common.collapse")}"
       >
     `;
   }
@@ -1318,53 +1431,59 @@ function toggleBudgetCard() {
 /* Render Edit Group Budget Form */
 function renderEditGroupBudgetForm() {
   bottomSheetContent.innerHTML = `
-        <div class="bottomSheetHeader">
-            <h2>
-                Monthly Group Budget
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
+    <div class="bottomSheetHeader">
+      <h2>
+        ${t("dashboard.monthlyGroupBudget")}
+      </h2>
+      <button
+        class="closeButton"
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
+    </div>
+    <div class="bottomSheetBody">
+      <div class="formField">
+        <label class="formLabel">
+          ${t("dashboard.monthlyBudgetLimit")}
+        </label>
+        <div class="currencyInputWrapper">
+          <span class="currencySymbol">$</span>
+          <input
+            id="groupBudgetInput"
+            type="number"
+            class="
+              bottomSheetInput
+              currencyInput
+            "
+            value="${
+              appState.budgets.groupBudgets?.[appState.activeGroup]
+                ?.monthlyLimit ?? ""
+            }"
+          >
         </div>
-        <div class="bottomSheetBody">
-            <div class="formField">
-                <label class="formLabel">
-                    Monthly Budget Limit
-                </label>
-                <div class="currencyInputWrapper">
-                    <span class="currencySymbol">$</span>
-                    <input
-                        id="groupBudgetInput"
-                        type="number"
-                        class="
-                            bottomSheetInput
-                            currencyInput
-                        "
-                        value="${
-                          appState.budgets.groupBudgets?.[appState.activeGroup]
-                            ?.monthlyLimit ?? ""
-                        }"                    >
-                </div>
-            </div>
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="closeBottomSheet()"
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="saveGroupBudget()"
-                >
-                    Save
-                </button>
-            </div>
-        </div>
-    `;
+      </div>
+      <div class="bottomSheetButtonRow">
+        <button
+          class="secondaryButton"
+          onclick="closeBottomSheet()"
+        >
+          ${t("common.cancel")}
+        </button>
+        <button
+          class="primaryButton"
+          onclick="saveGroupBudget()"
+        >
+          ${t("common.save")}
+        </button>
+      </div>
+    </div>
+  `;
   openBottomSheet();
 }
 /* Render Category Budget Form */
@@ -1375,36 +1494,36 @@ function renderCategoryBudgetForm(categoryName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Category Budget
+        ${t("dashboard.categoryBudget")}
       </h2>
       <button
         class="closeButton"
-        onclick="
-          closeBottomSheet()
-        "
+        onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
       >
-        <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <label>
-        Budget Amount
+        ${t("dashboard.budgetAmount")}
       </label>
       <p class="budgetHelperLabel">
-Group Budget
-<span id="groupBudgetValue">
-</span>
-</p>
-<p class="budgetHelperLabel">
-Allocated
-<span id="allocatedBudgetValue">
-</span>
-</p>
-<p class="budgetHelperLabel">
-Remaining
-<span id="remainingBudgetValue">
-</span>
-</p>
+        ${t("dashboard.groupBudget")}
+        <span id="groupBudgetValue"></span>
+      </p>
+      <p class="budgetHelperLabel">
+        ${t("dashboard.allocated")}
+        <span id="allocatedBudgetValue"></span>
+      </p>
+      <p class="budgetHelperLabel">
+        ${t("dashboard.remaining")}
+        <span id="remainingBudgetValue"></span>
+      </p>
       <input
         id="categoryBudgetInput"
         class="bottomSheetInput"
@@ -1423,7 +1542,7 @@ Remaining
           )
         "
       >
-        Save Budget
+        ${t("dashboard.saveBudget")}
       </button>
     </div>
   `;
@@ -1460,7 +1579,10 @@ function updateCategoryBudgetRemaining(categoryName) {
 function saveCategoryBudget(categoryName) {
   const amount = Number(document.getElementById("categoryBudgetInput").value);
   if (amount < 0) {
-    showDialog("Invalid Budget", "Budget cannot be negative.");
+    showDialog(
+      t("dashboard.invalidBudget"),
+      t("dashboard.budgetCannotBeNegative"),
+    );
     return;
   }
   if (!appState.budgets.categoryBudgets) {
@@ -1484,10 +1606,10 @@ function saveCategoryBudget(categoryName) {
   const totalAllocated = allocated + amount;
   if (groupBudget > 0 && totalAllocated > groupBudget) {
     showDialog(
-      "Category Budget Exceeded",
-      `Total allocated budget is $${totalAllocated}.
-Group budget is only $${groupBudget}.
-Reduce another category budget or increase the group budget.`,
+      t("dashboard.categoryBudgetExceeded"),
+      t("dashboard.categoryBudgetExceededMessage")
+        .replace("${totalAllocated}", totalAllocated)
+        .replace("${groupBudget}", groupBudget),
     );
     return;
   }
@@ -1496,7 +1618,7 @@ Reduce another category budget or increase the group budget.`,
   };
   saveAppState();
   closeBottomSheet();
-  showToast("Category Budget Saved");
+  showToast(t("dashboard.categoryBudgetSaved"));
 }
 /* Save Group Budget */
 function saveGroupBudget() {
@@ -1509,14 +1631,19 @@ function saveGroupBudget() {
   });
   if (amount < allocated) {
     showDialog(
-      "Invalid Group Budget",
-      `Your category budgets already total $${allocated}.
-Increase the group budget or reduce category budgets first.`,
+      t("dashboard.invalidGroupBudget"),
+      t("dashboard.groupBudgetBelowAllocated").replace(
+        "${allocated}",
+        allocated,
+      ),
     );
     return;
   }
   if (amount < 0) {
-    showDialog("Invalid Budget", "Budget cannot be negative.");
+    showDialog(
+      t("dashboard.invalidBudget"),
+      t("dashboard.budgetCannotBeNegative"),
+    );
     return;
   }
   if (!appState.budgets.groupBudgets) {
@@ -1529,13 +1656,18 @@ Increase the group budget or reduce category budgets first.`,
   saveAppState();
   createNotification(
     "budget",
-    "Budget Updated",
-    `${appState.activeGroup || "No Group Selected"} budget updated to $${amount}.`,
+    t("dashboard.budgetUpdated"),
+    t("dashboard.groupBudgetUpdatedMessage")
+      .replace(
+        "${groupName}",
+        appState.activeGroup || t("dashboard.noGroupSelected"),
+      )
+      .replace("${amount}", amount),
     "budget",
   );
   renderBudgetDashboardWidget();
   closeBottomSheet();
-  showToast("Budget updated.");
+  showToast(t("dashboard.budgetUpdated"));
 }
 /* Toggle Budget Widget */
 function toggleBudgetWidget() {
@@ -1572,13 +1704,13 @@ function importAppData(event) {
       renderCategories();
       closeBottomSheet();
       showDialog(
-        "Backup Restored",
-        "Your app data has been successfully restored.",
+        t("dashboard.backupRestored"),
+        t("dashboard.backupRestoredMessage"),
       );
     } catch {
       showDialog(
-        "Invalid Backup File",
-        "The selected file is not a valid backup file.",
+        t("dashboard.invalidBackupFile"),
+        t("dashboard.invalidBackupFileMessage"),
       );
     }
   };
@@ -1601,7 +1733,17 @@ if (menuButton) {
   menuButton.addEventListener("click", openSideDrawer);
 }
 /* Initial Render */
+/*
+ * Dashboard initialization is handled by bootstrap.js.
+ *
+ * Localization must finish loading before initializeDashboard()
+ * is executed.
+ */
+/* Load Product Catalog Independently */
 (async function () {
-  await loadProductCatalog();
-  initializeDashboard();
+  try {
+    await loadProductCatalog();
+  } catch (error) {
+    console.warn("Product catalog could not be loaded.", error);
+  }
 })();

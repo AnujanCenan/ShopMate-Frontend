@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopMate Dashboard</title>
+    <title data-i18n="dashboard.title">ShopMate Dashboard</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
     <div class="appContainer">
+      <!-- Dashboard Header -->
       <header class="dashboardHeader">
         <div class="headerLeftSection">
           <img
@@ -15,21 +16,28 @@
             alt="ShopMate Logo"
             class="appLogo"
           />
-          <h1 class="appName">ShopMate</h1>
+          <h1 class="appName" data-i18n="common.appName">ShopMate</h1>
         </div>
-
-        <button class="menuButton">
+        <button type="button" class="menuButton" aria-label="Open Menu">
           <img
             src="../assets/icons/navigation/menu.svg"
             class="icon navigationIcon"
-            alt="Menu"
+            alt=""
           />
         </button>
       </header>
+      <!-- Main Dashboard -->
       <main class="pageContent">
+        <!-- Group Selector -->
         <section class="groupDropdownSection">
-          <button class="groupDropdownButton" id="groupDropdownButton">
-            <span id="selectedGroupName"> No Group Selected </span>
+          <button
+            type="button"
+            class="groupDropdownButton"
+            id="groupDropdownButton"
+          >
+            <span id="selectedGroupName" data-i18n="dashboard.noGroupSelected">
+              No Group Selected
+            </span>
             <span class="dropdownArrow">
               <img
                 src="../assets/icons/navigation/collapse.svg"
@@ -39,40 +47,74 @@
             </span>
           </button>
         </section>
-        <div id="budgetDashboardWidget" class="budgetDashboardWidget"></div>
+        <!-- Budget Dashboard -->
+        <section
+          id="budgetDashboardWidget"
+          class="budgetDashboardWidget"
+        ></section>
+        <!-- Empty State -->
         <section class="emptyStateSection" id="emptyStateSection">
-          <p class="emptyStateText">Select or create a group</p>
+          <p class="emptyStateText" data-i18n="dashboard.selectOrCreateGroup">
+            Select or create a group
+          </p>
         </section>
+        <!-- Categories -->
         <section class="categoryList" id="categoryList"></section>
       </main>
-      <footer class="appFooter">© Wisemen IT Solutions</footer>
-      <button class="floatingActionButton" id="openCategoryBottomSheetButton">
+      <!-- Footer -->
+      <footer class="appFooter" data-i18n="common.footer">
+        © Wisemen IT Solutions
+      </footer>
+      <!-- Floating Action Button -->
+      <button
+        type="button"
+        class="floatingActionButton"
+        id="openCategoryBottomSheetButton"
+        aria-label="Add Category"
+      >
         <img
           src="../assets/icons/actions/add.svg"
           class="icon largeIcon"
-          alt="Add Category"
+          alt=""
         />
       </button>
+      <!-- Side Drawer Overlay -->
       <div
         class="sideDrawerOverlay"
         id="sideDrawerOverlay"
         onclick="closeSideDrawer()"
       ></div>
-      <div class="sideDrawer right" id="sideDrawer"></div>
+      <!-- Side Drawer -->
+      <aside class="sideDrawer right" id="sideDrawer"></aside>
+      <!-- Bottom Sheet Overlay -->
       <div
         id="screenOverlay"
         class="screenOverlay hidden"
         onclick="closeBottomSheet()"
       ></div>
-      <div class="bottomSheet hidden" id="bottomSheet">
+      <!-- Bottom Sheet -->
+      <section class="bottomSheet hidden" id="bottomSheet">
         <div class="bottomSheetHandle"></div>
         <div class="bottomSheetContent" id="bottomSheetContent"></div>
-      </div>
+      </section>
     </div>
+    <!-- CORE APPLICATION FILES -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
-    <script src="../js/authManager.js"></script>
+    <!-- LOCALIZATION FRAMEWORK -->
+    <script src="../js/localization/localizationRegistry.js"></script>
+    <script src="../js/localization/languageManager.js"></script>
+    <script src="../js/localization/localizationBootstrap.js"></script>
+    <!-- APPLICATION BOOTSTRAP -->
+    <script src="../js/bootstrap.js"></script>
+    <!-- DASHBOARD -->
     <script src="../js/dashboardPage.js"></script>
+    <!-- APPLICATION INITIALIZATION -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
+    </script>
   </body>
 </html>
