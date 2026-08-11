@@ -1,12 +1,27 @@
-/***************************************************************************************************
+/*
+ ***********************************************************************
  * FILE: languageManager.js
  *
  * PURPOSE
  * Handles ShopMate localization without language-specific application code.
  *
  * IMPORTANT
- * Adding a new language only requires adding its dictionary file to this folder.
- ***************************************************************************************************/
+ * Adding a new language requires adding its dictionary file to:
+ *
+ * js/localization/languages/
+ *
+ * Example:
+ * en -> english.js
+ * fr -> french.js
+ * ta -> tamil.js
+ ***********************************************************************
+ */
+/* Language Dictionary Configuration */
+const languageDictionaryFiles = {
+  en: "english.js",
+  fr: "french.js",
+  ta: "tamil.js",
+};
 /* Active Translation Dictionary */
 let currentTranslations = {};
 /* English Fallback Dictionary */
@@ -34,13 +49,18 @@ function getDictionaryBaseUrl() {
     return script.src.includes("languageManager.js");
   });
   if (!languageManagerScript) {
-    return "../js/localization/";
+    return "../js/localization/languages/";
   }
-  return new URL("./", languageManagerScript.src).href;
+  return new URL("./languages/", languageManagerScript.src).href;
 }
 /* Validate Language Code */
 function isValidLanguageCode(languageCode) {
   return typeof languageCode === "string" && /^[a-z]{2}$/i.test(languageCode);
+}
+/* Get Dictionary File Name */
+function getDictionaryFileName(languageCode) {
+  const normalizedLanguageCode = String(languageCode || "en").toLowerCase();
+  return languageDictionaryFiles[normalizedLanguageCode] || null;
 }
 /* Load Dictionary File */
 function loadDictionaryFile(languageCode) {
@@ -50,9 +70,25 @@ function loadDictionaryFile(languageCode) {
       new Error("Invalid language code: " + normalizedLanguageCode),
     );
   }
+  const dictionaryFileName = getDictionaryFileName(normalizedLanguageCode);
+  if (!dictionaryFileName) {
+    return Promise.reject(
+      new Error(
+        "Language dictionary is not registered: " + normalizedLanguageCode,
+      ),
+    );
+  }
+  /*
+   * If the dictionary has already registered itself,
+   * return it immediately.
+   */
   if (isLanguageRegistered(normalizedLanguageCode)) {
     return Promise.resolve(getRegisteredLanguage(normalizedLanguageCode));
   }
+  /*
+   * Prevent the same dictionary from being loaded
+   * multiple times simultaneously.
+   */
   if (dictionaryLoadPromises[normalizedLanguageCode]) {
     return dictionaryLoadPromises[normalizedLanguageCode];
   }
@@ -61,7 +97,7 @@ function loadDictionaryFile(languageCode) {
     reject,
   ) {
     const script = document.createElement("script");
-    script.src = getDictionaryBaseUrl() + normalizedLanguageCode + ".js";
+    script.src = getDictionaryBaseUrl() + dictionaryFileName;
     script.async = false;
     script.onload = function () {
       if (isLanguageRegistered(normalizedLanguageCode)) {
@@ -103,6 +139,10 @@ async function loadLanguage(languageCode) {
     currentLanguage = requestedLanguage;
   } catch (error) {
     console.warn("Unable to load language:", requestedLanguage, error);
+    /*
+     * If the requested language cannot be loaded,
+     * fall back to English.
+     */
     if (requestedLanguage !== "en") {
       try {
         currentTranslations = await loadDictionaryFile("en");
@@ -118,6 +158,9 @@ async function loadLanguage(languageCode) {
     }
     currentLanguage = "en";
   }
+  /*
+   * English itself becomes the fallback dictionary.
+   */
   if (currentLanguage === "en") {
     fallbackTranslations = currentTranslations;
   } else {
