@@ -228,7 +228,7 @@ const defaultState = {
   budgets: {
     groupBudgets: [
       {
-        // groupId: 0
+        // familyGroupId: 0
         // limit: 0
       }
     ],
@@ -236,8 +236,11 @@ const defaultState = {
       {
         // shoppingListId: 0
         // shoppingListName: ""
-        // limit: 0,
-        // spent: 0
+        // budgetLimit: 0,
+        // budgetSpent: 0,
+        // numPurchased: 0,
+        // shoppingListName: "",
+        // userType: (Admin|Normal)
       }
     ],
   },

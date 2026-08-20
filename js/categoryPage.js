@@ -18,6 +18,8 @@ async function getRenderingItems() {
 
   state.listItems = all_items.ListItems;
   state.favoriteItems = all_items.Favourites;
+
+  saveState();
 }
 
 /* Initialize Category Page */
@@ -27,7 +29,6 @@ async function initializeCategoryPage() {
   const groupId = localStorage.getItem("activeGroupId");
 
   await getRenderingItems();
-
 
   state.activeTab = "lists";
   appState.searchQuery = "";
@@ -61,7 +62,7 @@ function renderCategoryPage() {
   categoryPageTitle.textContent = activeCategory;
   const fab = document.getElementById("openItemBottomSheetButton");
   if (fab) {
-    fab.classList.toggle("hidden", appState.activeTab !== "lists");
+    fab.classList.toggle("hidden", state.activeTab !== "lists");
   }
   renderFilteredItems();
 }
@@ -107,6 +108,7 @@ async function renderFilteredItems() {
 }
 /* Render Items */
 function renderItems(items) {
+  console.log(`renderItems(): items = ${items}`);
   if (!itemList) {
     return;
   }
@@ -139,9 +141,9 @@ function renderItems(items) {
                     <div class="swipePurchased">
   <img
     src="${
-      appState.activeTab === "favorites"
+      state.activeTab === "favorites"
         ? getIconPath("actions", "add")
-        : appState.activeTab === "purchased"
+        : state.activeTab === "purchased"
           ? getIconPath("actions", "re-add")
           : getIconPath("actions", "purchased")
     }"
@@ -149,9 +151,9 @@ function renderItems(items) {
     alt=""
   >
   ${
-    appState.activeTab === "favorites"
+    state.activeTab === "favorites"
       ? "Add to List"
-      : appState.activeTab === "purchased"
+      : state.activeTab === "purchased"
         ? "Re-Add"
         : "Purchased"
   }
@@ -159,7 +161,7 @@ function renderItems(items) {
 <div class="swipeDelete">
   <img
     src="${
-      appState.activeTab === "favorites"
+      state.activeTab === "favorites"
         ? getIconPath(
             "actions",
             item.isFavorite ? "favorite" : "favorite-outline",
@@ -169,7 +171,7 @@ function renderItems(items) {
     class="icon actionIcon"
     alt=""
   >
-  ${appState.activeTab === "favorites" ? "Remove Favorite" : "Delete"}
+  ${state.activeTab === "favorites" ? "Remove Favorite" : "Delete"}
   </div>
 </div>
                <div class="itemCard swipeCard ${
@@ -227,7 +229,7 @@ function renderItems(items) {
   >
 </button>
                ${
-                 appState.activeTab === "favorites"
+                 state.activeTab === "favorites"
                    ? `<button
   class="modernActionButton addActionButton"
   onclick="addFavoriteToList('${item.ItemName}')"
@@ -254,7 +256,7 @@ function renderItems(items) {
     <span class="actionButtonIcon">
        <img
   src="${
-    appState.activeTab === "purchased"
+    state.activeTab === "purchased"
       ? getIconPath("actions", "re-add")
       : getIconPath("actions", "purchased")
   }"
@@ -335,7 +337,7 @@ function initializeTabs() {
       /* Show FAB only on Lists tab */
       const fab = document.getElementById("openItemBottomSheetButton");
       if (fab) {
-        fab.classList.toggle("hidden", appState.activeTab !== "lists");
+        fab.classList.toggle("hidden", state.activeTab !== "lists");
       }
       renderFilteredItems();
     });

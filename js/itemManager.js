@@ -574,10 +574,10 @@ async function updateItem(listItemId) {
       existingItem.ItemName !== originalItemName
     );
   });
-  if (duplicateItem) {
-    showSnackbar("Another item already exists with same name");
-    return;
-  }
+  // if (duplicateItem) {
+  //   showSnackbar("Another item already exists with same name");
+  //   return;
+  // }
   item.ItemName = updatedName;
   item.Quantity = updatedQuantity;
   item.OptionalNotes = updatedNotes;

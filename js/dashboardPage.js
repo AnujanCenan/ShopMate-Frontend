@@ -25,6 +25,8 @@ function restoreLastGroup() {
 }
 /* Render Categories */
 async function renderCategories() {
+  console.log("About to render categories: active Group id is:");
+  console.log(state.activeGroupId);
 
   if (!categoryList) {
     return;
@@ -70,6 +72,8 @@ async function renderCategories() {
   state.groups[groupId] = categories;
   saveState();
 
+  console.log(categories);
+
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
 
@@ -95,7 +99,7 @@ async function renderCategories() {
           onclick="
             event.stopPropagation();
             renderCategoryActions(
-              '${category.name}'
+              '${category.name}', ${category.listId}
             );
           "
         >
@@ -173,6 +177,8 @@ async function renderGroupDropdown() {
     return;
   }
   const groups = await res.json();
+  console.log("About to render the group dropdown");
+  console.log(groups);
 
   groups.forEach(function (group) {
      groupItemsHTML += `
@@ -185,7 +191,7 @@ async function renderGroupDropdown() {
           ? `
       <button
         class="groupMoreButton"
-        onclick="event.stopPropagation(); renderGroupActions('${groupName}');"
+        onclick="event.stopPropagation(); renderGroupActions('${group.familyName}', ${group.familyId});"
       >
         <img
           src="${getIconPath("navigation", "more")}"
@@ -357,6 +363,7 @@ async function createGroup() {
       return existingGroup.toLowerCase() === groupName.toLowerCase();
     },
   );
+
   if (groupExists) {
     groupNameInput.classList.add("formInputError");
     groupNameError.textContent = "A group with this name already exists.";
@@ -379,8 +386,6 @@ async function createGroup() {
 
   const body = await res.json();
 
-  // appState.groups[groupName] = [];
-  // saveAppState();
   selectGroup(groupName, body.familyId);
   if (appState.groups[groupName]) {
     showDialog("Group Exists", "A group with this name already exists.");
@@ -497,7 +502,7 @@ async function createCategory() {
   closeBottomSheet();
 }
 /* Render Category Actions */
-function renderCategoryActions(categoryName) {
+function renderCategoryActions(categoryName, listId) {
   bottomSheetContent.innerHTML = `
         <div class="bottomSheetHeader">
             <h2>
@@ -513,9 +518,8 @@ function renderCategoryActions(categoryName) {
         <div class="bottomSheetBody">
             <button
                 class="bottomSheetActionButton"
-                onclick="
-                    renameCategory(
-                        '${categoryName}'
+                onclick="renameCategory(
+                        '${categoryName}', ${listId}
                     )
                 "
             >
@@ -530,7 +534,7 @@ Rename Category
               class="bottomSheetActionButton"
               onclick="
                 renderCategoryBudgetForm(
-                    '${categoryName}'
+                    '${categoryName}', ${listId}
                 )
               "
             >Set Category Budget</button>
@@ -538,7 +542,7 @@ Rename Category
                 class="bottomSheetDeleteButton"
                 onclick="
                     deleteCategory(
-                        '${categoryName}'
+                        '${categoryName}', ${listId}
                     )
                 "
             >
@@ -554,14 +558,15 @@ Delete Category
   openBottomSheet();
 }
 /* Rename Category */
-function renameCategory(categoryName) {
-  const categories = appState.groups[appState.activeGroup];
-  const category = categories.find(function (item) {
-    return item.name === categoryName;
-  });
-  if (!category) {
-    return;
-  }
+function renameCategory(categoryName, listId) {
+  // const categories = appState.groups[appState.activeGroup];
+  // const category = categories.find(function (item) {
+  //   return item.name === categoryName;
+  // });
+  // if (!category) {
+  //   return;
+  // }
+  console.log(state);
   bottomSheetContent.innerHTML = `
         <div class="bottomSheetHeader">
             <h2>
@@ -579,14 +584,14 @@ function renameCategory(categoryName) {
                 type="text"
                 class="bottomSheetInput"
                 id="renameCategoryInput"
-                value="${category.name}"
+                value="${categoryName}"
             >
             <div class="bottomSheetButtonRow">
                 <button
                     class="secondaryButton"
                     onclick="
                         renderCategoryActions(
-                            '${categoryName}'
+                            '${categoryName}', ${listId}
                         )
                     "
                 >
@@ -596,7 +601,7 @@ function renameCategory(categoryName) {
                     class="primaryButton"
                     onclick="
                         saveRenamedCategory(
-                            '${categoryName}'
+                            '${categoryName}', ${listId}
                         )
                     "
                 >
@@ -607,14 +612,14 @@ function renameCategory(categoryName) {
     `;
 }
 /* Save Renamed Category */
-function saveRenamedCategory(categoryName) {
+async function saveRenamedCategory(categoryName, listId) {
   const renameCategoryInput = document.getElementById("renameCategoryInput");
   const newCategoryName = renameCategoryInput.value.trim();
   if (!newCategoryName) {
     showSnackbar("Enter category name");
     return;
   }
-  const categories = appState.groups[appState.activeGroup];
+  const categories = state.groups[state.activeGroupId];
   const duplicateCategory = categories.find(function (category) {
     return (
       category.name.toLowerCase() === newCategoryName.toLowerCase() &&
@@ -625,27 +630,30 @@ function saveRenamedCategory(categoryName) {
     showSnackbar("Category already exists");
     return;
   }
-  const category = categories.find(function (category) {
-    return category.name === categoryName;
-  });
-  if (!category) {
-    return;
-  }
-  category.name = newCategoryName;
-  if (
-    appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
-  ) {
-    appState.budgets.categoryBudgets[appState.activeGroup][newCategoryName] =
-      appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
-    delete appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
-  }
+  // const category = categories.find(function (category) {
+  //   return category.name === categoryName;
+  // });
+  // if (!category) {
+  //   return;
+  // }
+  // category.name = newCategoryName;
+  // if (
+  //   appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
+  // ) {
+  //   appState.budgets.categoryBudgets[appState.activeGroup][newCategoryName] =
+  //     appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
+  //   delete appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
+  // }
+  
+  await renameCategoryMySql(newCategoryName, state.activeGroupId, listId);
+
   saveAppState();
   renderCategories();
   closeBottomSheet();
   showSnackbar("Category renamed");
 }
 /* Delete Category */
-function deleteCategory(categoryName) {
+function deleteCategory(categoryName, listId) {
   bottomSheetContent.innerHTML = `
         <div class="bottomSheetHeader">
             <h2>
@@ -655,7 +663,7 @@ function deleteCategory(categoryName) {
                 class="closeButton"
                 onclick="
                     renderCategoryActions(
-                        '${categoryName}'
+                        '${categoryName}', ${listId}
                     )
                 "
             >
@@ -672,7 +680,7 @@ function deleteCategory(categoryName) {
                     class="secondaryButton"
                     onclick="
                         renderCategoryActions(
-                            '${categoryName}'
+                            '${categoryName}', ${listId}
                         )
                     "
                 >
@@ -682,7 +690,7 @@ function deleteCategory(categoryName) {
                     class="bottomSheetDeleteButton"
                     onclick="
                         confirmDeleteCategory(
-                            '${categoryName}'
+                            '${categoryName}', ${listId}
                         )
                     "
                 >
@@ -693,7 +701,7 @@ function deleteCategory(categoryName) {
     `;
 }
 /* Confirm Delete Category */
-function confirmDeleteCategory(categoryName) {
+async function confirmDeleteCategory(categoryName, categoryId) {
   appState.groups[appState.activeGroup] = appState.groups[
     appState.activeGroup
   ].filter(function (category) {
@@ -702,13 +710,16 @@ function confirmDeleteCategory(categoryName) {
   if (appState.budgets.categoryBudgets?.[appState.activeGroup]) {
     delete appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
   }
+
+  await deleteCategoryMySql(categoryId);
+
   saveAppState();
   renderCategories();
   closeBottomSheet();
   showSnackbar("Category deleted");
 }
 /* Render Group Actions */
-function renderGroupActions(groupName) {
+function renderGroupActions(groupName, familyGroupId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -728,7 +739,7 @@ function renderGroupActions(groupName) {
     <div class="bottomSheetBody">
       <button
         class="bottomSheetActionButton"
-        onclick="renameGroup('${groupName}')"
+        onclick="renameGroup('${groupName}', ${familyGroupId})"
       >
         <img
           src="${getIconPath("actions", "edit")}"
@@ -741,7 +752,7 @@ function renderGroupActions(groupName) {
       </button>
      <button
   class="bottomSheetActionButton"
-  onclick="renderInviteMemberForm('${groupName}')"
+  onclick="renderInviteMemberForm('${groupName}', ${familyGroupId})"
 >
   <img
     src="${getIconPath("actions", "add")}"
@@ -754,7 +765,7 @@ function renderGroupActions(groupName) {
 </button>
 <button
   class="bottomSheetDeleteButton"
-  onclick="deleteGroup('${groupName}')"
+  onclick="deleteGroup('${groupName}', ${familyGroupId})"
 >
   <img
     src="${getIconPath("actions", "delete")}"
@@ -770,7 +781,7 @@ function renderGroupActions(groupName) {
   openBottomSheet();
 }
 /* Render Invite Member Form */
-function renderInviteMemberForm(groupName) {
+function renderInviteMemberForm(groupName, familyGroupId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>Invite Member</h2>
@@ -795,10 +806,10 @@ function renderInviteMemberForm(groupName) {
           <div id="inviteMemberEmailError" class="validationMessage"></div>
       </div>
         <div class="bottomSheetButtonRow">
-          <button class="secondaryButton" onclick="renderGroupActions('${groupName}')">
+          <button class="secondaryButton" onclick="renderGroupActions('${groupName}', ${familyGroupId})">
             Cancel
           </button>
-          <button class="primaryButton" onclick="sendMemberInvitation('${groupName}')">
+          <button class="primaryButton" onclick="sendMemberInvitation('${groupName}', ${familyGroupId})">
             Send Invitation
           </button>
       </div>
@@ -892,7 +903,7 @@ function sendMemberInvitation(groupName) {
   showToast("Invitation sent successfully.");
 }
 /* Rename Group */
-function renameGroup(groupName) {
+async function renameGroup(groupName, familyGroupId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -930,13 +941,13 @@ function renameGroup(groupName) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderGroupActions('${groupName}')"
+          onclick="renderGroupActions('${groupName}', ${familyGroupId})"
         >
           Cancel
         </button>
         <button
           class="primaryButton"
-          onclick="saveRenamedGroup('${groupName}')"
+          onclick="saveRenamedGroup('${groupName}', ${familyGroupId})"
         >
           Save
         </button>
@@ -954,7 +965,8 @@ function renameGroup(groupName) {
   }, 100);
 }
 /* Save Renamed Group */
-function saveRenamedGroup(oldGroupName) {
+async function saveRenamedGroup(oldGroupName, familyGroupId) {
+
   const renameGroupInput = document.getElementById("renameGroupInput");
   const renameGroupError = document.getElementById("renameGroupError");
   const newGroupName = renameGroupInput.value.trim().replace(/\s+/g, " ");
@@ -980,40 +992,43 @@ function saveRenamedGroup(oldGroupName) {
     renameGroupInput.focus();
     return;
   }
-  const duplicateGroup = Object.keys(appState.groups).some(function (group) {
-    return (
-      group.toLowerCase() === newGroupName.toLowerCase() &&
-      group !== oldGroupName
-    );
-  });
-  if (duplicateGroup) {
-    renameGroupInput.classList.add("formInputError");
-    renameGroupError.textContent = "A group with this name already exists.";
-    renameGroupInput.focus();
-    renameGroupInput.select();
-    return;
-  }
-  appState.groups[newGroupName] = appState.groups[oldGroupName];
-  delete appState.groups[oldGroupName];
-  if (appState.groupMembers?.[oldGroupName]) {
-    appState.groupMembers[newGroupName] = appState.groupMembers[oldGroupName];
-    delete appState.groupMembers[oldGroupName];
-  }
-  if (appState.budgets.groupBudgets?.[oldGroupName]) {
-    appState.budgets.groupBudgets[newGroupName] =
-      appState.budgets.groupBudgets[oldGroupName];
-    delete appState.budgets.groupBudgets[oldGroupName];
-  }
-  if (appState.budgets.categoryBudgets?.[oldGroupName]) {
-    appState.budgets.categoryBudgets[newGroupName] =
-      appState.budgets.categoryBudgets[oldGroupName];
-    delete appState.budgets.categoryBudgets[oldGroupName];
-  }
-  if (appState.activeGroup === oldGroupName) {
-    appState.activeGroup = newGroupName;
-    selectedGroupName.textContent = newGroupName;
-    localStorage.setItem("activeGroup", newGroupName);
-  }
+  // const duplicateGroup = Object.keys(appState.groups).some(function (group) {
+  //   return (
+  //     group.toLowerCase() === newGroupName.toLowerCase() &&
+  //     group !== oldGroupName
+  //   );
+  // });
+  // if (duplicateGroup) {
+  //   renameGroupInput.classList.add("formInputError");
+  //   renameGroupError.textContent = "A group with this name already exists.";
+  //   renameGroupInput.focus();
+  //   renameGroupInput.select();
+  //   return;
+  // }
+  // appState.groups[newGroupName] = appState.groups[oldGroupName];
+  // delete appState.groups[oldGroupName];
+  // if (appState.groupMembers?.[oldGroupName]) {
+  //   appState.groupMembers[newGroupName] = appState.groupMembers[oldGroupName];
+  //   delete appState.groupMembers[oldGroupName];
+  // }
+  // if (appState.budgets.groupBudgets?.[oldGroupName]) {
+  //   appState.budgets.groupBudgets[newGroupName] =
+  //     appState.budgets.groupBudgets[oldGroupName];
+  //   delete appState.budgets.groupBudgets[oldGroupName];
+  // }
+  // if (appState.budgets.categoryBudgets?.[oldGroupName]) {
+  //   appState.budgets.categoryBudgets[newGroupName] =
+  //     appState.budgets.categoryBudgets[oldGroupName];
+  //   delete appState.budgets.categoryBudgets[oldGroupName];
+  // }
+  // if (appState.activeGroup === oldGroupName) {
+  //   appState.activeGroup = newGroupName;
+  //   selectedGroupName.textContent = newGroupName;
+  //   localStorage.setItem("activeGroup", newGroupName);
+  // }
+
+  await renameGroupMySql(familyGroupId, newGroupName);
+
   saveAppState();
   renderCategories();
   renderGroupDropdown();
@@ -1022,36 +1037,37 @@ function saveRenamedGroup(oldGroupName) {
   showToast("Group Renamed");
 }
 /* Delete Group */
-function deleteGroup(groupName) {
+async function deleteGroup(groupName, familyGroupId) {
   showConfirmDialog(
     "Delete Group",
     `Are you sure you want to delete "${groupName}"?
 All categories, shopping items, budgets and members in this group will also be permanently deleted.
 This action cannot be undone.`,
-    function () {
-      delete appState.groups[groupName];
-      if (appState.groupMembers?.[groupName]) {
-        delete appState.groupMembers[groupName];
-      }
-      if (appState.budgets.groupBudgets?.[groupName]) {
-        delete appState.budgets.groupBudgets[groupName];
-      }
-      if (appState.budgets.categoryBudgets?.[groupName]) {
-        delete appState.budgets.categoryBudgets[groupName];
-      }
-      if (appState.activeGroup === groupName) {
-        const remainingGroups = Object.keys(appState.groups);
-        if (remainingGroups.length > 0) {
-          appState.activeGroup = remainingGroups[0];
-          selectedGroupName.textContent = appState.activeGroup;
-          localStorage.setItem("activeGroup", appState.activeGroup);
-        } else {
-          appState.activeGroup = null;
-          selectedGroupName.textContent = "No Group Selected";
-          localStorage.removeItem("activeGroup");
-        }
-      }
-      saveAppState();
+    async function () {
+      // delete appState.groups[groupName];
+      // if (appState.groupMembers?.[groupName]) {
+      //   delete appState.groupMembers[groupName];
+      // }
+      // if (appState.budgets.groupBudgets?.[groupName]) {
+      //   delete appState.budgets.groupBudgets[groupName];
+      // }
+      // if (appState.budgets.categoryBudgets?.[groupName]) {
+      //   delete appState.budgets.categoryBudgets[groupName];
+      // }
+      // if (appState.activeGroup === groupName) {
+      //   const remainingGroups = Object.keys(appState.groups);
+      //   if (remainingGroups.length > 0) {
+      //     appState.activeGroup = remainingGroups[0];
+      //     selectedGroupName.textContent = appState.activeGroup;
+      //     localStorage.setItem("activeGroup", appState.activeGroup);
+      //   } else {
+      //     appState.activeGroup = null;
+      //     selectedGroupName.textContent = "No Group Selected";
+      //     localStorage.removeItem("activeGroup");
+      //   }
+      // }
+      await deleteGroupMySql(familyGroupId);
+
       renderCategories();
       renderGroupDropdown();
       renderBudgetDashboardWidget();
@@ -1191,21 +1207,26 @@ function renderSideDrawer() {
   `;
 }
 
-async function getGroupBudgets() {
-  const res = await fetch("get-group-budgets", {
+// Gets the 
+async function getGroupListBudgets() {
+  const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${state.activeGroupId}`, {
     method: "GET",
     credentials: "include",
   });
 
   if (!res.ok) {
     const msg = await res.text();
-    console.error(`Failure at getGroupBudgets(): ${msg}`);
-    return;
+    console.error(`Failure at getGroupListBudgets(): ${msg}`);
+    return null;
   }
 
   const budgets = await res.json();
-  state.budgets.groupBudgets = budgets;
+  
+
+  state.budgets.categoryBudgets = budgets.shoppingListBudgets;
   saveState();
+  console.log(state.budgets.categoryBudgets);
+  return budgets.shoppingListBudgets;
 }
 
 /* Render Budget Dashboard Widget */
@@ -1224,6 +1245,7 @@ async function renderBudgetDashboardWidget() {
   }
 
   const budgets = await res.json();
+  console.log(`Fetched budgets from database: budgets == ${JSON.stringify(budgets)}`);
   state.budgets.groupBudgets = budgets;
   saveState();
 
@@ -1252,10 +1274,11 @@ async function renderBudgetDashboardWidget() {
   const spent = currBudget.spendingThisMonth;
   const remaining = Math.max(limit - spent, 0);
   let allocated = 0;
-  const categoryBudgets =
-    appState.budgets.categoryBudgets?.[appState.activeGroup] || {};
-  Object.values(categoryBudgets).forEach(function (budget) {
-    allocated += budget.monthlyLimit || 0;
+  
+  const categoryBudgets = await getGroupListBudgets();
+
+  categoryBudgets.forEach(function (budget) {
+    allocated += budget.budgetLimit || 0;
   });
   const unallocated = Math.max(limit - allocated, 0);
   const allocationPercent =
@@ -1297,7 +1320,7 @@ async function renderBudgetDashboardWidget() {
             Monthly Budget
           </h3>
           <p class="budgetGroupName">
-            ${appState.activeGroup || "No Group Selected"}
+            ${state.activeGroup || "No Group Selected"}
           </p>
         </div>
         <span id="budgetCollapseIcon">
@@ -1483,7 +1506,8 @@ function renderEditGroupBudgetForm() {
   openBottomSheet();
 }
 /* Render Category Budget Form */
-function renderCategoryBudgetForm(categoryName) {
+function renderCategoryBudgetForm(categoryName, categoryId) {
+  console.log("Want to edit the shopping list name...")
   const currentBudget =
     appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
       ?.monthlyLimit ?? "";
@@ -1534,7 +1558,7 @@ Remaining
         class="primaryButton"
         onclick="
           saveCategoryBudget(
-            '${categoryName}'
+            '${categoryName}', ${categoryId}
           )
         "
       >
@@ -1572,7 +1596,7 @@ function updateCategoryBudgetRemaining(categoryName) {
   remainingLabel.style.color = remaining < 0 ? "#dc2626" : "#16a34a";
 }
 /* Save Category Budget */
-function saveCategoryBudget(categoryName) {
+async function saveCategoryBudget(categoryName, categoryId) {
   const amount = Number(document.getElementById("categoryBudgetInput").value);
   if (amount < 0) {
     showDialog("Invalid Budget", "Budget cannot be negative.");
@@ -1609,19 +1633,29 @@ Reduce another category budget or increase the group budget.`,
   appState.budgets.categoryBudgets[appState.activeGroup][categoryName] = {
     monthlyLimit: amount,
   };
+  await createListBudget(state.activeGroupId, categoryId, amount);
+
   saveAppState();
   closeBottomSheet();
   showToast("Category Budget Saved");
+  renderCategories();
 }
+
 /* Save Group Budget */
-function saveGroupBudget() {
+async function saveGroupBudget() {
+  console.log("Save Group Budgets");
+  console.log("\t active group id ==", state.activeGroupId);
+
+  const groupAndListBudgets = await getCategoryBudgets(state.activeGroupId);
+
   const amount = Number(document.getElementById("groupBudgetInput").value);
-  let allocated = 0;
-  const categoryBudgets =
-    appState.budgets.categoryBudgets?.[appState.activeGroup] || {};
-  Object.values(categoryBudgets).forEach(function (budget) {
-    allocated += budget.monthlyLimit || 0;
-  });
+  
+  let allocated = groupAndListBudgets.shoppingListBudgets.reduce(
+      (value, listBudget) => value += (listBudget.budgetLimit ?? 0), 0
+    );
+  console.log("\t allocated == ", allocated);
+
+  
   if (amount < allocated) {
     showDialog(
       "Invalid Group Budget",
@@ -1640,8 +1674,12 @@ Increase the group budget or reduce category budgets first.`,
   if (!appState.budgets.groupBudgets[appState.activeGroup]) {
     appState.budgets.groupBudgets[appState.activeGroup] = {};
   }
+
   appState.budgets.groupBudgets[appState.activeGroup].monthlyLimit = amount;
   saveAppState();
+  
+  await createGroupBudget(state.activeGroupId, amount);
+  
   createNotification(
     "budget",
     "Budget Updated",
@@ -1652,6 +1690,7 @@ Increase the group budget or reduce category budgets first.`,
   closeBottomSheet();
   showToast("Budget updated.");
 }
+
 /* Toggle Budget Widget */
 function toggleBudgetWidget() {
   appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
