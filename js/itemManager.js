@@ -98,7 +98,7 @@ function renderAddItemForm(itemName = "") {
           placeholder="${t("item.enterPreferredShop")}"
         >
       </div>
-      <div class="formField">
+            <div class="formField">
         <label class="formLabel">
           ${t("item.notes")}
         </label>
@@ -108,6 +108,53 @@ function renderAddItemForm(itemName = "") {
           class="bottomSheetInput"
           placeholder="${t("item.enterNotes")}"
         >
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          ${t("item.repeat")}
+        </label>
+        <select
+          id="itemRecurrenceFrequency"
+          class="bottomSheetInput"
+        >
+          <option value="none">
+            ${t("item.doesNotRepeat")}
+          </option>
+          <option value="daily">
+            ${t("item.daily")}
+          </option>
+          <option value="weekly">
+            ${t("item.weekly")}
+          </option>
+          <option value="monthly">
+            ${t("item.monthly")}
+          </option>
+        </select>
+      </div>
+      <div
+        id="itemRecurrenceDates"
+        style="display: none;"
+      >
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.startDate")}
+          </label>
+          <input
+            type="date"
+            id="itemRecurrenceStartDate"
+            class="bottomSheetInput"
+          >
+        </div>
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.endDate")}
+          </label>
+          <input
+            type="date"
+            id="itemRecurrenceEndDate"
+            class="bottomSheetInput"
+          >
+        </div>
       </div>
       <div class="bottomSheetButtonRow">
         <button
@@ -225,7 +272,7 @@ function renderEditItemForm(itemName) {
           value="${item.notes || ""}"
         >
       </div>
-      <div class="formField">
+            <div class="formField">
         <label class="formLabel">
           ${t("item.preferredShop")}
         </label>
@@ -235,6 +282,71 @@ function renderEditItemForm(itemName) {
           class="bottomSheetInput"
           value="${item.preferredShop || ""}"
         >
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          ${t("item.repeat")}
+        </label>
+        <select
+          id="editItemRecurrenceFrequency"
+          class="bottomSheetInput"
+        >
+          <option
+            value="none"
+            ${(item.recurrence?.frequency || "none") === "none" ? "selected" : ""}
+          >
+            ${t("item.doesNotRepeat")}
+          </option>
+          <option
+            value="daily"
+            ${item.recurrence?.frequency === "daily" ? "selected" : ""}
+          >
+            ${t("item.daily")}
+          </option>
+          <option
+            value="weekly"
+            ${item.recurrence?.frequency === "weekly" ? "selected" : ""}
+          >
+            ${t("item.weekly")}
+          </option>
+          <option
+            value="monthly"
+            ${item.recurrence?.frequency === "monthly" ? "selected" : ""}
+          >
+            ${t("item.monthly")}
+          </option>
+        </select>
+      </div>
+      <div
+        id="editItemRecurrenceDates"
+        style="${
+          item.recurrence?.enabled && item.recurrence?.frequency !== "none"
+            ? ""
+            : "display: none;"
+        }"
+      >
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.startDate")}
+          </label>
+          <input
+            type="date"
+            id="editItemRecurrenceStartDate"
+            class="bottomSheetInput"
+            value="${item.recurrence?.startDate || ""}"
+          >
+        </div>
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.endDate")}
+          </label>
+          <input
+            type="date"
+            id="editItemRecurrenceEndDate"
+            class="bottomSheetInput"
+            value="${item.recurrence?.endDate || ""}"
+          >
+        </div>
       </div>
       <div class="bottomSheetButtonRow">
         <button
@@ -254,6 +366,7 @@ function renderEditItemForm(itemName) {
   `;
   openBottomSheet();
   initializeEditImagePreview();
+  initializeEditRecurrenceForm();
 }
 /* Initialize Item Form */
 function initializeItemForm() {
@@ -315,6 +428,30 @@ function initializeItemForm() {
       imagePreview.src = imageUrl;
       imagePreview.classList.remove("hidden");
     }
+  });
+  const recurrenceFrequency = document.getElementById(
+    "itemRecurrenceFrequency",
+  );
+  const recurrenceDates = document.getElementById("itemRecurrenceDates");
+  if (recurrenceFrequency && recurrenceDates) {
+    recurrenceFrequency.addEventListener("change", function () {
+      recurrenceDates.style.display =
+        recurrenceFrequency.value === "none" ? "none" : "";
+    });
+  }
+}
+/* Initialize Edit Recurrence Form */
+function initializeEditRecurrenceForm() {
+  const recurrenceFrequency = document.getElementById(
+    "editItemRecurrenceFrequency",
+  );
+  const recurrenceDates = document.getElementById("editItemRecurrenceDates");
+  if (!recurrenceFrequency || !recurrenceDates) {
+    return;
+  }
+  recurrenceFrequency.addEventListener("change", function () {
+    recurrenceDates.style.display =
+      recurrenceFrequency.value === "none" ? "none" : "";
   });
 }
 /*Image Preview */
@@ -433,6 +570,12 @@ function createItem() {
     `;
     return;
   }
+  const recurrenceFrequency =
+    document.getElementById("itemRecurrenceFrequency")?.value || "none";
+  const recurrenceStartDate =
+    document.getElementById("itemRecurrenceStartDate")?.value || null;
+  const recurrenceEndDate =
+    document.getElementById("itemRecurrenceEndDate")?.value || null;
   const newItem = {
     name: itemName,
     quantity: itemQuantity,
@@ -442,6 +585,12 @@ function createItem() {
     actualPrice: 0,
     purchaseDate: null,
     purchased: false,
+    recurrence: {
+      enabled: recurrenceFrequency !== "none",
+      frequency: recurrenceFrequency,
+      startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
+      endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+    },
   };
   currentCategory.items.unshift(newItem);
   /* Update Product Usage */
@@ -542,11 +691,23 @@ function updateItem(originalItemName) {
     showSnackbar(t("item.duplicateItemName"));
     return;
   }
+  const recurrenceFrequency =
+    document.getElementById("editItemRecurrenceFrequency")?.value || "none";
+  const recurrenceStartDate =
+    document.getElementById("editItemRecurrenceStartDate")?.value || null;
+  const recurrenceEndDate =
+    document.getElementById("editItemRecurrenceEndDate")?.value || null;
   item.name = newName;
   item.quantity = newQuantity;
   item.estimatedPrice = newPrice;
   item.notes = newNotes;
   item.preferredShop = newShop;
+  item.recurrence = {
+    enabled: recurrenceFrequency !== "none",
+    frequency: recurrenceFrequency,
+    startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
+    endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+  };
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
@@ -569,6 +730,9 @@ function openPurchaseConfirmation(itemName) {
     item.purchased = false;
     item.purchaseDate = null;
     item.actualPrice = 0;
+    if (item.recurrence && item.recurrence.enabled === true) {
+      item.recurrence.lastGeneratedDate = null;
+    }
     saveAppState();
     renderFilteredItems();
     showSnackbar(t("item.movedBackToList"));
@@ -661,8 +825,20 @@ function confirmPurchase(itemName) {
   const actualPrice =
     Number(document.getElementById("actualPriceInput").value) || 0;
   item.actualPrice = actualPrice;
-  item.purchaseDate = new Date().toISOString();
   item.purchased = !item.purchased;
+  if (item.purchased) {
+    item.purchaseDate = new Date().toISOString();
+    if (item.recurrence && item.recurrence.enabled === true) {
+      item.recurrence.lastGeneratedDate = null;
+    }
+  } else {
+    item.purchaseDate = null;
+  }
+  if (item.purchased) {
+    item.purchaseDate = new Date().toISOString();
+  } else {
+    item.purchaseDate = null;
+  }
   updateBudgetTracking(currentCategory.name, actualPrice);
   calculateGroupBudget();
   saveAppState();

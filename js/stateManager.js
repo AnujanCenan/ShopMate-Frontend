@@ -151,6 +151,33 @@ function loadAppState() {
           item.purchaseDate = null;
           stateUpdated = true;
         }
+        /* Recurring Item Support */
+        if (item.recurrence === undefined || item.recurrence === null) {
+          item.recurrence = {
+            enabled: false,
+            frequency: "none",
+            startDate: null,
+            endDate: null,
+          };
+          stateUpdated = true;
+        } else {
+          if (item.recurrence.enabled === undefined) {
+            item.recurrence.enabled = false;
+            stateUpdated = true;
+          }
+          if (item.recurrence.frequency === undefined) {
+            item.recurrence.frequency = "none";
+            stateUpdated = true;
+          }
+          if (item.recurrence.startDate === undefined) {
+            item.recurrence.startDate = null;
+            stateUpdated = true;
+          }
+          if (item.recurrence.endDate === undefined) {
+            item.recurrence.endDate = null;
+            stateUpdated = true;
+          }
+        }
       });
     });
   });

@@ -448,6 +448,13 @@ registerLanguage("en", {
     quickPicks: "Quick Picks",
     shopName: "Shop Name",
     updateQuantity: "Update Quantity",
+    repeat: "Repeat",
+    doesNotRepeat: "Does not repeat",
+    daily: "Daily",
+    weekly: "Weekly",
+    monthly: "Monthly",
+    startDate: "Start Date",
+    endDate: "End Date",
   },
   notifications: {
     all: "All",
@@ -479,6 +486,9 @@ registerLanguage("en", {
     system: "System",
     title: "Notifications",
     unread: "Unread",
+    recurringItemAdded: "Recurring item added",
+    recurringItemAddedMessage:
+      "{{itemName}} has been added to your shopping list again.",
   },
   profile: {
     account: "Account",

@@ -475,6 +475,13 @@ registerLanguage("ta", {
     quickPicks: "விரைவான தேர்வுகள்",
     shopName: "கடை பெயர்",
     updateQuantity: "அளவைப் புதுப்பிக்கவும்",
+    repeat: "மீண்டும்",
+    doesNotRepeat: "மீண்டும் வேண்டாம்",
+    daily: "தினசரி",
+    weekly: "வாரந்தோறும்",
+    monthly: "மாதந்தோறும்",
+    startDate: "தொடக்க தேதி",
+    endDate: "முடிவு தேதி",
   },
 
   notifications: {
@@ -507,6 +514,9 @@ registerLanguage("ta", {
     system: "சிஸ்டம்",
     title: "அறிவிப்புகள்",
     unread: "படிக்காதவை",
+    recurringItemAdded: "மீண்டும் சேர்க்கப்பட்ட பொருள்",
+    recurringItemAddedMessage:
+      "{{itemName}} மீண்டும் உங்கள் ஷாப்பிங் பட்டியலில் சேர்க்கப்பட்டது.",
   },
 
   profile: {

@@ -13,22 +13,19 @@
  * This prevents dashboard functions from calling t() before
  * the translation dictionary has been loaded.
  ***************************************************************************************************/
-
 /* Initialize Application */
 async function initializeApplication() {
   try {
     if (typeof applyTheme === "function") {
       applyTheme();
     }
-
     if (typeof initializeLocalization === "function") {
       await initializeLocalization();
     }
-
+    processRecurringItems();
     if (typeof refreshIcons === "function") {
       refreshIcons();
     }
-
     if (typeof initializeDashboard === "function") {
       initializeDashboard();
     }

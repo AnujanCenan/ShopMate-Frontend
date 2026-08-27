@@ -480,6 +480,146 @@ function showToast(message, type = "success") {
     }
   }, 2500);
 }
+/* Process Recurring Items */
+function processRecurringItems() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let stateUpdated = false;
+  Object.values(appState.groups || {}).forEach(function (categories) {
+    categories.forEach(function (category) {
+      if (!Array.isArray(category.items)) {
+        return;
+      }
+      const recurringItems = category.items.filter(function (item) {
+        return (
+          item.recurrence &&
+          item.recurrence.enabled === true &&
+          item.recurrence.frequency !== "none"
+        );
+      });
+      recurringItems.forEach(function (item) {
+        if (!item.purchased || !item.purchaseDate) {
+          return;
+        }
+        if (item.recurrence.startDate) {
+          const recurrenceStartDate = new Date(
+            item.recurrence.startDate + "T00:00:00",
+          );
+          recurrenceStartDate.setHours(0, 0, 0, 0);
+          if (today < recurrenceStartDate) {
+            return;
+          }
+        }
+        const recurrence = item.recurrence;
+        const lastOccurrenceDate = new Date(item.purchaseDate);
+        lastOccurrenceDate.setHours(0, 0, 0, 0);
+        let nextOccurrenceDate = new Date(lastOccurrenceDate);
+        if (recurrence.frequency === "daily") {
+          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
+        } else if (recurrence.frequency === "weekly") {
+          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
+        } else if (recurrence.frequency === "monthly") {
+          nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
+        }
+        while (nextOccurrenceDate <= today) {
+          const existingOccurrence = category.items.some(
+            function (existingItem) {
+              return (
+                existingItem.name === item.name &&
+                existingItem.purchaseDate &&
+                existingItem.recurrence &&
+                existingItem.recurrence.frequency === recurrence.frequency &&
+                existingItem.purchaseDate.startsWith(
+                  nextOccurrenceDate.toISOString().split("T")[0],
+                )
+              );
+            },
+          );
+          if (existingOccurrence) {
+            nextOccurrenceDate = new Date(nextOccurrenceDate);
+            if (recurrence.frequency === "daily") {
+              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
+            } else if (recurrence.frequency === "weekly") {
+              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
+            } else if (recurrence.frequency === "monthly") {
+              nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
+            }
+          } else {
+            break;
+          }
+        }
+        const endDate = recurrence.endDate
+          ? new Date(recurrence.endDate + "T00:00:00")
+          : null;
+        if (endDate) {
+          endDate.setHours(0, 0, 0, 0);
+        }
+        if (endDate && nextOccurrenceDate > endDate) {
+          return;
+        }
+        if (nextOccurrenceDate > today) {
+          return;
+        }
+        const newItem = {
+          name: item.name,
+          quantity: item.quantity,
+          notes: item.notes,
+          preferredShop: item.preferredShop,
+          estimatedPrice: item.estimatedPrice,
+          actualPrice: 0,
+          purchaseDate: null,
+          purchased: false,
+          recurrence: {
+            enabled: true,
+            frequency: recurrence.frequency,
+            startDate: nextOccurrenceDate.toISOString().split("T")[0],
+            endDate: recurrence.endDate || null,
+            lastGeneratedDate: nextOccurrenceDate.toISOString(),
+          },
+        };
+        const duplicatePendingItem = category.items.some(
+          function (existingItem) {
+            return (
+              existingItem.name === newItem.name &&
+              !existingItem.purchased &&
+              existingItem.recurrence &&
+              existingItem.recurrence.enabled === true &&
+              existingItem.recurrence.frequency === newItem.recurrence.frequency
+            );
+          },
+        );
+        if (!duplicatePendingItem) {
+          category.items.unshift(newItem);
+
+          createNotification(
+            "item",
+            t("notifications.recurringItemAdded"),
+            t("notifications.recurringItemAddedMessage", {
+              itemName: newItem.name,
+            }),
+            "category",
+            {
+              group: appState.activeGroup,
+              category: category.name,
+            },
+            {
+              titleKey: "notifications.recurringItemAdded",
+              messageKey: "notifications.recurringItemAddedMessage",
+              params: {
+                itemName: newItem.name,
+              },
+            },
+          );
+
+          stateUpdated = true;
+        }
+      });
+    });
+  });
+  if (stateUpdated) {
+    saveAppState();
+  }
+}
 /* Create Notification - Creates a new notification and updates the notification badge. */
 function createNotification(
   type,

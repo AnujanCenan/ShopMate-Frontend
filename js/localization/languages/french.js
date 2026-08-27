@@ -477,6 +477,13 @@ registerLanguage("fr", {
     quickPicks: "Sélections rapides",
     shopName: "Nom du magasin",
     updateQuantity: "Mettre à jour la quantité",
+    repeat: "Répéter",
+    doesNotRepeat: "Ne pas répéter",
+    daily: "Quotidien",
+    weekly: "Hebdomadaire",
+    monthly: "Mensuel",
+    startDate: "Date de début",
+    endDate: "Date de fin",
   },
 
   notifications: {
@@ -509,6 +516,9 @@ registerLanguage("fr", {
     system: "Système",
     title: "Notifications",
     unread: "Non lues",
+    recurringItemAdded: "Article récurrent ajouté",
+    recurringItemAddedMessage:
+      "{{itemName}} a de nouveau été ajouté à votre liste de courses.",
   },
 
   profile: {
