@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notifications</title>
+    <title data-i18n="notifications.title">Notifications</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -16,53 +16,69 @@
             alt="Back"
           />
         </button>
-        <h1 class="modernPageTitle">Notifications</h1>
+        <h1 class="modernPageTitle" data-i18n="notifications.title">
+          Notifications
+        </h1>
       </header>
       <main class="pageContent">
         <div class="notificationFilterBar">
           <button
             class="notificationFilterButton activeNotificationFilter"
             onclick="filterNotifications('all', this)"
+            data-i18n="notifications.all"
           >
             All
           </button>
           <button
             class="notificationFilterButton"
             onclick="filterNotifications('unread', this)"
+            data-i18n="notifications.unread"
           >
             Unread
           </button>
           <button
             class="notificationFilterButton"
             onclick="filterNotifications('item', this)"
+            data-i18n="notifications.items"
           >
             Items
           </button>
           <button
             class="notificationFilterButton"
             onclick="filterNotifications('budget', this)"
+            data-i18n="notifications.budget"
           >
             Budget
           </button>
           <button
             class="notificationFilterButton"
             onclick="filterNotifications('group', this)"
+            data-i18n="notifications.groups"
           >
             Groups
           </button>
           <button
             class="notificationFilterButton"
             onclick="filterNotifications('system', this)"
+            data-i18n="notifications.system"
           >
             System
           </button>
         </div>
         <div id="notificationList"></div>
         <div class="bottomActionBar">
-          <button class="secondaryButton" onclick="markAllNotificationsRead()">
+          <button
+            class="secondaryButton"
+            onclick="markAllNotificationsRead()"
+            data-i18n="notifications.markAllRead"
+          >
             Mark All Read
           </button>
-          <button class="dangerButton" onclick="clearNotifications()">
+          <button
+            class="dangerButton"
+            onclick="clearNotifications()"
+            data-i18n="notifications.clearAll"
+          >
             Clear All
           </button>
         </div>
@@ -70,6 +86,13 @@
     </div>
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
+    <script src="../js/localization/languageManager.js"></script>
     <script src="../js/notificationsPage.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
+    </script>
   </body>
 </html>

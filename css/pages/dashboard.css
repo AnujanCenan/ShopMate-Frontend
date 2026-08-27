@@ -28,7 +28,7 @@
 /* Budget Widget Subtitle */
 .budgetWidgetSubtitle {
   margin-top: 4px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 13px;
 }
 /* Budget Widget Summary */
@@ -47,7 +47,7 @@
 .budgetWidgetDetails {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid #eef2f7;
+  border-top: 1px solid var(--borderColor);
 }
 /* Budget Detail Row */
 .budgetDetailRow {
@@ -69,7 +69,7 @@
 /* Budget Allocation Text */
 .budgetAllocationText {
   margin-top: 10px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 13px;
   font-weight: 600;
 }

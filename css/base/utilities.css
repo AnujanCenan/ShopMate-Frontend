@@ -17,11 +17,7 @@
 .hidden {
   display: none !important;
 }
-/* Hidden Screen Overlay */
-.screenOverlay.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
+
 /* Hidden Bottom Sheet */
 .bottomSheet.hidden {
   transform: translateY(100%);

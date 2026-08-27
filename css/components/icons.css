@@ -72,7 +72,7 @@
   align-items: center;
   justify-content: center;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: var(--iconColor);
   font-size: 20px;
   line-height: 1;
   pointer-events: none;
@@ -95,4 +95,21 @@
 #budgetCollapseIcon {
   font-size: 20px;
   transition: 0.25s;
+}
+/* Theme Aware SVG Icons */
+.icon,
+.actionIcon,
+.navigationIcon,
+.featureIcon,
+.largeIcon,
+.smallIcon {
+  color: var(--iconColor);
+}
+/* SVGs using currentColor */
+.icon path,
+.actionIcon path,
+.navigationIcon path,
+.featureIcon path {
+  stroke: currentColor;
+  fill: currentColor;
 }

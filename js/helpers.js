@@ -147,7 +147,7 @@ function renderProductSuggestions(searchText) {
     search === ""
       ? `
         <div class="quickPickHeading">
-          ⭐ Quick Picks
+          ⭐ ${t("item.quickPicks")}
         </div>
       `
       : "";
@@ -209,9 +209,38 @@ function selectSuggestedProduct(productName) {
   itemQuantityInput.focus();
 }
 const ICON_BASE_PATH = "../assets/icons";
-/* Get Icon Path - Returns the full path of an SVG icon from the assets folder. */
+/* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {
-  return `${ICON_BASE_PATH}/${folder}/${iconName}.svg`;
+  let themeFolder = "light";
+  if (appState.settings.theme === "dark") {
+    themeFolder = "dark";
+  } else if (appState.settings.theme === "system") {
+    themeFolder = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return `${ICON_BASE_PATH}/${themeFolder}/${folder}/${iconName}.svg`;
+}
+/* Refresh Icons - Reloads all application icons after the theme changes. */
+function refreshIcons() {
+  document.querySelectorAll("img.icon").forEach(function (icon) {
+    const source = icon.getAttribute("src");
+    if (!source) {
+      return;
+    }
+    const parts = source.split("/");
+    const iconFile = parts.pop();
+    const folder = parts.pop();
+    icon.src = getIconPath(folder, iconFile.replace(".svg", ""));
+    const fingerprintIcon = document.getElementById("fingerprintIcon");
+    if (fingerprintIcon) {
+      fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+    }
+    const faceIdIcon = document.getElementById("faceIdIcon");
+    if (faceIdIcon) {
+      faceIdIcon.src = getIconPath("biometric", "faceid");
+    }
+  });
 }
 /* Open Bottom Sheet - Displays the bottom sheet and prevents background interaction. */
 function openBottomSheet() {
@@ -322,12 +351,13 @@ function calculateGroupBudget() {
   });
   return spent;
 }
-/* Show Dialog */
-function showDialog(title, message="") {
+/* Show Dialog - Displays a simple information dialog with an optional confirmation callback. */
+function showDialog(title, message, onConfirm = null) {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
   }
+  window.dialogConfirmCallback = onConfirm;
   document.body.insertAdjacentHTML(
     "beforeend",
     `
@@ -345,7 +375,7 @@ function showDialog(title, message="") {
           <div class="dialogActions">
             <button
               class="primaryButton"
-              onclick="closeDialog()"
+              onclick="confirmDialog()"
             >
               OK
             </button>
@@ -355,6 +385,15 @@ function showDialog(title, message="") {
     `,
   );
 }
+/* Confirm Dialog - Closes the dialog and executes the confirmation callback if one exists. */
+function confirmDialog() {
+  closeDialog();
+  if (typeof window.dialogConfirmCallback === "function") {
+    const callback = window.dialogConfirmCallback;
+    window.dialogConfirmCallback = null;
+    callback();
+  }
+}
 /* Close Dialog - Closes the currently displayed dialog. */
 function closeDialog() {
   const dialog = document.getElementById("appDialogOverlay");
@@ -363,12 +402,13 @@ function closeDialog() {
   }
 }
 /* Show Confirmation Dialog - Displays a confirmation dialog and executes the supplied callback when confirmed. */
-function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
+function showConfirmDialog(title, message, onConfirm, confirmText = null) {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
   }
   window.dialogConfirmAction = onConfirm;
+  const resolvedConfirmText = confirmText || t("common.confirm");
   document.body.insertAdjacentHTML(
     "beforeend",
     `
@@ -388,13 +428,13 @@ function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
               class="secondaryButton"
               onclick="closeDialog()"
             >
-              Cancel
+              ${t("common.cancel")}
             </button>
             <button
               class="dangerButton"
               onclick="executeDialogConfirm()"
             >
-              ${confirmText}
+              ${resolvedConfirmText}
             </button>
           </div>
         </div>
@@ -442,6 +482,146 @@ function showToast(message, type = "success") {
     }
   }, 2500);
 }
+/* Process Recurring Items */
+function processRecurringItems() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let stateUpdated = false;
+  Object.values(appState.groups || {}).forEach(function (categories) {
+    categories.forEach(function (category) {
+      if (!Array.isArray(category.items)) {
+        return;
+      }
+      const recurringItems = category.items.filter(function (item) {
+        return (
+          item.recurrence &&
+          item.recurrence.enabled === true &&
+          item.recurrence.frequency !== "none"
+        );
+      });
+      recurringItems.forEach(function (item) {
+        if (!item.purchased || !item.purchaseDate) {
+          return;
+        }
+        if (item.recurrence.startDate) {
+          const recurrenceStartDate = new Date(
+            item.recurrence.startDate + "T00:00:00",
+          );
+          recurrenceStartDate.setHours(0, 0, 0, 0);
+          if (today < recurrenceStartDate) {
+            return;
+          }
+        }
+        const recurrence = item.recurrence;
+        const lastOccurrenceDate = new Date(item.purchaseDate);
+        lastOccurrenceDate.setHours(0, 0, 0, 0);
+        let nextOccurrenceDate = new Date(lastOccurrenceDate);
+        if (recurrence.frequency === "daily") {
+          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
+        } else if (recurrence.frequency === "weekly") {
+          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
+        } else if (recurrence.frequency === "monthly") {
+          nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
+        }
+        while (nextOccurrenceDate <= today) {
+          const existingOccurrence = category.items.some(
+            function (existingItem) {
+              return (
+                existingItem.name === item.name &&
+                existingItem.purchaseDate &&
+                existingItem.recurrence &&
+                existingItem.recurrence.frequency === recurrence.frequency &&
+                existingItem.purchaseDate.startsWith(
+                  nextOccurrenceDate.toISOString().split("T")[0],
+                )
+              );
+            },
+          );
+          if (existingOccurrence) {
+            nextOccurrenceDate = new Date(nextOccurrenceDate);
+            if (recurrence.frequency === "daily") {
+              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
+            } else if (recurrence.frequency === "weekly") {
+              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
+            } else if (recurrence.frequency === "monthly") {
+              nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
+            }
+          } else {
+            break;
+          }
+        }
+        const endDate = recurrence.endDate
+          ? new Date(recurrence.endDate + "T00:00:00")
+          : null;
+        if (endDate) {
+          endDate.setHours(0, 0, 0, 0);
+        }
+        if (endDate && nextOccurrenceDate > endDate) {
+          return;
+        }
+        if (nextOccurrenceDate > today) {
+          return;
+        }
+        const newItem = {
+          name: item.name,
+          quantity: item.quantity,
+          notes: item.notes,
+          preferredShop: item.preferredShop,
+          estimatedPrice: item.estimatedPrice,
+          actualPrice: 0,
+          purchaseDate: null,
+          purchased: false,
+          recurrence: {
+            enabled: true,
+            frequency: recurrence.frequency,
+            startDate: nextOccurrenceDate.toISOString().split("T")[0],
+            endDate: recurrence.endDate || null,
+            lastGeneratedDate: nextOccurrenceDate.toISOString(),
+          },
+        };
+        const duplicatePendingItem = category.items.some(
+          function (existingItem) {
+            return (
+              existingItem.name === newItem.name &&
+              !existingItem.purchased &&
+              existingItem.recurrence &&
+              existingItem.recurrence.enabled === true &&
+              existingItem.recurrence.frequency === newItem.recurrence.frequency
+            );
+          },
+        );
+        if (!duplicatePendingItem) {
+          category.items.unshift(newItem);
+
+          createNotification(
+            "item",
+            t("notifications.recurringItemAdded"),
+            t("notifications.recurringItemAddedMessage", {
+              itemName: newItem.name,
+            }),
+            "category",
+            {
+              group: appState.activeGroup,
+              category: category.name,
+            },
+            {
+              titleKey: "notifications.recurringItemAdded",
+              messageKey: "notifications.recurringItemAddedMessage",
+              params: {
+                itemName: newItem.name,
+              },
+            },
+          );
+
+          stateUpdated = true;
+        }
+      });
+    });
+  });
+  if (stateUpdated) {
+    saveAppState();
+  }
+}
 /* Create Notification - Creates a new notification and updates the notification badge. */
 function createNotification(
   type,
@@ -449,6 +629,7 @@ function createNotification(
   message,
   action = null,
   actionData = null,
+  localization = null,
 ) {
   const duplicateNotification = appState.notifications.find(
     function (notification) {
@@ -463,7 +644,7 @@ function createNotification(
   if (duplicateNotification) {
     return;
   }
-  appState.notifications.unshift({
+  const notification = {
     id: "notif_" + Date.now(),
     type,
     title,
@@ -472,7 +653,11 @@ function createNotification(
     read: false,
     action,
     actionData,
-  });
+  };
+  if (localization) {
+    notification.localization = localization;
+  }
+  appState.notifications.unshift(notification);
   const MAX_NOTIFICATIONS = 100;
   if (appState.notifications.length > MAX_NOTIFICATIONS) {
     appState.notifications = appState.notifications.slice(0, MAX_NOTIFICATIONS);
@@ -505,7 +690,7 @@ function markAllNotificationsRead() {
     renderNotifications();
   }
   updateNotificationBadge();
-  showToast("All Notifications Read");
+  showToast(t("notifications.allRead"));
 }
 /* Update Notification Badge - Updates the unread notification count displayed in the application header. */
 function updateNotificationBadge() {
@@ -545,8 +730,32 @@ function getProductImage(itemName) {
 function normalizeItemName(itemName) {
   return itemName.trim().toLowerCase();
 }
+/* Apply Theme - Applies the user's selected theme throughout the application. */
+function applyTheme() {
+  const selectedTheme = appState.settings.theme;
+  document.body.classList.remove("darkMode");
+  if (selectedTheme === "dark") {
+    document.body.classList.add("darkMode");
+  } else if (selectedTheme === "system") {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.body.classList.add("darkMode");
+    }
+  }
+  refreshIcons();
+}
+/* Initialize Theme Listener - Updates the application theme when the operating system theme changes. */
+function initializeThemeListener() {
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  mediaQuery.addEventListener("change", function () {
+    if (appState.settings.theme === "system") {
+      applyTheme();
+    }
+  });
+}
 /* Initialize Helpers - Registers helper event listeners and shared helper functionality. */
 function initializeHelpers() {
   initializeBottomSheetEvents();
+  applyTheme();
+  initializeThemeListener();
 }
 initializeHelpers();

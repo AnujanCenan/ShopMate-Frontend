@@ -70,7 +70,7 @@ function addFavorite(itemName) {
     return favoriteItem.name.trim().toLowerCase() === normalizedName;
   });
   if (alreadyExists) {
-    showSnackbar("Item already exists in Favorites");
+    showSnackbar(t("favorites.itemAlreadyExists"));
     return;
   }
   appState.favoriteItems.unshift({
@@ -78,7 +78,7 @@ function addFavorite(itemName) {
   });
   saveAppState();
   renderFilteredItems();
-  showSnackbar("Added to Favorites");
+  showSnackbar(t("favorites.addedToFavorites"));
 }
 /* Add Favorite To List - Opens the Add Item form using a favorite item. */
 function addFavoriteToList(itemName) {

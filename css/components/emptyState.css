@@ -25,20 +25,20 @@
 }
 /* Empty State Text */
 .emptyStateText {
-  color: #777777;
+  color: var(--mutedTextColor);
   font-size: 18px;
 }
 /* Duplicate Message */
 .duplicateMessage {
   margin-bottom: 14px;
-  color: #4b5563;
+  color: var(--textSecondary);
   font-size: 15px;
   line-height: 1.5;
 }
 /* Delete Message */
 .deleteMessage {
   margin-bottom: 18px;
-  color: #4b5563;
+  color: var(--textSecondary);
   font-size: 15px;
   line-height: 1.5;
 }

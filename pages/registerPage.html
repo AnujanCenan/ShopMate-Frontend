@@ -3,60 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Shopping Group</title>
+    <title data-i18n="register.title">Register</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
     <div class="authPage">
       <div class="authCard">
-        <h1 class="authTitle">Register</h1>
-        <input
-          type="text"
-          placeholder="Full Name"
-          class="authInput"
-          id="registerNameInput"
-        />
-        <input
-          type="email"
-          placeholder="Email Address"
-          class="authInput"
-          id="registerEmailInput"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          class="authInput"
-          id="registerPasswordInput"
-        />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          class="authInput"
-          id="registerConfirmPasswordInput"
-        />
-        <input
-          type="text"
-          placeholder="Group Name"
-          class="authInput"
-          id="groupNameInput"
-        />
-        <label class="biometricToggle">
-          <input type="checkbox" id="biometricCheckbox" />
-          Protect ShopMate with Biometrics
-        </label>
-        <button class="authButton" onclick="registerUser()">
-          Create Group
-        </button>
-        <button
-          class="authTextButton"
-          onclick="window.location.href = './loginPage.html'"
-        >
-          Already have an account? Login
-        </button>
+        <h1 class="authTitle" data-i18n="register.title">Register</h1>
+        <form id="registerForm" onsubmit="registerUser(event)">
+          <input
+            type="text"
+            class="authInput"
+            id="registerFirstNameInput"
+            placeholder="First Name"
+            data-i18n-placeholder="register.firstName"
+            autocomplete="given-name"
+          />
+          <input
+            type="text"
+            class="authInput"
+            id="registerLastNameInput"
+            placeholder="Last Name"
+            data-i18n-placeholder="register.lastName"
+            autocomplete="family-name"
+          />
+          <input
+            type="email"
+            class="authInput"
+            id="registerEmailInput"
+            placeholder="Email Address"
+            data-i18n-placeholder="register.email"
+            autocomplete="email"
+          />
+          <input
+            type="password"
+            class="authInput"
+            id="registerPasswordInput"
+            placeholder="Password"
+            data-i18n-placeholder="register.password"
+            autocomplete="new-password"
+          />
+          <input
+            type="password"
+            class="authInput"
+            id="registerConfirmPasswordInput"
+            placeholder="Confirm Password"
+            data-i18n-placeholder="register.confirmPassword"
+            autocomplete="new-password"
+          />
+          <input
+            type="text"
+            class="authInput"
+            id="groupNameInput"
+            placeholder="Group Name"
+            data-i18n-placeholder="register.groupName"
+            autocomplete="off"
+          />
+          <label class="biometricToggle">
+            <input type="checkbox" id="biometricCheckbox" />
+            <span data-i18n="register.biometric">
+              Protect ShopMate with Biometrics
+            </span>
+          </label>
+          <button
+            type="submit"
+            class="authButton"
+            data-i18n="register.createGroup"
+          >
+            Create Shopping Group
+          </button>
+          <button
+            type="button"
+            class="authTextButton"
+            onclick="window.location.href = './loginPage.html'"
+          >
+            <span data-i18n="register.alreadyHaveAccount">
+              Already have an account? Login
+            </span>
+          </button>
+        </form>
       </div>
     </div>
+    <!-- Core Application -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
+    <!-- Localization -->
+    <script src="../js/localization/languageManager.js"></script>
+    <!-- Application Bootstrap -->
+    <script src="../js/bootstrap.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
+    </script>
   </body>
 </html>

@@ -5,25 +5,107 @@ function initializeNotifications() {
     appState.notifications = [];
     saveAppState();
   }
+  applyNotificationPreferences();
   renderNotifications();
+}
+/* Apply Notification Preferences - Shows only enabled notification filter tabs. */
+function applyNotificationPreferences() {
+  const notificationButtons = document.querySelectorAll(
+    ".notificationFilterButton",
+  );
+  const notificationSettings = appState.settings.notifications;
+  let activeFilterAvailable = true;
+  notificationButtons.forEach(function (button) {
+    const filterType = button.textContent.trim().toLowerCase();
+    let visible = true;
+    switch (filterType) {
+      case "all":
+      case "unread":
+        visible = true;
+        break;
+      case "items":
+        visible = notificationSettings.shopping;
+        if (activeNotificationFilter === "item" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+      case "budget":
+        visible = notificationSettings.budget;
+        if (activeNotificationFilter === "budget" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+      case "groups":
+        visible = notificationSettings.group;
+        if (activeNotificationFilter === "group" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+      case "system":
+        visible = notificationSettings.general;
+        if (activeNotificationFilter === "system" && !visible) {
+          activeFilterAvailable = false;
+        }
+        break;
+    }
+    button.style.display = visible ? "" : "none";
+  });
+  if (!activeFilterAvailable) {
+    activeNotificationFilter = "all";
+    document
+      .querySelectorAll(".notificationFilterButton")
+      .forEach(function (button) {
+        button.classList.remove("activeNotificationFilter");
+        if (button.textContent.trim() === "All") {
+          button.classList.add("activeNotificationFilter");
+        }
+      });
+  }
 }
 /* Format Time */
 function formatNotificationTime(timestamp) {
   const minutes = Math.floor((Date.now() - timestamp) / 60000);
   if (minutes < 1) {
-    return "Just Now";
+    return t("notifications.justNow");
   }
   if (minutes < 60) {
-    return `${minutes} mins ago`;
+    return t("notifications.minutesAgo", {
+      count: minutes,
+    });
   }
   const hours = Math.floor(minutes / 60);
   if (hours < 24) {
-    return `${hours} hrs ago`;
+    return t("notifications.hoursAgo", {
+      count: hours,
+    });
   }
   const days = Math.floor(hours / 24);
-  return `${days} days ago`;
+  return t("notifications.daysAgo", {
+    count: days,
+  });
 }
 let activeNotificationFilter = "all";
+/* Get Localized Notification Content */
+function getLocalizedNotificationContent(notification) {
+  if (
+    notification.localization &&
+    notification.localization.titleKey &&
+    notification.localization.messageKey
+  ) {
+    return {
+      title: t(notification.localization.titleKey),
+      message: t(
+        notification.localization.messageKey,
+        notification.localization.params || {},
+      ),
+    };
+  }
+
+  return {
+    title: notification.title,
+    message: notification.message || "",
+  };
+}
 /* Get Notification Icon */
 function getNotificationIcon(notificationType) {
   switch (notificationType) {
@@ -43,10 +125,25 @@ function getNotificationIcon(notificationType) {
       return "🔔";
   }
 }
-/* Render */
+/* Render Notifications - Displays notifications based on the selected filter and user preferences. */
 function renderNotifications() {
   notificationList.innerHTML = "";
-  let notifications = appState.notifications;
+  const notificationSettings = appState.settings.notifications;
+  let notifications = appState.notifications.filter(function (notification) {
+    if (notification.type === "group" && !notificationSettings.group) {
+      return false;
+    }
+    if (notification.type === "item" && !notificationSettings.shopping) {
+      return false;
+    }
+    if (notification.type === "budget" && !notificationSettings.budget) {
+      return false;
+    }
+    if (notification.type === "system" && !notificationSettings.general) {
+      return false;
+    }
+    return true;
+  });
   switch (activeNotificationFilter) {
     case "unread":
       notifications = notifications.filter(function (notification) {
@@ -65,58 +162,59 @@ function renderNotifications() {
     notificationList.innerHTML = `
       <div class="emptyState">
         <p class="emptyStateText">
-          No Notifications Found
+          ${t("notifications.noNotificationsFound")}
         </p>
       </div>
     `;
     return;
   }
   notifications.forEach(function (notification) {
+    const localizedContent = getLocalizedNotificationContent(notification);
     notificationList.innerHTML += `
-  <div
-    class="
-      notificationCard
-      ${notification.read ? "" : "unreadNotification"}
-    "
-    onclick="
-      openNotification(
-        '${notification.id}'
-      )
-    "
-  >
-    <div class="notificationHeader">
-  <div class="notificationTitleWrapper">
-    <span class="notificationTypeIcon">
-      ${getNotificationIcon(notification.type)}
-    </span>
-    <h3 class="notificationTitle">
-      ${notification.title}
-    </h3>
-  </div>
-      <button
-        class="notificationDeleteButton"
+      <div
+        class="
+          notificationCard
+          ${notification.read ? "" : "unreadNotification"}
+        "
         onclick="
-          event.stopPropagation();
-          deleteNotification(
+          openNotification(
             '${notification.id}'
-          );
+          )
         "
       >
-        <img
-          src="${getIconPath("actions", "delete")}"
-          class="icon actionIcon"
-          alt="Delete"
-        >
-      </button>
-    </div>
-    <p class="notificationMessage">
-      ${notification.message || ""}
-    </p>
-    <p class="notificationTime">
-      ${formatNotificationTime(notification.createdAt)}
-    </p>
-  </div>
-`;
+        <div class="notificationHeader">
+          <div class="notificationTitleWrapper">
+            <span class="notificationTypeIcon">
+              ${getNotificationIcon(notification.type)}
+            </span>
+            <h3 class="notificationTitle">
+             ${localizedContent.title}
+            </h3>
+          </div>
+          <button
+            class="notificationDeleteButton"
+            onclick="
+              event.stopPropagation();
+              deleteNotification(
+                '${notification.id}'
+              );
+            "
+          >
+            <img
+              src="${getIconPath("actions", "delete")}"
+              class="icon actionIcon"
+              alt="${t("common.delete")}"
+            >
+          </button>
+        </div>
+        <p class="notificationMessage">
+          ${localizedContent.message}
+        </p>
+        <p class="notificationTime">
+          ${formatNotificationTime(notification.createdAt)}
+        </p>
+      </div>
+    `;
   });
 }
 /* Open Notification */
@@ -179,14 +277,14 @@ function goBack() {
 /* Clear All Notifications */
 function clearNotifications() {
   showConfirmDialog(
-    "Clear Notifications",
-    "Are you sure you want to clear all notifications?",
+    t("notifications.clearNotifications"),
+    t("notifications.confirmClearAll"),
     function () {
       appState.notifications = [];
       saveAppState();
       renderNotifications();
       updateNotificationBadge();
-      showToast("Notifications Cleared");
+      showToast(t("notifications.notificationsCleared"));
     },
   );
 }
@@ -200,6 +298,9 @@ function deleteNotification(notificationId) {
   saveAppState();
   renderNotifications();
   updateNotificationBadge();
-  showToast("Notification Deleted");
+  showToast(t("notifications.notificationDeleted"));
 }
-initializeNotifications();
+(async function () {
+  await initializeLocalization();
+  initializeNotifications();
+})();

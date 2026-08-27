@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopMate Category</title>
+    <title data-i18n="category.title">ShopMate Category</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -17,19 +17,37 @@
             alt="Back"
           />
         </button>
-        <h1 class="modernPageTitle" id="categoryPageTitle">Category</h1>
+        <h1
+          class="modernPageTitle"
+          id="categoryPageTitle"
+          data-i18n="category.title"
+        >
+          Category
+        </h1>
       </header>
       <!-- MAIN CONTENT -->
       <main class="pageContent">
         <!-- TABS -->
         <div class="modernTabContainer">
-          <button class="modernTabButton tabButton activeTab" data-tab="lists">
+          <button
+            class="modernTabButton tabButton activeTab"
+            data-tab="lists"
+            data-i18n="category.lists"
+          >
             Lists
           </button>
-          <button class="modernTabButton tabButton" data-tab="favorites">
+          <button
+            class="modernTabButton tabButton"
+            data-tab="favorites"
+            data-i18n="category.favorites"
+          >
             Favorites
           </button>
-          <button class="modernTabButton tabButton" data-tab="purchased">
+          <button
+            class="modernTabButton tabButton"
+            data-tab="purchased"
+            data-i18n="category.purchased"
+          >
             Purchased
           </button>
         </div>
@@ -46,6 +64,7 @@
             type="text"
             class="modernSearchInput searchInput"
             placeholder="Search Items"
+            data-i18n-placeholder="category.searchItems"
           />
         </div>
         <!-- EMPTY STATE -->
@@ -55,7 +74,13 @@
       </main>
       <!-- BULK ACTION BAR -->
       <div class="bulkActionBar hidden" id="bulkActionBar">
-        <div class="bulkSelectionCount" id="bulkSelectionCount">1 Selected</div>
+        <div
+          class="bulkSelectionCount"
+          id="bulkSelectionCount"
+          data-i18n="category.oneSelected"
+        >
+          1 Selected
+        </div>
         <button class="bulkActionButton" id="bulkFavoriteButton">
           <img
             src="../assets/icons/actions/favorite-outline.svg"
@@ -79,7 +104,9 @@
         </button>
       </div>
       <!-- FOOTER -->
-      <footer class="appFooter">© Wisemen IT Solutions</footer>
+      <footer class="appFooter" data-i18n="common.footer">
+        © Wisemen IT Solutions
+      </footer>
       <!-- FLOATING ACTION BUTTON -->
       <button class="floatingActionButton" id="openItemBottomSheetButton">
         <img
@@ -91,10 +118,20 @@
       <!-- SNACKBAR -->
       <div class="snackbar hidden" id="snackbar">
         <span class="snackbarText" id="snackbarText"></span>
-        <button class="snackbarButton" id="snackbarUndoButton">Undo</button>
+        <button
+          class="snackbarButton"
+          id="snackbarUndoButton"
+          data-i18n="common.undo"
+        >
+          Undo
+        </button>
       </div>
       <!-- OVERLAY -->
-      <div class="screenOverlay hidden" id="screenOverlay"></div>
+      <div
+        id="screenOverlay"
+        class="screenOverlay hidden"
+        onclick="closeBottomSheet()"
+      ></div>
       <!-- BOTTOM SHEET -->
       <div class="bottomSheet hidden" id="bottomSheet">
         <div class="bottomSheetHandle"></div>
@@ -111,5 +148,12 @@
     <script src="../js/selectionManager.js"></script>
     <script src="../js/authManager.js"></script>
     <script src="../js/categoryPage.js"></script>
+    <script src="../js/localization/languageManager.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
+    </script>
   </body>
 </html>

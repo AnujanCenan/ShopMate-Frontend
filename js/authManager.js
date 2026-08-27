@@ -104,38 +104,27 @@ function redirectIfLoggedIn() {
   }
 }
 /* Login User - Authenticates the user using their email address and password. */
-function loginUser() {
-  const email = document.getElementById("loginEmailInput").value.trim();
-  const password = document.getElementById("loginPasswordInput").value.trim();
-  if (!validateLoginCredentials(email, password)) {
+async function loginUser(event) {
+  if (event) {
+    event.preventDefault();
+  }
+  const emailInput = document.getElementById("loginEmailInput");
+  const passwordInput = document.getElementById("loginPasswordInput");
+  if (!emailInput || !passwordInput) {
     return;
   }
-  const user = findUserByCredentials(email, password);
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const user = validateLoginCredentials(email, password);
   if (!user) {
-    showDialog(
-      "Invalid Login",
-      "Please check your email address and password.",
-    );
+    showDialog(t("auth.invalidLogin"), t("auth.invalidLoginMessage"));
     return;
   }
-  createUserSession(user);
-  window.location.href = "./dashboardPage.html";
-  /*
-    Backend
-    POST /auth/login
-    Request
-    {
-      email,
-      password
-    }
-    Response
-    {
-      accessToken,
-      refreshToken,
-      user,
-      groups
-    }
-  */
+  setCurrentUser(user);
+  if (typeof saveAppState === "function") {
+    saveAppState();
+  }
+  window.location.href = "../pages/dashboardPage.html";
 }
 
 async function loginUserMySQL() {
@@ -187,12 +176,21 @@ async function loginUserMySQL() {
 function validateLoginCredentials(email, password) {
   if (!email || !password) {
     showDialog(
-      "Missing Information",
-      "Please enter your email address and password.",
+      t("auth.missingInformation"),
+      t("auth.missingInformationMessage"),
     );
-    return false;
+    return null;
   }
-  return true;
+  const users = appState.users || [];
+  const normalizedEmail = email.toLowerCase();
+  const user = users.find(function (item) {
+    return (
+      item.email &&
+      item.email.toLowerCase() === normalizedEmail &&
+      item.password === password
+    );
+  });
+  return user || null;
 }
 /* Find User By Credentials - Returns the matching user for the supplied login credentials. */
 function findUserByCredentials(email, password) {
@@ -204,8 +202,16 @@ function findUserByCredentials(email, password) {
   });
 }
 /* Register User - Creates a new ShopMate account and signs the user into the application. */
-function registerUser() {
-  const name = document.getElementById("registerNameInput").value.trim();
+async function registerUser(event) {
+  if (event) {
+    event.preventDefault();
+  }
+  const firstName = document
+    .getElementById("registerFirstNameInput")
+    .value.trim();
+  const lastName = document
+    .getElementById("registerLastNameInput")
+    .value.trim();
   const email = document.getElementById("registerEmailInput").value.trim();
   const password = document
     .getElementById("registerPasswordInput")
@@ -215,9 +221,11 @@ function registerUser() {
     .value.trim();
   const groupName = document.getElementById("groupNameInput").value.trim();
   const biometricEnabled = document.getElementById("biometricCheckbox").checked;
+  /* Validate Registration Details */
   if (
     !validateRegistrationDetails(
-      name,
+      firstName,
+      lastName,
       email,
       password,
       confirmPassword,
@@ -226,54 +234,84 @@ function registerUser() {
   ) {
     return;
   }
+  /* Check Whether Email Already Exists */
   if (isEmailRegistered(email)) {
     showDialog(
-      "Account Already Exists",
-      "An account with this email address already exists.",
+      t("register.accountExistsTitle"),
+      t("register.accountExistsMessage"),
     );
     return;
   }
-  const user = createUserAccount(name, email, password, biometricEnabled);
+  /* Create User Account */
+  const user = createUserAccount(
+    firstName,
+    lastName,
+    email,
+    "",
+    password,
+    biometricEnabled,
+    "",
+    "",
+    "",
+  );
+  /* Create Shopping Group */
   createGroup(groupName, user);
+  /* Start User Session */
   createUserSession(user);
-  window.location.href = "./dashboardPage.html";
+  /* Welcome New User */
+  showDialog(
+    t("register.successTitle"),
+    t("register.successMessage"),
+    function () {
+      window.location.href = "./dashboardPage.html";
+    },
+  );
   /*
-    Backend
-    POST /auth/register
-    Request
-    {
-      name,
-      email,
-      password,
-      groupName,
-      biometricEnabled
-    }
-    Response
-    {
-      user,
-      accessToken,
-      refreshToken,
-      group
-    }
-  */
+      Backend
+      POST /auth/register
+      Request
+      {
+        firstName,
+        lastName,
+        email,
+        password,
+        groupName,
+        biometricEnabled
+      }
+      Response
+      {
+        user,
+        accessToken,
+        refreshToken,
+        group
+      }
+    */
 }
 /* Validate Registration Details - Validates all information required to register a new account. */
 function validateRegistrationDetails(
-  name,
+  firstName,
+  lastName,
   email,
   password,
   confirmPassword,
   groupName,
 ) {
-  if (!name || !email || !password || !confirmPassword || !groupName) {
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !password ||
+    !confirmPassword ||
+    !groupName
+  ) {
     showDialog(
-      "Missing Information",
-      "Please complete all registration fields.",
+      t("auth.registrationMissingInformation"),
+      t("auth.registrationMissingInformationMessage"),
     );
     return false;
   }
   if (password !== confirmPassword) {
-    showDialog("Password Mismatch", "Passwords do not match.");
+    showDialog(t("auth.passwordMismatch"), t("auth.passwordMismatchMessage"));
     return false;
   }
   return true;
@@ -285,11 +323,25 @@ function isEmailRegistered(email) {
   });
 }
 /* Create User Account - Creates and stores a new user account. */
-function createUserAccount(name, email, password, biometricEnabled) {
+function createUserAccount(
+  firstName,
+  lastName,
+  email,
+  password,
+  biometricEnabled,
+) {
   const user = {
     id: "user_" + Date.now(),
-    name,
+    firstName,
+    lastName,
+    name: `${firstName} ${lastName}`.trim(),
     email,
+    phone: "",
+    gender: "",
+    dateOfBirth: "",
+    profilePhoto: "",
+    profileCompleted: false,
+    memberSince: new Date().toISOString().split("T")[0],
     password,
     biometricEnabled,
   };
@@ -298,7 +350,6 @@ function createUserAccount(name, email, password, biometricEnabled) {
   return user;
 }
 /* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
-
 function createGroup(groupName, user) {
   appState.groups[groupName] = [];
   if (!appState.groupMembers) {
@@ -320,8 +371,11 @@ function createUserSession(user) {
   appState.loggedIn = true;
   appState.currentUser = {
     id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     name: user.name,
     email: user.email,
+    memberSince: user.memberSince,
     biometricEnabled: user.biometricEnabled,
   };
   appState.activeGroup = getUserPrimaryGroup(user.id);
@@ -350,8 +404,11 @@ function refreshUserSession() {
   }
   appState.currentUser = {
     id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     name: user.name,
     email: user.email,
+    memberSince: user.memberSince,
     biometricEnabled: user.biometricEnabled,
   };
   appState.activeGroup = getUserPrimaryGroup(user.id);
@@ -423,24 +480,24 @@ function validateInvite(inviteCode) {
 function joinGroupFromInvite(inviteCode) {
   const invite = validateInvite(inviteCode);
   if (!invite) {
-    showDialog("Invalid Invite", "The invite code you entered is invalid.");
+    showDialog(t("auth.invalidInvite"), t("auth.invalidInviteMessage"));
     return;
   }
   const currentUser = getCurrentUser();
   if (!currentUser) {
     showDialog(
-      "Authentication Required",
-      "Please sign in before joining a group.",
+      t("auth.authenticationRequired"),
+      t("auth.authenticationRequiredMessage"),
     );
     return;
   }
   const groupMembers = appState.groupMembers[invite.groupName];
   if (!groupMembers) {
-    showDialog("Group Not Found", "The invited group no longer exists.");
+    showDialog(t("auth.groupNotFound"), t("auth.groupNotFoundMessage"));
     return;
   }
   if (isGroupMember(currentUser.id)) {
-    showDialog("Already a Member", "You are already a member of this group.");
+    showDialog(t("auth.alreadyMember"), t("auth.alreadyMemberMessage"));
     return;
   }
   groupMembers.push({
@@ -453,50 +510,53 @@ function joinGroupFromInvite(inviteCode) {
   saveAppState();
   window.location.href = "../pages/dashboardPage.html";
   /*
-    Backend
-    POST /groups/join
-    Request
-    {
-      inviteCode,
-      userId
-    }
-    Response
-    {
-      group,
-      members
-    }
-  */
+      Backend
+      POST /groups/join
+      Request
+      {
+        inviteCode,
+        userId
+      }
+      Response
+      {
+        group,
+        members
+      }
+    */
 }
 /* Render Forgot Password Form - Displays the password recovery form in the bottom sheet. */
 function renderForgotPasswordForm() {
   const bottomSheetContent = document.getElementById("bottomSheetContent");
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
-      <h2>Forgot Password</h2>
+      <h2>
+        ${t("forgotPassword.title")}
+      </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
+        aria-label="${t("common.close")}"
       >
         ✕
       </button>
     </div>
     <div class="bottomSheetBody">
       <p class="bottomSheetDescription">
-        Enter your registered email address to receive a password reset link.
+        ${t("forgotPassword.description")}
       </p>
       <div class="formField">
         <input
           id="forgotPasswordEmail"
           type="email"
           class="bottomSheetInput"
-          placeholder="Email Address"
-        >
+          placeholder="${t("forgotPassword.emailPlaceholder")}"
+        />
       </div>
       <button
         class="primaryButton"
         onclick="sendPasswordResetLink()"
       >
-        Send Reset Link
+        ${t("forgotPassword.sendButton")}
       </button>
     </div>
   `;
@@ -509,10 +569,7 @@ function sendPasswordResetLink() {
     return;
   }
   closeBottomSheet();
-  showDialog(
-    "Password Reset",
-    "If an account exists with this email address, a password reset link has been sent.",
-  );
+  showDialog(t("forgotPassword.resetTitle"), t("forgotPassword.resetMessage"));
   /*
     Backend
     POST /auth/forgot-password
@@ -530,7 +587,10 @@ function sendPasswordResetLink() {
 /* Validate Password Recovery Email - Ensures a valid email address has been entered. */
 function validatePasswordRecoveryEmail(email) {
   if (!email) {
-    showDialog("Missing Email", "Please enter your registered email address.");
+    showDialog(
+      t("forgotPassword.missingEmailTitle"),
+      t("forgotPassword.missingEmailMessage"),
+    );
     return false;
   }
   return true;
@@ -558,13 +618,13 @@ function enableBiometricAuthentication() {
   user.biometricEnabled = true;
   refreshUserSession();
   /*
-    Backend
-    PATCH /users/preferences
-    Request
-    {
-      biometricEnabled: true
-    }
-  */
+      Backend
+      PATCH /users/preferences
+      Request
+      {
+        biometricEnabled: true
+      }
+    */
 }
 /* Disable Biometric Authentication - Disables biometric authentication for the current user. */
 function disableBiometricAuthentication() {
@@ -581,13 +641,13 @@ function disableBiometricAuthentication() {
   user.biometricEnabled = false;
   refreshUserSession();
   /*
-    Backend
-    PATCH /users/preferences
-    Request
-    {
-      biometricEnabled: false
-    }
-  */
+      Backend
+      PATCH /users/preferences
+      Request
+      {
+        biometricEnabled: false
+      }
+    */
 }
 /* Authenticate With Biometrics - Attempts to unlock the application using biometric authentication. */
 async function authenticateWithBiometrics() {
@@ -595,15 +655,15 @@ async function authenticateWithBiometrics() {
     return false;
   }
   /*
-    Mobile Integration
-    Replace this section with the platform's biometric API.
-    Android
-    • Fingerprint
-    • Face Unlock
-    iOS
-    • Face ID
-    • Touch ID
-  */
+      Mobile Integration
+      Replace this section with the platform's biometric API.
+      Android
+      • Fingerprint
+      • Face Unlock
+      iOS
+      • Face ID
+      • Touch ID
+    */
   return true;
 }
 /* Unlock Application - Unlocks the application after successful biometric authentication. */
@@ -615,3 +675,14 @@ async function unlockApplication() {
   }
   window.location.href = "../pages/dashboardPage.html";
 }
+/* Initialize Login Page - Loads biometric icons based on the selected theme. */
+document.addEventListener("DOMContentLoaded", function () {
+  const fingerprintIcon = document.getElementById("fingerprintIcon");
+  const faceIdIcon = document.getElementById("faceIdIcon");
+  if (fingerprintIcon) {
+    fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+  }
+  if (faceIdIcon) {
+    faceIdIcon.src = getIconPath("biometric", "faceid");
+  }
+});

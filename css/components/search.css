@@ -35,9 +35,9 @@
   margin-top: -10px;
   margin-bottom: 14px;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--cardColor);
   border-radius: 18px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 24px var(--shadowMedium);
   opacity: 0;
   transform: translateY(-6px);
   transition:
@@ -62,10 +62,10 @@
   transition: background 0.18s;
 }
 .productSuggestionItem:hover {
-  background: #f7fafc;
+  background: var(--surfaceColor);
 }
 .productSuggestionItem:active {
-  background: #eef7ff;
+  background: rgba(17, 138, 178, 0.12);
 }
 /* Product Suggestion Image */
 .productSuggestionImage {
@@ -75,7 +75,7 @@
   width: 46px;
   height: 46px;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--surfaceColor);
   border-radius: 12px;
   flex-shrink: 0;
 }
@@ -86,7 +86,7 @@
 }
 /* Product Suggestion Name */
 .productSuggestionName {
-  color: #222;
+  color: var(--textPrimary);
   font-size: 16px;
   font-weight: 600;
 }

@@ -1,0 +1,29 @@
+/***************************************************************************************************
+ * Global Typography
+ ***************************************************************************************************/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--textPrimary);
+  font-weight: 700;
+}
+
+p,
+span,
+label,
+small {
+  color: var(--textSecondary);
+}
+
+strong {
+  color: var(--textPrimary);
+}
+
+a {
+  color: var(--primaryColor);
+  text-decoration: none;
+}

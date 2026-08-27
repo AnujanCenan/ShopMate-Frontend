@@ -44,8 +44,15 @@ const defaultAppState = {
   users: [
     {
       id: "user_1",
+      firstName: "ShopMate",
+      lastName: "Admin",
       name: "ShopMate Admin",
       email: "admin@shopmate.app",
+      phone: "",
+      gender: "",
+      dateOfBirth: "",
+      profilePhoto: "",
+      memberSince: new Date().toISOString().split("T")[0],
       password: "123456",
       biometricEnabled: true,
     },
@@ -98,7 +105,20 @@ const defaultAppState = {
   },
   dashboardBudgetExpanded: false,
   drawerPosition: "right",
+  settings: {
+    theme: "system",
+    language: "en",
+    currency: "AUD",
+    measurementUnit: "metric",
+    notifications: {
+      group: true,
+      shopping: true,
+      budget: true,
+      general: true,
+    },
+  },
 };
+/* Load Application State - Loads the saved application state from Local Storage and upgrades older data structures if required. */
 /* Load Application State - Loads the saved application state from Local Storage and upgrades older data structures if required. */
 function loadAppState() {
   const savedState = localStorage.getItem(STORAGE_KEY);
@@ -131,6 +151,33 @@ function loadAppState() {
           item.purchaseDate = null;
           stateUpdated = true;
         }
+        /* Recurring Item Support */
+        if (item.recurrence === undefined || item.recurrence === null) {
+          item.recurrence = {
+            enabled: false,
+            frequency: "none",
+            startDate: null,
+            endDate: null,
+          };
+          stateUpdated = true;
+        } else {
+          if (item.recurrence.enabled === undefined) {
+            item.recurrence.enabled = false;
+            stateUpdated = true;
+          }
+          if (item.recurrence.frequency === undefined) {
+            item.recurrence.frequency = "none";
+            stateUpdated = true;
+          }
+          if (item.recurrence.startDate === undefined) {
+            item.recurrence.startDate = null;
+            stateUpdated = true;
+          }
+          if (item.recurrence.endDate === undefined) {
+            item.recurrence.endDate = null;
+            stateUpdated = true;
+          }
+        }
       });
     });
   });
@@ -142,6 +189,48 @@ function loadAppState() {
   /* Upgrade Group Members */
   if (!parsedState.groupMembers) {
     parsedState.groupMembers = {};
+    stateUpdated = true;
+  }
+  /* Upgrade Application Settings */
+  if (!parsedState.settings) {
+    parsedState.settings = {
+      theme: "system",
+      language: "en",
+      currency: "AUD",
+      measurementUnit: "metric",
+      notifications: {
+        group: true,
+        shopping: true,
+        budget: true,
+        general: true,
+      },
+    };
+    stateUpdated = true;
+  }
+  /* Upgrade Language Codes */
+  if (parsedState.settings.language === "english") {
+    parsedState.settings.language = "en";
+    stateUpdated = true;
+  }
+  if (parsedState.settings.language === "french") {
+    parsedState.settings.language = "fr";
+    stateUpdated = true;
+  }
+  if (parsedState.settings.language === "tamil") {
+    parsedState.settings.language = "ta";
+    stateUpdated = true;
+  }
+  /* Upgrade Notification Settings Structure */
+  if (
+    parsedState.settings &&
+    typeof parsedState.settings.notifications === "boolean"
+  ) {
+    parsedState.settings.notifications = {
+      group: true,
+      shopping: true,
+      budget: true,
+      general: true,
+    };
     stateUpdated = true;
   }
   if (stateUpdated) {

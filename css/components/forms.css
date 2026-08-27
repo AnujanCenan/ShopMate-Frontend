@@ -36,7 +36,7 @@
   height: 56px;
   padding: 0 18px;
   margin-bottom: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--borderColor);
   border-radius: 18px;
   font-size: 16px;
   outline: none;
@@ -70,9 +70,9 @@
   width: 100%;
   height: 48px;
   padding: 0 18px 0 48px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--borderColor);
   border-radius: 18px;
-  background: white;
+  background: var(--cardColor);
   font-size: 15px;
   outline: none;
   transition: all 0.2s ease;
@@ -97,7 +97,7 @@
   top: 50%;
   left: 12px;
   transform: translateY(-100%);
-  color: #334155;
+  color: var(--textSecondary);
   font-size: 18px;
   font-weight: 700;
   pointer-events: none;
@@ -107,7 +107,7 @@
   display: block;
   margin-bottom: 4px;
   margin: 0;
-  color: #4b5563;
+  color: var(--textSecondary);
   font-size: 14px;
   font-weight: 600;
 }
@@ -137,4 +137,78 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
+}
+/* Toggle Row */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--borderColor);
+}
+.toggleRow:last-child {
+  border-bottom: none;
+}
+.toggleContent {
+  flex: 1;
+}
+.toggleTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--textPrimary);
+}
+.toggleDescription {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--textSecondary);
+}
+/* Toggle Switch */
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 30px;
+}
+/* Hide native checkbox */
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+/* Toggle Background */
+.toggleSlider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: var(--borderColor); /* OFF colour */
+  border-radius: 999px;
+  transition: 0.25s ease;
+}
+/* Toggle Circle */
+.toggleSlider::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 4px;
+  top: 4px;
+  background: var(--cardColor);
+  border-radius: 50%;
+  transition: 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+/* ON State */
+.toggleSwitch input:checked + .toggleSlider {
+  background: var(--primaryColor);
+}
+/* Move Circle */
+.toggleSwitch input:checked + .toggleSlider::before {
+  transform: translateX(22px);
+}
+/* Focus */
+.toggleSwitch input:focus + .toggleSlider {
+  outline: 2px solid rgba(0, 137, 186, 0.25);
+  outline-offset: 2px;
 }

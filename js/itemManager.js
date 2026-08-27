@@ -5,63 +5,66 @@ const bottomSheetContent = document.getElementById("bottomSheetContent");
 /* Favorite Item Being Added */
 let favoriteItemToAdd = null;
 /* Render Add Item Form */
-/* Render Add Item Form */
 function renderAddItemForm(itemName = "") {
   favoriteItemToAdd = itemName || null;
   const imageUrl = itemName ? getProductImage(itemName) : "";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Add Item
+        ${t("item.addItem")}
       </h2>
       <button
         class="closeButton"
         onclick="
           favoriteItemToAdd = null;
-          closeBottomSheet();">
+          closeBottomSheet();
+        "
+      >
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close">
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Item Name
+          ${t("item.itemName")}
         </label>
         <input
           type="text"
           id="itemNameInput"
           class="bottomSheetInput"
-          placeholder="Enter Item Name"
+          placeholder="${t("item.enterItemName")}"
           value="${itemName}"
           ${itemName ? "readonly" : ""}
         >
         ${
           itemName
             ? ""
-            : `<div id="productSuggestions"
-                    class="productSuggestions">
-               </div>`
+            : `<div
+                 id="productSuggestions"
+                 class="productSuggestions"
+               ></div>`
         }
       </div>
       <div class="formRow">
         <div class="halfWidthField">
           <label class="formLabel">
-            Quantity
+            ${t("item.quantity")}
           </label>
           <input
             type="number"
             id="itemQuantityInput"
             class="bottomSheetInput"
-            placeholder="Enter Quantity"
+            placeholder="${t("item.enterQuantity")}"
             value="1"
           >
         </div>
         <div class="halfWidthField">
           <label class="formLabel">
-            Estimated Price
+            ${t("item.estimatedPrice")}
           </label>
           <div class="currencyInputWrapper">
             <span class="currencySymbol">
@@ -71,7 +74,7 @@ function renderAddItemForm(itemName = "") {
               type="number"
               id="itemPriceInput"
               class="bottomSheetInput currencyInput"
-              placeholder="Enter Estimated Price"
+              placeholder="${t("item.enterEstimatedPrice")}"
             >
           </div>
         </div>
@@ -81,42 +84,90 @@ function renderAddItemForm(itemName = "") {
           id="itemImagePreview"
           class="itemImagePreview ${imageUrl ? "" : "hidden"}"
           src="${imageUrl}"
+          alt=""
         >
       </div>
       <div class="formField">
         <label class="formLabel">
-          Preferred Shop
+          ${t("item.preferredShop")}
         </label>
         <input
           type="text"
           id="itemShopInput"
           class="bottomSheetInput"
-          placeholder="Enter Preferred Shop"
+          placeholder="${t("item.enterPreferredShop")}"
         >
       </div>
-      <div class="formField">
+            <div class="formField">
         <label class="formLabel">
-          Notes
+          ${t("item.notes")}
         </label>
         <input
           type="text"
           id="itemNotesInput"
           class="bottomSheetInput"
-          placeholder="Enter Notes"
+          placeholder="${t("item.enterNotes")}"
         >
+      </div>
+      <div class="formField">
+        <label class="formLabel">
+          ${t("item.repeat")}
+        </label>
+        <select
+          id="itemRecurrenceFrequency"
+          class="bottomSheetInput"
+        >
+          <option value="none">
+            ${t("item.doesNotRepeat")}
+          </option>
+          <option value="daily">
+            ${t("item.daily")}
+          </option>
+          <option value="weekly">
+            ${t("item.weekly")}
+          </option>
+          <option value="monthly">
+            ${t("item.monthly")}
+          </option>
+        </select>
+      </div>
+      <div
+        id="itemRecurrenceDates"
+        style="display: none;"
+      >
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.startDate")}
+          </label>
+          <input
+            type="date"
+            id="itemRecurrenceStartDate"
+            class="bottomSheetInput"
+          >
+        </div>
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.endDate")}
+          </label>
+          <input
+            type="date"
+            id="itemRecurrenceEndDate"
+            class="bottomSheetInput"
+          >
+        </div>
       </div>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
           onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
           onclick="createItem()"
         >
-          Add Item
+          ${t("item.addItem")}
         </button>
       </div>
     </div>
@@ -139,23 +190,23 @@ function renderEditItemForm(listItemId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Edit Item
+        ${t("item.editItem")}
       </h2>
       <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Item Name
+          ${t("item.itemName")}
         </label>
         <input
           type="text"
@@ -167,7 +218,7 @@ function renderEditItemForm(listItemId) {
       <div class="formRow">
         <div class="halfWidthField">
           <label class="formLabel">
-            Quantity
+            ${t("item.quantity")}
           </label>
           <input
             type="number"
@@ -178,7 +229,7 @@ function renderEditItemForm(listItemId) {
         </div>
         <div class="halfWidthField">
           <label class="formLabel">
-            Estimated Price
+            ${t("item.estimatedPrice")}
           </label>
           <div class="currencyInputWrapper">
             <span class="currencySymbol">
@@ -197,21 +248,22 @@ function renderEditItemForm(listItemId) {
         </div>
       </div>
       <div class="formField">
-  <label class="formLabel">
-    Item Image
-  </label>
-  <img
-    id="editItemImagePreview"
-    class="
-      itemImagePreview
-      ${getProductImage(item.ItemName) ? "" : "hidden"}
-    "
-    src="${getProductImage(item.ItemName)}"
-  >
-</div>
+        <label class="formLabel">
+          ${t("item.itemImage")}
+        </label>
+        <img
+          id="editItemImagePreview"
+          class="
+            itemImagePreview
+            ${getProductImage(item.name) ? "" : "hidden"}
+          "
+          src="${getProductImage(item.ItemName)}"
+          alt=""
+        >
+      </div>
       <div class="formField">
         <label class="formLabel">
-          Notes
+          ${t("item.notes")}
         </label>
         <input
           type="text"
@@ -220,9 +272,9 @@ function renderEditItemForm(listItemId) {
           value="${item.OptionalNotes || ""}"
         >
       </div>
-      <div class="formField">
+            <div class="formField">
         <label class="formLabel">
-          Preferred Shop
+          ${t("item.preferredShop")}
         </label>
         <input
           type="text"
@@ -231,24 +283,90 @@ function renderEditItemForm(listItemId) {
           value="${item.ShopName || ""}"
         >
       </div>
+      <div class="formField">
+        <label class="formLabel">
+          ${t("item.repeat")}
+        </label>
+        <select
+          id="editItemRecurrenceFrequency"
+          class="bottomSheetInput"
+        >
+          <option
+            value="none"
+            ${(item.recurrence?.frequency || "none") === "none" ? "selected" : ""}
+          >
+            ${t("item.doesNotRepeat")}
+          </option>
+          <option
+            value="daily"
+            ${item.recurrence?.frequency === "daily" ? "selected" : ""}
+          >
+            ${t("item.daily")}
+          </option>
+          <option
+            value="weekly"
+            ${item.recurrence?.frequency === "weekly" ? "selected" : ""}
+          >
+            ${t("item.weekly")}
+          </option>
+          <option
+            value="monthly"
+            ${item.recurrence?.frequency === "monthly" ? "selected" : ""}
+          >
+            ${t("item.monthly")}
+          </option>
+        </select>
+      </div>
+      <div
+        id="editItemRecurrenceDates"
+        style="${
+          item.recurrence?.enabled && item.recurrence?.frequency !== "none"
+            ? ""
+            : "display: none;"
+        }"
+      >
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.startDate")}
+          </label>
+          <input
+            type="date"
+            id="editItemRecurrenceStartDate"
+            class="bottomSheetInput"
+            value="${item.recurrence?.startDate || ""}"
+          >
+        </div>
+        <div class="formField">
+          <label class="formLabel">
+            ${t("item.endDate")}
+          </label>
+          <input
+            type="date"
+            id="editItemRecurrenceEndDate"
+            class="bottomSheetInput"
+            value="${item.recurrence?.endDate || ""}"
+          >
+        </div>
+      </div>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
           onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
           onclick="updateItem(${listItemId})"
         >
-          Save Changes
+          ${t("common.saveChanges")}
         </button>
       </div>
     </div>
   `;
   openBottomSheet();
   initializeEditImagePreview();
+  initializeEditRecurrenceForm();
 }
 /* Initialize Item Form */
 function initializeItemForm() {
@@ -311,6 +429,30 @@ function initializeItemForm() {
       imagePreview.classList.remove("hidden");
     }
   });
+  const recurrenceFrequency = document.getElementById(
+    "itemRecurrenceFrequency",
+  );
+  const recurrenceDates = document.getElementById("itemRecurrenceDates");
+  if (recurrenceFrequency && recurrenceDates) {
+    recurrenceFrequency.addEventListener("change", function () {
+      recurrenceDates.style.display =
+        recurrenceFrequency.value === "none" ? "none" : "";
+    });
+  }
+}
+/* Initialize Edit Recurrence Form */
+function initializeEditRecurrenceForm() {
+  const recurrenceFrequency = document.getElementById(
+    "editItemRecurrenceFrequency",
+  );
+  const recurrenceDates = document.getElementById("editItemRecurrenceDates");
+  if (!recurrenceFrequency || !recurrenceDates) {
+    return;
+  }
+  recurrenceFrequency.addEventListener("change", function () {
+    recurrenceDates.style.display =
+      recurrenceFrequency.value === "none" ? "none" : "";
+  });
 }
 /*Image Preview */
 function initializeImagePreview() {
@@ -364,10 +506,10 @@ async function createItem() {
   const itemShop = itemShopInput.value.trim();
   const itemPrice =
     Number(document.getElementById("itemPriceInput").value) || 0;
-  /* Item added from Favorites? */
+  /* Item added from Favorites */
   const openedFromFavorite = favoriteItemToAdd !== null;
   if (!itemName || !itemQuantity) {
-    showSnackbar("Please enter item details");
+    showSnackbar(t("item.enterItemDetails"));
     return;
   }
 
@@ -405,52 +547,59 @@ async function createItem() {
   const existingItem = false; // TODO: check if there is an existing item
   if (existingItem) {
     bottomSheetContent.innerHTML = `
-            <div class="bottomSheetHeader">
-                <h2>
-                    Item Already Exists
-                </h2>
-                <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
-            </div>
-            <div class="bottomSheetBody">
-                <p class="duplicateMessage">
-                    "${existingItem.name}" already exists with quantity
-                    ${existingItem.quantity}.
-                </p>
-                <p class="duplicateMessage">
-                    Do you want to add ${itemQuantity} more?
-                </p>
-                <div class="bottomSheetButtonRow">
-                    <button
-                        class="secondaryButton"
-                        onclick="closeBottomSheet()"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        class="primaryButton"
-                        onclick="updateDuplicateQuantity(
-                            '${existingItem.name}',
-                            '${itemQuantity}'
-                        )"
-                    >
-                        Update Quantity
-                    </button>
-                </div>
-            </div>
-        `;
+      <div class="bottomSheetHeader">
+        <h2>
+          ${t("item.itemAlreadyExists")}
+        </h2>
+        <button
+          class="closeButton"
+          onclick="closeBottomSheet()"
+        >
+          <img
+            src="${getIconPath("navigation", "close")}"
+            class="icon actionIcon"
+            alt="${t("common.close")}"
+          >
+        </button>
+      </div>
+      <div class="bottomSheetBody">
+        <p class="duplicateMessage">
+          "${existingItem.name}"
+          ${t("item.alreadyExistsWithQuantity")}
+          ${existingItem.quantity}.
+        </p>
+        <p class="duplicateMessage">
+          ${t("item.addMoreQuantity", {
+            quantity: itemQuantity,
+          })}
+        </p>
+        <div class="bottomSheetButtonRow">
+          <button
+            class="secondaryButton"
+            onclick="closeBottomSheet()"
+          >
+            ${t("common.cancel")}
+          </button>
+          <button
+            class="primaryButton"
+            onclick="updateDuplicateQuantity(
+              '${existingItem.name}',
+              '${itemQuantity}'
+            )"
+          >
+            ${t("item.updateQuantity")}
+          </button>
+        </div>
+      </div>
+    `;
     return;
   }
-
-  
+  const recurrenceFrequency =
+    document.getElementById("itemRecurrenceFrequency")?.value || "none";
+  const recurrenceStartDate =
+    document.getElementById("itemRecurrenceStartDate")?.value || null;
+  const recurrenceEndDate =
+    document.getElementById("itemRecurrenceEndDate")?.value || null;
   const newItem = {
     ListItemId: listItemId,
     ItemMasterId: itemMasterId,
@@ -464,6 +613,12 @@ async function createItem() {
     ActualPrice: 0,
     purchaseDate: null,
     Purchased: false,
+    recurrence: {
+      enabled: recurrenceFrequency !== "none",
+      frequency: recurrenceFrequency,
+      startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
+      endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+    },
   };
   state.listItems.unshift(newItem);
   saveProductToCatalog(newItem);
@@ -491,11 +646,26 @@ async function createItem() {
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
-  showSnackbar("Item added");
-  createNotification("item", "Item Added", `${item.name} added.`, "category", {
-    group: appState.activeGroup,
-    category: getActiveCategory().name,
-  });
+  showSnackbar(t("item.itemAdded"));
+  createNotification(
+    "item",
+    t("notifications.itemAdded"),
+    t("notifications.itemAddedMessage", {
+      itemName: itemName,
+    }),
+    "category",
+    {
+      group: appState.activeGroup,
+      category: getActiveCategory().name,
+    },
+    {
+      titleKey: "notifications.itemAdded",
+      messageKey: "notifications.itemAddedMessage",
+      params: {
+        itemName: itemName,
+      },
+    },
+  );
   favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
@@ -514,7 +684,7 @@ function updateDuplicateQuantity(itemName, newQuantity) {
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
-  showSnackbar("Quantity updated");
+  showSnackbar(t("item.quantityUpdated"));
 }
 /* Update Item */
 
@@ -553,47 +723,50 @@ async function updateItem(listItemId) {
     return;
   }
   const originalItemName = item.ItemName.trim().toLowerCase();
-
-  const updatedName = document.getElementById("editItemNameInput").value.trim();
-  const updatedQuantity = document
+  const newName = document.getElementById("editItemNameInput").value.trim();
+  const newQuantity = document
     .getElementById("editItemQuantityInput")
     .value.trim();
-  const updatedNotes = document
-    .getElementById("editItemNotesInput")
-    .value.trim();
-  const updatedShop = document.getElementById("editItemShopInput").value.trim();
-  const updatedPrice =
+  const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
-  if (!updatedName || !updatedQuantity) {
-    showSnackbar("Please enter item details");
+  const newNotes = document.getElementById("editItemNotesInput").value.trim();
+  const newShop = document.getElementById("editItemShopInput").value.trim();
+  if (!newName || !newQuantity) {
+    showSnackbar(t("item.enterItemDetails"));
     return;
   }
-  const duplicateItem = state.listItems.find(function (existingItem) {
+  const normalizedNewName = newName.toLowerCase();
+  const duplicateItem = currentCategory.items.find(function (existingItem) {
     return (
-      existingItem.ItemName.toLowerCase() === updatedName.trim().toLowerCase() &&
-      existingItem.ItemName !== originalItemName
+      existingItem.name !== originalItemName &&
+      existingItem.name.trim().toLowerCase() === normalizedNewName
     );
   });
-  // if (duplicateItem) {
-  //   showSnackbar("Another item already exists with same name");
-  //   return;
-  // }
-  item.ItemName = updatedName;
-  item.Quantity = updatedQuantity;
-  item.OptionalNotes = updatedNotes;
-  item.ShopName = updatedShop;
-  item.estimatedPrice = updatedPrice;
-
-  await updateItemMySql(listItemId, item);
-
-  saveAppState();
-  calculateGroupBudget();
-  if (typeof renderBudgetDashboardWidget === "function") {
-    renderBudgetDashboardWidget();
+  if (duplicateItem) {
+    showSnackbar(t("item.duplicateItemName"));
+    return;
   }
+  const recurrenceFrequency =
+    document.getElementById("editItemRecurrenceFrequency")?.value || "none";
+  const recurrenceStartDate =
+    document.getElementById("editItemRecurrenceStartDate")?.value || null;
+  const recurrenceEndDate =
+    document.getElementById("editItemRecurrenceEndDate")?.value || null;
+  item.ItemName = newName;
+  item.Quantity = newQuantity;
+  item.estimatedPrice = newPrice;
+  item.notes = newNotes;
+  item.preferredShop = newShop;
+  item.recurrence = {
+    enabled: recurrenceFrequency !== "none",
+    frequency: recurrenceFrequency,
+    startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
+    endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+  };
+  saveAppState();
   renderFilteredItems();
   closeBottomSheet();
-  showSnackbar("Item updated");
+  showSnackbar(t("item.itemUpdated"));
 }
 
 /*Save Product to Catalog */
@@ -652,7 +825,7 @@ async function openPurchaseConfirmation(listItemId) {
     item.ActualPrice = 0;
     // saveAppState();
     renderFilteredItems();
-    showSnackbar("Moved back to List");
+    showSnackbar(t("item.movedBackToList"));
     return;
   }
 
@@ -660,61 +833,63 @@ async function openPurchaseConfirmation(listItemId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Confirm Purchase
+        ${t("item.confirmPurchase")}
       </h2>
       <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
     </div>
     <div class="bottomSheetBody">
-      <div class="purchaseSummaryCard">
-        <h3>
-          ${item.ItemName}
-        </h3>
-        <p>
-          Estimated:
-          $${item.estimatedPrice || 0}
-        </p>
+      <div class="purchaseItemName">
+        ${item.ItemName}
       </div>
       <div class="formField">
         <label class="formLabel">
-          Actual Price Paid
+          ${t("item.estimatedPrice")}
         </label>
-        <div
-          class="currencyInputWrapper"
-        >
-          <span
-            class="currencySymbol"
-          >
+        <div class="currencyInputWrapper">
+          <span class="currencySymbol">
             $
           </span>
           <input
             type="number"
-            id="purchasePriceInput"
             class="bottomSheetInput currencyInput"
             value="${item.estimatedPrice || 0}"
+            readonly
           >
         </div>
       </div>
-      <div
-        class="
-          bottomSheetButtonRow
-        "
-      >
+      <div class="formField">
+        <label class="formLabel">
+          ${t("item.actualPricePaid")}
+        </label>
+        <div class="currencyInputWrapper">
+          <span class="currencySymbol">
+            $
+          </span>
+          <input
+            type="number"
+            id="actualPriceInput"
+            class="bottomSheetInput currencyInput"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+          >
+        </div>
+      </div>
+      <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="
-            closeBottomSheet()
-          "
+          onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
@@ -724,7 +899,7 @@ async function openPurchaseConfirmation(listItemId) {
             )
           "
         >
-          Confirm
+          ${t("common.confirm")}
         </button>
       </div>
     </div>
@@ -741,36 +916,52 @@ async function confirmPurchase(listItemId) {
     return;
   }
   const actualPrice =
-    Number(document.getElementById("purchasePriceInput").value) || 0;
+    Number(document.getElementById("actualPriceInput").value) || 0;
   item.actualPrice = actualPrice;
-  item.purchaseDate = new Date().toISOString();
   item.purchased = !item.purchased;
-
+  
   await markPurchased_mysql(item, actualPrice);
-
-  const itemToUpdate = state.listItems.find(item => item.ListItemId === listItemId);
-    
-  if (itemToUpdate) {
-    itemToUpdate.Purchased = true;
-    itemToUpdate.actualPrice = actualPrice;
+  if (item.purchased) {
+    item.purchaseDate = new Date().toISOString();
+    if (item.recurrence && item.recurrence.enabled === true) {
+      item.recurrence.lastGeneratedDate = null;
+    }
+  } else {
+    item.purchaseDate = null;
   }
-  // updateBudgetTracking(currentCategory.name, actualPrice);   // TODO: rectify budget tracking
+  if (item.purchased) {
+    item.purchaseDate = new Date().toISOString();
+  } else {
+    item.purchaseDate = null;
+  }
+  updateBudgetTracking(currentCategory.name, actualPrice);
   calculateGroupBudget();
   saveAppState();
   renderFilteredItems();
   if (typeof renderBudgetDashboardWidget === "function") {
     renderBudgetDashboardWidget();
-  }  
+  }
   closeBottomSheet();
-  showSnackbar(item.purchased ? "Item purchased" : "Item restored");
+  showSnackbar(
+    item.purchased ? t("item.itemPurchased") : t("item.itemRestored"),
+  );
   createNotification(
     "purchase",
-    "Item Purchased",
-    `${item.name} purchased.`,
+    t("notifications.itemPurchased"),
+    t("notifications.itemPurchasedMessage", {
+      itemName: item.name,
+    }),
     "category",
     {
       group: state.activeGroupId,
       category: state.activeCategoryId,
+    },
+    {
+      titleKey: "notifications.itemPurchased",
+      messageKey: "notifications.itemPurchasedMessage",
+      params: {
+        itemName: item.name,
+      },
     },
   );
 }
@@ -793,10 +984,17 @@ function updateBudgetTracking(categoryName, amount) {
       categoryBudget.overspendNotified = true;
       createNotification(
         "budget",
-        "Budget Exceeded",
-        `${categoryName} exceeded its budget`,
+        t("notifications.budgetExceeded"),
+        t("notifications.budgetExceededMessage", {
+          categoryName: categoryName,
+        }),
       );
-      showToast(`${categoryName} budget exceeded`, "info");
+      showToast(
+        t("notifications.budgetExceededToast", {
+          categoryName: categoryName,
+        }),
+        "info",
+      );
     }
   }
   saveAppState();

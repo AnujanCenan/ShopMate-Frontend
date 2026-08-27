@@ -80,7 +80,7 @@ function getTopSpendingCategory() {
     }
   });
   return {
-    name: topCategory || "No Spending Yet",
+    name: topCategory || t("budget.noSpendingYet"),
     amount: highestSpend,
   };
 }
@@ -148,7 +148,7 @@ function openBudgetMenu(categoryName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Budget Options
+        ${t("budget.budgetOptions")}
       </h2>
       <button
         class="closeButton"
@@ -157,7 +157,7 @@ function openBudgetMenu(categoryName) {
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close"
+          alt="${t("common.close")}"
         >
       </button>
     </div>
@@ -175,7 +175,9 @@ function openBudgetMenu(categoryName) {
           class="icon actionIcon"
           alt=""
         >
-        <span>Edit Budget</span>
+        <span>
+          ${t("budget.editBudget")}
+        </span>
       </button>
       <button
         class="bottomSheetActionButton destructiveAction"
@@ -190,7 +192,9 @@ function openBudgetMenu(categoryName) {
           class="icon actionIcon"
           alt=""
         >
-        <span>Delete Budget</span>
+        <span>
+          ${t("budget.deleteBudget")}
+        </span>
       </button>
     </div>
   `;
@@ -199,14 +203,14 @@ function openBudgetMenu(categoryName) {
 /* Edit Category Budget - Opens the form to update the monthly budget limit. */
 function editCategoryBudget(categoryName) {
   if (!canManageBudget()) {
-    showDialog("Only Admin can edit budgets.");
+    showDialog(t("budget.onlyAdminCanEdit"));
     return;
   }
   const categoryBudget = appState.budgets.categoryBudgets[categoryName];
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Edit Budget
+        ${t("budget.editBudget")}
       </h2>
       <button
         class="closeButton"
@@ -215,7 +219,7 @@ function editCategoryBudget(categoryName) {
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close"
+          alt="${t("common.close")}"
         >
       </button>
     </div>
@@ -234,7 +238,7 @@ function editCategoryBudget(categoryName) {
           )
         "
       >
-        Save
+        ${t("common.save")}
       </button>
     </div>
   `;
@@ -245,10 +249,9 @@ function saveEditedBudget(categoryName) {
   const newLimit = Number(document.getElementById("editBudgetLimit").value);
   appState.budgets.categoryBudgets[categoryName].monthlyLimit = newLimit;
   saveAppState();
-  showToast("Budget Updated");
+  showToast(t("budget.budgetUpdated"));
   closeBottomSheet();
 }
-
 /* Open Bottom Sheet - Displays the bottom sheet and locks page scrolling. */
 function openBottomSheet() {
   screenOverlay.classList.remove("hidden");

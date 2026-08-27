@@ -26,6 +26,6 @@
 }
 /* Dropdown Arrow */
 .dropdownArrow {
-  color: #7cc242;
+  color: var(--textPrimary);
   font-size: 16px;
 }

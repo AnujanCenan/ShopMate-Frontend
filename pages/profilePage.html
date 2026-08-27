@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Member Profile</title>
+    <title data-i18n="profile.title">Profile</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -16,27 +16,119 @@
             alt="Back"
           />
         </button>
-        <h1 class="modernPageTitle">Member Profile</h1>
+        <h1 class="modernPageTitle" data-i18n="profile.title">Profile</h1>
       </header>
       <main class="pageContent">
+        <!-- Profile Hero -->
         <section class="profileHero">
-          <div class="profileAvatar" id="profileAvatar">H</div>
-          <h2 class="profileName" id="profileName">Hari</h2>
-          <p class="profileRole" id="profileRole">Admin</p>
+          <div
+            class="profileAvatar clickableAvatar"
+            id="profileAvatar"
+            onclick="renderChangeProfilePhotoForm()"
+          >
+            H
+          </div>
+          <h2 id="profileName" class="profileName">Hari</h2>
+          <p id="profileEmail" class="profileEmail">hari@email.com</p>
+          <button
+            class="primaryButton"
+            onclick="renderEditProfileForm()"
+            data-i18n="profile.editProfile"
+          >
+            Edit Profile
+          </button>
         </section>
-        <section class="profileInfoCard">
+        <!-- Group Summary -->
+        <section class="profileSummaryCard">
+          <p class="profileSummaryDescription" data-i18n="profile.memberOf">
+            You're currently a member of
+          </p>
+          <div id="profileGroups" class="profileSummaryValue">0</div>
+          <div class="profileSummaryLabel" data-i18n="profile.groups">
+            Groups
+          </div>
+        </section>
+        <!-- Account Information -->
+        <section class="modernCard profileSecurityCard">
+          <h3 class="sectionTitle" data-i18n="profile.accountInformation">
+            Account Information
+          </h3>
           <div class="profileInfoRow">
-            <span>Email</span>
-            <span id="profileEmail"> hari@shopmate.app </span>
+            <span data-i18n="profile.email"> Email </span>
+            <span id="profileEmailDisplay"> - </span>
           </div>
           <div class="profileInfoRow">
-            <span>Status</span>
-            <span id="profileStatus"> Active </span>
+            <span data-i18n="profile.mobile"> Mobile </span>
+            <span id="profilePhone"> - </span>
           </div>
+          <div class="profileInfoRow">
+            <span data-i18n="profile.gender"> Gender </span>
+            <span id="profileGender"> - </span>
+          </div>
+          <div class="profileInfoRow">
+            <span data-i18n="profile.dateOfBirth"> Date of Birth </span>
+            <span id="profileDob"> - </span>
+          </div>
+          <div class="profileInfoRow">
+            <span data-i18n="profile.memberSince"> Member Since </span>
+            <span id="profileMemberSince"> - </span>
+          </div>
+        </section>
+        <!-- Security -->
+        <section class="modernCard profileSecurityCard">
+          <h3 class="sectionTitle" data-i18n="profile.security">Security</h3>
+          <button
+            class="secondaryButton"
+            onclick="changePassword()"
+            data-i18n="profile.changePassword"
+          >
+            Change Password
+          </button>
+          <button
+            class="secondaryButton"
+            onclick="toggleBiometricAuthentication()"
+          >
+            <span id="biometricButtonText" data-i18n="profile.biometricLogin">
+              Biometric Login
+            </span>
+          </button>
         </section>
       </main>
+      <!-- Bottom Sheet -->
+      <div id="bottomSheet" class="bottomSheet hidden">
+        <div id="bottomSheetContent" class="bottomSheetContent"></div>
+      </div>
+      <!-- Snackbar -->
+      <div class="snackbar hidden" id="snackbar">
+        <span class="snackbarText" id="snackbarText"></span>
+        <button
+          class="snackbarButton"
+          id="snackbarUndoButton"
+          data-i18n="common.undo"
+        >
+          Undo
+        </button>
+      </div>
+      <!-- Profile Photo Input -->
+      <input
+        type="file"
+        id="profilePhotoInput"
+        accept="image/*"
+        hidden
+        onchange="previewProfilePhoto(event)"
+      />
+      <script src="../js/stateManager.js"></script>
+      <script src="../js/helpers.js"></script>
+      <script src="../js/authManager.js"></script>
+      <script src="../js/localization/languageManager.js"></script>
+      <script src="../js/profilePage.js"></script>
+      <script src="../js/snackbarManager.js"></script>
+      <script src="../js/bootstrap.js"></script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          initializeApplication();
+        });
+      </script>
     </div>
-    <script src="../js/stateManager.js"></script>
-    <script src="../js/profilePage.js"></script>
   </body>
 </html>

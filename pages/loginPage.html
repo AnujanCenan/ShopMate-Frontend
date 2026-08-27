@@ -3,12 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopMate Login</title>
+
+    <title data-i18n="auth.login">ShopMate Login</title>
+
     <link rel="stylesheet" href="../css/app.css" />
   </head>
+
   <body>
     <div class="authPage">
       <div class="authCard">
+        <!-- Logo and Tagline -->
         <div class="authLogoSection">
           <div class="authLogoPlaceholder">
             <img
@@ -17,68 +21,152 @@
               alt="ShopMate Logo"
             />
           </div>
-          <p class="authTagline">Manage your shopping together</p>
+
+          <p class="authTagline" data-i18n="auth.tagline">
+            Manage your shopping together
+          </p>
         </div>
-        <input
-          type="email"
-          placeholder="Email Address"
-          class="authInput"
-          id="loginEmailInput"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          class="authInput"
-          id="loginPasswordInput"
-        />
-        <div class="authBiometricRow">
-          <button class="biometricButton" onclick="unlockApplication()">
-            <img
-              src="../assets/icons/biometric/fingerprint.svg"
-              class="actionIcon"
-              alt="Edit"
-            />
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="loginUser(event)">
+          <input
+            type="email"
+            data-i18n-placeholder="auth.emailAddress"
+            placeholder="Email Address"
+            class="authInput"
+            id="loginEmailInput"
+            autocomplete="email"
+          />
+
+          <input
+            type="password"
+            data-i18n-placeholder="auth.password"
+            placeholder="Password"
+            class="authInput"
+            id="loginPasswordInput"
+            autocomplete="current-password"
+          />
+
+          <!-- Biometric Login -->
+          <div class="authBiometricRow">
+            <button
+              type="button"
+              class="biometricButton"
+              onclick="unlockApplication()"
+            >
+              <img
+                id="fingerprintIcon"
+                src="../assets/icons/light/biometric/fingerprint.svg"
+                class="icon actionIcon"
+                alt="Fingerprint"
+              />
+            </button>
+
+            <span class="authOrText" data-i18n="common.or"> OR </span>
+
+            <button
+              type="button"
+              class="biometricButton"
+              onclick="unlockApplication()"
+            >
+              <img
+                id="faceIdIcon"
+                src="../assets/icons/light/biometric/faceid.svg"
+                class="icon actionIcon"
+                alt="Face ID"
+              />
+            </button>
+          </div>
+
+          <!-- Login -->
+          <button type="submit" class="authButton" data-i18n="auth.login">
+            LOGIN
           </button>
-          <span class="authOrText"> OR </span>
-          <button class="biometricButton" onclick="unlockApplication()">
-            <img
-              src="../assets/icons/biometric/faceid.svg"
-              class="actionIcon"
-              alt="Edit"
-            />
-          </button>
-        </div>
-        <button class="authButton" onclick="loginUserMySQL()">LOGIN</button>
+        </form>
+
+        <!-- Forgot Password -->
         <button
+          type="button"
           class="authTextButton forgotPasswordButton"
           onclick="renderForgotPasswordForm()"
         >
-          Forgot Password?
+          <span data-i18n="auth.forgotPassword"> Forgot Password? </span>
         </button>
+
+        <!-- Divider -->
         <div class="authDivider">
-          <span>OR</span>
+          <span data-i18n="common.or"> OR </span>
         </div>
+
+        <!-- Create Shopping Group -->
         <button
+          type="button"
           class="secondaryButton authRegisterButton"
           onclick="window.location.href = './registerPage.html'"
         >
-          Create Shopping Group
+          <span data-i18n="auth.createShoppingGroup">
+            Create Shopping Group
+          </span>
         </button>
 
-        <p class="authInviteText">Been invited to join a shopping group?</p>
-        <p class="authInviteSubText">
+        <!-- Invitation Information -->
+        <p class="authInviteText" data-i18n="auth.invitedText">
+          Been invited to join a shopping group?
+        </p>
+
+        <p class="authInviteSubText" data-i18n="auth.invitedSubText">
           Use the invitation email sent to your registered email address.
         </p>
       </div>
     </div>
-    <div class="screenOverlay hidden" id="screenOverlay"></div>
+
+    <!-- Bottom Sheet Overlay -->
+    <div
+      id="screenOverlay"
+      class="screenOverlay hidden"
+      onclick="closeBottomSheet()"
+    ></div>
+
+    <!-- Bottom Sheet -->
     <div class="bottomSheet hidden" id="bottomSheet">
       <div class="bottomSheetHandle"></div>
+
       <div class="bottomSheetContent" id="bottomSheetContent"></div>
     </div>
+
+    <!-- Core Application -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
-    <!-- <script src="../js/bottomSheet.js"></script> -->
     <script src="../js/authManager.js"></script>
+
+    <!-- Language Architecture -->
+    <script src="../js/localization/languageManager.js"></script>
+
+    <!-- Application Bootstrap -->
+    <script src="../js/bootstrap.js"></script>
+
+    <!-- Initialize Application -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
+    </script>
+
+    <!-- Refresh Biometric Icons -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const fingerprintIcon = document.getElementById("fingerprintIcon");
+
+        const faceIdIcon = document.getElementById("faceIdIcon");
+
+        if (fingerprintIcon && typeof getIconPath === "function") {
+          fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+        }
+
+        if (faceIdIcon && typeof getIconPath === "function") {
+          faceIdIcon.src = getIconPath("biometric", "faceid");
+        }
+      });
+    </script>
   </body>
 </html>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Budget</title>
+    <title data-i18n="budget.title">Budget</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -16,14 +16,18 @@
             alt="Back"
           />
         </button>
-        <h1 class="modernPageTitle">Budget</h1>
+        <h1 class="modernPageTitle" data-i18n="budget.title">Budget</h1>
       </header>
       <main class="pageContent">
         <div id="budgetAnalysisContainer"></div>
       </main>
     </div>
     <!-- Screen Overlay -->
-    <div class="screenOverlay hidden" id="screenOverlay"></div>
+    <div
+      id="screenOverlay"
+      class="screenOverlay hidden"
+      onclick="closeBottomSheet()"
+    ></div>
     <!-- Bottom Sheet -->
     <div class="bottomSheet hidden" id="bottomSheet">
       <div class="bottomSheetHandle"></div>
@@ -32,5 +36,12 @@
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/budgetPage.js"></script>
+    <script src="../js/localization/languageManager.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
+    </script>
   </body>
 </html>

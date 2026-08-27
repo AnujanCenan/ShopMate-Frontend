@@ -25,7 +25,7 @@
   min-width: 260px;
   max-width: 90%;
   padding: 14px 18px;
-  background: white;
+  background: var(--cardColor);
   border-radius: 16px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
   transform: translateX(-50%);

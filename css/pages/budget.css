@@ -22,7 +22,7 @@
   padding: 32px 24px;
   margin-bottom: 24px;
   background: linear-gradient(135deg, #118ab2, #0f6d8d);
-  color: white;
+  color: var(--textPrimary);
   border-radius: 28px;
 }
 /* Budget Amount */
@@ -35,7 +35,7 @@
 .budgetSubtitle {
   margin-top: 6px;
   margin-bottom: 18px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 14px;
 }
 /* Budget Statistics */
@@ -56,7 +56,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 12px;
-  color: #475569;
+  color: var(--textSecondary);
   font-size: 14px;
   font-weight: 600;
 }
@@ -106,14 +106,14 @@
 /* Budget Insight */
 .budgetInsight {
   margin-top: 8px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   text-align: center;
   font-size: 14px;
 }
 /* Budget Recommendation */
 .budgetRecommendation {
   margin-top: 12px;
-  color: #475569;
+  color: var(--textSecondary);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -136,7 +136,7 @@
 .categoryBudgetSummary {
   margin-top: 8px;
   margin-bottom: 10px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -145,7 +145,7 @@
   justify-content: space-between;
 }
 .categoryBudgetSummary strong {
-  color: #0f172a;
+  color: var(--textPrimary);
   font-weight: 700;
 }
 /* Quick Pick Heading */
@@ -153,9 +153,9 @@
   position: sticky;
   top: 0;
   padding: 14px 16px 10px;
-  background: #fafafa;
-  color: #64748b;
-  border-bottom: 1px solid #edf2f7;
+  background: var(--cardColor);
+  color: var(--mutedTextColor);
+  border-bottom: 1px solid var(--borderColor);
   text-transform: uppercase;
   letter-spacing: 0.6px;
   font-size: 13px;
@@ -177,7 +177,7 @@
   justify-content: space-between;
   width: 100%;
   padding: 20px 15px 15px;
-  background: white;
+  background: var(--cardColor);
   border: none;
   cursor: pointer;
 }
@@ -188,7 +188,7 @@
 }
 .budgetSummaryHeader p {
   margin-top: 10px;
-  color: #64748b;
+  color: var(--mutedTextColor);
   font-size: 13px;
 }
 /* Budget Summary Body */
