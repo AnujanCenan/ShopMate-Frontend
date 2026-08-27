@@ -644,7 +644,7 @@ async function saveRenamedCategory(categoryName, listId) {
   //     appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
   //   delete appState.budgets.categoryBudgets[appState.activeGroup][categoryName];
   // }
-  
+
   await renameCategoryMySql(newCategoryName, state.activeGroupId, listId);
 
   saveAppState();
@@ -1639,6 +1639,7 @@ Reduce another category budget or increase the group budget.`,
   closeBottomSheet();
   showToast("Category Budget Saved");
   renderCategories();
+  renderBudgetDashboardWidget();
 }
 
 /* Save Group Budget */
