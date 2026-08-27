@@ -22,15 +22,24 @@ function showUndoSnackbar(item, index) {
   if (!snackbar || !snackbarText || !snackbarUndoButton) {
     return;
   }
+
   undoItem = item;
   undoIndex = index;
-  snackbarText.textContent = `${item.name} deleted`;
+
+  snackbarText.textContent = t("common.itemDeleted", {
+    itemName: itemName,
+  });
+
   snackbarUndoButton.style.display = "block";
+
   snackbar.classList.remove("hidden");
+
   clearTimeout(timeout);
+
   timeout = setTimeout(function () {
     undoItem = null;
     undoIndex = null;
+
     snackbar.classList.add("hidden");
   }, 5000);
 }

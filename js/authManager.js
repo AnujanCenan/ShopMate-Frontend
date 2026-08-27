@@ -104,52 +104,47 @@ function redirectIfLoggedIn() {
   }
 }
 /* Login User - Authenticates the user using their email address and password. */
-function loginUser() {
+async function loginUser(event) {
   if (event) {
     event.preventDefault();
   }
-  const email = document.getElementById("loginEmailInput").value.trim();
-  const password = document.getElementById("loginPasswordInput").value.trim();
-  if (!validateLoginCredentials(email, password)) {
+  const emailInput = document.getElementById("loginEmailInput");
+  const passwordInput = document.getElementById("loginPasswordInput");
+  if (!emailInput || !passwordInput) {
     return;
   }
-  const user = findUserByCredentials(email, password);
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const user = validateLoginCredentials(email, password);
   if (!user) {
-    showDialog(
-      "Invalid Login",
-      "Please check your email address and password.",
-    );
+    showDialog(t("auth.invalidLogin"), t("auth.invalidLoginMessage"));
     return;
   }
-  createUserSession(user);
-  window.location.href = "./dashboardPage.html";
-  /*
-      Backend
-      POST /auth/login
-      Request
-      {
-        email,
-        password
-      }
-      Response
-      {
-        accessToken,
-        refreshToken,
-        user,
-        groups
-      }
-    */
+  setCurrentUser(user);
+  if (typeof saveAppState === "function") {
+    saveAppState();
+  }
+  window.location.href = "../pages/dashboardPage.html";
 }
 /* Validate Login Credentials - Checks whether the required login fields are completed. */
 function validateLoginCredentials(email, password) {
   if (!email || !password) {
     showDialog(
-      "Missing Information",
-      "Please enter your email address and password.",
+      t("auth.missingInformation"),
+      t("auth.missingInformationMessage"),
     );
-    return false;
+    return null;
   }
-  return true;
+  const users = appState.users || [];
+  const normalizedEmail = email.toLowerCase();
+  const user = users.find(function (item) {
+    return (
+      item.email &&
+      item.email.toLowerCase() === normalizedEmail &&
+      item.password === password
+    );
+  });
+  return user || null;
 }
 /* Find User By Credentials - Returns the matching user for the supplied login credentials. */
 function findUserByCredentials(email, password) {
@@ -264,13 +259,13 @@ function validateRegistrationDetails(
     !groupName
   ) {
     showDialog(
-      "Missing Information",
-      "Please complete all registration fields.",
+      t("auth.registrationMissingInformation"),
+      t("auth.registrationMissingInformationMessage"),
     );
     return false;
   }
   if (password !== confirmPassword) {
-    showDialog("Password Mismatch", "Passwords do not match.");
+    showDialog(t("auth.passwordMismatch"), t("auth.passwordMismatchMessage"));
     return false;
   }
   return true;
@@ -438,24 +433,24 @@ function validateInvite(inviteCode) {
 function joinGroupFromInvite(inviteCode) {
   const invite = validateInvite(inviteCode);
   if (!invite) {
-    showDialog("Invalid Invite", "The invite code you entered is invalid.");
+    showDialog(t("auth.invalidInvite"), t("auth.invalidInviteMessage"));
     return;
   }
   const currentUser = getCurrentUser();
   if (!currentUser) {
     showDialog(
-      "Authentication Required",
-      "Please sign in before joining a group.",
+      t("auth.authenticationRequired"),
+      t("auth.authenticationRequiredMessage"),
     );
     return;
   }
   const groupMembers = appState.groupMembers[invite.groupName];
   if (!groupMembers) {
-    showDialog("Group Not Found", "The invited group no longer exists.");
+    showDialog(t("auth.groupNotFound"), t("auth.groupNotFoundMessage"));
     return;
   }
   if (isGroupMember(currentUser.id)) {
-    showDialog("Already a Member", "You are already a member of this group.");
+    showDialog(t("auth.alreadyMember"), t("auth.alreadyMemberMessage"));
     return;
   }
   groupMembers.push({
@@ -542,7 +537,6 @@ function sendPasswordResetLink() {
     }
   */
 }
-
 /* Validate Password Recovery Email - Ensures a valid email address has been entered. */
 function validatePasswordRecoveryEmail(email) {
   if (!email) {
@@ -550,10 +544,8 @@ function validatePasswordRecoveryEmail(email) {
       t("forgotPassword.missingEmailTitle"),
       t("forgotPassword.missingEmailMessage"),
     );
-
     return false;
   }
-
   return true;
 }
 /* Check Biometric Status - Returns whether biometric authentication is enabled for the current user. */

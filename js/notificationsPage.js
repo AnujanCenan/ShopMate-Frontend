@@ -66,19 +66,46 @@ function applyNotificationPreferences() {
 function formatNotificationTime(timestamp) {
   const minutes = Math.floor((Date.now() - timestamp) / 60000);
   if (minutes < 1) {
-    return "Just Now";
+    return t("notifications.justNow");
   }
   if (minutes < 60) {
-    return `${minutes} mins ago`;
+    return t("notifications.minutesAgo", {
+      count: minutes,
+    });
   }
   const hours = Math.floor(minutes / 60);
   if (hours < 24) {
-    return `${hours} hrs ago`;
+    return t("notifications.hoursAgo", {
+      count: hours,
+    });
   }
   const days = Math.floor(hours / 24);
-  return `${days} days ago`;
+  return t("notifications.daysAgo", {
+    count: days,
+  });
 }
 let activeNotificationFilter = "all";
+/* Get Localized Notification Content */
+function getLocalizedNotificationContent(notification) {
+  if (
+    notification.localization &&
+    notification.localization.titleKey &&
+    notification.localization.messageKey
+  ) {
+    return {
+      title: t(notification.localization.titleKey),
+      message: t(
+        notification.localization.messageKey,
+        notification.localization.params || {},
+      ),
+    };
+  }
+
+  return {
+    title: notification.title,
+    message: notification.message || "",
+  };
+}
 /* Get Notification Icon */
 function getNotificationIcon(notificationType) {
   switch (notificationType) {
@@ -135,13 +162,14 @@ function renderNotifications() {
     notificationList.innerHTML = `
       <div class="emptyState">
         <p class="emptyStateText">
-          No Notifications Found
+          ${t("notifications.noNotificationsFound")}
         </p>
       </div>
     `;
     return;
   }
   notifications.forEach(function (notification) {
+    const localizedContent = getLocalizedNotificationContent(notification);
     notificationList.innerHTML += `
       <div
         class="
@@ -160,7 +188,7 @@ function renderNotifications() {
               ${getNotificationIcon(notification.type)}
             </span>
             <h3 class="notificationTitle">
-              ${notification.title}
+             ${localizedContent.title}
             </h3>
           </div>
           <button
@@ -175,12 +203,12 @@ function renderNotifications() {
             <img
               src="${getIconPath("actions", "delete")}"
               class="icon actionIcon"
-              alt="Delete"
+              alt="${t("common.delete")}"
             >
           </button>
         </div>
         <p class="notificationMessage">
-          ${notification.message || ""}
+          ${localizedContent.message}
         </p>
         <p class="notificationTime">
           ${formatNotificationTime(notification.createdAt)}
@@ -249,14 +277,14 @@ function goBack() {
 /* Clear All Notifications */
 function clearNotifications() {
   showConfirmDialog(
-    "Clear Notifications",
-    "Are you sure you want to clear all notifications?",
+    t("notifications.clearNotifications"),
+    t("notifications.confirmClearAll"),
     function () {
       appState.notifications = [];
       saveAppState();
       renderNotifications();
       updateNotificationBadge();
-      showToast("Notifications Cleared");
+      showToast(t("notifications.notificationsCleared"));
     },
   );
 }
@@ -270,6 +298,9 @@ function deleteNotification(notificationId) {
   saveAppState();
   renderNotifications();
   updateNotificationBadge();
-  showToast("Notification Deleted");
+  showToast(t("notifications.notificationDeleted"));
 }
-initializeNotifications();
+(async function () {
+  await initializeLocalization();
+  initializeNotifications();
+})();

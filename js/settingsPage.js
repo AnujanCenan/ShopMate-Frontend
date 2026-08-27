@@ -253,8 +253,8 @@ function openLanguageSettings() {
         <input
           type="radio"
           name="language"
-          value="english"
-          ${selectedLanguage === "english" ? "checked" : ""}
+          value="en"
+          ${selectedLanguage === "en" ? "checked" : ""}
         >
         🇺🇸 English
       </label>
@@ -262,8 +262,8 @@ function openLanguageSettings() {
         <input
           type="radio"
           name="language"
-          value="french"
-          ${selectedLanguage === "french" ? "checked" : ""}
+          value="fr"
+          ${selectedLanguage === "fr" ? "checked" : ""}
         >
         🇫🇷 French
       </label>
@@ -271,8 +271,8 @@ function openLanguageSettings() {
         <input
           type="radio"
           name="language"
-          value="tamil"
-          ${selectedLanguage === "tamil" ? "checked" : ""}
+          value="ta"
+          ${selectedLanguage === "ta" ? "checked" : ""}
         >
         🇮🇳 Tamil
       </label>
@@ -298,19 +298,33 @@ function openLanguageSettings() {
   openBottomSheet();
 }
 /* Save Language Preference - Saves the user's preferred application language. */
-function saveLanguagePreference() {
+// function saveLanguagePreference() {
+//   const selectedLanguage = document.querySelector(
+//     'input[name="language"]:checked',
+//   );
+//   if (!selectedLanguage) {
+//     return;
+//   }
+//   appState.settings.language = selectedLanguage.value;
+//   saveAppState();
+//   closeBottomSheet();
+//   showDialog(
+//     "Language Updated",
+//     "Your preferred language has been saved. Full language support will be available in a future update.",
+//   );
+// }
+async function saveLanguagePreference() {
   const selectedLanguage = document.querySelector(
     'input[name="language"]:checked',
   );
   if (!selectedLanguage) {
     return;
   }
-  appState.settings.language = selectedLanguage.value;
-  saveAppState();
+  await changeLanguage(selectedLanguage.value);
   closeBottomSheet();
   showDialog(
-    "Language Updated",
-    "Your preferred language has been saved. Full language support will be available in a future update.",
+    t("dialogs.languageUpdatedTitle"),
+    t("dialogs.languageUpdatedMessage"),
   );
 }
 /* Open Currency Settings */

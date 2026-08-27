@@ -5,63 +5,66 @@ const bottomSheetContent = document.getElementById("bottomSheetContent");
 /* Favorite Item Being Added */
 let favoriteItemToAdd = null;
 /* Render Add Item Form */
-/* Render Add Item Form */
 function renderAddItemForm(itemName = "") {
   favoriteItemToAdd = itemName || null;
   const imageUrl = itemName ? getProductImage(itemName) : "";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Add Item
+        ${t("item.addItem")}
       </h2>
       <button
         class="closeButton"
         onclick="
           favoriteItemToAdd = null;
-          closeBottomSheet();">
+          closeBottomSheet();
+        "
+      >
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close">
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Item Name
+          ${t("item.itemName")}
         </label>
         <input
           type="text"
           id="itemNameInput"
           class="bottomSheetInput"
-          placeholder="Enter Item Name"
+          placeholder="${t("item.enterItemName")}"
           value="${itemName}"
           ${itemName ? "readonly" : ""}
         >
         ${
           itemName
             ? ""
-            : `<div id="productSuggestions"
-                    class="productSuggestions">
-               </div>`
+            : `<div
+                 id="productSuggestions"
+                 class="productSuggestions"
+               ></div>`
         }
       </div>
       <div class="formRow">
         <div class="halfWidthField">
           <label class="formLabel">
-            Quantity
+            ${t("item.quantity")}
           </label>
           <input
             type="number"
             id="itemQuantityInput"
             class="bottomSheetInput"
-            placeholder="Enter Quantity"
+            placeholder="${t("item.enterQuantity")}"
             value="1"
           >
         </div>
         <div class="halfWidthField">
           <label class="formLabel">
-            Estimated Price
+            ${t("item.estimatedPrice")}
           </label>
           <div class="currencyInputWrapper">
             <span class="currencySymbol">
@@ -71,7 +74,7 @@ function renderAddItemForm(itemName = "") {
               type="number"
               id="itemPriceInput"
               class="bottomSheetInput currencyInput"
-              placeholder="Enter Estimated Price"
+              placeholder="${t("item.enterEstimatedPrice")}"
             >
           </div>
         </div>
@@ -81,28 +84,29 @@ function renderAddItemForm(itemName = "") {
           id="itemImagePreview"
           class="itemImagePreview ${imageUrl ? "" : "hidden"}"
           src="${imageUrl}"
+          alt=""
         >
       </div>
       <div class="formField">
         <label class="formLabel">
-          Preferred Shop
+          ${t("item.preferredShop")}
         </label>
         <input
           type="text"
           id="itemShopInput"
           class="bottomSheetInput"
-          placeholder="Enter Preferred Shop"
+          placeholder="${t("item.enterPreferredShop")}"
         >
       </div>
       <div class="formField">
         <label class="formLabel">
-          Notes
+          ${t("item.notes")}
         </label>
         <input
           type="text"
           id="itemNotesInput"
           class="bottomSheetInput"
-          placeholder="Enter Notes"
+          placeholder="${t("item.enterNotes")}"
         >
       </div>
       <div class="bottomSheetButtonRow">
@@ -110,13 +114,13 @@ function renderAddItemForm(itemName = "") {
           class="secondaryButton"
           onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
           onclick="createItem()"
         >
-          Add Item
+          ${t("item.addItem")}
         </button>
       </div>
     </div>
@@ -139,23 +143,23 @@ function renderEditItemForm(itemName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Edit Item
+        ${t("item.editItem")}
       </h2>
       <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Item Name
+          ${t("item.itemName")}
         </label>
         <input
           type="text"
@@ -167,7 +171,7 @@ function renderEditItemForm(itemName) {
       <div class="formRow">
         <div class="halfWidthField">
           <label class="formLabel">
-            Quantity
+            ${t("item.quantity")}
           </label>
           <input
             type="number"
@@ -178,7 +182,7 @@ function renderEditItemForm(itemName) {
         </div>
         <div class="halfWidthField">
           <label class="formLabel">
-            Estimated Price
+            ${t("item.estimatedPrice")}
           </label>
           <div class="currencyInputWrapper">
             <span class="currencySymbol">
@@ -197,21 +201,22 @@ function renderEditItemForm(itemName) {
         </div>
       </div>
       <div class="formField">
-  <label class="formLabel">
-    Item Image
-  </label>
-  <img
-    id="editItemImagePreview"
-    class="
-      itemImagePreview
-      ${getProductImage(item.name) ? "" : "hidden"}
-    "
-    src="${getProductImage(item.name)}"
-  >
-</div>
+        <label class="formLabel">
+          ${t("item.itemImage")}
+        </label>
+        <img
+          id="editItemImagePreview"
+          class="
+            itemImagePreview
+            ${getProductImage(item.name) ? "" : "hidden"}
+          "
+          src="${getProductImage(item.name)}"
+          alt=""
+        >
+      </div>
       <div class="formField">
         <label class="formLabel">
-          Notes
+          ${t("item.notes")}
         </label>
         <input
           type="text"
@@ -222,7 +227,7 @@ function renderEditItemForm(itemName) {
       </div>
       <div class="formField">
         <label class="formLabel">
-          Preferred Shop
+          ${t("item.preferredShop")}
         </label>
         <input
           type="text"
@@ -236,13 +241,13 @@ function renderEditItemForm(itemName) {
           class="secondaryButton"
           onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
           onclick="updateItem('${item.name}')"
         >
-          Save Changes
+          ${t("common.saveChanges")}
         </button>
       </div>
     </div>
@@ -364,10 +369,10 @@ function createItem() {
   const itemShop = itemShopInput.value.trim();
   const itemPrice =
     Number(document.getElementById("itemPriceInput").value) || 0;
-  /* Item added from Favorites? */
+  /* Item added from Favorites */
   const openedFromFavorite = favoriteItemToAdd !== null;
   if (!itemName || !itemQuantity) {
-    showSnackbar("Please enter item details");
+    showSnackbar(t("item.enterItemDetails"));
     return;
   }
   const currentCategory = getActiveCategory();
@@ -381,48 +386,51 @@ function createItem() {
   /* Existing Item Found */
   if (existingItem) {
     bottomSheetContent.innerHTML = `
-            <div class="bottomSheetHeader">
-                <h2>
-                    Item Already Exists
-                </h2>
-                <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
-            </div>
-            <div class="bottomSheetBody">
-                <p class="duplicateMessage">
-                    "${existingItem.name}" already exists with quantity
-                    ${existingItem.quantity}.
-                </p>
-                <p class="duplicateMessage">
-                    Do you want to add ${itemQuantity} more?
-                </p>
-                <div class="bottomSheetButtonRow">
-                    <button
-                        class="secondaryButton"
-                        onclick="closeBottomSheet()"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        class="primaryButton"
-                        onclick="updateDuplicateQuantity(
-                            '${existingItem.name}',
-                            '${itemQuantity}'
-                        )"
-                    >
-                        Update Quantity
-                    </button>
-                </div>
-            </div>
-        `;
+      <div class="bottomSheetHeader">
+        <h2>
+          ${t("item.itemAlreadyExists")}
+        </h2>
+        <button
+          class="closeButton"
+          onclick="closeBottomSheet()"
+        >
+          <img
+            src="${getIconPath("navigation", "close")}"
+            class="icon actionIcon"
+            alt="${t("common.close")}"
+          >
+        </button>
+      </div>
+      <div class="bottomSheetBody">
+        <p class="duplicateMessage">
+          "${existingItem.name}"
+          ${t("item.alreadyExistsWithQuantity")}
+          ${existingItem.quantity}.
+        </p>
+        <p class="duplicateMessage">
+          ${t("item.addMoreQuantity", {
+            quantity: itemQuantity,
+          })}
+        </p>
+        <div class="bottomSheetButtonRow">
+          <button
+            class="secondaryButton"
+            onclick="closeBottomSheet()"
+          >
+            ${t("common.cancel")}
+          </button>
+          <button
+            class="primaryButton"
+            onclick="updateDuplicateQuantity(
+              '${existingItem.name}',
+              '${itemQuantity}'
+            )"
+          >
+            ${t("item.updateQuantity")}
+          </button>
+        </div>
+      </div>
+    `;
     return;
   }
   const newItem = {
@@ -459,11 +467,26 @@ function createItem() {
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
-  showSnackbar("Item added");
-  createNotification("item", "Item Added", `${item.name} added.`, "category", {
-    group: appState.activeGroup,
-    category: getActiveCategory().name,
-  });
+  showSnackbar(t("item.itemAdded"));
+  createNotification(
+    "item",
+    t("notifications.itemAdded"),
+    t("notifications.itemAddedMessage", {
+      itemName: itemName,
+    }),
+    "category",
+    {
+      group: appState.activeGroup,
+      category: getActiveCategory().name,
+    },
+    {
+      titleKey: "notifications.itemAdded",
+      messageKey: "notifications.itemAddedMessage",
+      params: {
+        itemName: itemName,
+      },
+    },
+  );
   favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
@@ -482,7 +505,7 @@ function updateDuplicateQuantity(itemName, newQuantity) {
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
-  showSnackbar("Quantity updated");
+  showSnackbar(t("item.quantityUpdated"));
 }
 /* Update Item */
 function updateItem(originalItemName) {
@@ -496,47 +519,40 @@ function updateItem(originalItemName) {
   if (!item) {
     return;
   }
-  const updatedName = document.getElementById("editItemNameInput").value.trim();
-  const updatedQuantity = document
+  const newName = document.getElementById("editItemNameInput").value.trim();
+  const newQuantity = document
     .getElementById("editItemQuantityInput")
     .value.trim();
-  const updatedNotes = document
-    .getElementById("editItemNotesInput")
-    .value.trim();
-  const updatedShop = document.getElementById("editItemShopInput").value.trim();
-  const updatedPrice =
+  const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
-  if (!updatedName || !updatedQuantity) {
-    showSnackbar("Please enter item details");
+  const newNotes = document.getElementById("editItemNotesInput").value.trim();
+  const newShop = document.getElementById("editItemShopInput").value.trim();
+  if (!newName || !newQuantity) {
+    showSnackbar(t("item.enterItemDetails"));
     return;
   }
-  const normalizedUpdatedName = updatedName.trim().toLowerCase();
-  const normalizedOriginalName = originalItemName.trim().toLowerCase();
+  const normalizedNewName = newName.toLowerCase();
   const duplicateItem = currentCategory.items.find(function (existingItem) {
     return (
-      existingItem.name.trim().toLowerCase() === normalizedUpdatedName &&
-      existingItem.name.trim().toLowerCase() !== normalizedOriginalName
+      existingItem.name !== originalItemName &&
+      existingItem.name.trim().toLowerCase() === normalizedNewName
     );
   });
   if (duplicateItem) {
-    showSnackbar("Another item already exists with same name");
+    showSnackbar(t("item.duplicateItemName"));
     return;
   }
-  item.name = updatedName;
-  item.quantity = updatedQuantity;
-  item.notes = updatedNotes;
-  item.preferredShop = updatedShop;
-  item.estimatedPrice = updatedPrice;
+  item.name = newName;
+  item.quantity = newQuantity;
+  item.estimatedPrice = newPrice;
+  item.notes = newNotes;
+  item.preferredShop = newShop;
   saveAppState();
-  calculateGroupBudget();
-  if (typeof renderBudgetDashboardWidget === "function") {
-    renderBudgetDashboardWidget();
-  }
   renderFilteredItems();
   closeBottomSheet();
-  showSnackbar("Item updated");
+  showSnackbar(t("item.itemUpdated"));
 }
-/*  Purchase Confirmation */
+/* Open Purchase Confirmation */
 function openPurchaseConfirmation(itemName) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
@@ -548,83 +564,82 @@ function openPurchaseConfirmation(itemName) {
   if (!item) {
     return;
   }
-  if (item.purchased) {
+  /* Re-adding a purchased item */
+  if (appState.activeTab === "purchased" && item.purchased) {
     item.purchased = false;
+    item.purchaseDate = null;
+    item.actualPrice = 0;
     saveAppState();
     renderFilteredItems();
-    showSnackbar("Moved back to List");
+    showSnackbar(t("item.movedBackToList"));
     return;
   }
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Confirm Purchase
+        ${t("item.confirmPurchase")}
       </h2>
       <button
-  class="closeButton"
-  onclick="closeBottomSheet()"
->
-  <img
-    src="${getIconPath("navigation", "close")}"
-    class="icon actionIcon"
-    alt="Close"
-  >
-</button>
+        class="closeButton"
+        onclick="closeBottomSheet()"
+      >
+        <img
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
+      </button>
     </div>
     <div class="bottomSheetBody">
-      <div class="purchaseSummaryCard">
-    <h3 class="purchaseItemName">
+      <div class="purchaseItemName">
         ${item.name}
-    </h3>
-    <p class="purchaseEstimatedPrice">
-        Estimated Price
-    </p>
-    <p class="purchaseEstimatedAmount">
-        $${item.estimatedPrice || 0}
-    </p>
-</div>
+      </div>
       <div class="formField">
         <label class="formLabel">
-          Actual Price Paid
+          ${t("item.estimatedPrice")}
         </label>
-        <div
-          class="currencyInputWrapper"
-        >
-          <span
-            class="currencySymbol"
-          >
+        <div class="currencyInputWrapper">
+          <span class="currencySymbol">
             $
           </span>
           <input
             type="number"
-            id="purchasePriceInput"
             class="bottomSheetInput currencyInput"
             value="${item.estimatedPrice || 0}"
+            readonly
           >
         </div>
       </div>
-      <div
-        class="
-          bottomSheetButtonRow
-        "
-      >
+      <div class="formField">
+        <label class="formLabel">
+          ${t("item.actualPricePaid")}
+        </label>
+        <div class="currencyInputWrapper">
+          <span class="currencySymbol">
+            $
+          </span>
+          <input
+            type="number"
+            id="actualPriceInput"
+            class="bottomSheetInput currencyInput"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+          >
+        </div>
+      </div>
+      <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="
-            closeBottomSheet()
-          "
+          onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
-          onclick="
-            confirmPurchase(
-              '${item.name}'
-            )
-          "
+          onclick="confirmPurchase('${item.name}')"
         >
-          Confirm
+          ${t("common.confirm")}
         </button>
       </div>
     </div>
@@ -644,7 +659,7 @@ function confirmPurchase(itemName) {
     return;
   }
   const actualPrice =
-    Number(document.getElementById("purchasePriceInput").value) || 0;
+    Number(document.getElementById("actualPriceInput").value) || 0;
   item.actualPrice = actualPrice;
   item.purchaseDate = new Date().toISOString();
   item.purchased = !item.purchased;
@@ -656,15 +671,26 @@ function confirmPurchase(itemName) {
   if (typeof renderBudgetDashboardWidget === "function") {
     renderBudgetDashboardWidget();
   }
-  showSnackbar(item.purchased ? "Item purchased" : "Item restored");
+  showSnackbar(
+    item.purchased ? t("item.itemPurchased") : t("item.itemRestored"),
+  );
   createNotification(
     "purchase",
-    "Item Purchased",
-    `${item.name} purchased.`,
+    t("notifications.itemPurchased"),
+    t("notifications.itemPurchasedMessage", {
+      itemName: item.name,
+    }),
     "category",
     {
       group: appState.activeGroup,
       category: getActiveCategory().name,
+    },
+    {
+      titleKey: "notifications.itemPurchased",
+      messageKey: "notifications.itemPurchasedMessage",
+      params: {
+        itemName: item.name,
+      },
     },
   );
 }
@@ -686,10 +712,17 @@ function updateBudgetTracking(categoryName, amount) {
       categoryBudget.overspendNotified = true;
       createNotification(
         "budget",
-        "Budget Exceeded",
-        `${categoryName} exceeded its budget`,
+        t("notifications.budgetExceeded"),
+        t("notifications.budgetExceededMessage", {
+          categoryName: categoryName,
+        }),
       );
-      showToast(`${categoryName} budget exceeded`, "info");
+      showToast(
+        t("notifications.budgetExceededToast", {
+          categoryName: categoryName,
+        }),
+        "info",
+      );
     }
   }
   saveAppState();

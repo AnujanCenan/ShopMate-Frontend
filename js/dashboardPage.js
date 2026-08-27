@@ -1664,6 +1664,15 @@ function saveGroupBudget() {
       )
       .replace("${amount}", amount),
     "budget",
+    null,
+    {
+      titleKey: "dashboard.budgetUpdated",
+      messageKey: "dashboard.groupBudgetUpdatedMessage",
+      params: {
+        groupName: appState.activeGroup || t("dashboard.noGroupSelected"),
+        amount: amount,
+      },
+    },
   );
   renderBudgetDashboardWidget();
   closeBottomSheet();

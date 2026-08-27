@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Shopping Group</title>
+    <title data-i18n="register.title">Register</title>
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
@@ -17,6 +17,7 @@
             id="registerFirstNameInput"
             placeholder="First Name"
             data-i18n-placeholder="register.firstName"
+            autocomplete="given-name"
           />
           <input
             type="text"
@@ -24,6 +25,7 @@
             id="registerLastNameInput"
             placeholder="Last Name"
             data-i18n-placeholder="register.lastName"
+            autocomplete="family-name"
           />
           <input
             type="email"
@@ -31,6 +33,7 @@
             id="registerEmailInput"
             placeholder="Email Address"
             data-i18n-placeholder="register.email"
+            autocomplete="email"
           />
           <input
             type="password"
@@ -38,13 +41,15 @@
             id="registerPasswordInput"
             placeholder="Password"
             data-i18n-placeholder="register.password"
+            autocomplete="new-password"
           />
           <input
             type="password"
-            placeholder="Confirm Password"
             class="authInput"
             id="registerConfirmPasswordInput"
+            placeholder="Confirm Password"
             data-i18n-placeholder="register.confirmPassword"
+            autocomplete="new-password"
           />
           <input
             type="text"
@@ -52,6 +57,7 @@
             id="groupNameInput"
             placeholder="Group Name"
             data-i18n-placeholder="register.groupName"
+            autocomplete="off"
           />
           <label class="biometricToggle">
             <input type="checkbox" id="biometricCheckbox" />
@@ -62,12 +68,12 @@
           <button
             type="submit"
             class="authButton"
-            onclick="registerUser()"
             data-i18n="register.createGroup"
           >
-            Create Group
+            Create Shopping Group
           </button>
           <button
+            type="button"
             class="authTextButton"
             onclick="window.location.href = './loginPage.html'"
           >
@@ -78,13 +84,18 @@
         </form>
       </div>
     </div>
+    <!-- Core Application -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
-    <script src="../js/localization/localizationBootstrap.js"></script>
+    <!-- Localization -->
+    <script src="../js/localization/languageManager.js"></script>
+    <!-- Application Bootstrap -->
     <script src="../js/bootstrap.js"></script>
     <script>
-      initializeApplication();
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeApplication();
+      });
     </script>
   </body>
 </html>

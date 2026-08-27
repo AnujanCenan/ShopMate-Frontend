@@ -41,20 +41,20 @@ function renderGroupAccordion() {
               ${groupName}
             </h3>
             <p class="groupAccordionSubtitle">
-              ${members.length} Members •
-              ${categories.length} Categories
+              ${members.length} ${t("groupManagement.members")} •
+              ${categories.length} ${t("groupManagement.categories")}
             </p>
           </div>
-         <span
-  id="accordionIcon_${groupName}"
-  class="accordionIcon"
->
-  <img
-    src="${getIconPath("navigation", "expand")}"
-    class="icon actionIcon"
-    alt=""
-  >
-</span>
+          <span
+            id="accordionIcon_${groupName}"
+            class="accordionIcon"
+          >
+            <img
+              src="${getIconPath("navigation", "expand")}"
+              class="icon actionIcon"
+              alt=""
+            >
+          </span>
         </button>
         <div
           id="accordionBody_${groupName}"
@@ -64,109 +64,117 @@ function renderGroupAccordion() {
           "
         >
           <h4 class="groupSectionTitle">
-            Members
+            ${t("groupManagement.members")}
           </h4>
           ${
             members.length === 0
               ? `
                 <p class="emptyStateText">
-                  No Members
+                  ${t("groupManagement.noMembers")}
                 </p>
               `
               : members
                   .map(function (member) {
                     return `
-                  <div class="groupMemberRow">
-  <div class="groupMemberInformation">
-    <div class="groupMemberName">
-      ${member.name}
-    </div>
-    <div
-      class="
-        groupMemberRole
-        ${member.role === "admin" ? "memberRoleAdmin" : "memberRoleMember"}
-      "
-    >
-      ${member.role === "admin" ? "Admin" : "Member"}
-    </div>
-  </div>
-  ${
-    canManageGroup() && member.id !== getCurrentUser().id
-      ? `
-        <button
-          class="groupMoreButton"
-          onclick="
-            event.stopPropagation();
-            openMemberActions(
-              '${member.id}'
-            );
-          "
-        >
-          <img
-            src="${getIconPath("navigation", "more")}"
-            class="icon actionIcon"
-            alt="More"
-          >
-        </button>
-      `
-      : ""
-  }
-</div>
-                `;
+                      <div class="groupMemberRow">
+                        <div class="groupMemberInformation">
+                          <div class="groupMemberName">
+                            ${member.name}
+                          </div>
+                          <div
+                            class="
+                              groupMemberRole
+                              ${
+                                member.role === "admin"
+                                  ? "memberRoleAdmin"
+                                  : "memberRoleMember"
+                              }
+                            "
+                          >
+                            ${
+                              member.role === "admin"
+                                ? t("groupManagement.admin")
+                                : t("groupManagement.member")
+                            }
+                          </div>
+                        </div>
+                        ${
+                          canManageGroup() && member.id !== getCurrentUser().id
+                            ? `
+                              <button
+                                class="groupMoreButton"
+                                onclick="
+                                  event.stopPropagation();
+                                  openMemberActions(
+                                    '${member.id}'
+                                  );
+                                "
+                              >
+                                <img
+                                  src="${getIconPath("navigation", "more")}"
+                                  class="icon actionIcon"
+                                  alt="${t("common.more")}"
+                                >
+                              </button>
+                            `
+                            : ""
+                        }
+                      </div>
+                    `;
                   })
                   .join("")
           }
           <hr class="groupDivider">
           <h4 class="groupSectionTitle">
-            Pending Invitations
+            ${t("groupManagement.pendingInvitations")}
           </h4>
           ${
             pendingInvitations.length === 0
               ? `
-               <div class="emptyPendingInvitationState">
+                <div class="emptyPendingInvitationState">
                   <div class="emptyStateTitle">
-                      No Pending Invitations
+                    ${t("groupManagement.noPendingInvitations")}
                   </div>
                   <div class="emptyStateSubtitle">
-                      Invite members to start collaborating.
+                    ${t("groupManagement.inviteMembersToCollaborate")}
                   </div>
                 </div>
               `
               : pendingInvitations
                   .map(function (invitation) {
                     return `
-      <div class="groupInviteRow">
-        <div class="groupInviteInformation">
-          <div class="groupMemberName">
-            ${invitation.email}
-          </div>
-          <div class="groupMemberRole">
-             ${
-               new Date(invitation.expiresAt) < new Date()
-                 ? "Expired"
-                 : `Invited ${new Date(invitation.invitedAt).toLocaleDateString(
-                     "en-GB",
-                   )}`
-             }
-          </div>
-        </div>
-        <button
-          class="groupMoreButton"
-          onclick="
-            event.stopPropagation();
-            openInviteActions(
-              '${invitation.id}'
-            );
-          "
-        >
-          <img
-            src="${getIconPath("navigation", "more")}"
-            class="icon actionIcon"
-            alt="More"
-          >
-        </button>
-      </div>
-    `;
+                      <div class="groupInviteRow">
+                        <div class="groupInviteInformation">
+                          <div class="groupMemberName">
+                            ${invitation.email}
+                          </div>
+                          <div class="groupMemberRole">
+                            ${
+                              new Date(invitation.expiresAt) < new Date()
+                                ? t("groupManagement.expired")
+                                : `${t("groupManagement.invited")} ${new Date(
+                                    invitation.invitedAt,
+                                  ).toLocaleDateString("en-GB")}`
+                            }
+                          </div>
+                        </div>
+                        <button
+                          class="groupMoreButton"
+                          onclick="
+                            event.stopPropagation();
+                            openInviteActions(
+                              '${invitation.id}'
+                            );
+                          "
+                        >
+                          <img
+                            src="${getIconPath("navigation", "more")}"
+                            class="icon actionIcon"
+                            alt="${t("common.more")}"
+                          >
+                        </button>
+                      </div>
+                    `;
                   })
                   .join("")
           }
@@ -177,7 +185,7 @@ function renderGroupAccordion() {
               renderInviteMemberForm();
             "
           >
-            Send Invitation
+            ${t("groupManagement.sendInvitation")}
           </button>
           <button
             class="secondaryButton"
@@ -186,7 +194,7 @@ function renderGroupAccordion() {
               openLeaveGroupDialog();
             "
           >
-            Leave Group
+            ${t("groupManagement.leaveGroup")}
           </button>
         </div>
       </div>
@@ -243,8 +251,6 @@ function setupPermissions() {
     readOnlyBanner.classList.add("hidden");
   }
 }
-/* Render Members */
-/* Render Pending Invites */
 /* Open Invite Actions */
 function openInviteActions(invitationId) {
   if (!canManageGroup()) {
@@ -261,7 +267,7 @@ function openInviteActions(invitationId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Pending Invitation
+        ${t("groupManagement.pendingInvitation")}
       </h2>
       <button
         class="closeButton"
@@ -270,14 +276,14 @@ function openInviteActions(invitationId) {
         <img
           src="${getIconPath("navigation", "close")}"
           class="icon actionIcon"
-          alt="Close"
+          alt="${t("common.close")}"
         >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Email Address
+          ${t("groupManagement.emailAddress")}
         </label>
         <div class="bottomSheetStaticValue">
           ${invitation.email}
@@ -285,7 +291,7 @@ function openInviteActions(invitationId) {
       </div>
       <div class="formField">
         <label class="formLabel">
-          Invited On
+          ${t("groupManagement.invitedOn")}
         </label>
         <div class="bottomSheetStaticValue">
           ${new Date(invitation.invitedAt).toLocaleDateString("en-GB")}
@@ -296,13 +302,13 @@ function openInviteActions(invitationId) {
           class="secondaryButton"
           onclick="resendInvitation('${invitation.id}')"
         >
-          Resend
+          ${t("groupManagement.resend")}
         </button>
         <button
           class="bottomSheetDeleteButton"
           onclick="cancelInvitation('${invitation.id}')"
         >
-          Cancel Invitation
+          ${t("groupManagement.cancelInvitation")}
         </button>
       </div>
     </div>
@@ -313,8 +319,8 @@ function openInviteActions(invitationId) {
 function resendInvitation(invitationId) {
   if (!canManageGroup()) {
     showDialog(
-      "Permission Denied",
-      "Only group administrators can resend invitations.",
+      t("common.permissionDenied"),
+      t("groupManagement.onlyAdminsCanResend"),
     );
     return;
   }
@@ -333,18 +339,29 @@ function resendInvitation(invitationId) {
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
-  showToast("Invitation Resent");
+  showToast(t("groupManagement.invitationResent"));
   createNotification(
     "group",
-    "Invitation Resent",
-    `Invitation resent to ${invitation.email}.`,
+    t("groupManagement.invitationResent"),
+    t("groupManagement.invitationResentTo", {
+      email: invitation.email,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.invitationResent",
+      messageKey: "groupManagement.invitationResentTo",
+      params: {
+        email: invitation.email,
+      },
+    },
   );
 }
 /* Cancel Invitation */
 function cancelInvitation(invitationId) {
   showConfirmDialog(
-    "Cancel Invitation",
-    "Are you sure you want to cancel this invitation?",
+    t("groupManagement.cancelInvitation"),
+    t("groupManagement.confirmCancelInvitation"),
     function () {
       revokeInvite(invitationId);
     },
@@ -354,8 +371,8 @@ function cancelInvitation(invitationId) {
 function revokeInvite(invitationId) {
   if (!canManageGroup()) {
     showDialog(
-      "Permission Denied",
-      "Only group administrators can cancel invitations.",
+      t("common.permissionDenied"),
+      t("groupManagement.onlyAdminsCanCancel"),
     );
     return;
   }
@@ -375,11 +392,22 @@ function revokeInvite(invitationId) {
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
-  showToast("Invitation Cancelled");
+  showToast(t("groupManagement.invitationCancelled"));
   createNotification(
     "group",
-    "Invitation Cancelled",
-    `${invitation.email} invitation cancelled.`,
+    t("groupManagement.invitationCancelled"),
+    t("groupManagement.invitationCancelledTo", {
+      email: invitation.email,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.invitationCancelled",
+      messageKey: "groupManagement.invitationCancelledTo",
+      params: {
+        email: invitation.email,
+      },
+    },
   );
 }
 /* Render Join Group Form */
@@ -387,36 +415,36 @@ function renderJoinGroupForm() {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Accept Invitation
+        ${t("groupManagement.acceptInvitation")}
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
         <img
-  src="${getIconPath("navigation", "close")}"
-  class="icon actionIcon"
-  alt="Close"
->
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Invitation Email
+          ${t("groupManagement.invitationEmail")}
         </label>
         <input
           id="joinInvitationEmail"
           class="bottomSheetInput"
           type="email"
-          placeholder="Enter invitation email"
+          placeholder="${t("groupManagement.enterInvitationEmail")}"
         >
       </div>
       <button
         class="primaryButton"
         onclick="joinGroup()"
       >
-        Accept Invitation
+        ${t("groupManagement.acceptInvitation")}
       </button>
     </div>
   `;
@@ -429,11 +457,17 @@ async function joinGroup() {
     .value.trim()
     .toLowerCase();
   if (!email) {
-    showDialog("Missing Email", "Please enter your invitation email.");
+    showDialog(
+      t("groupManagement.missingEmail"),
+      t("groupManagement.enterInvitationEmail"),
+    );
     return;
   }
   if (!isValidEmail(email)) {
-    showDialog("Invalid Email", "Please enter a valid email address.");
+    showDialog(
+      t("groupManagement.invalidEmail"),
+      t("groupManagement.enterValidEmail"),
+    );
     return;
   }
   /*
@@ -443,8 +477,23 @@ async function joinGroup() {
       email
     }
   */
-  showToast("Join request submitted");
-  createNotification("group", "Join Request", `Join request sent for ${email}`);
+  showToast(t("groupManagement.joinRequestSubmitted"));
+  createNotification(
+    "group",
+    t("groupManagement.joinRequest"),
+    t("groupManagement.joinRequestSentFor", {
+      email: email,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.joinRequest",
+      messageKey: "groupManagement.joinRequestSentFor",
+      params: {
+        email: email,
+      },
+    },
+  );
   closeBottomSheet();
 }
 /* Open Member Profile */
@@ -481,10 +530,10 @@ function openMemberActions(memberId) {
         onclick="closeBottomSheet()"
       >
         <img
-  src="${getIconPath("navigation", "close")}"
-  class="icon actionIcon"
-  alt="Close"
->
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
@@ -500,11 +549,13 @@ function openMemberActions(memberId) {
               "
             >
               <img
-  src="${getIconPath("features", "admin")}"
-  class="icon featureIcon"
-  alt=""
->
-<span>Make Admin</span>
+                src="${getIconPath("features", "admin")}"
+                class="icon featureIcon"
+                alt=""
+              >
+              <span>
+                ${t("groupManagement.makeAdmin")}
+              </span>
             </button>
           `
           : ""
@@ -521,11 +572,13 @@ function openMemberActions(memberId) {
               "
             >
               <img
-  src="${getIconPath("features", "admin")}"
-  class="icon featureIcon"
-  alt=""
->
-<span>Transfer Ownership</span>
+                src="${getIconPath("features", "admin")}"
+                class="icon featureIcon"
+                alt=""
+              >
+              <span>
+                ${t("groupManagement.transferOwnership")}
+              </span>
             </button>
           `
           : ""
@@ -542,11 +595,13 @@ function openMemberActions(memberId) {
         "
       >
         <img
-  src="${getIconPath("actions", "delete")}"
-  class="icon actionIcon"
-  alt=""
->
-<span>Remove Member</span>
+          src="${getIconPath("actions", "delete")}"
+          class="icon actionIcon"
+          alt=""
+        >
+        <span>
+          ${t("groupManagement.removeMember")}
+        </span>
       </button>
     </div>
   `;
@@ -556,8 +611,8 @@ function openMemberActions(memberId) {
 async function makeAdmin(memberId) {
   if (!canManageGroup()) {
     showDialog(
-      "Permission Denied",
-      "Only group administrators can change member roles.",
+      t("common.permissionDenied"),
+      t("groupManagement.onlyAdminsCanChangeRoles"),
     );
     return;
   }
@@ -570,26 +625,37 @@ async function makeAdmin(memberId) {
   }
   member.role = "admin";
   /*
-      Backend
-      PATCH
-      /group/member/role
+    Backend
+    PATCH
+    /group/member/role
   */
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
-  showToast("Member promoted");
+  showToast(t("groupManagement.memberPromoted"));
   createNotification(
     "group",
-    "Member Promoted",
-    `${member.name} is now an Admin.`,
+    t("groupManagement.memberPromotedTitle"),
+    t("groupManagement.memberPromotedMessage", {
+      name: member.name,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.memberPromotedTitle",
+      messageKey: "groupManagement.memberPromotedMessage",
+      params: {
+        name: member.name,
+      },
+    },
   );
 }
 /* Transfer Ownership */
 function transferOwnership(memberId) {
   if (!canManageGroup()) {
     showDialog(
-      "Permission Denied",
-      "Only group administrators can transfer ownership.",
+      t("common.permissionDenied"),
+      t("groupManagement.onlyAdminsCanTransferOwnership"),
     );
     return;
   }
@@ -607,18 +673,29 @@ function transferOwnership(memberId) {
   }
   selectedMember.role = "owner";
   /*
-      Backend
-      PATCH
-      /group/owner
+    Backend
+    PATCH
+    /group/owner
   */
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
-  showToast("Ownership transferred");
+  showToast(t("groupManagement.ownershipTransferred"));
   createNotification(
     "group",
-    "Ownership Transferred",
-    `${selectedMember.name} is now the Owner.`,
+    t("groupManagement.ownershipTransferredTitle"),
+    t("groupManagement.ownershipTransferredMessage", {
+      name: selectedMember.name,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.ownershipTransferredTitle",
+      messageKey: "groupManagement.ownershipTransferredMessage",
+      params: {
+        name: selectedMember.name,
+      },
+    },
   );
 }
 /* Remove Dialog */
@@ -626,29 +703,29 @@ function openRemoveMemberDialog(memberId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Remove Member
+        ${t("groupManagement.removeMember")}
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
         <img
-  src="${getIconPath("navigation", "close")}"
-  class="icon actionIcon"
-  alt="Close"
->
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <p class="deleteMessage">
-        Are you sure you want to remove this member?
+        ${t("groupManagement.confirmRemoveMember")}
       </p>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
           onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="bottomSheetDeleteButton"
@@ -658,7 +735,7 @@ function openRemoveMemberDialog(memberId) {
             )
           "
         >
-          Remove
+          ${t("common.remove")}
         </button>
       </div>
     </div>
@@ -668,8 +745,8 @@ function openRemoveMemberDialog(memberId) {
 async function removeMember(memberId) {
   if (!canManageGroup()) {
     showDialog(
-      "Permission Denied",
-      "Only group administrators can remove members.",
+      t("common.permissionDenied"),
+      t("groupManagement.onlyAdminsCanRemoveMembers"),
     );
     return;
   }
@@ -683,66 +760,76 @@ async function removeMember(memberId) {
     },
   );
   /*
-      Backend
-      DELETE
-      /group/member
+    Backend
+    DELETE
+    /group/member
   */
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
-  showToast("Member removed");
+  showToast(t("groupManagement.memberRemoved"));
   if (removedMember) {
     createNotification(
       "group",
-      "Member Removed",
-      `${removedMember.name} was removed from the group.`,
+      t("groupManagement.memberRemovedTitle"),
+      t("groupManagement.memberRemovedMessage", {
+        name: removedMember.name,
+      }),
+      null,
+      null,
+      {
+        titleKey: "groupManagement.memberRemovedTitle",
+        messageKey: "groupManagement.memberRemovedMessage",
+        params: {
+          name: removedMember.name,
+        },
+      },
     );
   }
 }
-/* Invite Member */
 /* Invite Member Form */
 function renderInviteMemberForm() {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Invite Member
+        ${t("groupManagement.inviteMember")}
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
         <img
-  src="${getIconPath("navigation", "close")}"
-  class="icon actionIcon"
-  alt="Close"
->
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <div class="formField">
         <label class="formLabel">
-          Email Address
+          ${t("groupManagement.emailAddress")}
         </label>
         <input
           id="inviteMemberEmail"
           type="email"
           class="bottomSheetInput"
-          placeholder="Enter email address"
+          placeholder="${t("groupManagement.enterEmailAddress")}"
         >
       </div>
       <div class="formField">
         <label class="formLabel">
-          Role
+          ${t("groupManagement.role")}
         </label>
         <select
           id="inviteMemberRole"
           class="bottomSheetInput"
         >
           <option value="member">
-            Member
+            ${t("groupManagement.member")}
           </option>
           <option value="admin">
-            Admin
+            ${t("groupManagement.admin")}
           </option>
         </select>
       </div>
@@ -750,7 +837,7 @@ function renderInviteMemberForm() {
         class="primaryButton"
         onclick="sendInvitation()"
       >
-        Send Invitation
+        ${t("groupManagement.sendInvitation")}
       </button>
     </div>
   `;
@@ -760,8 +847,8 @@ function renderInviteMemberForm() {
 function sendInvitation() {
   if (!canManageGroup()) {
     showDialog(
-      "Permission Denied",
-      "Only group administrators can invite members.",
+      t("common.permissionDenied"),
+      t("groupManagement.onlyAdminsCanInvite"),
     );
     return;
   }
@@ -771,11 +858,17 @@ function sendInvitation() {
     .toLowerCase();
   const role = document.getElementById("inviteMemberRole").value;
   if (!email) {
-    showDialog("Missing Email", "Please enter an email address.");
+    showDialog(
+      t("groupManagement.missingEmail"),
+      t("groupManagement.enterEmailAddress"),
+    );
     return;
   }
   if (!isValidEmail(email)) {
-    showDialog("Invalid Email", "Please enter a valid email address.");
+    showDialog(
+      t("groupManagement.invalidEmail"),
+      t("groupManagement.enterValidEmail"),
+    );
     return;
   }
   appState.pendingInvitations.push({
@@ -797,44 +890,59 @@ function sendInvitation() {
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
-  showToast("Invitation Sent");
-  createNotification("group", "Invitation Sent", `${email} has been invited.`);
+  showToast(t("groupManagement.invitationSent"));
+  createNotification(
+    "group",
+    t("groupManagement.invitationSent"),
+    t("groupManagement.memberInvited", {
+      email: email,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.invitationSent",
+      messageKey: "groupManagement.memberInvited",
+      params: {
+        email: email,
+      },
+    },
+  );
 }
 /* Leave Group Dialog */
 function openLeaveGroupDialog() {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        Leave Group
+        ${t("groupManagement.leaveGroup")}
       </h2>
       <button
         class="closeButton"
         onclick="closeBottomSheet()"
       >
         <img
-  src="${getIconPath("navigation", "close")}"
-  class="icon actionIcon"
-  alt="Close"
->
+          src="${getIconPath("navigation", "close")}"
+          class="icon actionIcon"
+          alt="${t("common.close")}"
+        >
       </button>
     </div>
     <div class="bottomSheetBody">
       <p class="deleteMessage">
-        Leaving this group is permanent.
-        You will need a new invite to rejoin.
+        ${t("groupManagement.leaveGroupWarning")}
+        ${t("groupManagement.rejoinRequiresInvite")}
       </p>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
           onclick="closeBottomSheet()"
         >
-          Cancel
+          ${t("common.cancel")}
         </button>
         <button
           class="bottomSheetDeleteButton"
           onclick="leaveCurrentGroup()"
         >
-          Leave
+          ${t("groupManagement.leave")}
         </button>
       </div>
     </div>
@@ -849,7 +957,10 @@ function leaveCurrentGroup() {
     return member.id === currentUser.id;
   });
   if (!currentMember) {
-    showDialog("Cannot Leave Group", "You are not a member of this group.");
+    showDialog(
+      t("groupManagement.cannotLeaveGroup"),
+      t("groupManagement.notMemberOfGroup"),
+    );
     return;
   }
   const adminCount = members.filter(function (member) {
@@ -861,8 +972,8 @@ function leaveCurrentGroup() {
     members.length > 1
   ) {
     showDialog(
-      "Cannot Leave Group",
-      "Please promote another member to Admin before leaving.",
+      t("groupManagement.cannotLeaveGroup"),
+      t("groupManagement.promoteAnotherAdmin"),
     );
     return;
   }
@@ -871,8 +982,8 @@ function leaveCurrentGroup() {
   });
   if (remainingMembers.length === 0) {
     showConfirmDialog(
-      "Delete Group?",
-      "You are the last member of this group. Leaving will permanently delete this group, its categories, budgets, pending invitations and all associated data. This action cannot be undone.",
+      t("groupManagement.deleteGroup"),
+      t("groupManagement.deleteLastMemberWarning"),
       function () {
         completeLeaveGroup(currentUser, remainingMembers);
       },
@@ -880,8 +991,8 @@ function leaveCurrentGroup() {
     return;
   }
   showConfirmDialog(
-    "Leave Group?",
-    "Are you sure you want to leave this group?",
+    t("groupManagement.leaveGroup"),
+    t("groupManagement.confirmLeaveGroup"),
     function () {
       completeLeaveGroup(currentUser, remainingMembers);
     },
@@ -909,17 +1020,28 @@ function completeLeaveGroup(currentUser, remainingMembers) {
     appState.groupMembers[appState.activeGroup] = remainingMembers;
   }
   /*
-      Backend
-      DELETE
-      /group/leave
-      {
-          groupId
-      }
+    Backend
+    DELETE
+    /group/leave
+    {
+      groupId
+    }
   */
   createNotification(
     "group",
-    "Left Group",
-    `${currentUser.name} left the group.`,
+    t("groupManagement.leftGroup"),
+    t("groupManagement.leftGroupMessage", {
+      name: currentUser.name,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.leftGroup",
+      messageKey: "groupManagement.leftGroupMessage",
+      params: {
+        name: currentUser.name,
+      },
+    },
   );
   const remainingGroups = Object.keys(appState.groups);
   if (remainingGroups.length > 0) {
@@ -932,7 +1054,9 @@ function completeLeaveGroup(currentUser, remainingMembers) {
   saveAppState();
   closeBottomSheet();
   showToast(
-    remainingMembers.length === 0 ? "Group deleted." : "You left the group.",
+    remainingMembers.length === 0
+      ? t("groupManagement.groupDeleted")
+      : t("groupManagement.youLeftGroup"),
   );
   window.location.href = "../pages/dashboardPage.html";
 }
@@ -955,7 +1079,10 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 /* Initialize */
-initializeGroupManagement();
+(async function () {
+  await initializeLocalization();
+  initializeGroupManagement();
+})();
 /*
 ========================================
 Backend Integration Points

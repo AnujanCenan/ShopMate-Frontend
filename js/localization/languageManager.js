@@ -22,6 +22,35 @@ const languageDictionaryFiles = {
   fr: "french.js",
   ta: "tamil.js",
 };
+/* Language Dictionary Registry */
+const languageRegistry = {};
+/* Register Language - Called automatically by each language dictionary. */
+function registerLanguage(languageCode, dictionary) {
+  const normalizedLanguageCode = String(languageCode || "")
+    .toLowerCase()
+    .trim();
+  if (!normalizedLanguageCode || !dictionary) {
+    return;
+  }
+  languageRegistry[normalizedLanguageCode] = dictionary;
+}
+/* Check Language Registration */
+function isLanguageRegistered(languageCode) {
+  const normalizedLanguageCode = String(languageCode || "")
+    .toLowerCase()
+    .trim();
+  return Object.prototype.hasOwnProperty.call(
+    languageRegistry,
+    normalizedLanguageCode,
+  );
+}
+/* Get Registered Language */
+function getRegisteredLanguage(languageCode) {
+  const normalizedLanguageCode = String(languageCode || "")
+    .toLowerCase()
+    .trim();
+  return languageRegistry[normalizedLanguageCode] || null;
+}
 /* Active Translation Dictionary */
 let currentTranslations = {};
 /* English Fallback Dictionary */
@@ -194,19 +223,43 @@ function getTranslationValue(dictionary, key) {
   return value;
 }
 /* Get Translation */
-function t(key) {
+// function t(key) {
+//   if (!key) {
+//     return "";
+//   }
+//   const translatedValue = getTranslationValue(currentTranslations, key);
+//   if (translatedValue !== null && translatedValue !== undefined) {
+//     return translatedValue;
+//   }
+//   const fallbackValue = getTranslationValue(fallbackTranslations, key);
+//   if (fallbackValue !== null && fallbackValue !== undefined) {
+//     return fallbackValue;
+//   }
+//   return key;
+// }
+function t(key, params) {
   if (!key) {
     return "";
   }
-  const translatedValue = getTranslationValue(currentTranslations, key);
-  if (translatedValue !== null && translatedValue !== undefined) {
+  let translatedValue = getTranslationValue(currentTranslations, key);
+  if (translatedValue === null || translatedValue === undefined) {
+    translatedValue = getTranslationValue(fallbackTranslations, key);
+  }
+  if (translatedValue === null || translatedValue === undefined) {
+    return key;
+  }
+  if (typeof translatedValue !== "string") {
     return translatedValue;
   }
-  const fallbackValue = getTranslationValue(fallbackTranslations, key);
-  if (fallbackValue !== null && fallbackValue !== undefined) {
-    return fallbackValue;
+  if (params) {
+    Object.keys(params).forEach(function (paramKey) {
+      translatedValue = translatedValue.replace(
+        new RegExp("\\{\\{" + paramKey + "\\}\\}", "g"),
+        String(params[paramKey]),
+      );
+    });
   }
-  return key;
+  return translatedValue;
 }
 /* Translate Page */
 function translatePage() {

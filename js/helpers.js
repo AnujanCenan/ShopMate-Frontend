@@ -147,7 +147,7 @@ function renderProductSuggestions(searchText) {
     search === ""
       ? `
         <div class="quickPickHeading">
-          ⭐ Quick Picks
+          ⭐ ${t("item.quickPicks")}
         </div>
       `
       : "";
@@ -400,12 +400,13 @@ function closeDialog() {
   }
 }
 /* Show Confirmation Dialog - Displays a confirmation dialog and executes the supplied callback when confirmed. */
-function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
+function showConfirmDialog(title, message, onConfirm, confirmText = null) {
   const existingDialog = document.getElementById("appDialogOverlay");
   if (existingDialog) {
     existingDialog.remove();
   }
   window.dialogConfirmAction = onConfirm;
+  const resolvedConfirmText = confirmText || t("common.confirm");
   document.body.insertAdjacentHTML(
     "beforeend",
     `
@@ -425,13 +426,13 @@ function showConfirmDialog(title, message, onConfirm, confirmText = "Confirm") {
               class="secondaryButton"
               onclick="closeDialog()"
             >
-              Cancel
+              ${t("common.cancel")}
             </button>
             <button
               class="dangerButton"
               onclick="executeDialogConfirm()"
             >
-              ${confirmText}
+              ${resolvedConfirmText}
             </button>
           </div>
         </div>
@@ -486,6 +487,7 @@ function createNotification(
   message,
   action = null,
   actionData = null,
+  localization = null,
 ) {
   const duplicateNotification = appState.notifications.find(
     function (notification) {
@@ -500,7 +502,7 @@ function createNotification(
   if (duplicateNotification) {
     return;
   }
-  appState.notifications.unshift({
+  const notification = {
     id: "notif_" + Date.now(),
     type,
     title,
@@ -509,7 +511,11 @@ function createNotification(
     read: false,
     action,
     actionData,
-  });
+  };
+  if (localization) {
+    notification.localization = localization;
+  }
+  appState.notifications.unshift(notification);
   const MAX_NOTIFICATIONS = 100;
   if (appState.notifications.length > MAX_NOTIFICATIONS) {
     appState.notifications = appState.notifications.slice(0, MAX_NOTIFICATIONS);
@@ -542,7 +548,7 @@ function markAllNotificationsRead() {
     renderNotifications();
   }
   updateNotificationBadge();
-  showToast("All Notifications Read");
+  showToast(t("notifications.allRead"));
 }
 /* Update Notification Badge - Updates the unread notification count displayed in the application header. */
 function updateNotificationBadge() {
