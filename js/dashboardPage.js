@@ -18,18 +18,9 @@ function initializeDashboard() {
 }
 /* Restore Last Group */
 function restoreLastGroup() {
-<<<<<<< HEAD
   const savedGroup = localStorage.getItem("activeGroup");
   if (savedGroup) {
     selectedGroupName.textContent = savedGroup;
-=======
-  if (
-    !selectedGroupName ||
-    !appState.groups ||
-    typeof appState.groups !== "object"
-  ) {
-    return;
->>>>>>> upstream/master
   }
   const savedGroup = localStorage.getItem("activeGroup");
   const stateGroup =
@@ -116,7 +107,6 @@ async function renderCategories() {
         onclick="openCategoryPage('${category.name}', ${category.listId})"
       >
         <div class="categoryHeaderTitle">
-<<<<<<< HEAD
         <h2 class="categoryTitle">
           ${category.name}
         </h2>
@@ -152,41 +142,6 @@ async function renderCategories() {
     ${categoryBudget > 0 ? "$" + Number(categoryRemaining).toFixed(2) : "-"}
   </strong>
 </div>
-=======
-          <h2 class="categoryTitle">
-            ${category.name}
-          </h2>
-          <button
-            class="categoryMoreButton"
-            onclick="
-              event.stopPropagation();
-              renderCategoryActions('${category.name}');
-            "
-          >
-            <img
-              src="${getIconPath("navigation", "menu")}"
-              class="icon actionIcon"
-              alt="${t("common.more")}"
-            />
-          </button>
-        </div>
-        <div class="categoryBudgetSummary">
-          ${t("dashboard.budget")}
-          <strong>
-            ${categoryBudget > 0 ? "$" + categoryBudget : t("dashboard.notSet")}
-          </strong>
-          &nbsp; • &nbsp;
-          ${t("dashboard.spent")}
-          <strong>
-            $${categorySpent}
-          </strong>
-          &nbsp; • &nbsp;
-          ${t("dashboard.left")}
-          <strong>
-            ${categoryBudget > 0 ? "$" + categoryRemaining : "-"}
-          </strong>
-        </div>
->>>>>>> upstream/master
         <p class="categoryInfo">
           ${pendingCount}
           ${t("dashboard.pending")}
@@ -225,7 +180,6 @@ function openCategoryPage(categoryName, categoryId) {
 /* Render Group Dropdown */
 async function renderGroupDropdown() {
   let groupItemsHTML = "";
-<<<<<<< HEAD
 
   const res = await fetch(`http://localhost:5113/api/get-groups`, {
     method: "GET",
@@ -244,23 +198,9 @@ async function renderGroupDropdown() {
 
   groups.forEach(function (group) {
      groupItemsHTML += `
-    <div class="groupItem" onclick="event.stopPropagation(); selectGroup('${group.familyName}', ${group.familyId})">
-      <span class="groupItemName">
-        ${group.familyName}
-      </span>
-      ${
-        canManageGroup()
-          ? `
-      <button
-        class="groupMoreButton"
-        onclick="event.stopPropagation(); renderGroupActions('${group.familyName}', ${group.familyId});"
-=======
-  Object.keys(appState.groups).forEach(function (groupName) {
-    groupItemsHTML += `
-      <div
+<div
         class="groupItem"
-        onclick="selectGroup('${groupName}')"
->>>>>>> upstream/master
+        onclick="selectGroup('${group.familyName}', ${group.familyId})"
       >
         <span class="groupItemName">
           ${groupName}
@@ -272,7 +212,7 @@ async function renderGroupDropdown() {
                 class="groupMoreButton"
                 onclick="
                   event.stopPropagation();
-                  renderGroupActions('${groupName}');
+                  renderGroupActions('${groupName}',  ${group.familyId});
                 "
               >
                 <img
@@ -287,6 +227,7 @@ async function renderGroupDropdown() {
       </div>
     `;
   });
+
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -417,13 +358,8 @@ function clearRenameGroupValidation() {
   renameGroupInput.classList.remove("formInputError");
   renameGroupError.textContent = "";
 }
-<<<<<<< HEAD
 /* Create Group */
 async function createGroup() {
-=======
-/* Create Group - Creates a new shopping group after validating the group name. */
-function createGroup() {
->>>>>>> upstream/master
   const groupNameInput = document.getElementById("groupNameInput");
   const groupNameError = document.getElementById("groupNameError");
   const groupName = groupNameInput.value.trim().replace(/\s+/g, " ");
@@ -627,59 +563,6 @@ async function createCategory() {
 /* Render Category Actions */
 function renderCategoryActions(categoryName, listId) {
   bottomSheetContent.innerHTML = `
-<<<<<<< HEAD
-        <div class="bottomSheetHeader">
-            <h2>
-                Category Actions
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <button
-                class="bottomSheetActionButton"
-                onclick="renameCategory(
-                        '${categoryName}', ${listId}
-                    )
-                "
-            >
-                <img
-    src="${getIconPath("actions", "edit")}"
-    class="icon actionIcon"
-    alt=""
->
-Rename Category
-            </button>
-            <button
-              class="bottomSheetActionButton"
-              onclick="
-                renderCategoryBudgetForm(
-                    '${categoryName}', ${listId}
-                )
-              "
-            >Set Category Budget</button>
-            <button
-                class="bottomSheetDeleteButton"
-                onclick="
-                    deleteCategory(
-                        '${categoryName}', ${listId}
-                    )
-                "
-            >
-                <img
-    src="${getIconPath("actions", "delete")}"
-    class="icon actionIcon"
-    alt=""
->
-Delete Category
-            </button>
-        </div>
-    `;
-=======
     <div class="bottomSheetHeader">
       <h2>
         ${t("dashboard.categoryActions")}
@@ -699,7 +582,7 @@ Delete Category
     <div class="bottomSheetBody">
       <button
         class="bottomSheetActionButton"
-        onclick="renameCategory('${categoryName}')"
+        onclick="renameCategory('${categoryName}', ${listId})"
       >
         <img
           src="${getIconPath("actions", "edit")}"
@@ -710,13 +593,13 @@ Delete Category
       </button>
       <button
         class="bottomSheetActionButton"
-        onclick="renderCategoryBudgetForm('${categoryName}')"
+        onclick="renderCategoryBudgetForm('${categoryName}', ${listId})"
       >
         ${t("dashboard.setCategoryBudget")}
       </button>
       <button
         class="bottomSheetDeleteButton"
-        onclick="deleteCategory('${categoryName}')"
+        onclick="deleteCategory('${categoryName}', ${listId})"
       >
         <img
           src="${getIconPath("actions", "delete")}"
@@ -727,7 +610,6 @@ Delete Category
       </button>
     </div>
   `;
->>>>>>> upstream/master
   openBottomSheet();
 }
 /* Rename Category */
@@ -741,50 +623,6 @@ function renameCategory(categoryName, listId) {
   // }
   console.log(state);
   bottomSheetContent.innerHTML = `
-<<<<<<< HEAD
-        <div class="bottomSheetHeader">
-            <h2>
-                Rename Category
-            </h2>
-            <button
-                class="closeButton"
-                onclick="closeBottomSheet()"
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <input
-                type="text"
-                class="bottomSheetInput"
-                id="renameCategoryInput"
-                value="${categoryName}"
-            >
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="
-                        renderCategoryActions(
-                            '${categoryName}', ${listId}
-                        )
-                    "
-                >
-                    Cancel
-                </button>
-                <button
-                    class="primaryButton"
-                    onclick="
-                        saveRenamedCategory(
-                            '${categoryName}', ${listId}
-                        )
-                    "
-                >
-                    Save
-                </button>
-            </div>
-        </div>
-    `;
-=======
     <div class="bottomSheetHeader">
       <h2>
         ${t("dashboard.renameCategory")}
@@ -811,20 +649,19 @@ function renameCategory(categoryName, listId) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderCategoryActions('${categoryName}')"
+          onclick="renderCategoryActions('${categoryName}', ${listId})"
         >
           ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
-          onclick="saveRenamedCategory('${categoryName}')"
+          onclick="saveRenamedCategory('${categoryName}', ${listId})"
         >
           ${t("common.save")}
         </button>
       </div>
     </div>
   `;
->>>>>>> upstream/master
 }
 /* Save Renamed Category */
 async function saveRenamedCategory(categoryName, listId) {
@@ -870,59 +707,13 @@ async function saveRenamedCategory(categoryName, listId) {
 /* Delete Category */
 function deleteCategory(categoryName, listId) {
   bottomSheetContent.innerHTML = `
-<<<<<<< HEAD
-        <div class="bottomSheetHeader">
-            <h2>
-                Delete Category
-            </h2>
-            <button
-                class="closeButton"
-                onclick="
-                    renderCategoryActions(
-                        '${categoryName}', ${listId}
-                    )
-                "
-            >
-                <img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt="Close">
-            </button>
-        </div>
-        <div class="bottomSheetBody">
-            <p class="deleteMessage">
-                Are you sure you want to delete
-                "${categoryName}"?
-            </p>
-            <div class="bottomSheetButtonRow">
-                <button
-                    class="secondaryButton"
-                    onclick="
-                        renderCategoryActions(
-                            '${categoryName}', ${listId}
-                        )
-                    "
-                >
-                    Cancel
-                </button>
-                <button
-                    class="bottomSheetDeleteButton"
-                    onclick="
-                        confirmDeleteCategory(
-                            '${categoryName}', ${listId}
-                        )
-                    "
-                >
-                    Delete
-                </button>
-            </div>
-        </div>
-    `;
-=======
     <div class="bottomSheetHeader">
       <h2>
         ${t("dashboard.deleteCategory")}
       </h2>
       <button
         class="closeButton"
-        onclick="renderCategoryActions('${categoryName}')"
+        onclick="renderCategoryActions('${categoryName}', ${listId})"
         aria-label="${t("common.close")}"
       >
         <img
@@ -940,20 +731,19 @@ function deleteCategory(categoryName, listId) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderCategoryActions('${categoryName}')"
+          onclick="renderCategoryActions('${categoryName}', ${listId})"
         >
           ${t("common.cancel")}
         </button>
         <button
           class="bottomSheetDeleteButton"
-          onclick="confirmDeleteCategory('${categoryName}')"
+          onclick="confirmDeleteCategory('${categoryName}', ${listId})"
         >
           ${t("common.delete")}
         </button>
       </div>
     </div>
   `;
->>>>>>> upstream/master
 }
 /* Confirm Delete Category */
 async function confirmDeleteCategory(categoryName, categoryId) {
@@ -1008,7 +798,7 @@ function renderGroupActions(groupName, familyGroupId) {
       </button>
       <button
         class="bottomSheetActionButton"
-        onclick="renderInviteMemberForm('${groupName}')"
+        onclick="renderInviteMemberForm('${groupName}', ${familyGroupId})"
       >
         <img
           src="${getIconPath("actions", "add")}"
@@ -1021,7 +811,7 @@ function renderGroupActions(groupName, familyGroupId) {
       </button>
       <button
         class="bottomSheetDeleteButton"
-        onclick="deleteGroup('${groupName}')"
+        onclick="deleteGroup('${groupName}', ${familyGroupId})"
       >
         <img
           src="${getIconPath("actions", "delete")}"
@@ -1032,35 +822,6 @@ function renderGroupActions(groupName, familyGroupId) {
           ${t("dashboard.deleteGroup")}
         </span>
       </button>
-<<<<<<< HEAD
-     <button
-  class="bottomSheetActionButton"
-  onclick="renderInviteMemberForm('${groupName}', ${familyGroupId})"
->
-  <img
-    src="${getIconPath("actions", "add")}"
-    class="icon actionIcon"
-    alt=""
-  >
-  <span>
-    Invite Member
-  </span>
-</button>
-<button
-  class="bottomSheetDeleteButton"
-  onclick="deleteGroup('${groupName}', ${familyGroupId})"
->
-  <img
-    src="${getIconPath("actions", "delete")}"
-    class="icon actionIcon"
-    alt=""
-  >
-  <span>
-    Delete Group
-  </span>
-</button>
-=======
->>>>>>> upstream/master
     </div>
   `;
   openBottomSheet();
@@ -1109,29 +870,19 @@ function renderInviteMemberForm(groupName, familyGroupId) {
           class="validationMessage"
         ></div>
       </div>
-<<<<<<< HEAD
-        <div class="bottomSheetButtonRow">
-          <button class="secondaryButton" onclick="renderGroupActions('${groupName}', ${familyGroupId})">
-            Cancel
-          </button>
-          <button class="primaryButton" onclick="sendMemberInvitation('${groupName}', ${familyGroupId})">
-            Send Invitation
-          </button>
-=======
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderGroupActions('${groupName}')"
+          onclick="renderGroupActions('${groupName}', ${familyGroupId})"
         >
           ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
-          onclick="sendMemberInvitation('${groupName}')"
+          onclick="sendMemberInvitation('${groupName}', ${familyGroupId})"
         >
           ${t("dashboard.sendInvitation")}
         </button>
->>>>>>> upstream/master
       </div>
     </div>
   `;
@@ -1311,80 +1062,9 @@ async function saveRenamedGroup(oldGroupName, familyGroupId) {
     renameGroupInput.focus();
     return;
   }
-<<<<<<< HEAD
-  // const duplicateGroup = Object.keys(appState.groups).some(function (group) {
-  //   return (
-  //     group.toLowerCase() === newGroupName.toLowerCase() &&
-  //     group !== oldGroupName
-  //   );
-  // });
-  // if (duplicateGroup) {
-  //   renameGroupInput.classList.add("formInputError");
-  //   renameGroupError.textContent = "A group with this name already exists.";
-  //   renameGroupInput.focus();
-  //   renameGroupInput.select();
-  //   return;
-  // }
-  // appState.groups[newGroupName] = appState.groups[oldGroupName];
-  // delete appState.groups[oldGroupName];
-  // if (appState.groupMembers?.[oldGroupName]) {
-  //   appState.groupMembers[newGroupName] = appState.groupMembers[oldGroupName];
-  //   delete appState.groupMembers[oldGroupName];
-  // }
-  // if (appState.budgets.groupBudgets?.[oldGroupName]) {
-  //   appState.budgets.groupBudgets[newGroupName] =
-  //     appState.budgets.groupBudgets[oldGroupName];
-  //   delete appState.budgets.groupBudgets[oldGroupName];
-  // }
-  // if (appState.budgets.categoryBudgets?.[oldGroupName]) {
-  //   appState.budgets.categoryBudgets[newGroupName] =
-  //     appState.budgets.categoryBudgets[oldGroupName];
-  //   delete appState.budgets.categoryBudgets[oldGroupName];
-  // }
-  // if (appState.activeGroup === oldGroupName) {
-  //   appState.activeGroup = newGroupName;
-  //   selectedGroupName.textContent = newGroupName;
-  //   localStorage.setItem("activeGroup", newGroupName);
-  // }
 
   await renameGroupMySql(familyGroupId, newGroupName);
 
-=======
-  const duplicateGroup = Object.keys(appState.groups).some(function (group) {
-    return (
-      group.toLowerCase() === newGroupName.toLowerCase() &&
-      group !== oldGroupName
-    );
-  });
-  if (duplicateGroup) {
-    renameGroupInput.classList.add("formInputError");
-    renameGroupError.textContent = t("dashboard.groupAlreadyExists");
-    renameGroupInput.focus();
-    renameGroupInput.select();
-    return;
-  }
-  appState.groups[newGroupName] = appState.groups[oldGroupName];
-  delete appState.groups[oldGroupName];
-  if (appState.groupMembers?.[oldGroupName]) {
-    appState.groupMembers[newGroupName] = appState.groupMembers[oldGroupName];
-    delete appState.groupMembers[oldGroupName];
-  }
-  if (appState.budgets.groupBudgets?.[oldGroupName]) {
-    appState.budgets.groupBudgets[newGroupName] =
-      appState.budgets.groupBudgets[oldGroupName];
-    delete appState.budgets.groupBudgets[oldGroupName];
-  }
-  if (appState.budgets.categoryBudgets?.[oldGroupName]) {
-    appState.budgets.categoryBudgets[newGroupName] =
-      appState.budgets.categoryBudgets[oldGroupName];
-    delete appState.budgets.categoryBudgets[oldGroupName];
-  }
-  if (appState.activeGroup === oldGroupName) {
-    appState.activeGroup = newGroupName;
-    selectedGroupName.textContent = newGroupName;
-    localStorage.setItem("activeGroup", newGroupName);
-  }
->>>>>>> upstream/master
   saveAppState();
   renderCategories();
   renderGroupDropdown();
@@ -1395,66 +1075,14 @@ async function saveRenamedGroup(oldGroupName, familyGroupId) {
 /* Delete Group */
 async function deleteGroup(groupName, familyGroupId) {
   showConfirmDialog(
-<<<<<<< HEAD
     "Delete Group",
     `Are you sure you want to delete "${groupName}"?
 All categories, shopping items, budgets and members in this group will also be permanently deleted.
 This action cannot be undone.`,
     async function () {
-      // delete appState.groups[groupName];
-      // if (appState.groupMembers?.[groupName]) {
-      //   delete appState.groupMembers[groupName];
-      // }
-      // if (appState.budgets.groupBudgets?.[groupName]) {
-      //   delete appState.budgets.groupBudgets[groupName];
-      // }
-      // if (appState.budgets.categoryBudgets?.[groupName]) {
-      //   delete appState.budgets.categoryBudgets[groupName];
-      // }
-      // if (appState.activeGroup === groupName) {
-      //   const remainingGroups = Object.keys(appState.groups);
-      //   if (remainingGroups.length > 0) {
-      //     appState.activeGroup = remainingGroups[0];
-      //     selectedGroupName.textContent = appState.activeGroup;
-      //     localStorage.setItem("activeGroup", appState.activeGroup);
-      //   } else {
-      //     appState.activeGroup = null;
-      //     selectedGroupName.textContent = "No Group Selected";
-      //     localStorage.removeItem("activeGroup");
-      //   }
-      // }
+      
       await deleteGroupMySql(familyGroupId);
 
-=======
-    t("dashboard.deleteGroup"),
-    `${t("dashboard.deleteGroupConfirmationStart")} "${groupName}"?
-${t("dashboard.deleteGroupConfirmationDetails")}
-${t("dashboard.deleteGroupConfirmationWarning")}`,
-    function () {
-      delete appState.groups[groupName];
-      if (appState.groupMembers?.[groupName]) {
-        delete appState.groupMembers[groupName];
-      }
-      if (appState.budgets.groupBudgets?.[groupName]) {
-        delete appState.budgets.groupBudgets[groupName];
-      }
-      if (appState.budgets.categoryBudgets?.[groupName]) {
-        delete appState.budgets.categoryBudgets[groupName];
-      }
-      if (appState.activeGroup === groupName) {
-        const remainingGroups = Object.keys(appState.groups);
-        if (remainingGroups.length > 0) {
-          appState.activeGroup = remainingGroups[0];
-          selectedGroupName.textContent = appState.activeGroup;
-          localStorage.setItem("activeGroup", appState.activeGroup);
-        } else {
-          appState.activeGroup = null;
-          selectedGroupName.textContent = t("dashboard.noGroupSelected");
-          localStorage.removeItem("activeGroup");
-        }
-      }
-      saveAppState();
->>>>>>> upstream/master
       renderCategories();
       renderGroupDropdown();
       renderBudgetDashboardWidget();
@@ -1614,7 +1242,6 @@ function renderSideDrawer() {
     </div>
   `;
 }
-<<<<<<< HEAD
 
 // Gets the 
 async function getGroupListBudgets() {
@@ -1638,13 +1265,14 @@ async function getGroupListBudgets() {
   return budgets.shoppingListBudgets;
 }
 
-=======
+
 /* Open Profile Page - Opens the logged-in user's profile page. */
 function openProfilePage() {
   closeSideDrawer();
   window.location.href = "../pages/profilePage.html";
 }
->>>>>>> upstream/master
+
+
 /* Render Budget Dashboard Widget */
 async function renderBudgetDashboardWidget() {
 
@@ -1736,11 +1364,7 @@ async function renderBudgetDashboardWidget() {
             ${t("dashboard.monthlyBudget")}
           </h3>
           <p class="budgetGroupName">
-<<<<<<< HEAD
-            ${state.activeGroup || "No Group Selected"}
-=======
-            ${appState.activeGroup || t("dashboard.noGroupSelected")}
->>>>>>> upstream/master
+            ${state.activeGroup || t("dashboard.noGroupSelected")}
           </p>
         </div>
         <span id="budgetCollapseIcon">
@@ -2085,13 +1709,9 @@ async function saveCategoryBudget(categoryName, categoryId) {
 
   saveAppState();
   closeBottomSheet();
-<<<<<<< HEAD
-  showToast("Category Budget Saved");
+  showToast(t("dashboard.categoryBudgetSaved"));
   renderCategories();
   renderBudgetDashboardWidget();
-=======
-  showToast(t("dashboard.categoryBudgetSaved"));
->>>>>>> upstream/master
 }
 
 /* Save Group Budget */
@@ -2235,15 +1855,9 @@ if (menuButton) {
  */
 /* Load Product Catalog Independently */
 (async function () {
-<<<<<<< HEAD
-  await loadProductCatalog();
-  initializeDashboard();
-})();
-=======
   try {
     await loadProductCatalog();
   } catch (error) {
     console.warn("Product catalog could not be loaded.", error);
   }
 })();
->>>>>>> upstream/master
