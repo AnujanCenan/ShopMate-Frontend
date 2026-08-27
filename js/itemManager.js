@@ -655,8 +655,8 @@ async function createItem() {
     }),
     "category",
     {
-      group: appState.activeGroup,
-      category: getActiveCategory().name,
+      group: state.activeGroup,
+      category: state.activeCategory
     },
     {
       titleKey: "notifications.itemAdded",
@@ -921,6 +921,8 @@ async function confirmPurchase(listItemId) {
   item.purchased = !item.purchased;
   
   await markPurchased_mysql(item, actualPrice);
+  item.Purchased = true;      // update local state as well
+
   if (item.purchased) {
     item.purchaseDate = new Date().toISOString();
     if (item.recurrence && item.recurrence.enabled === true) {
@@ -934,9 +936,9 @@ async function confirmPurchase(listItemId) {
   } else {
     item.purchaseDate = null;
   }
-  updateBudgetTracking(currentCategory.name, actualPrice);
+  updateBudgetTracking(state.activeCategory, actualPrice);
   calculateGroupBudget();
-  saveAppState();
+  saveState();
   renderFilteredItems();
   if (typeof renderBudgetDashboardWidget === "function") {
     renderBudgetDashboardWidget();

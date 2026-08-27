@@ -127,7 +127,10 @@ async function loginUser(event) {
   window.location.href = "../pages/dashboardPage.html";
 }
 
-async function loginUserMySQL() {
+async function loginUserMySQL(event) {
+  if (event) {
+    event.preventDefault();
+  }
   const email = document.getElementById("loginEmailInput").value.trim();
   const password = document
     .getElementById("loginPasswordInput")

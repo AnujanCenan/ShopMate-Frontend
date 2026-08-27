@@ -28,7 +28,7 @@
         </div>
 
         <!-- Login Form -->
-        <form id="loginForm" onsubmit="loginUser(event)">
+        <form id="loginForm" onsubmit="loginUserMySQL(event)">
           <input
             type="email"
             data-i18n-placeholder="auth.emailAddress"
@@ -79,7 +79,7 @@
           </div>
 
           <!-- Login -->
-          <button type="submit" class="authButton" data-i18n="auth.login">
+          <button onClick="submit" class="authButton" data-i18n="auth.login">
             LOGIN
           </button>
         </form>

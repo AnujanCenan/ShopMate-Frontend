@@ -337,7 +337,7 @@ const defaultState = {
 
 
 function loadState() {
-    const savedState = localStorage.getItem(STATE_KEY);
+  const savedState = localStorage.getItem(STATE_KEY);
   if (!savedState) {
     return structuredClone(defaultState);
   }

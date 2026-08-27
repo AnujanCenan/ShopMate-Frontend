@@ -18,37 +18,38 @@ function initializeDashboard() {
 }
 /* Restore Last Group */
 function restoreLastGroup() {
-  const savedGroup = localStorage.getItem("activeGroup");
+  const savedGroup = state.activeGroup;
   if (savedGroup) {
     selectedGroupName.textContent = savedGroup;
   }
-  const savedGroup = localStorage.getItem("activeGroup");
   const stateGroup =
-    appState.activeGroup && appState.groups[appState.activeGroup]
-      ? appState.activeGroup
+    state.activeGroup && state.groups[state.activeGroup]
+      ? state.activeGroup
       : null;
   const groupToRestore =
-    savedGroup && appState.groups[savedGroup] ? savedGroup : stateGroup;
+    savedGroup && state.groups[savedGroup] ? savedGroup : stateGroup;
   if (groupToRestore) {
-    appState.activeGroup = groupToRestore;
+    state.activeGroup = groupToRestore;
     selectedGroupName.textContent = groupToRestore;
     localStorage.setItem("activeGroup", groupToRestore);
+    renderCategories();
+    renderBudgetDashboardWidget();
     return;
   }
-  appState.activeGroup = null;
+  state.activeGroup = null;
   selectedGroupName.textContent = t("dashboard.noGroupSelected");
   localStorage.removeItem("activeGroup");
 }
 /* Render Categories */
 async function renderCategories() {
-  console.log("About to render categories: active Group id is:");
-  console.log(state.activeGroupId);
+
+  console.log(state)
 
   if (!categoryList) {
     return;
   }
   categoryList.innerHTML = "";
-  if (!appState.activeGroup) {
+  if (!state.activeGroup) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
         ${t("dashboard.selectOrCreateGroup")}
@@ -87,8 +88,6 @@ async function renderCategories() {
   }
   state.groups[groupId] = categories;
   saveState();
-
-  console.log(categories);
 
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
@@ -155,12 +154,10 @@ async function renderCategories() {
 }
 /* Select Group */
 function selectGroup(groupName, groupId) {
-  appState.activeGroup = groupName;
+  state.activeGroup = groupName;
   selectedGroupName.textContent = groupName;
   state.activeGroupId = groupId;
   state.activeGroup = groupName;
-  localStorage.setItem("activeGroup", groupName);
-  localStorage.setItem("activeGroupId", groupId);
   saveState();
   
   renderCategories();
@@ -193,8 +190,6 @@ async function renderGroupDropdown() {
     return;
   }
   const groups = await res.json();
-  console.log("About to render the group dropdown");
-  console.log(groups);
 
   groups.forEach(function (group) {
      groupItemsHTML += `
@@ -203,7 +198,7 @@ async function renderGroupDropdown() {
         onclick="selectGroup('${group.familyName}', ${group.familyId})"
       >
         <span class="groupItemName">
-          ${groupName}
+          ${group.familyName}
         </span>
         ${
           canManageGroup()
@@ -212,7 +207,7 @@ async function renderGroupDropdown() {
                 class="groupMoreButton"
                 onclick="
                   event.stopPropagation();
-                  renderGroupActions('${groupName}',  ${group.familyId});
+                  renderGroupActions('${group.familyName}',  ${group.familyId});
                 "
               >
                 <img
@@ -421,25 +416,27 @@ async function createGroup() {
   const body = await res.json();
 
   selectGroup(groupName, body.familyId);
-  if (appState.groups[groupName]) {
+  if (state.groups[body.familyId]) {
     showDialog("Group Exists", "A group with this name already exists.");
     return;
   }
-  appState.groups[groupName] = [];
-  if (!appState.budgets) {
-    appState.budgets = {};
+  state.groups[body.familyId] = [];
+  if (!state.budgets) {
+    state.budgets = {};
   }
-  if (!appState.budgets.groupBudgets) {
-    appState.budgets.groupBudgets = {};
+  if (!state.budgets.groupBudgets) {
+    state.budgets.groupBudgets = [];
   }
-  appState.budgets.groupBudgets[groupName] = {
-    monthlyLimit: null,
-  };
-  if (!appState.groupMembers) {
-    appState.groupMembers = {};
+  appState.budgets.groupBudgets.push({
+    familyGroupId: body.familyId,
+    limit: null
+  })
+
+  if (!state.groupMembers) {
+    state.groupMembers = {};
   }
   const currentUser = getCurrentUser();
-  appState.groupMembers[groupName] = [
+  appState.groupMembers[body.familyId] = [
     {
       id: currentUser.id,
       name: currentUser.name,
@@ -447,7 +444,7 @@ async function createGroup() {
       role: "admin",
     },
   ];
-  saveAppState();
+  saveState();
   selectGroup(groupName);
   showSnackbar(t("dashboard.groupCreated"));
 }
@@ -513,7 +510,8 @@ async function createCategory() {
     );
     return;
   }
-  const categoryExists = appState.groups[appState.activeGroup].some(
+
+  const categoryExists = state.groups[state.activeGroupId].some(
     function (category) {
       return category.name.toLowerCase() === categoryName.toLowerCase();
     },
@@ -621,7 +619,6 @@ function renameCategory(categoryName, listId) {
   // if (!category) {
   //   return;
   // }
-  console.log(state);
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -1147,7 +1144,7 @@ function renderSideDrawer() {
       >
         <div class="drawerAvatar">
           ${
-            currentUser.profilePhoto
+            currentUser?.profilePhoto
               ? `
                 <img
                   src="${currentUser.profilePhoto}"
@@ -1155,12 +1152,12 @@ function renderSideDrawer() {
                   alt="${t("common.profile")}"
                 >
               `
-              : currentUser.name.charAt(0).toUpperCase()
+              : "User" /* currentUser.name.charAt(0).toUpperCase() */
           }
         </div>
         <div class="drawerProfileDetails">
           <div class="drawerProfileName">
-            ${currentUser.name}
+            ${currentUser}
           </div>
         </div>
       </div>
@@ -1261,7 +1258,6 @@ async function getGroupListBudgets() {
 
   state.budgets.categoryBudgets = budgets.shoppingListBudgets;
   saveState();
-  console.log(state.budgets.categoryBudgets);
   return budgets.shoppingListBudgets;
 }
 
@@ -1289,7 +1285,6 @@ async function renderBudgetDashboardWidget() {
   }
 
   const budgets = await res.json();
-  console.log(`Fetched budgets from database: budgets == ${JSON.stringify(budgets)}`);
   state.budgets.groupBudgets = budgets;
   saveState();
 
@@ -1576,7 +1571,6 @@ function renderEditGroupBudgetForm() {
 }
 /* Render Category Budget Form */
 function renderCategoryBudgetForm(categoryName, categoryId) {
-  console.log("Want to edit the shopping list name...")
   const currentBudget =
     appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
       ?.monthlyLimit ?? "";
@@ -1716,9 +1710,6 @@ async function saveCategoryBudget(categoryName, categoryId) {
 
 /* Save Group Budget */
 async function saveGroupBudget() {
-  console.log("Save Group Budgets");
-  console.log("\t active group id ==", state.activeGroupId);
-
   const groupAndListBudgets = await getCategoryBudgets(state.activeGroupId);
 
   const amount = Number(document.getElementById("groupBudgetInput").value);
@@ -1726,8 +1717,6 @@ async function saveGroupBudget() {
   let allocated = groupAndListBudgets.shoppingListBudgets.reduce(
       (value, listBudget) => value += (listBudget.budgetLimit ?? 0), 0
     );
-  console.log("\t allocated == ", allocated);
-
   
   if (amount < allocated) {
     showDialog(

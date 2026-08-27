@@ -114,23 +114,13 @@ function renderItems(items) {
   }
   itemList.innerHTML = "";
   /* Empty State */
-<<<<<<< HEAD
-  if (!items || items.length === 0) {
-    let emptyMessage = "No items yet";
-    if (state.activeTab === "favorites") {
-      emptyMessage = "No favorite items yet";
-    }
-    if (state.activeTab === "purchased") {
-      emptyMessage = "No purchased items yet";
-=======
   if (items.length === 0) {
     let emptyMessage = t("category.noItems");
-    if (appState.activeTab === "favorites") {
+    if (state.activeTab === "favorites") {
       emptyMessage = t("category.noFavoriteItems");
     }
-    if (appState.activeTab === "purchased") {
+    if (state.activeTab === "purchased") {
       emptyMessage = t("category.noPurchasedItems");
->>>>>>> upstream/master
     }
     itemEmptyState.innerHTML = `
       <p class="emptyStateText">
@@ -146,7 +136,6 @@ function renderItems(items) {
       return favoriteItem.ItemName.trim().toLowerCase() === normalizedItemName;
     });
     itemList.innerHTML += `
-<<<<<<< HEAD
             <div class="swipeWrapper">
                 <div class="swipeBackground">
                     <div class="swipePurchased">
@@ -330,215 +319,6 @@ function renderItems(items) {
           `
     }
 </div>`;
-=======
-      <div class="swipeWrapper">
-        <div class="swipeBackground">
-          <div class="swipePurchased">
-            <img
-              src="${
-                appState.activeTab === "favorites"
-                  ? getIconPath("actions", "add")
-                  : appState.activeTab === "purchased"
-                    ? getIconPath("actions", "re-add")
-                    : getIconPath("actions", "purchased")
-              }"
-              class="icon actionIcon"
-              alt=""
-            >
-            ${
-              appState.activeTab === "favorites"
-                ? t("category.addToList")
-                : appState.activeTab === "purchased"
-                  ? t("category.reAdd")
-                  : t("category.purchased")
-            }
-          </div>
-          <div class="swipeDelete">
-            <img
-              src="${
-                appState.activeTab === "favorites"
-                  ? getIconPath(
-                      "actions",
-                      item.isFavorite ? "favorite" : "favorite-outline",
-                    )
-                  : getIconPath("actions", "delete")
-              }"
-              class="icon actionIcon"
-              alt=""
-            >
-            ${
-              appState.activeTab === "favorites"
-                ? t("category.removeFavorite")
-                : t("category.delete")
-            }
-          </div>
-        </div>
-        <div
-          class="itemCard swipeCard ${
-            appState.selectedItems.includes(item.name) ? "selectedItem" : " "
-          }"
-          data-item-name="${item.name}"
-          onclick="
-            event.stopPropagation();
-            if(appState.selectionMode){
-              toggleItemSelection('${item.name}');
-            }
-          "
-          oncontextmenu="
-            event.preventDefault();
-            toggleItemSelection('${item.name}');
-          "
-        >
-          <div class="itemCardTopRow">
-            <div class="itemTitleSection">
-              <h2
-                class="itemName"
-                onclick="
-                  event.stopPropagation();
-                  if(!appState.selectionMode){
-                    renderEditItemForm('${item.name}');
-                  }
-                "
-              >
-                ${item.name}
-              </h2>
-              ${
-                appState.activeTab === "favorites"
-                  ? ""
-                  : `
-                    <p class="itemQuantityBadge">
-                      ${t("category.quantity")}: ${item.quantity}
-                    </p>
-                  `
-              }
-            </div>
-            <div class="itemActionButtons">
-              <button
-                class="modernActionButton favoriteActionButton ${
-                  isFavorite ? "activeFavoriteButton" : ""
-                }"
-                onclick="
-                  event.stopPropagation();
-                  toggleFavorite('${item.name}');
-                "
-              >
-                <img
-                  src="${getIconPath(
-                    "actions",
-                    isFavorite ? "favorite" : "favorite-outline",
-                  )}"
-                  class="icon actionIcon"
-                  alt="${t("category.favorite")}"
-                >
-              </button>
-              ${
-                appState.activeTab === "favorites"
-                  ? `
-                    <button
-                      class="modernActionButton addActionButton"
-                      onclick="addFavoriteToList('${item.name}')"
-                    >
-                      <img
-                        src="${getIconPath("actions", "add")}"
-                        class="icon actionIcon"
-                        alt="${t("category.add")}"
-                      >
-                    </button>
-                  `
-                  : `
-                    <button
-                      class="
-                        modernActionButton
-                        purchasedActionButton
-                        ${item.purchased ? "activePurchasedButton" : ""}
-                      "
-                      onclick="
-                        event.stopPropagation();
-                        openPurchaseConfirmation('${item.name}');
-                      "
-                    >
-                      <span class="actionButtonIcon">
-                        <img
-                          src="${
-                            appState.activeTab === "purchased"
-                              ? getIconPath("actions", "re-add")
-                              : getIconPath("actions", "purchased")
-                          }"
-                          class="icon actionIcon"
-                          alt="${t("category.purchased")}"
-                        >
-                      </span>
-                    </button>
-                  `
-              }
-            </div>
-          </div>
-          <div class="itemCardContent">
-            ${
-              appState.activeTab === "favorites"
-                ? `
-                  <div class="itemImageContainer">
-                    ${
-                      getProductImage(item.name)
-                        ? `
-                          <img
-                            src="${getProductImage(item.name)}"
-                            class="itemImage"
-                            alt="${item.name}"
-                          >
-                        `
-                        : `
-                          <div class="itemImagePlaceholder">
-                            <img
-                              src="${getIconPath("actions", "package")}"
-                              class="icon largeIcon"
-                              alt="${t("category.product")}"
-                            >
-                          </div>
-                        `
-                    }
-                  </div>
-                `
-                : `
-                  <div class="itemDetailsSection">
-                    <p class="itemDetails">
-                      ${t("category.notes")}: ${item.notes || "-"}
-                    </p>
-                    <p class="itemDetails">
-                      ${t("category.shop")}: ${item.preferredShop || "-"}
-                    </p>
-                    <p class="itemDetails">
-                      ${t("category.estimatedPrice")}: $${item.estimatedPrice || 0}
-                    </p>
-                  </div>
-                  <div class="itemImageContainer">
-                    ${
-                      getProductImage(item.name)
-                        ? `
-                          <img
-                            src="${getProductImage(item.name)}"
-                            class="itemImage"
-                            alt="${item.name}"
-                          >
-                        `
-                        : `
-                          <div class="itemImagePlaceholder">
-                            <img
-                              src="${getIconPath("actions", "package")}"
-                              class="icon largeIcon"
-                              alt="${t("category.product")}"
-                            >
-                          </div>
-                        `
-                    }
-                  </div>
-                `
-            }
-          </div>
-        </div>
-      </div>
-    `;
->>>>>>> upstream/master
   });
 }
 /* Initialize Tabs */
