@@ -284,12 +284,12 @@ function initializeBottomSheetEvents() {
 }
 /* Get Active Category - Returns the currently selected category object. */
 function getActiveCategory() {
-  const activeGroup = localStorage.getItem("activeGroup");
-  const activeCategory = localStorage.getItem("activeCategory");
+  const activeGroup = state.activeCategory;
+  const activeCategory = state.activeCategoryId;
   if (!activeGroup || !activeCategory) {
     return null;
   }
-  const categories = appState.groups[activeGroup];
+  const categories = state.groups[activeGroup];
   if (!categories) {
     return null;
   }
@@ -622,6 +622,59 @@ function processRecurringItems() {
     saveAppState();
   }
 }
+
+/**
+ * 
+ * @param {str} type - Probably should be an enum but describes the type of 
+ * notification [group, items, budget-category, budget-group, system] (all lower case)
+ * Will be used for filtering to determine which notification heading this
+ * noitification belongs to
+ * @param {str} title_key - the key (starting with notif.) that will be used by the 
+ * language::manager::t function to get the exact tytle string
+ * @param {str} message_key - the key (starting with notif.) that will be used
+ * by the languageManager::t function to get the exact message string
+ * @param {Object} notif_payload - should have four keys: 
+ * - title_params: Object - used to translate any parameters in the title key
+ * - message_params: Object - used to translate any parameters in the message key
+ * - action_data: Object - data used to inform the exact action
+ * - image_key: str - used to inform which icon to use
+ * @param {int} type_id - Provides a soft id reference to the corresponding object
+ * e.g. If the notification is a items notif, provide the id of the list item
+ * e.g. If the notification is a budget notif, provide the id of the budget
+ * @param {int|null} family_group_id - if relevant to a single family group (i.e.)
+ * not a system notification, should privide the family group id.
+ */
+async function createNotification_mysql(
+  type,
+  title_key,
+  message_key,
+  notif_payload,
+  type_id = null,
+  family_group_id = null
+) {
+  const res = await fetch(`http://localhost:5113/api/create-notification`, {
+    method: "POST",
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      FamilyGroupId: family_group_id, 
+      TitleKey: title_key,
+      MessageKey: message_key,
+      TargetType: type,
+      TargetId: type_id,
+      Payload: notif_payload
+    })
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return;
+  }
+
+  return;
+}
+
 /* Create Notification - Creates a new notification and updates the notification badge. */
 function createNotification(
   type,
