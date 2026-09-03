@@ -48,6 +48,9 @@ async function createGroupBudget(familyGroupId, budgetValue) {
         const msg = await res.text();
         console.error(msg);
     }
+
+    const body = await res.json();
+    return body.bgtId;
 }
 
 async function createListBudget(familyGroupId, shoppingListId, budgetValue) {

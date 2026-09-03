@@ -1,6 +1,6 @@
 async function getRenderingItems() {
-  const categoryId = localStorage.getItem("activeCategoryId")
-  const groupId = localStorage.getItem("activeGroupId");
+  const categoryId = state.activeCategoryId;
+  const groupId = state.activeGroupId;
 
   const res = await fetch(`http://localhost:5113/api/get-rendering-items?listId=${categoryId}&familyGroupId=${groupId}`, {
     method: "GET",
@@ -25,9 +25,9 @@ async function getRenderingItems() {
 /* Initialize Category Page */
 async function initializeCategoryPage() {
 
-  const categoryId = localStorage.getItem("activeCategoryId")
-  const groupId = localStorage.getItem("activeGroupId");
-
+  const categoryId = state.activeCategoryId;
+  const groupId = state.activeGroupId;
+  
   await getRenderingItems();
 
   state.activeTab = "lists";
@@ -58,7 +58,7 @@ function renderCategoryPage() {
   if (!categoryPageTitle) {
     return;
   }
-  const activeCategory = localStorage.getItem("activeCategory");
+  const activeCategory = state.activeCategory;
   categoryPageTitle.textContent = activeCategory;
   const fab = document.getElementById("openItemBottomSheetButton");
   if (fab) {

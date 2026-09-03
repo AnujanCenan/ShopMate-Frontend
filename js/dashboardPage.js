@@ -13,32 +13,14 @@ const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 function initializeDashboard() {
   restoreLastGroup();
-  renderCategories();
+  // renderCategories();    // restore last group handles the rendering now
   renderBudgetDashboardWidget();
 }
 /* Restore Last Group */
 function restoreLastGroup() {
-  const savedGroup = state.activeGroup;
-  if (savedGroup) {
-    selectedGroupName.textContent = savedGroup;
-  }
-  const stateGroup =
-    state.activeGroup && state.groups[state.activeGroup]
-      ? state.activeGroup
-      : null;
-  const groupToRestore =
-    savedGroup && state.groups[savedGroup] ? savedGroup : stateGroup;
-  if (groupToRestore) {
-    state.activeGroup = groupToRestore;
-    selectedGroupName.textContent = groupToRestore;
-    localStorage.setItem("activeGroup", groupToRestore);
-    renderCategories();
-    renderBudgetDashboardWidget();
-    return;
-  }
-  state.activeGroup = null;
-  selectedGroupName.textContent = t("dashboard.noGroupSelected");
-  localStorage.removeItem("activeGroup");
+  selectGroup(state.activeGroup, state.activeGroupId);
+  return;
+
 }
 /* Render Categories */
 async function renderCategories() {
@@ -58,13 +40,13 @@ async function renderCategories() {
     return;
   }
   // const categories = appState.groups[appState.activeGroup];
-  const groupId = localStorage.getItem("activeGroupId");
+  const groupId = state.activeGroupId;
   if (!groupId) {
     console.error("GROUP ID IS UNDEFINED in RENDER CATEGORIES PAGE")
     return;
   }
 
-  const res = await fetch(`http://localhost:5113/api/get-lists?family_group_id=${groupId}`, {
+   const res = await fetch(`http://localhost:5113/api/get-lists?family_group_id=${groupId}`, {
     method: "GET",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -155,7 +137,7 @@ async function renderCategories() {
 /* Select Group */
 function selectGroup(groupName, groupId) {
   state.activeGroup = groupName;
-  selectedGroupName.textContent = groupName;
+  selectedGroupName.textContent = (groupId) ? groupName : t("dashboard.noGroupSelected");;
   state.activeGroupId = groupId;
   state.activeGroup = groupName;
   saveState();
@@ -401,7 +383,8 @@ async function createGroup() {
 
     return;
   }
-
+ 
+  // put this fetch in createGroup In AuthManager
   const res = await fetch(`http://localhost:5113/api/group-create`, {
     method: "POST",
     credentials: 'include',
@@ -427,7 +410,7 @@ async function createGroup() {
   if (!state.budgets.groupBudgets) {
     state.budgets.groupBudgets = [];
   }
-  appState.budgets.groupBudgets.push({
+  state.budgets.groupBudgets.push({
     familyGroupId: body.familyId,
     limit: null
   })
@@ -436,7 +419,7 @@ async function createGroup() {
     state.groupMembers = {};
   }
   const currentUser = getCurrentUser();
-  appState.groupMembers[body.familyId] = [
+  state.groupMembers[body.familyId] = [
     {
       id: currentUser.id,
       name: currentUser.name,
@@ -530,7 +513,7 @@ async function createCategory() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: categoryName,
-      familyGroupId: localStorage.getItem("activeGroupId")
+      familyGroupId: state.activeGroupId
     })
   })
 
@@ -641,7 +624,7 @@ function renameCategory(categoryName, listId) {
         type="text"
         class="bottomSheetInput"
         id="renameCategoryInput"
-        value="${category.name}"
+        value="${categoryName}"
       >
       <div class="bottomSheetButtonRow">
         <button
@@ -1617,6 +1600,7 @@ function renderCategoryBudgetForm(categoryName, categoryId) {
         id="categoryBudgetRemaining"
         class="budgetHelperText"
       ></div>
+
       <button
         class="primaryButton"
         onclick="
@@ -1639,14 +1623,20 @@ function renderCategoryBudgetForm(categoryName, categoryId) {
 }
 /* Update Remaining Budget */
 function updateCategoryBudgetRemaining(categoryName) {
+
+  // major change - state object is different to app state so causes difference in how to find group budget
   const groupBudget =
-    appState.budgets.groupBudgets?.[appState.activeGroup]?.monthlyLimit ?? 0;
+    state.budgets.groupBudgets?.find(b => b.familyGroupId === state.activeGroupId)?.monthlyLimit ?? 0;
+
+
   let allocated = 0;
   const categoryBudgets =
-    appState.budgets.categoryBudgets?.[appState.activeGroup] || {};
-  Object.entries(categoryBudgets).forEach(function (entry) {
-    if (entry[0] !== categoryName) {
-      allocated += entry[1].monthlyLimit || 0;
+    state.budgets.categoryBudgets || {};
+
+  // major change - state object is different to appState object, so causes difference in for loop
+  categoryBudgets.forEach(function (entry) {
+    if (entry.shoppingListName !== categoryName) {
+      allocated += entry.budgetLimit || 0;
     }
   });
   const entered =
@@ -1668,24 +1658,28 @@ async function saveCategoryBudget(categoryName, categoryId) {
     );
     return;
   }
-  if (!appState.budgets.categoryBudgets) {
-    appState.budgets.categoryBudgets = {};
+  if (!state.budgets.categoryBudgets) {
+    state.budgets.categoryBudgets = [];
   }
-  if (!appState.budgets.categoryBudgets[appState.activeGroup]) {
-    appState.budgets.categoryBudgets[appState.activeGroup] = {};
-  }
+
+  // dont want this anymore - categoryBudgets is a list not an object
+  // if (!state.budgets.categoryBudgets[state.activeGroup]) {
+  //   state.budgets.categoryBudgets[state.activeGroup] = {};
+  // }
+
+  
   const groupBudget =
-    appState.budgets.groupBudgets?.[appState.activeGroup]?.monthlyLimit ?? 0;
+    state.budgets.groupBudgets?.find(b => b.familyGroupId === state.activeGroupId)?.monthlyLimit ?? 0;
   let allocated = 0;
-  Object.entries(
-    appState.budgets.categoryBudgets[appState.activeGroup],
-  ).forEach(function (entry) {
-    const name = entry[0];
-    const budget = entry[1];
-    if (name !== categoryName) {
-      allocated += budget.monthlyLimit || 0;
+  const categoryBudgets =
+    state.budgets.categoryBudgets || {}; 
+  // major change - state object is different to appState object, so causes difference in for loop
+  categoryBudgets.forEach(function (entry) {
+    if (entry.shoppingListName !== categoryName) {
+      allocated += entry.budgetLimit || 0;
     }
   });
+
   const totalAllocated = allocated + amount;
   if (groupBudget > 0 && totalAllocated > groupBudget) {
     showDialog(
@@ -1696,12 +1690,14 @@ async function saveCategoryBudget(categoryName, categoryId) {
     );
     return;
   }
-  appState.budgets.categoryBudgets[appState.activeGroup][categoryName] = {
-    monthlyLimit: amount,
-  };
+  // no need to update state object here; createListBudget() will persist the data
+  // in the database
+  // state.budgets.categoryBudgets[state.activeGroup][categoryName] = {
+  //   monthlyLimit: amount,
+  // };
   await createListBudget(state.activeGroupId, categoryId, amount);
 
-  saveAppState();
+  saveState();
   closeBottomSheet();
   showToast(t("dashboard.categoryBudgetSaved"));
   renderCategories();
@@ -1745,9 +1741,28 @@ async function saveGroupBudget() {
   appState.budgets.groupBudgets[appState.activeGroup].monthlyLimit = amount;
   saveAppState();
   
-  await createGroupBudget(state.activeGroupId, amount);
-  
-  createNotification(
+  const bgtId = await createGroupBudget(state.activeGroupId, amount);
+
+  await createNotification_mysql(
+    "budget",
+    "dashboard.budgetUpdated",
+    "dashboard.groupBudgetUpdatedMessage",
+    {
+      title_params: {},
+      message_params: {
+        groupName: state.activeGroup,
+        amount: amount
+      }, 
+      action: "budget",
+      action_data: null,
+      image_key: "budget"
+    },
+    bgtId,
+    state.activeGroupId
+  )
+
+
+  createNotification(   //done
     "budget",
     t("dashboard.budgetUpdated"),
     t("dashboard.groupBudgetUpdatedMessage")

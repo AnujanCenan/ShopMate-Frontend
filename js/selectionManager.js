@@ -1,7 +1,5 @@
 /* Toggle Selection */
 function toggleItemSelection(listItemId) {
-  console.log("Toggling selection: item.ListItemId = ");
-  console.log(listItemId);
   state.selectionMode = true;
   /* Remove Selection */
   if (state.selectedItems.some(other => listItemId === other)) {

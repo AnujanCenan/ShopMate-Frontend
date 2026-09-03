@@ -251,6 +251,7 @@ function t(key, params) {
   if (typeof translatedValue !== "string") {
     return translatedValue;
   }
+
   if (params) {
     Object.keys(params).forEach(function (paramKey) {
       translatedValue = translatedValue.replace(

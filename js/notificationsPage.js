@@ -7,6 +7,7 @@ function initializeNotifications() {
   }
   applyNotificationPreferences();
   renderNotifications();
+
 }
 /* Apply Notification Preferences - Shows only enabled notification filter tabs. */
 function applyNotificationPreferences() {
@@ -64,7 +65,12 @@ function applyNotificationPreferences() {
 }
 /* Format Time */
 function formatNotificationTime(timestamp) {
-  const minutes = Math.floor((Date.now() - timestamp) / 60000);
+  const notifSent = new Date(timestamp.replace(' ', 'T'));   // Need to get rid of the T in the MySQL DateTime
+  const now = new Date();
+
+  const diffMs = now - notifSent;
+  const minutes = Math.floor(diffMs / (1000 * 60));
+
   if (minutes < 1) {
     return t("notifications.justNow");
   }
@@ -88,15 +94,15 @@ let activeNotificationFilter = "all";
 /* Get Localized Notification Content */
 function getLocalizedNotificationContent(notification) {
   if (
-    notification.localization &&
-    notification.localization.titleKey &&
-    notification.localization.messageKey
+    notification.titleKey &&
+    notification.messageKey
   ) {
+    let notifPayload = JSON.parse(notification.payload);
     return {
-      title: t(notification.localization.titleKey),
+      title: t(notification.titleKey),
       message: t(
-        notification.localization.messageKey,
-        notification.localization.params || {},
+        notification.messageKey,
+        notifPayload.message_params || {},
       ),
     };
   }
@@ -125,15 +131,36 @@ function getNotificationIcon(notificationType) {
       return "🔔";
   }
 }
+
+async function getNotifications_mysql() {
+  const res = await fetch("http://localhost:5113/api/get-notifications", {
+    method: "GET",
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Fetch failed:", errorText);
+    return;
+  }
+
+  const notifs = await res.json();
+
+  return notifs;
+}
+
 /* Render Notifications - Displays notifications based on the selected filter and user preferences. */
-function renderNotifications() {
+async function renderNotifications() {
+  const notifs = await getNotifications_mysql() ;
   notificationList.innerHTML = "";
   const notificationSettings = appState.settings.notifications;
-  let notifications = appState.notifications.filter(function (notification) {
+  let notifications = notifs.filter(function (notification) {
     if (notification.type === "group" && !notificationSettings.group) {
       return false;
     }
-    if (notification.type === "item" && !notificationSettings.shopping) {
+    if (notification.type === "items" && !notificationSettings.shopping) {
       return false;
     }
     if (notification.type === "budget" && !notificationSettings.budget) {
@@ -147,14 +174,14 @@ function renderNotifications() {
   switch (activeNotificationFilter) {
     case "unread":
       notifications = notifications.filter(function (notification) {
-        return !notification.read;
+        return !notification.isRead;
       });
       break;
     case "all":
       break;
     default:
       notifications = notifications.filter(function (notification) {
-        return notification.type === activeNotificationFilter;
+        return notification.targetType === activeNotificationFilter;
       });
       break;
   }
@@ -168,24 +195,26 @@ function renderNotifications() {
     `;
     return;
   }
+  state.notifications = []
   notifications.forEach(function (notification) {
+    state.notifications.push(notification);
     const localizedContent = getLocalizedNotificationContent(notification);
     notificationList.innerHTML += `
       <div
         class="
           notificationCard
-          ${notification.read ? "" : "unreadNotification"}
+          ${notification.isRead ? "" : "unreadNotification"}
         "
         onclick="
           openNotification(
-            '${notification.id}'
+            ${notification.unfId}
           )
         "
       >
         <div class="notificationHeader">
           <div class="notificationTitleWrapper">
             <span class="notificationTypeIcon">
-              ${getNotificationIcon(notification.type)}
+              ${getNotificationIcon(notification.targetType)}
             </span>
             <h3 class="notificationTitle">
              ${localizedContent.title}
@@ -196,7 +225,7 @@ function renderNotifications() {
             onclick="
               event.stopPropagation();
               deleteNotification(
-                '${notification.id}'
+                '${notification.unfId}'
               );
             "
           >
@@ -216,20 +245,25 @@ function renderNotifications() {
       </div>
     `;
   });
+
 }
 /* Open Notification */
-function openNotification(notificationId) {
-  const notification = appState.notifications.find(function (notification) {
-    return notification.id === notificationId;
+async function openNotification(notificationId) {
+  console.log("Hi");
+  const notification = state.notifications.find(function (notification) {
+    return notification.unfId === notificationId;
   });
+
   if (!notification) {
+    console.log("Early return...");
     return;
   }
-  markNotificationRead(notificationId);
-  if (!notification.action) {
-    return;
-  }
-  switch (notification.action) {
+  await markNotificationRead(notificationId);
+
+  console.log(notification);
+  const notifPayload = JSON.parse(notification.payload);
+  console.log(notifPayload);
+  switch (notifPayload.action) {
     case "dashboard":
       window.location.href = "../pages/dashboardPage.html";
       break;
@@ -246,8 +280,14 @@ function openNotification(notificationId) {
       window.location.href = "../pages/favoritesPage.html";
       break;
     case "category":
-      if (notification.actionData) {
-        localStorage.setItem("activeGroup", notification.actionData.group);
+      if (notifPayload.actionData) {
+        state.activeGroupId = notifPayload.actionData.groupId;
+        state.activeGroup = notifPayload.actionData.group;
+        state.activeCategoryId = notifPayload.actionData.categoryId;
+        state.activeCategory = notifPayload.actionData.category;
+        saveState();
+        
+        localStorage.setItem("activeGroup", notifPayload.actionData.group);
         localStorage.setItem(
           "activeCategory",
           notification.actionData.category,
@@ -275,11 +315,12 @@ function goBack() {
   window.location.href = "../pages/dashboardPage.html";
 }
 /* Clear All Notifications */
-function clearNotifications() {
+async function clearNotifications() {
   showConfirmDialog(
     t("notifications.clearNotifications"),
     t("notifications.confirmClearAll"),
-    function () {
+    async function () {
+      await deleteNotification_mysql(null);
       appState.notifications = [];
       saveAppState();
       renderNotifications();
@@ -288,13 +329,43 @@ function clearNotifications() {
     },
   );
 }
-/* Delete Notification */
-function deleteNotification(notificationId) {
-  appState.notifications = appState.notifications.filter(
-    function (notification) {
-      return notification.id !== notificationId;
+
+/**
+ * @param {Array<int> | null} notificationIds 
+ * if an array of integers will soft-delete these particular user notifications from the 
+ * database 
+ * If null, will soft-delete ALL user notifications belonging to this user.
+ */
+async function deleteNotification_mysql(notificationIds) {
+
+  const res = await fetch("http://localhost:5113/api/delete-notifications", {
+    method: "DELETE",
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      NotificationIds: notificationIds
+    })
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return;
+  }
+}
+
+/* Delete Notification */
+async function deleteNotification(notificationId) {
+  // appState.notifications = appState.notifications.filter(
+  //   function (notification) {
+  //     return notification.id !== notificationId;
+  //   },
+  // );
+
+  await deleteNotification_mysql([notificationId]);
+  
   saveAppState();
   renderNotifications();
   updateNotificationBadge();

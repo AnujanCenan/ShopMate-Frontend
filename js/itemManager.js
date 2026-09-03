@@ -255,7 +255,7 @@ function renderEditItemForm(listItemId) {
           id="editItemImagePreview"
           class="
             itemImagePreview
-            ${getProductImage(item.name) ? "" : "hidden"}
+            ${getProductImage(item.ItemName) ? "" : "hidden"}
           "
           src="${getProductImage(item.ItemName)}"
           alt=""
@@ -513,7 +513,7 @@ async function createItem() {
     return;
   }
 
-  const categoryId = localStorage.getItem("activeCategoryId");
+  const categoryId = state.activeCategoryId; 
 
   // const existingItem = currentCategory.items.find(function (item) {
   //   return item.name.toLowerCase() === itemName.toLowerCase();
@@ -526,6 +526,7 @@ async function createItem() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: itemName,
+      familyGroupId: state.activeGroupId,
       quantity: itemQuantity,
       optionalNotes: itemNotes,
       listId: categoryId,
@@ -647,7 +648,31 @@ async function createItem() {
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar(t("item.itemAdded"));
-  createNotification(
+
+  await createNotification_mysql(
+    "item",
+    "notifications.itemAdded",
+    "notifications.itemAddedMessage",
+    {
+      title_params: {},
+      message_params: {
+        itemName: itemName
+      },
+      action: "category",
+      action_data: {
+        groupId: state.activeGroupId,
+        group: state.activeGroup,
+        categoryId: state.activeCategoryId,
+        category: state.activeCategory
+      },
+      image_key: "item"
+    },
+    categoryId,           // note: decided to give the shopping list id here instead of the item id
+    state.activeGroupId 
+  );
+
+  
+  createNotification( // Done
     "item",
     t("notifications.itemAdded"),
     t("notifications.itemAddedMessage", {
@@ -736,10 +761,10 @@ async function updateItem(listItemId) {
     return;
   }
   const normalizedNewName = newName.toLowerCase();
-  const duplicateItem = currentCategory.items.find(function (existingItem) {
+  const duplicateItem = state.listItems.find(function (existingItem) {
     return (
-      existingItem.name !== originalItemName &&
-      existingItem.name.trim().toLowerCase() === normalizedNewName
+      existingItem.ItemName !== originalItemName &&
+      existingItem.ItemName.trim().toLowerCase() === normalizedNewName
     );
   });
   if (duplicateItem) {
@@ -756,14 +781,15 @@ async function updateItem(listItemId) {
   item.Quantity = newQuantity;
   item.estimatedPrice = newPrice;
   item.notes = newNotes;
-  item.preferredShop = newShop;
+  item.ShopName = newShop;
   item.recurrence = {
     enabled: recurrenceFrequency !== "none",
     frequency: recurrenceFrequency,
     startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
     endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
   };
-  saveAppState();
+  updateItemMySql(listItemId, item);
+  saveState();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar(t("item.itemUpdated"));
@@ -783,7 +809,7 @@ function saveProductToCatalog(item) {
 
 
 async function unmarkPurchased_mysql(item) {
-  const listId = parseInt(localStorage.getItem("activeCategoryId"));
+  const listId = state.activeCategoryId;
   const res = await fetch("http://localhost:5113/api/unmark-purchase", {
     method: 'POST',
     credentials: 'include',
@@ -796,7 +822,7 @@ async function unmarkPurchased_mysql(item) {
 }
 
 async function markPurchased_mysql(item, price) {
-  const listId = parseInt(localStorage.getItem("activeCategoryId"));
+  const listId = state.activeCategoryId;
   const res = await fetch("http://localhost:5113/api/mark-purchase", {
     method: 'POST',
     credentials: 'include',
@@ -947,6 +973,30 @@ async function confirmPurchase(listItemId) {
   showSnackbar(
     item.purchased ? t("item.itemPurchased") : t("item.itemRestored"),
   );
+
+
+  await createNotification_mysql(
+    "item",
+    "notifications.itemPurchased",
+    "notifications.itemPurchasedMessage",
+    {
+      title_params: {},
+      message_params: {
+        itemName: item.ItemName
+      },
+      action: "category",
+      action_data: {
+        groupId: state.activeGroupId,
+        group: state.activeGroup,
+        categoryId: state.activeCategoryId,
+        category: state.activeCategory
+      },
+      image_key: "purchase",
+    },
+    listItemId,   // note we provide the list item id instead of the purchase id
+    state.activeGroupId
+  );
+  
   createNotification(
     "purchase",
     t("notifications.itemPurchased"),
@@ -970,7 +1020,7 @@ async function confirmPurchase(listItemId) {
 
 /* Update Budget Tracking */
 function updateBudgetTracking(categoryName, amount) {
-  if (!appState.budgets) {
+  if (!state.budgets) {
     return;
   }
   /* Update Group Budget */
@@ -1016,14 +1066,9 @@ async function deleteItemMySql(listItemId) {
     return;
   }
 
-  console.log("About to clean up the local data...");
-  console.log("BEFORE");
-  console.log(state.listItems);
   state.listItems = state.listItems.filter((item) => item.ListItemId != listItemId);
   state.selectedItems = state.selectedItems.filter((itemId) => itemId != listItemId);
   saveState();
-  console.log("AFTER");
-  console.log(state.listItems);
 }
 
 /* Delete Item */

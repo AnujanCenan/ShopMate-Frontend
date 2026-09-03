@@ -33,9 +33,6 @@ async function deleteGroupMySql(familyGroupId) {
     return;
   }
 
-  console.log("Finished deleteing group...");
-
-
   delete state.groups[familyGroupId];
   saveState();
   

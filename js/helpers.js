@@ -259,12 +259,11 @@ function openBottomSheet() {
 }
 /* Close Bottom Sheet - Hides the bottom sheet and restores page interaction. */
 function closeBottomSheet() {
-  console.log("Attempting to close bottom sheet");
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
   if (!bottomSheet || !screenOverlay) {
-    console.log("Could Not close the bottom sheet");
+    console.error("Could Not close the bottom sheet");
     return;
   }
   screenOverlay.classList.add("hidden");
@@ -635,12 +634,14 @@ function processRecurringItems() {
  * by the languageManager::t function to get the exact message string
  * @param {Object} notif_payload - should have four keys: 
  * - title_params: Object - used to translate any parameters in the title key
+ *    Note the keys of the title_params should match the string that should be replaced (see t function)
  * - message_params: Object - used to translate any parameters in the message key
+ *    Note: the keys of message_params should match the strings that should be replaced (see t function)
+ * - action: str - used to determine which page this notification should redirect to
  * - action_data: Object - data used to inform the exact action
  * - image_key: str - used to inform which icon to use
  * @param {int} type_id - Provides a soft id reference to the corresponding object
- * e.g. If the notification is a items notif, provide the id of the list item
- * e.g. If the notification is a budget notif, provide the id of the budget
+ * e.g. If the notification is a items notif, provide the id of the shopping list  
  * @param {int|null} family_group_id - if relevant to a single family group (i.e.)
  * not a system notification, should privide the family group id.
  */
@@ -718,27 +719,55 @@ function createNotification(
   saveAppState();
   updateNotificationBadge();
 }
-/* Mark Notification Read - Marks a notification as read and refreshes the notification UI. */
-function markNotificationRead(notificationId) {
-  const notification = appState.notifications.find(function (notification) {
-    return notification.id === notificationId;
+
+/**
+ * @param {Array[int] | null} notificationIds 
+ * If an array, will mark all of specified notifications as read in the database
+ * If null, will mark all notifications owned by the user as read in the database
+ */
+async function markNotificationRead_mysql(notificationIds) {
+  const res = await fetch("http://localhost:5113/api/read-notifications", {
+    method: "PUT",
+    credentials: 'include',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      NotificationIds: notificationIds
+    })
   });
-  if (!notification) {
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
     return;
   }
-  notification.read = true;
+
+}
+
+/* Mark Notification Read - Marks a notification as read and refreshes the notification UI. */
+async function markNotificationRead(notificationId) {
+  // const notification = appState.notifications.find(function (notification) {
+  //   return notification.id === notificationId;
+  // });
+  // if (!notification) {
+  //   return;
+  // }
+  // notification.read = true;
   saveAppState();
+  await markNotificationRead_mysql([notificationId]);
   if (typeof renderNotifications === "function") {
     renderNotifications();
   }
   updateNotificationBadge();
 }
 /* Mark All Notifications Read - Marks every notification as read and refreshes the notification UI. */
-function markAllNotificationsRead() {
+async function markAllNotificationsRead() {
   appState.notifications.forEach(function (notification) {
     notification.read = true;
   });
   saveAppState();
+  await markNotificationRead_mysql(null);
   if (typeof renderNotifications === "function") {
     renderNotifications();
   }

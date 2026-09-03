@@ -336,9 +336,8 @@ function getBudgetInsights(percent) {
 /* Render Budget Analysis - Displays the budget summary and insights for the active group. */
 function renderBudgetAnalysis() {
   const container = document.getElementById("budgetAnalysisContainer");
-  const activeGroup =
-    localStorage.getItem("activeGroup") || appState.activeGroup;
-  appState.activeGroup = activeGroup;
+  const activeGroup = state.activeGroup;
+
   if (!activeGroup) {
     container.innerHTML = `
       <div class="emptyState">
@@ -432,7 +431,7 @@ function renderCategoryBudgetCards() {
   const container = document.getElementById("categoryBudgetContainer");
   container.innerHTML = "";
   const categoryBudgets = state.budgets.categoryBudgets || [];
-  console.log(categoryBudgets);
+
   if (categoryBudgets.length === 0) {
     container.innerHTML = `
       <div class="emptyStateCard">
