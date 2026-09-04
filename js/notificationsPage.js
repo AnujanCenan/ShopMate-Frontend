@@ -262,15 +262,23 @@ async function openNotification(notificationId) {
 
   console.log(notification);
   const notifPayload = JSON.parse(notification.payload);
+  const actionData = notifPayload.action_data;
+
   console.log(notifPayload);
   switch (notifPayload.action) {
     case "dashboard":
       window.location.href = "../pages/dashboardPage.html";
       break;
     case "budget":
+      if (actionData) {
+        state.activeGroupId = actionData.groupId;
+        state.activeGroup = actionData.group;
+        saveState();
+      }
       window.location.href = "../pages/budgetPage.html";
       break;
     case "notifications":
+      state.activeGroupId = 
       window.location.href = "../pages/notificationsPage.html";
       break;
     case "group":
@@ -280,18 +288,19 @@ async function openNotification(notificationId) {
       window.location.href = "../pages/favoritesPage.html";
       break;
     case "category":
-      if (notifPayload.actionData) {
-        state.activeGroupId = notifPayload.actionData.groupId;
-        state.activeGroup = notifPayload.actionData.group;
-        state.activeCategoryId = notifPayload.actionData.categoryId;
-        state.activeCategory = notifPayload.actionData.category;
+      if (notifPayload.action_data) {
+        state.activeGroupId = notifPayload.action_data.groupId;
+        state.activeGroup = notifPayload.action_data.group;
+        state.activeCategoryId = notifPayload.action_data.categoryId;
+        state.activeCategory = notifPayload.action_data.category;
         saveState();
-        
-        localStorage.setItem("activeGroup", notifPayload.actionData.group);
-        localStorage.setItem(
-          "activeCategory",
-          notification.actionData.category,
-        );
+        console.log(state);
+
+        // localStorage.setItem("activeGroup", notifPayload.action_data.group);
+        // localStorage.setItem(
+        //   "activeCategory",
+        //   notification.action_data.category,
+        // );
       }
       window.location.href = "../pages/categoryPage.html";
       break;

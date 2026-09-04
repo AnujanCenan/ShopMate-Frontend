@@ -1754,7 +1754,10 @@ async function saveGroupBudget() {
         amount: amount
       }, 
       action: "budget",
-      action_data: null,
+      action_data: {
+        groupId: state.activeGroupId,
+        group: state.activeGroup,
+      },
       image_key: "budget"
     },
     bgtId,
