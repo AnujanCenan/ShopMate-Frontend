@@ -53,6 +53,7 @@ function toggleFavorite(itemName) {
   renderFilteredItems();
   updateNotificationBadge();
 }
+
 /* Add Favorite - Adds an item from the current shopping list to the Favorites list. */
 function addFavorite(itemName) {
   const currentCategory = getActiveCategory();
@@ -126,7 +127,7 @@ async function toggleFavorite_mysql(itemMasterId) {
       OptionalNotes: currentItem.OptionalNotes || "",
       PreferredShop: currentItem.PreferredShop || "",
       imageUrl: currentItem.imageUrl || "",
-      estimatedPrice: currentItem.estimatedPrice || 0,
+      estimatedPrice: currentItem.EstimatedPrice || 0,
       actualPrice: currentItem.actualPrice || 0,
       purchaseDate: currentItem.purchaseDate || null,
     });

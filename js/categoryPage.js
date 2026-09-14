@@ -298,7 +298,7 @@ function renderItems(items) {
                     Shop: ${item.ShopName || "-"}
                 </p>
                 <p class="itemDetails">
-                    Est Price: $${item.estimatedPrice || 0}
+                    Est Price: $${item.EstimatedPrice || 0}
                 </p>
             </div>
             <div class="itemImageContainer">

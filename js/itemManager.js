@@ -181,12 +181,15 @@ function renderEditItemForm(listItemId) {
   // if (!currentCategory) {
   //   return;
   // }
+  console.log("In renderEditForm...");
+  console.log(state.listItems);
   const item = state.listItems.find(function (item) {
     return item.ListItemId === listItemId;
   });
   if (!item) {
     return;
   }
+  console.log(item);
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -242,7 +245,7 @@ function renderEditItemForm(listItemId) {
                 bottomSheetInput
                 currencyInput
               "
-              value="${item.estimatedPrice || 0}"
+              value="${item.EstimatedPrice || 0}"
             >
           </div>
         </div>
@@ -494,6 +497,16 @@ function initializeEditImagePreview() {
     reader.readAsDataURL(file);
   });
 }
+
+
+function getItemWithName(itemName) {
+  console.log("In itemExists...");
+  console.log(state.listItems);
+  return state.listItems.find(item => {
+    return item.ItemName.toLowerCase().trim() === itemName.toLowerCase().trim()
+  });
+}
+
 /* Create Item */
 async function createItem() {
   const itemNameInput = document.getElementById("itemNameInput");
@@ -526,35 +539,9 @@ async function createItem() {
   // });
   /* Existing Item Found */
 
-  const res = await fetch("http://localhost:5113/api/item-add", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: itemName,
-      familyGroupId: state.activeGroupId,
-      quantity: itemQuantity,
-      optionalNotes: itemNotes,
-      listId: categoryId,
-      shopName: itemShop,
-      itemRecurrenceInterval: recurrenceFrequency,
-      startDate: recurrenceStartDate ? new Date(recurrenceStartDate).toISOString() : null,
-      endDate: recurrenceEndDate ? new Date(recurrenceEndDate).toISOString() : null
-    })
-  });
 
-  if (!res.ok)
-  {
-    // error handler
-    return;
-  }
-
-  const body = await res.json();
-  
-  const itemMasterId = body.itemMasterId;
-  const listItemId = body.listItemId;
-
-  const existingItem = false; // TODO: check if there is an existing item
+  const existingItem = getItemWithName(itemName); // TODO: check if there is an existing item
+  console.log(`existing item === ${existingItem}`);
   if (existingItem) {
     bottomSheetContent.innerHTML = `
       <div class="bottomSheetHeader">
@@ -574,9 +561,9 @@ async function createItem() {
       </div>
       <div class="bottomSheetBody">
         <p class="duplicateMessage">
-          "${existingItem.name}"
+          "${existingItem.ItemName}"
           ${t("item.alreadyExistsWithQuantity")}
-          ${existingItem.quantity}.
+          ${existingItem.Quantity}.
         </p>
         <p class="duplicateMessage">
           ${t("item.addMoreQuantity", {
@@ -593,8 +580,8 @@ async function createItem() {
           <button
             class="primaryButton"
             onclick="updateDuplicateQuantity(
-              '${existingItem.name}',
-              '${itemQuantity}'
+              '${itemName}',
+              ${itemQuantity}
             )"
           >
             ${t("item.updateQuantity")}
@@ -604,6 +591,35 @@ async function createItem() {
     `;
     return;
   }
+
+  const res = await fetch("http://localhost:5113/api/item-add", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: itemName,
+      familyGroupId: state.activeGroupId,
+      quantity: itemQuantity,
+      optionalNotes: itemNotes,
+      estimatedPrice: itemPrice,
+      listId: categoryId,
+      shopName: itemShop,
+      itemRecurrenceInterval: recurrenceFrequency,
+      startDate: recurrenceStartDate ? new Date(recurrenceStartDate).toISOString() : null,
+      endDate: recurrenceEndDate ? new Date(recurrenceEndDate).toISOString() : null
+    })
+  });
+
+  if (!res.ok)
+  {
+    // error handler
+    return;
+  }
+
+  const body = await res.json();
+  
+  const itemMasterId = body.itemMasterId;
+  const listItemId = body.listItemId;
   // const recurrenceFrequency =
   //   document.getElementById("itemRecurrenceFrequency")?.value || "none";
   // const recurrenceStartDate =
@@ -703,19 +719,25 @@ async function createItem() {
   favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
-function updateDuplicateQuantity(itemName, newQuantity) {
-  const currentCategory = getActiveCategory();
-  if (!currentCategory) {
-    return;
-  }
-  const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
-  });
-  if (!item) {
-    return;
-  }
-  item.quantity = Number(item.quantity) + Number(newQuantity);
-  saveAppState();
+async function updateDuplicateQuantity(ItemName, addedQuantity) {
+  // const currentCategory = getActiveCategory();
+  // if (!currentCategory) {
+  //   return;
+  // }
+  // const item = currentCategory.items.find(function (item) {
+  //   return item.name === itemName;
+  // });
+  // if (!item) {
+  //   return;
+  // }
+  // item.quantity = Number(item.quantity) + Number(newQuantity);
+  // saveAppState();
+
+
+  const existingItem = getItemWithName(ItemName);
+  existingItem.Quantity = Number(existingItem.Quantity) +  Number(addedQuantity);
+  await updateItemMySql(existingItem.ListItemId, existingItem);
+  saveState();
   renderFilteredItems();
   closeBottomSheet();
   showSnackbar(t("item.quantityUpdated"));
@@ -729,23 +751,28 @@ async function updateItemMySql(listItemId, newItem) {
     document.getElementById("editItemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
+  
+  console.log(`In updateItemMySql: esitmated price value = ${newItem.EstimatedPrice}`);
+  console.log(`In updateItem MySQL; listItemId == ${listItemId}; type == ${typeof(listItemId)}`);
+  console.log(`In updateItem MySQL: List ID being passed in is ${newItem.ListId}`);
+  console.log(`In updateItem MySQL: Quantity passed in is ${newItem.Quantity}`);
 
   const res = await fetch("http://localhost:5113/api/edit-item", {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      listItemId: listItemId,
-      itemName: newItem.ItemName,
-      shopName: newItem.ShopName,
-      familyGroupId: state.activeGroupId,
-      listId: newItem.ListId,
-      quantity: newItem.Quantity,
-      optionalNotes: newItem.OptionalNotes,
-      estimatedPrice: newItem.estimatedPrice,
-      itemRecurrenceInterval: recurrenceFrequency,
-      startDate: recurrenceStartDate ? new Date(recurrenceStartDate).toISOString() : null,
-      endDate: recurrenceEndDate ? new Date(recurrenceEndDate).toISOString() : null
+      ListItemId: listItemId,
+      ItemName: newItem.ItemName,
+      ShopName: newItem.ShopName,
+      FamilyGroupId: state.activeGroupId,
+      ListId: newItem.ListId,
+      Quantity: newItem.Quantity,
+      OptionalNotes: newItem.OptionalNotes,
+      EstimatedPrice: newItem.EstimatedPrice,
+      ItemRecurrenceInterval: recurrenceFrequency,
+      StartDate: recurrenceStartDate ? new Date(recurrenceStartDate).toISOString() : null,
+      EndDate: recurrenceEndDate ? new Date(recurrenceEndDate).toISOString() : null
     })
   });
 
@@ -781,16 +808,25 @@ async function updateItem(listItemId) {
     return;
   }
   const normalizedNewName = newName.toLowerCase();
-  const duplicateItem = state.listItems.find(function (existingItem) {
-    return (
-      existingItem.ItemName !== originalItemName &&
-      existingItem.ItemName.trim().toLowerCase() === normalizedNewName
-    );
-  });
-  if (duplicateItem) {
-    showSnackbar(t("item.duplicateItemName"));
-    return;
+  if (newName.toLowerCase().trim() === originalItemName) {
+
+  } else {
+    const duplicateItem = getItemWithName(newName);
+    if (duplicateItem) {
+      showSnackbar(t("item.duplicateItemName"));
+      return;
+    }
   }
+  // const duplicateItem = state.listItems.find(function (existingItem) {
+  //   return (
+  //     existingItem.ItemName !== originalItemName &&
+  //     existingItem.ItemName.trim().toLowerCase() === normalizedNewName
+  //   );
+  // });
+  // // if (duplicateItem) {
+
+  // // }
+  console.log(`In updateItem: esitmated price == `)
   const recurrenceFrequency =
     document.getElementById("editItemRecurrenceFrequency")?.value || "none";
   const recurrenceStartDate =
@@ -799,8 +835,8 @@ async function updateItem(listItemId) {
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
   item.ItemName = newName;
   item.Quantity = newQuantity;
-  item.estimatedPrice = newPrice;
-  item.notes = newNotes;
+  item.EstimatedPrice = newPrice;
+  item.OptionalNotes = newNotes;
   item.ShopName = newShop;
   item.recurrence = {
     enabled: recurrenceFrequency !== "none",
@@ -911,7 +947,7 @@ async function openPurchaseConfirmation(listItemId) {
           <input
             type="number"
             class="bottomSheetInput currencyInput"
-            value="${item.estimatedPrice || 0}"
+            value="${item.EstimatedPrice || 0}"
             readonly
           >
         </div>
