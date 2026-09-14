@@ -840,4 +840,9 @@ function initializeHelpers() {
   applyTheme();
   initializeThemeListener();
 }
+
+function sqlToJsTimeStamp(mySqlTimeStamp) {
+  return new Date(mySqlTimeStamp.replace(' ', 'T'));   // Need to get rid of the T in the MySQL DateTime
+}
+
 initializeHelpers();

@@ -89,7 +89,7 @@ function getCurrentUser() {
 }
 /* Check Login Status - Returns whether a valid user session currently exists. */
 function isUserLoggedIn() {
-  return appState.loggedIn && getCurrentUser() !== null;
+  return state.loggedIn;
 }
 /* Redirect Logged-Out Users - Redirects unauthenticated users to the login page. */
 function redirectIfLoggedOut() {
@@ -127,53 +127,74 @@ async function loginUser(event) {
   window.location.href = "../pages/dashboardPage.html";
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// Pre-fill email and store token on login page load
+function handleLoginInviteFlow() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
+  const email = urlParams.get("email");
+
+  if (email) {
+    const emailInput = document.getElementById("loginEmailInput");
+    if (emailInput) {
+      emailInput.value = decodeURIComponent(email);
+    }
+  }
+
+  if (token) {
+    let hiddenToken = document.getElementById("inviteTokenInput");
+    if (!hiddenToken) {
+      hiddenToken = document.createElement("input");
+      hiddenToken.type = "hidden";
+      hiddenToken.id = "inviteTokenInput";
+      document.getElementById("loginForm")?.appendChild(hiddenToken);
+    }
+    hiddenToken.value = token;
+  }
+}
+
 async function loginUserMySQL(event) {
   if (event) {
     event.preventDefault();
   }
+
   const email = document.getElementById("loginEmailInput").value.trim();
-  const password = document
-    .getElementById("loginPasswordInput")
-    .value.trim();
+  const password = document.getElementById("loginPasswordInput").value.trim();
 
-  const response = await fetch(`http://localhost:5113/api/login`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      userEmail: email,
-      userPassword: password
-    })
-  });
+  // Extract invite token from hidden input or URL parameters
+  const hiddenTokenInput = document.getElementById("inviteTokenInput");
+  const urlParams = new URLSearchParams(window.location.search);
+  const inviteToken = hiddenTokenInput?.value || urlParams.get("token") || null;
 
+  try {
+    const response = await fetch(`http://localhost:5113/api/login`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userEmail: email,
+        userPassword: password,
+        inviteToken: inviteToken // Sent to backend for auto-joining family group
+      })
+    });
 
-  if (!response.ok) {
-    console.error(response.json())
-    showDialog("Invalid Login", "Please check your email and password.");
-    return;
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Login failed:", errorData);
+      showDialog("Invalid Login", "Please check your email and password.");
+      return;
+    }
+
+    state.loggedIn = true;
+    saveState();
+
+    window.location.href = "./dashboardPage.html";
+  } catch (error) {
+    console.error("Network or server error during login:", error);
+    showDialog("Error", "Unable to connect to the authentication server.");
   }
-
-  appState.loggedIn = true;
-  appState.activeGroup = "Family Group";
-  saveAppState();
-
-  // appState.currentUser = {
-  //   id: user.id,
-
-  //   name: user.name,
-
-  //   email: user.email,
-  //   role: "admin",
-  // };
-
-  // appState.loggedIn = true;
-
-  // appState.activeGroup = "Family Group";
-
-  // saveAppState();
-
-  window.location.href = "./dashboardPage.html";
 }
+///////////////////////////////////////////////////////////////////////////////
 
 /* Validate Login Credentials - Checks whether the required login fields are completed. */
 function validateLoginCredentials(email, password) {

@@ -10,19 +10,25 @@ function initializeGroupManagement() {
   setupPermissions();
 }
 /* Render Group Accordion */
-function renderGroupAccordion() {
+async function renderGroupAccordion() {
   const container = document.getElementById("groupManagementContainer");
   container.innerHTML = "";
-  Object.keys(appState.groups).forEach(function (groupName) {
-    const categories = appState.groups[groupName] || [];
-    const members =
-      appState.groupMembers && appState.groupMembers[groupName]
-        ? appState.groupMembers[groupName]
-        : [];
-    const pendingInvitations = (appState.pendingInvitations || []).filter(
+  const groupData = await getGroupManagementData();
+  
+  if (!groupData) return;
+
+  console.log("GROUP MANAGEMENT DATA");
+  console.log(groupData);
+  groupData.forEach(function (group) {
+    const groupName = group.fgpName
+    const groupId = group.fgpId;
+    const numCategories = group.totalShoppingLists || 0;
+    const members = group.members;
+
+    const pendingInvitations = (group.invitations || []).filter(
       function (invitation) {
         return (
-          invitation.groupName === groupName && invitation.status === "pending"
+          invitation.invStatus === "Pending"
         );
       },
     );
@@ -42,7 +48,7 @@ function renderGroupAccordion() {
             </h3>
             <p class="groupAccordionSubtitle">
               ${members.length} ${t("groupManagement.members")} •
-              ${categories.length} ${t("groupManagement.categories")}
+              ${numCategories} ${t("groupManagement.categories")}
             </p>
           </div>
           <span
@@ -79,27 +85,27 @@ function renderGroupAccordion() {
                       <div class="groupMemberRow">
                         <div class="groupMemberInformation">
                           <div class="groupMemberName">
-                            ${member.name}
+                            ${member?.usrName}
                           </div>
                           <div
                             class="
                               groupMemberRole
                               ${
-                                member.role === "admin"
+                                member?.role === "Admin"
                                   ? "memberRoleAdmin"
                                   : "memberRoleMember"
                               }
                             "
                           >
                             ${
-                              member.role === "admin"
+                              member?.role === "Admin"
                                 ? t("groupManagement.admin")
                                 : t("groupManagement.member")
                             }
                           </div>
                         </div>
                         ${
-                          canManageGroup() && member.id !== getCurrentUser().id
+                          canManageGroup() && member?.id !== getCurrentUser()?.id
                             ? `
                               <button
                                 class="groupMoreButton"
@@ -142,18 +148,22 @@ function renderGroupAccordion() {
               `
               : pendingInvitations
                   .map(function (invitation) {
+                    console.log(invitation);
+                    const expiryTime = Date(sqlToJsTimeStamp(invitation.invExpiresAt));
+                    const creationTime = Date(sqlToJsTimeStamp(invitation.invSentAt));
+                    console.log(expiryTime);
                     return `
                       <div class="groupInviteRow">
                         <div class="groupInviteInformation">
                           <div class="groupMemberName">
-                            ${invitation.email}
+                            ${invitation.invEmail}
                           </div>
                           <div class="groupMemberRole">
                             ${
-                              new Date(invitation.expiresAt) < new Date()
+                              expiryTime < new Date()
                                 ? t("groupManagement.expired")
                                 : `${t("groupManagement.invited")} ${new Date(
-                                    invitation.invitedAt,
+                                    sqlToJsTimeStamp(invitation.invSentAt),
                                   ).toLocaleDateString("en-GB")}`
                             }
                           </div>
@@ -182,6 +192,9 @@ function renderGroupAccordion() {
             class="primaryButton"
             onclick="
               appState.activeGroup='${groupName}';
+              state.activeGroupId=${groupId};
+              state.activeGroup='${groupName}';
+              saveState();
               renderInviteMemberForm();
             "
           >
@@ -240,7 +253,7 @@ function setupPermissions() {
   const currentUser = getCurrentUser();
   const members = getCurrentGroupMembers();
   const currentMember = members.find(function (member) {
-    return member.id === currentUser.id;
+    return member?.id === currentUser?.id;
   });
   if (!currentMember) {
     return;
@@ -825,10 +838,10 @@ function renderInviteMemberForm() {
           id="inviteMemberRole"
           class="bottomSheetInput"
         >
-          <option value="member">
+          <option value="Normal"> 
             ${t("groupManagement.member")}
           </option>
-          <option value="admin">
+          <option value="Admin">
             ${t("groupManagement.admin")}
           </option>
         </select>
@@ -844,7 +857,7 @@ function renderInviteMemberForm() {
   openBottomSheet();
 }
 /* Send Invitation */
-function sendInvitation() {
+async function sendInvitation() {
   if (!canManageGroup()) {
     showDialog(
       t("common.permissionDenied"),
@@ -864,6 +877,7 @@ function sendInvitation() {
     );
     return;
   }
+  console.log(role);
   if (!isValidEmail(email)) {
     showDialog(
       t("groupManagement.invalidEmail"),
@@ -878,15 +892,7 @@ function sendInvitation() {
     status: "pending",
     createdAt: Date.now(),
   });
-  /*
-    Backend
-    POST /group/invite
-    {
-      email,
-      role,
-      groupName
-    }
-  */
+  await sendInvititation_mysql(email, role);
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();

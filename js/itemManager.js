@@ -514,6 +514,12 @@ async function createItem() {
   }
 
   const categoryId = state.activeCategoryId; 
+  const recurrenceFrequency =
+    document.getElementById("itemRecurrenceFrequency")?.value || "none";
+  const recurrenceStartDate =
+    document.getElementById("itemRecurrenceStartDate")?.value || null;
+  const recurrenceEndDate =
+    document.getElementById("itemRecurrenceEndDate")?.value || null;
 
   // const existingItem = currentCategory.items.find(function (item) {
   //   return item.name.toLowerCase() === itemName.toLowerCase();
@@ -531,8 +537,11 @@ async function createItem() {
       optionalNotes: itemNotes,
       listId: categoryId,
       shopName: itemShop,
+      itemRecurrenceInterval: recurrenceFrequency,
+      startDate: recurrenceStartDate ? new Date(recurrenceStartDate).toISOString() : null,
+      endDate: recurrenceEndDate ? new Date(recurrenceEndDate).toISOString() : null
     })
-  })
+  });
 
   if (!res.ok)
   {
@@ -595,12 +604,12 @@ async function createItem() {
     `;
     return;
   }
-  const recurrenceFrequency =
-    document.getElementById("itemRecurrenceFrequency")?.value || "none";
-  const recurrenceStartDate =
-    document.getElementById("itemRecurrenceStartDate")?.value || null;
-  const recurrenceEndDate =
-    document.getElementById("itemRecurrenceEndDate")?.value || null;
+  // const recurrenceFrequency =
+  //   document.getElementById("itemRecurrenceFrequency")?.value || "none";
+  // const recurrenceStartDate =
+  //   document.getElementById("itemRecurrenceStartDate")?.value || null;
+  // const recurrenceEndDate =
+  //   document.getElementById("itemRecurrenceEndDate")?.value || null;
   const newItem = {
     ListItemId: listItemId,
     ItemMasterId: itemMasterId,
@@ -714,20 +723,31 @@ function updateDuplicateQuantity(itemName, newQuantity) {
 /* Update Item */
 
 async function updateItemMySql(listItemId, newItem) {
+  const recurrenceFrequency =
+    document.getElementById("editItemRecurrenceFrequency")?.value || "none";
+  const recurrenceStartDate =
+    document.getElementById("editItemRecurrenceStartDate")?.value || null;
+  const recurrenceEndDate =
+    document.getElementById("editItemRecurrenceEndDate")?.value || null;
+
   const res = await fetch("http://localhost:5113/api/edit-item", {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      ListItemId: listItemId,
-      ItemName: newItem.ItemName,
-      Quantity: newItem.Quantity,
-      EstimatedPrice: newItem.estimatedPrice,
-      OptionalNotes: newItem.OptionalNotes,
-      ShopName: newItem.ShopName,
-      FamilyGroupId: state.activeGroupId,
+      listItemId: listItemId,
+      itemName: newItem.ItemName,
+      shopName: newItem.ShopName,
+      familyGroupId: state.activeGroupId,
+      listId: newItem.ListId,
+      quantity: newItem.Quantity,
+      optionalNotes: newItem.OptionalNotes,
+      estimatedPrice: newItem.estimatedPrice,
+      itemRecurrenceInterval: recurrenceFrequency,
+      startDate: recurrenceStartDate ? new Date(recurrenceStartDate).toISOString() : null,
+      endDate: recurrenceEndDate ? new Date(recurrenceEndDate).toISOString() : null
     })
-  })
+  });
 
   if (!res.ok) {
     const msg = await res.text();
@@ -788,6 +808,10 @@ async function updateItem(listItemId) {
     startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
     endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
   };
+  item.ItemRecurrenceInterval = recurrenceFrequency;
+  item.StartDate = recurrenceStartDate;
+  item.EndDate = recurrenceEndDate;
+
   updateItemMySql(listItemId, item);
   saveState();
   renderFilteredItems();
