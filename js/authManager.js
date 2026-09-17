@@ -1219,13 +1219,13 @@ function initializeApplicationEntry() {
 
   if (!isApplicationLockEnabled()) {
     sessionStorage.setItem("shopMateAppUnlocked", "true");
-    window.location.href = "../pages/dashboardPage.html";
+    // window.location.href = "../pages/dashboardPage.html";
     return true;
   }
 
   if (sessionStorage.getItem("shopMateAppUnlocked") === "true") {
     applicationLocked = false;
-    window.location.href = "../pages/dashboardPage.html";
+    // window.location.href = "../pages/dashboardPage.html";
     return true;
   }
 

@@ -19,6 +19,9 @@ async function renderGroupAccordion() {
 
   console.log("GROUP MANAGEMENT DATA");
   console.log(groupData);
+
+  state.tempPendingInvites = {};
+  state.tempMembers = {};
   groupData.forEach(function (group) {
     const groupName = group.fgpName
     const groupId = group.fgpId;
@@ -32,6 +35,10 @@ async function renderGroupAccordion() {
         );
       },
     );
+
+    state.tempPendingInvites[groupId] = pendingInvitations;
+    state.tempMembers[groupId] = members;
+
     container.innerHTML += `
       <div class="groupAccordionCard">
         <button
@@ -174,7 +181,7 @@ async function renderGroupAccordion() {
                           onclick="
                             event.stopPropagation();
                             openInviteActions(
-                              '${invitation.id}'
+                              ${groupId}, ${invitation.id}
                             );
                           "
                         >
@@ -266,12 +273,13 @@ function setupPermissions() {
   }
 }
 /* Open Invite Actions */
-function openInviteActions(invitationId) {
+function openInviteActions(groupId, invitationId) {
   console.log("Opening invite actions...");
+  console.log(state.tempPendingInvites);
   if (!canManageGroup()) {
     return;
   }
-  const invitation = (appState.pendingInvitations || []).find(
+  const invitation = (state.tempPendingInvites[groupId] || []).find(
     function (invitation) {
       return invitation.id === invitationId;
     },
@@ -301,7 +309,7 @@ function openInviteActions(invitationId) {
           ${t("groupManagement.emailAddress")}
         </label>
         <div class="bottomSheetStaticValue">
-          ${invitation.email}
+          ${invitation.invEmail}
         </div>
       </div>
       <div class="formField">
@@ -309,7 +317,7 @@ function openInviteActions(invitationId) {
           ${t("groupManagement.invitedOn")}
         </label>
         <div class="bottomSheetStaticValue">
-          ${new Date(invitation.invitedAt).toLocaleDateString("en-GB")}
+          ${new Date(invitation.invSentAt).toLocaleDateString("en-GB")}
         </div>
       </div>
       <div class="bottomSheetButtonRow">
@@ -526,6 +534,7 @@ function openMemberProfile(memberId) {
 /* Member Actions */
 function openMemberActions(memberId, groupName) {
   if (!canManageGroup()) {
+    console.log("TSK TSK Cant manage group");
     return;
   }
 
@@ -534,13 +543,13 @@ function openMemberActions(memberId, groupName) {
       ? appState.groupMembers[groupName]
       : [];
 
-  const member = members.find(function (member) {
-    return member.id === memberId;
-  });
+  // const member = members.find(function (member) {
+  //   return member.id === memberId;
+  // });
 
-  if (!member) {
-    return;
-  }
+  // if (!member) {
+  //   return;
+  // }
 
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
@@ -880,7 +889,7 @@ function renderInviteMemberForm() {
       </div>
       <button
         class="primaryButton"
-        onclick="sendInvitation()"
+        onclick="sendInvititation_mysql()"
       >
         ${t("groupManagement.sendInvitation")}
       </button>

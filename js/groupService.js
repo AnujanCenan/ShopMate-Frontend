@@ -111,7 +111,12 @@ async function getGroupManagementData()
 }
 
 
-async function sendInvititation_mysql(invitee_email, role) {
+async function sendInvititation_mysql() {
+  const invitee_email = document
+    .getElementById("inviteMemberEmail")
+    .value.trim()
+    .toLowerCase();
+  const role = document.getElementById("inviteMemberRole").value;
   console.log("In mysql send invite");
   console.log(`Role = ${role}`);
   console.log(`FgpId: ${state.activeCategoryId}`);

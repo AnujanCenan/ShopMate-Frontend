@@ -235,7 +235,7 @@ function renderItems(items) {
                 }"
                 onclick="
                   event.stopPropagation();
-                  toggleFavorite_mysql('${item.ItemMasterId}');
+                  toggleFavorite_mysql(${item.ItemMasterId});
                 "
               >
                 <img
@@ -270,7 +270,7 @@ function renderItems(items) {
                       "
                       onclick="
                         event.stopPropagation();
-                        openPurchaseConfirmation('${item.ListItemId}');
+                        openPurchaseConfirmation(${item.ListItemId});
                       "
                     >
                       <span class="actionButtonIcon">

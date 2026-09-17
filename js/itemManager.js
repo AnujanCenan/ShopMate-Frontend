@@ -950,8 +950,13 @@ async function markPurchased_mysql(item, price) {
 
 /*  Purchase Confirmation */
 async function openPurchaseConfirmation(listItemId) {
-  
-  const item = state.listItems.find(item => item.ListItemId === listItemId);
+  console.log("In open purchase confirmation...");
+  console.log(`listItemId = ${listItemId}`);
+  console.log(state.listItems);
+
+  const item = state.listItems.find(item => item.ListItemId == listItemId);
+  console.log(item);
+
   if (item.Purchased) {
     await unmarkPurchased_mysql(item);
     item.Purchased = false;
