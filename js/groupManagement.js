@@ -204,7 +204,7 @@ async function renderGroupAccordion() {
             class="secondaryButton"
             onclick="
               appState.activeGroup='${groupName}';
-              openLeaveGroupDialog();
+              openLeaveGroupDialog(${groupId});
             "
           >
             ${t("groupManagement.leaveGroup")}
@@ -266,6 +266,7 @@ function setupPermissions() {
 }
 /* Open Invite Actions */
 function openInviteActions(invitationId) {
+  console.log("Opening invite actions...");
   if (!canManageGroup()) {
     return;
   }
@@ -915,7 +916,7 @@ async function sendInvitation() {
   );
 }
 /* Leave Group Dialog */
-function openLeaveGroupDialog() {
+function openLeaveGroupDialog(familyGroupId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -946,7 +947,7 @@ function openLeaveGroupDialog() {
         </button>
         <button
           class="bottomSheetDeleteButton"
-          onclick="leaveCurrentGroup()"
+          onclick="leaveCurrentGroup(${familyGroupId})"
         >
           ${t("groupManagement.leave")}
         </button>
@@ -956,75 +957,74 @@ function openLeaveGroupDialog() {
   openBottomSheet();
 }
 /* Leave Group */
-function leaveCurrentGroup() {
-  const currentUser = getCurrentUser();
-  const members = getCurrentGroupMembers();
-  const currentMember = members.find(function (member) {
-    return member.id === currentUser.id;
-  });
-  if (!currentMember) {
-    showDialog(
-      t("groupManagement.cannotLeaveGroup"),
-      t("groupManagement.notMemberOfGroup"),
-    );
-    return;
-  }
-  const adminCount = members.filter(function (member) {
-    return member.role === "admin";
-  }).length;
-  if (
-    currentMember.role === "admin" &&
-    adminCount === 1 &&
-    members.length > 1
-  ) {
+async function leaveCurrentGroup(familyGroupId) {
+  // const currentUser = getCurrentUser();
+  // const members = getCurrentGroupMembers();
+  // const currentMember = members.find(function (member) {
+  //   return member.id === currentUser.id;
+  // });
+  // if (!currentMember) {
+  //   showDialog(
+  //     t("groupManagement.cannotLeaveGroup"),
+  //     t("groupManagement.notMemberOfGroup"),
+  //   );
+  //   return;
+  // }
+  // const adminCount = members.filter(function (member) {
+  //   return member.role === "admin";
+  // }).length;
+  const leavingStatus = await canLeave(familyGroupId);
+  if (leavingStatus === "mustPromoteFirst") {
     showDialog(
       t("groupManagement.cannotLeaveGroup"),
       t("groupManagement.promoteAnotherAdmin"),
     );
     return;
-  }
-  const remainingMembers = members.filter(function (member) {
-    return member.id !== currentUser.id;
-  });
-  if (remainingMembers.length === 0) {
+  } else if (leavingStatus === "confirmDeletion") {
     showConfirmDialog(
       t("groupManagement.deleteGroup"),
       t("groupManagement.deleteLastMemberWarning"),
       function () {
-        completeLeaveGroup(currentUser, remainingMembers);
+        completeLeaveGroup(familyGroupId, true);
       },
     );
     return;
   }
+
   showConfirmDialog(
     t("groupManagement.leaveGroup"),
     t("groupManagement.confirmLeaveGroup"),
     function () {
-      completeLeaveGroup(currentUser, remainingMembers);
+      completeLeaveGroup(familyGroupId, false);
     },
   );
 }
+
+
 /* Complete Leave Group */
-function completeLeaveGroup(currentUser, remainingMembers) {
-  if (remainingMembers.length === 0) {
-    delete appState.groupMembers[appState.activeGroup];
-    delete appState.groups[appState.activeGroup];
-    if (appState.budgets && appState.budgets.groupBudgets) {
-      delete appState.budgets.groupBudgets[appState.activeGroup];
-    }
-    if (appState.pendingInvitations) {
-      appState.pendingInvitations = appState.pendingInvitations.filter(
-        function (invite) {
-          return invite.groupName !== appState.activeGroup;
-        },
-      );
-    }
-    if (appState.budgets && appState.budgets.categoryBudgets) {
-      delete appState.budgets.categoryBudgets[appState.activeGroup];
-    }
-  } else {
-    appState.groupMembers[appState.activeGroup] = remainingMembers;
-  }
+async function completeLeaveGroup(familyGroupId, shouldDelete) {
+  await leaveGroup(familyGroupId, shouldDelete);
+  state.groups = state.groups.filter(group => group.familyGroupId !== familyGroupId);
+
+  // if (remainingMembers.length === 0) {
+  //   delete appState.groupMembers[appState.activeGroup];
+  //   delete appState.groups[appState.activeGroup];
+  //   if (appState.budgets && appState.budgets.groupBudgets) {
+  //     delete appState.budgets.groupBudgets[appState.activeGroup];
+  //   }
+  //   if (appState.pendingInvitations) {
+  //     appState.pendingInvitations = appState.pendingInvitations.filter(
+  //       function (invite) {
+  //         return invite.groupName !== appState.activeGroup;
+  //       },
+  //     );
+  //   }
+  //   if (appState.budgets && appState.budgets.categoryBudgets) {
+  //     delete appState.budgets.categoryBudgets[appState.activeGroup];
+  //   }
+  // } else {
+  //   appState.groupMembers[appState.activeGroup] = remainingMembers;
+  // }
   /*
     Backend
     DELETE
@@ -1033,37 +1033,37 @@ function completeLeaveGroup(currentUser, remainingMembers) {
       groupId
     }
   */
-  createNotification(
-    "group",
-    t("groupManagement.leftGroup"),
-    t("groupManagement.leftGroupMessage", {
-      name: currentUser.name,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.leftGroup",
-      messageKey: "groupManagement.leftGroupMessage",
-      params: {
-        name: currentUser.name,
-      },
-    },
-  );
-  const remainingGroups = Object.keys(appState.groups);
-  if (remainingGroups.length > 0) {
-    appState.activeGroup = remainingGroups[0];
-    localStorage.setItem("activeGroup", remainingGroups[0]);
-  } else {
-    appState.activeGroup = null;
-    localStorage.removeItem("activeGroup");
-  }
+  // createNotification(
+  //   "group",
+  //   t("groupManagement.leftGroup"),
+  //   t("groupManagement.leftGroupMessage", {
+  //     name: currentUser.name,
+  //   }),
+  //   null,
+  //   null,
+  //   {
+  //     titleKey: "groupManagement.leftGroup",
+  //     messageKey: "groupManagement.leftGroupMessage",
+  //     params: {
+  //       name: currentUser.name,
+  //     },
+  //   },
+  // );
+  // const remainingGroups = Object.keys(appState.groups);
+  // if (remainingGroups.length > 0) {
+  //   appState.activeGroup = remainingGroups[0];
+  //   localStorage.setItem("activeGroup", remainingGroups[0]);
+  // } else {
+  //   appState.activeGroup = null;
+  //   localStorage.removeItem("activeGroup");
+  // }
   saveAppState();
   closeBottomSheet();
-  showToast(
-    remainingMembers.length === 0
-      ? t("groupManagement.groupDeleted")
-      : t("groupManagement.youLeftGroup"),
-  );
+  // showToast(
+  //   remainingMembers.length === 0
+  //     ? t("groupManagement.groupDeleted")
+  //     : t("groupManagement.youLeftGroup"),
+  // );
   window.location.href = "../pages/dashboardPage.html";
 }
 /* Bottom Sheet */

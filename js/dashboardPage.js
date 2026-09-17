@@ -11,7 +11,8 @@ const menuButton = document.querySelector(".menuButton");
 const sideDrawer = document.getElementById("sideDrawer");
 const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
-function initializeDashboard() {
+async function initializeDashboard() {
+  await getGroups();    // setting the state.groups
   restoreLastGroup();
   // renderCategories();    // restore last group handles the rendering now
   renderBudgetDashboardWidget();
@@ -60,6 +61,9 @@ async function renderCategories() {
   }
     
   const categories = await res.json();
+  state.currentCategories = categories;
+  console.log("Family group's categories...");
+  console.log(state.currentCategories);
   if (!categories || categories.length === 0) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
@@ -68,7 +72,7 @@ async function renderCategories() {
     `;
     return;
   }
-  state.groups[groupId] = categories;
+  // state.groups[groupId] = categories;
   saveState();
 
   emptyStateSection.innerHTML = "";
@@ -136,6 +140,7 @@ async function renderCategories() {
 }
 /* Select Group */
 function selectGroup(groupName, groupId) {
+  console.log(`Seelcting group... name = ${groupName}; id = ${groupId}`);
   state.activeGroup = groupName;
   selectedGroupName.textContent = (groupId) ? groupName : t("dashboard.noGroupSelected");;
   state.activeGroupId = groupId;
@@ -160,36 +165,26 @@ function openCategoryPage(categoryName, categoryId) {
 async function renderGroupDropdown() {
   let groupItemsHTML = "";
 
-  const res = await fetch(`http://localhost:5113/api/get-groups`, {
-    method: "GET",
-    credentials: 'include',
-    headers: { "Content-Type": "application/json" }
-  })
-
-  if (!res.ok)
-  {
-    console.error(await res.text());
-    return;
-  }
-  const groups = await res.json();
+  const groups = await getGroups(); 
+  if (!groups) return;
 
   groups.forEach(function (group) {
      groupItemsHTML += `
 <div
         class="groupItem"
-        onclick="selectGroup('${group.familyName}', ${group.familyId})"
+        onclick="selectGroup('${group.familyName}', ${group.familyGroupId})"
       >
         <span class="groupItemName">
           ${group.familyName}
         </span>
         ${
-          canManageGroup()
+          group.isAdmin 
             ? `
               <button
                 class="groupMoreButton"
                 onclick="
                   event.stopPropagation();
-                  renderGroupActions('${group.familyName}',  ${group.familyId});
+                  renderGroupActions('${group.familyName}',  ${group.familyGroupId});
                 "
               >
                 <img
@@ -398,12 +393,11 @@ async function createGroup() {
 
   const body = await res.json();
 
-  selectGroup(groupName, body.familyId);
-  if (state.groups[body.familyId]) {
+  selectGroup(groupName, body.familyGroupId);
+  if (state.groups.find(group => group.FamilyName === groupName)) {
     showDialog("Group Exists", "A group with this name already exists.");
     return;
   }
-  state.groups[body.familyId] = [];
   if (!state.budgets) {
     state.budgets = {};
   }
@@ -411,7 +405,7 @@ async function createGroup() {
     state.budgets.groupBudgets = [];
   }
   state.budgets.groupBudgets.push({
-    familyGroupId: body.familyId,
+    familyGroupId: body.familyGroupId,
     limit: null
   })
 
@@ -419,7 +413,7 @@ async function createGroup() {
     state.groupMembers = {};
   }
   const currentUser = getCurrentUser();
-  state.groupMembers[body.familyId] = [
+  state.groupMembers[body.familyGroupId] = [
     {
       id: currentUser.id,
       name: currentUser.name,
@@ -494,11 +488,12 @@ async function createCategory() {
     return;
   }
 
-  const categoryExists = state.groups[state.activeGroupId].some(
-    function (category) {
-      return category.name.toLowerCase() === categoryName.toLowerCase();
-    },
-  );
+  const categoryExists = state.currentCategories.find(category => category.name.toLowerCase().trim() === categoryName.toLowerCase().trim());
+  // const categoryExists = state.groups[state.activeGroupId].some(
+  //   function (category) {
+  //     return category.name.toLowerCase() === categoryName.toLowerCase();
+  //   },
+  // );
   if (categoryExists) {
     showDialog(
       t("dashboard.categoryExistsTitle"),

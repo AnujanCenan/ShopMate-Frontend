@@ -311,11 +311,22 @@ function getCurrentMember() {
     return member.email === appState.currentUser.email;
   });
 }
-/* Is Admin - Determines whether the current user is an administrator of the active group. */
-function isAdmin() {
-  const member = getCurrentMember();
-  return member ? member.role === "admin" : false;
+
+function isAdminOfGroup(familyGroupId) {
+  const group = state.groups.find(group => group.familyGroupId === familyGroupId);
+  return group ? Boolean(group.isAdmin) : false;
 }
+
+/* 
+  Is Admin - Determines whether the current user is an administrator of the active group. 
+  Assumes state.activeGroupId is set to accurately reflect the 
+*/
+function isAdmin() {
+  const currGroupId = state.activeGroupId;
+  return isAdminOfGroup(currGroupId);
+}
+
+
 /* Is Member - Determines whether the current user is a standard member of the active group. */
 function isMember() {
   const member = getCurrentMember();

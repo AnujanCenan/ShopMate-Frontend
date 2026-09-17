@@ -18,12 +18,43 @@ async function removeGroupMember(memberId) {
     success: true,
   };
 }
-async function leaveGroup(groupName) {
-  console.log("TODO Backend Leave:", groupName);
-  return {
-    success: true,
-  };
+async function leaveGroup(groupId, shouldDelete) {
+  const res = await fetch(`http://localhost:5113/api/group-leave?familyGroupId=${groupId}&shouldDelete=${shouldDelete}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json"},
+  });
+
+  if (!res.ok) {
+    console.error("leaveGroup... something went wrong with the fetch call");
+    return;
+  }
 }
+
+async function canLeave(groupId) {
+  const res = await fetch(`http://localhost:5113/api/check-sole-admin?familyGroupId=${groupId}`, {
+    method: "GET",
+    credentials: "include",
+    headers: { "Content-Type": "application/json"},
+  });
+
+  if (!res.ok) {
+    console.log(res);
+    console.error("canLeave... something went wrong with the fetch call");
+    return;
+  }
+
+  const body = await res.json();
+  if (body.isUserAdmin && body.totalAdmins == 1 && body.totalMembers > 1) {
+    return "mustPromoteFirst"
+  } else if (body.totalMembers == 1) {
+    return "confirmDeletion"
+  } else {
+    return "canDelete";
+  }
+}
+
+
 async function joinGroupByInvite(inviteCode) {
   console.log("TODO Backend Join:", inviteCode);
   return {

@@ -457,15 +457,11 @@ function getUserPrimaryGroup(userId) {
 }
 /* Check Administrator Access - Returns whether the current user has administrator privileges. */
 function isAdmin() {
-  return true;
-  const currentUser = getCurrentUser();
-  if (!currentUser) {
-    return false;
-  }
-  return getCurrentGroupMembers().some(function (member) {
-    return member.id === currentUser.id && member.role === "admin";
-  });
+  const currGroupId = state.activeGroupId;
+  const group = state.groups.find(group => group.familyGroupId === currGroupId);
+  return group ? Boolean(group.isAdmin) : false;
 }
+
 /* Can Manage Group - Returns whether the current user can manage the active group. */
 function canManageGroup() {
   return isAdmin();
