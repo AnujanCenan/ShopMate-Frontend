@@ -199,126 +199,138 @@ function renderItems(items) {
             if (!state.selectionMode) {
               renderEditItemForm(${item.ListItemId});
             }
-            ">
-            ${item.ItemName}
-            </h2>
+          "
+          oncontextmenu="
+            event.preventDefault();
+            toggleItemSelection('${item.ListItemId}');
+          "
+        >
+          <div class="itemCardTopRow">
+            <div class="itemTitleSection">
+              <h2
+                class="itemName"
+                onclick="
+                  event.stopPropagation();
+                  if(!appState.selectionMode){
+                    renderEditItemForm('${item.ListItemId}');
+                  }
+                "
+              >
+                ${item.ItemName}
+              </h2>
+              ${
+                state.activeTab === "favorites"
+                  ? ""
+                  : `
+                    <p class="itemQuantityBadge">
+                      ${t("category.quantity")}: ${item.Quantity} ${getQuantityUnitLabel(item.quantityUnit)}
+                    </p>
+                  `
+              }
+            </div>
+            <div class="itemActionButtons">
+              <button
+                class="modernActionButton favoriteActionButton ${
+                  isFavorite ? "activeFavoriteButton" : ""
+                }"
+                onclick="
+                  event.stopPropagation();
+                  toggleFavorite_mysql('${item.ItemMasterId}');
+                "
+              >
+                <img
+                  src="${getIconPath(
+                    "actions",
+                    isFavorite ? "favorite" : "favorite-outline",
+                  )}"
+                  class="icon actionIcon"
+                  alt="${t("category.favorite")}"
+                >
+              </button>
+              ${
+                state.activeTab === "favorites"
+                  ? `
+                    <button
+                      class="modernActionButton addActionButton"
+                      onclick="addFavoriteToList('${item.ItemName}')"
+                    >
+                      <img
+                        src="${getIconPath("actions", "add")}"
+                        class="icon actionIcon"
+                        alt="${t("category.add")}"
+                      >
+                    </button>
+                  `
+                  : `
+                    <button
+                      class="
+                        modernActionButton
+                        purchasedActionButton
+                        ${item.purchased ? "activePurchasedButton" : ""}
+                      "
+                      onclick="
+                        event.stopPropagation();
+                        openPurchaseConfirmation('${item.ListItemId}');
+                      "
+                    >
+                      <span class="actionButtonIcon">
+                        <img
+                          src="${
+                            state.activeTab === "purchased"
+                              ? getIconPath("actions", "re-add")
+                              : getIconPath("actions", "purchased")
+                          }"
+                          class="icon actionIcon"
+                          alt="${t("category.purchased")}"
+                        >
+                      </span>
+                    </button>
+                  `
+              }
+            </div>
+          </div>
+          <div class="itemCardContent">
             ${
               state.activeTab === "favorites"
                 ? ""
                 : `
-            <p class="itemQuantityBadge">
-            Qty: ${item.Quantity}
-            </p>
-            `
+                  <div class="itemDetailsSection">
+                    <p class="itemDetails">
+                      ${t("category.notes")}: ${item.OptionalNotes || "-"}
+                    </p>
+                    <p class="itemDetails">
+                      ${t("category.shop")}: ${item.ShopName || "-"}
+                    </p>
+                    <p class="itemDetails">
+                      ${t("category.estimatedPrice")}: ${getCurrencySymbol()}${item.EstimatedPrice || 0}
+                    </p>
+                  </div>
+                  <div class="itemImageContainer">
+                    ${
+                      getProductImage(item.ItemName)
+                        ? `
+                          <img
+                            src="${getProductImage(item.ItemName)}"
+                            class="itemImage"
+                            alt="${item.ItemName}"
+                          >
+                        `
+                        : `
+                          <div class="itemImagePlaceholder">
+                            <img
+                              src="${getIconPath("actions", "package")}"
+                              class="icon largeIcon"
+                              alt="${t("category.product")}"
+                            >
+                          </div>
+                        `
+                    }
+                  </div>
+                `
             }
             </div>
-               <div class="itemActionButtons">
-                <button
-  class="modernActionButton favoriteActionButton ${
-    isFavorite ? "activeFavoriteButton" : ""
-  }"
-  onclick="event.stopPropagation(); toggleFavorite_mysql(${item.ItemMasterId});"
->
-  <img
-    src="${getIconPath(
-      "actions",
-      isFavorite ? "favorite" : "favorite-outline",
-    )}"
-    class="icon actionIcon"
-    alt="Favorite"
-  >
-</button>
-               ${
-                 state.activeTab === "favorites"
-                   ? `<button
-  class="modernActionButton addActionButton"
-  onclick="addFavoriteToList('${item.ItemName}')"
->
-  <img
-    src="${getIconPath("actions", "add")}"
-    class="icon actionIcon"
-    alt="Add"
-  >
-</button>
-            `
-                   : `
-            <button
-    class="
-        modernActionButton
-        purchasedActionButton
-        ${item.purchased ? "activePurchasedButton" : ""}
-    "
-    onclick="
-        event.stopPropagation();
-        openPurchaseConfirmation(${item.ListItemId});
-    "
->
-    <span class="actionButtonIcon">
-       <img
-  src="${
-    state.activeTab === "purchased"
-      ? getIconPath("actions", "re-add")
-      : getIconPath("actions", "purchased")
-  }"
-  class="icon actionIcon"
-  alt=""
->
-    </span>
-</button>
-            `
-               }
-    </div>
 </div>
-<div class="itemCardContent">
-    ${
-      state.activeTab === "favorites"
-        ? `
-            <div class="itemImageContainer">
-                ${
-                  getProductImage(item.ItemName)
-                    ? `<img src="${getProductImage(item.ItemName)}"
-                            class="itemImage"
-                            alt="${item.ItemName}">`
-                    : `<div class="itemImagePlaceholder">
-  <img
-    src="${getIconPath("actions", "package")}"
-    class="icon largeIcon"
-    alt="Product"
-  >
-</div>`
-                }
-            </div>
-          `
-        : `
-            <div class="itemDetailsSection">
-                <p class="itemDetails">
-                    Notes: ${item.OptionalNotes || "-"}
-                </p>
-                <p class="itemDetails">
-                    Shop: ${item.ShopName || "-"}
-                </p>
-                <p class="itemDetails">
-                    Est Price: $${item.EstimatedPrice || 0}
-                </p>
-            </div>
-            <div class="itemImageContainer">
-                ${
-                  getProductImage(item.ItemName)
-                    ? `<img src="${getProductImage(item.ItemName)}"
-                            class="itemImage"
-                            alt="${item.ItemName}">`
-                    : `<div class="itemImagePlaceholder">
-  <img
-    src="${getIconPath("actions", "package")}"
-    class="icon largeIcon"
-    alt="Product"
-  >
-</div>`
-                }
-            </div>
-          `
-    }
-</div>`;
+`;
   });
 }
 /* Initialize Tabs */

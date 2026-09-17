@@ -209,6 +209,19 @@ function selectSuggestedProduct(productName) {
   itemQuantityInput.focus();
 }
 const ICON_BASE_PATH = "../assets/icons";
+
+/* Get Currency Symbol */
+function getCurrencySymbol() {
+  const currency = appState.settings?.currency || "AUD";
+
+  const currencySymbols = {
+    AUD: "$",
+    LKR: "Rs",
+    INR: "₹",
+  };
+
+  return currencySymbols[currency] || "$";
+}
 /* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {
   let themeFolder = "light";
@@ -338,21 +351,20 @@ function canManageBudget() {
 }
 /* Can Manage Group - Determines whether the current user can manage the active group. */
 function canManageGroup() {
-  return isAdmin();
+  const member = getCurrentMember();
+  return member ? member.role === "admin" || member.role === "owner" : false;
 }
-/* Calculate Group Budget - Calculates the total amount spent for the active shopping group. */
-function calculateGroupBudget() {
-  if (!appState.budgets.groupBudgets) {
-    appState.budgets.groupBudgets = {};
-  }
-  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
-    appState.budgets.groupBudgets[appState.activeGroup] = {
-      monthlyLimit: null,
-    };
+/* Calculate Group Budget - Calculates the total amount spent for the specified shopping group. */
+function calculateGroupBudget(groupName) {
+  if (!groupName) {
+    return 0;
   }
   let spent = 0;
-  const categories = appState.groups[appState.activeGroup] || [];
+  const categories = appState.groups?.[groupName] || [];
   categories.forEach(function (category) {
+    if (!Array.isArray(category.items)) {
+      return;
+    }
     category.items.forEach(function (item) {
       if (item.purchased && item.estimatedPrice) {
         spent += Number(item.estimatedPrice);
@@ -602,7 +614,6 @@ function processRecurringItems() {
         );
         if (!duplicatePendingItem) {
           category.items.unshift(newItem);
-
           createNotification(
             "item",
             t("notifications.recurringItemAdded"),
@@ -622,7 +633,6 @@ function processRecurringItems() {
               },
             },
           );
-
           stateUpdated = true;
         }
       });
@@ -835,6 +845,9 @@ function applyTheme() {
     }
   }
   refreshIcons();
+  if (typeof renderFilteredItems === "function") {
+    renderFilteredItems();
+  }
 }
 /* Initialize Theme Listener - Updates the application theme when the operating system theme changes. */
 function initializeThemeListener() {
@@ -844,6 +857,65 @@ function initializeThemeListener() {
       applyTheme();
     }
   });
+}
+/* Currency & Measurement Helpers */
+
+function getCurrencySymbol() {
+  const currency = appState.settings?.currency || "AUD";
+
+  const currencySymbols = {
+    AUD: "$",
+    LKR: "Rs",
+    INR: "₹",
+  };
+
+  return currencySymbols[currency] || "$";
+}
+
+function getMeasurementUnits() {
+  const measurementUnit = appState.settings?.measurementUnit || "metric";
+
+  if (measurementUnit === "imperial") {
+    return [
+      { value: "pcs", label: "pcs" },
+      { value: "lb", label: "lb" },
+      { value: "oz", label: "oz" },
+      { value: "gal", label: "gal" },
+      { value: "fl_oz", label: "fl oz" },
+    ];
+  }
+
+  return [
+    { value: "pcs", label: "pcs" },
+    { value: "kg", label: "kg" },
+    { value: "g", label: "g" },
+    { value: "l", label: "L" },
+    { value: "ml", label: "mL" },
+  ];
+}
+
+function getQuantityUnitLabel(unit) {
+  const units = getMeasurementUnits();
+  const selectedUnit = units.find(function (measurement) {
+    return measurement.value === unit;
+  });
+
+  return selectedUnit ? selectedUnit.label : "pcs";
+}
+
+function getQuantityUnitOptions(selectedUnit = "pcs") {
+  return getMeasurementUnits()
+    .map(function (measurement) {
+      return `
+        <option
+          value="${measurement.value}"
+          ${selectedUnit === measurement.value ? "selected" : ""}
+        >
+          ${measurement.label}
+        </option>
+      `;
+    })
+    .join("");
 }
 /* Initialize Helpers - Registers helper event listeners and shared helper functionality. */
 function initializeHelpers() {

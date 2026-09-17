@@ -106,7 +106,6 @@ function getLocalizedNotificationContent(notification) {
       ),
     };
   }
-
   return {
     title: notification.title,
     message: notification.message || "",
@@ -273,6 +272,8 @@ async function openNotification(notificationId) {
       if (actionData) {
         state.activeGroupId = actionData.groupId;
         state.activeGroup = actionData.group;
+        // can we embed the groupId and group in the URI using encodeURIComponent so that 
+        // the global active group is not modified
         saveState();
       }
       window.location.href = "../pages/budgetPage.html";

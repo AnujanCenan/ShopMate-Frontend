@@ -112,21 +112,21 @@ async function renderCategories() {
         </button>
         </div>
         <div class="categoryBudgetSummary">
-  Budget
-  <strong>
-    ${categoryBudget > 0 ? "$" + Number(categoryBudget).toFixed(2) : "Not Set"}
-  </strong>
-  &nbsp; • &nbsp;
-  Spent
-  <strong>
-    $${Number(categorySpent).toFixed(2)}
-  </strong>
-  &nbsp; • &nbsp;
-  Left
-  <strong>
-    ${categoryBudget > 0 ? "$" + Number(categoryRemaining).toFixed(2) : "-"}
-  </strong>
-</div>
+          ${t("dashboard.budget")}
+          <strong>
+           ${categoryBudget > 0 ? getCurrencySymbol() + Number(categoryBudget).toFixed(2) : t("dashboard.notSet")}
+          </strong>
+          &nbsp; • &nbsp;
+          ${t("dashboard.spent")}
+          <strong>
+            ${getCurrencySymbol()}${Number(categorySpent).toFixed(2)}
+          </strong>
+          &nbsp; • &nbsp;
+          ${t("dashboard.left")}
+          <strong>
+            ${categoryBudget > 0 ? getCurrencySymbol() + Number(categoryRemaining).toFixed(2) : "-"}
+          </strong>
+        </div>
         <p class="categoryInfo">
           ${pendingCount}
           ${t("dashboard.pending")}
@@ -1163,17 +1163,7 @@ function renderSideDrawer() {
         >
         <span>${t("dashboard.notifications")}</span>
       </button>
-      <button
-        class="drawerItem"
-        onclick="window.location.href='../pages/budgetPage.html'"
-      >
-        <img
-          src="${getIconPath("features", "budget")}"
-          class="icon featureIcon"
-          alt=""
-        >
-        <span>${t("dashboard.budget")}</span>
-      </button>
+
       <button
         class="drawerItem"
         onclick="window.location.href='../pages/settingsPage.html'"
@@ -1207,13 +1197,28 @@ function renderSideDrawer() {
         >
         <span>${t("dashboard.import")}</span>
       </button>
-      <input
+         <input
         type="file"
         id="importBackupInput"
         accept=".json"
         hidden
         onchange="importAppData(event)"
       >
+    </div>
+
+    <div class="drawerLogout">
+      <button
+        type="button"
+        class="drawerItem drawerLogoutItem"
+        onclick="logoutUser()"
+      >
+        <img
+          src="${getIconPath("features", "logout")}"
+          class="icon featureIcon"
+          alt=""
+        >
+        <span>${t("profile.logout")}</span>
+      </button>
     </div>
   `;
 }
@@ -1353,14 +1358,14 @@ async function renderBudgetDashboardWidget() {
         class="budgetSummaryBody"
       >
         <h2>
-          ${limit === 0 ? t("dashboard.unlimited") : "$" + limit}
+          ${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}
         </h2>
         <div class="analysisValue">
           <span>
             ${t("dashboard.allocated")}
           </span>
           <span>
-            $${allocated}
+            ${getCurrencySymbol()} ${allocated}
           </span>
         </div>
         <div class="analysisValue">
@@ -1368,7 +1373,7 @@ async function renderBudgetDashboardWidget() {
             ${t("dashboard.spent")}
           </span>
           <span>
-            $${spent}
+            ${getCurrencySymbol()} ${spent}
           </span>
         </div>
         <div class="analysisValue">
@@ -1376,7 +1381,7 @@ async function renderBudgetDashboardWidget() {
             ${t("dashboard.remaining")}
           </span>
           <span>
-            ${limit === 0 ? t("dashboard.unlimited") : "$" + remaining}
+            ${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + remaining}
           </span>
         </div>
         <div class="budgetProgressBar">
@@ -1425,30 +1430,42 @@ async function renderBudgetDashboardWidget() {
               <p class="budgetInsight">
                 ${
                   remaining > 0
-                    ? "$" + remaining + " " + t("dashboard.remainingThisMonth")
+                    ? getCurrencySymbol() +
+                      " " +
+                      remaining +
+                      " " +
+                      t("dashboard.remainingThisMonth")
                     : t("dashboard.budgetExceeded")
                 }
               </p>
             `
         }
-        ${
-          canManageBudget()
-            ? `
-              <button
-                class="primaryButton budgetEditButton"
-                onclick="renderEditGroupBudgetForm()"
-              >
-                ${t("dashboard.editBudget")}
-              </button>
-            `
-            : ""
-        }
+        <div class="budgetActionButtons">
+  ${
+    canManageBudget()
+      ? `
         <button
-          class="secondaryButton budgetAnalysisButton"
-          onclick="window.location.href='../pages/budgetPage.html'"
+          class="primaryButton budgetEditButton"
+          onclick="renderEditGroupBudgetForm()"
         >
-          ${t("dashboard.budgetAnalysis")}
+          Edit Budget
         </button>
+      `
+      : ""
+  }
+
+  <button
+    class="secondaryButton budgetAnalysisButton"
+    onclick="
+      window.location.href =
+        '../pages/budgetPage.html?group=' +
+        encodeURIComponent(appState.activeGroup)
+    "
+  >
+    Budget Analysis
+  </button>
+</div>
+
       </div>
     </div>
   `;
@@ -1514,7 +1531,7 @@ function renderEditGroupBudgetForm() {
           ${t("dashboard.monthlyBudgetLimit")}
         </label>
         <div class="currencyInputWrapper">
-          <span class="currencySymbol">$</span>
+          <span class="currencySymbol"> ${getCurrencySymbol()}</span>
           <input
             id="groupBudgetInput"
             type="number"
@@ -1770,7 +1787,9 @@ async function saveGroupBudget() {
       )
       .replace("${amount}", amount),
     "budget",
-    null,
+    {
+      group: appState.activeGroup,
+    },
     {
       titleKey: "dashboard.budgetUpdated",
       messageKey: "dashboard.groupBudgetUpdatedMessage",

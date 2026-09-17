@@ -51,25 +51,35 @@ function renderAddItemForm(itemName = "") {
       </div>
       <div class="formRow">
         <div class="halfWidthField">
-          <label class="formLabel">
-            ${t("item.quantity")}
-          </label>
+        <label class="formLabel">
+          ${t("item.quantity")}
+        </label>
+          <div class="quantityInputWrapper">
           <input
             type="number"
             id="itemQuantityInput"
-            class="bottomSheetInput"
+            class="bottomSheetInput quantityInput"
             placeholder="${t("item.enterQuantity")}"
             value="1"
+            min="0"
+            step="any"
           >
+          <select
+            id="itemQuantityUnitInput"
+            class="quantityUnitInput"
+            aria-label="${t("item.quantityUnit")}"
+          >${getQuantityUnitOptions("pcs")}
+          </select>
+          </div>
         </div>
         <div class="halfWidthField">
           <label class="formLabel">
             ${t("item.estimatedPrice")}
           </label>
           <div class="currencyInputWrapper">
-            <span class="currencySymbol">
-              $
-            </span>
+  <span class="currencySymbol">
+    ${getCurrencySymbol()}
+  </span>
             <input
               type="number"
               id="itemPriceInput"
@@ -110,27 +120,36 @@ function renderAddItemForm(itemName = "") {
         >
       </div>
       <div class="formField">
-        <label class="formLabel">
-          ${t("item.repeat")}
-        </label>
-        <select
-          id="itemRecurrenceFrequency"
-          class="bottomSheetInput"
-        >
-          <option value="none">
-            ${t("item.doesNotRepeat")}
-          </option>
-          <option value="daily">
-            ${t("item.daily")}
-          </option>
-          <option value="weekly">
-            ${t("item.weekly")}
-          </option>
-          <option value="monthly">
-            ${t("item.monthly")}
-          </option>
-        </select>
-      </div>
+  <label class="formLabel">
+    ${t("item.repeat")}
+  </label>
+  <div class="dropdownInputWrapper">
+    <select
+      id="itemRecurrenceFrequency"
+      class="bottomSheetInput"
+    >
+      <option value="none">
+        ${t("item.doesNotRepeat")}
+      </option>
+      <option value="daily">
+        ${t("item.daily")}
+      </option>
+      <option value="weekly">
+        ${t("item.weekly")}
+      </option>
+      <option value="monthly">
+        ${t("item.monthly")}
+      </option>
+    </select>
+    <span class="dropdownArrow">
+      <img
+        src="${getIconPath("navigation", "collapse")}"
+        class="icon smallIcon"
+        alt=""
+      >
+    </span>
+  </div>
+</div>
       <div
         id="itemRecurrenceDates"
         style="display: none;"
@@ -219,25 +238,36 @@ function renderEditItemForm(listItemId) {
         >
       </div>
       <div class="formRow">
-        <div class="halfWidthField">
-          <label class="formLabel">
-            ${t("item.quantity")}
-          </label>
-          <input
-            type="number"
-            id="editItemQuantityInput"
-            class="bottomSheetInput"
-            value="${item.Quantity}"
-          >
-        </div>
+  <div class="halfWidthField">
+    <label class="formLabel">
+      ${t("item.quantity")}
+    </label>
+    <div class="quantityInputWrapper">
+      <input
+        type="number"
+        id="editItemQuantityInput"
+        class="bottomSheetInput quantityInput"
+        value="${item.Quantity}"
+        min="0"
+        step="any"
+      >
+      <select
+        id="editItemQuantityUnitInput"
+        class="quantityUnitInput"
+        aria-label="${t("item.quantityUnit")}"
+      >
+        ${getQuantityUnitOptions(item.quantityUnit || "pcs")}
+      </select>
+    </div>
+  </div>
         <div class="halfWidthField">
           <label class="formLabel">
             ${t("item.estimatedPrice")}
           </label>
           <div class="currencyInputWrapper">
-            <span class="currencySymbol">
-              $
-            </span>
+  <span class="currencySymbol">
+    ${getCurrencySymbol()}
+  </span>
             <input
               type="number"
               id="editItemPriceInput"
@@ -287,39 +317,48 @@ function renderEditItemForm(listItemId) {
         >
       </div>
       <div class="formField">
-        <label class="formLabel">
-          ${t("item.repeat")}
-        </label>
-        <select
-          id="editItemRecurrenceFrequency"
-          class="bottomSheetInput"
-        >
-          <option
-            value="none"
-            ${(item.recurrence?.frequency || "none") === "none" ? "selected" : ""}
-          >
-            ${t("item.doesNotRepeat")}
-          </option>
-          <option
-            value="daily"
-            ${item.recurrence?.frequency === "daily" ? "selected" : ""}
-          >
-            ${t("item.daily")}
-          </option>
-          <option
-            value="weekly"
-            ${item.recurrence?.frequency === "weekly" ? "selected" : ""}
-          >
-            ${t("item.weekly")}
-          </option>
-          <option
-            value="monthly"
-            ${item.recurrence?.frequency === "monthly" ? "selected" : ""}
-          >
-            ${t("item.monthly")}
-          </option>
-        </select>
-      </div>
+  <label class="formLabel">
+    ${t("item.repeat")}
+  </label>
+  <div class="dropdownInputWrapper">
+    <select
+      id="editItemRecurrenceFrequency"
+      class="bottomSheetInput"
+    >
+      <option
+        value="none"
+        ${(item.recurrence?.frequency || "none") === "none" ? "selected" : ""}
+      >
+        ${t("item.doesNotRepeat")}
+      </option>
+      <option
+        value="daily"
+        ${item.recurrence?.frequency === "daily" ? "selected" : ""}
+      >
+        ${t("item.daily")}
+      </option>
+      <option
+        value="weekly"
+        ${item.recurrence?.frequency === "weekly" ? "selected" : ""}
+      >
+        ${t("item.weekly")}
+      </option>
+      <option
+        value="monthly"
+        ${item.recurrence?.frequency === "monthly" ? "selected" : ""}
+      >
+        ${t("item.monthly")}
+      </option>
+    </select>
+    <span class="dropdownArrow">
+      <img
+        src="${getIconPath("navigation", "collapse")}"
+        class="icon smallIcon"
+        alt=""
+      >
+    </span>
+  </div>
+</div>
       <div
         id="editItemRecurrenceDates"
         style="${
@@ -515,6 +554,8 @@ async function createItem() {
   const itemShopInput = document.getElementById("itemShopInput");
   const itemName = itemNameInput.value.trim();
   const itemQuantity = itemQuantityInput.value.trim();
+  const itemQuantityUnit =
+    document.getElementById("itemQuantityUnitInput")?.value || "pcs";
   const itemNotes = itemNotesInput.value.trim();
   const itemShop = itemShopInput.value.trim();
   const itemPrice =
@@ -632,6 +673,7 @@ async function createItem() {
 
     ItemName: itemName,
     Quantity: itemQuantity,
+    quantityUnit: itemQuantityUnit,
     OptionalNotes: itemNotes,
     ShopName: itemShop,
     // imageUrl: imageUrl,
@@ -799,6 +841,10 @@ async function updateItem(listItemId) {
   const newQuantity = document
     .getElementById("editItemQuantityInput")
     .value.trim();
+
+  const newQuantityUnit =
+    document.getElementById("editItemQuantityUnitInput")?.value || "pcs";
+
   const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
   const newNotes = document.getElementById("editItemNotesInput").value.trim();
@@ -835,6 +881,7 @@ async function updateItem(listItemId) {
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
   item.ItemName = newName;
   item.Quantity = newQuantity;
+  item.quantityUnit = newQuantityUnit;
   item.EstimatedPrice = newPrice;
   item.OptionalNotes = newNotes;
   item.ShopName = newShop;
@@ -941,9 +988,9 @@ async function openPurchaseConfirmation(listItemId) {
           ${t("item.estimatedPrice")}
         </label>
         <div class="currencyInputWrapper">
-          <span class="currencySymbol">
-            $
-          </span>
+  <span class="currencySymbol">
+    ${getCurrencySymbol()}
+  </span>
           <input
             type="number"
             class="bottomSheetInput currencyInput"
@@ -958,7 +1005,7 @@ async function openPurchaseConfirmation(listItemId) {
         </label>
         <div class="currencyInputWrapper">
           <span class="currencySymbol">
-            $
+            ${getCurrencySymbol()}
           </span>
           <input
             type="number"

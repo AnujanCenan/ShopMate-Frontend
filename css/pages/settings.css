@@ -40,3 +40,401 @@
   font-size: 16px;
   font-weight: 600;
 }
+/* Security Settings */
+.securityActionButton {
+  flex: 0 0 auto;
+  min-height: 42px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 14px;
+  font-size: 14px;
+}
+/* =========================================================
+   APP LOCK
+   ========================================================= */
+.appLockScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--backgroundColor);
+  color: var(--textPrimary);
+  box-sizing: border-box;
+}
+.appLockCard {
+  width: 100%;
+  max-width: 340px;
+  padding: 32px 24px;
+  border-radius: 24px;
+  background: var(--surfaceColor);
+  box-shadow: var(--cardShadow);
+  text-align: center;
+}
+.appLockIcon {
+  font-size: 42px;
+  margin-bottom: 16px;
+}
+.appLockTitle {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--textPrimary);
+}
+.appLockDescription {
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--textSecondary);
+}
+.appLockPinInput {
+  width: 100%;
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border: 1px solid var(--borderColor);
+  border-radius: 14px;
+  background: var(--backgroundColor);
+  color: var(--textPrimary);
+  font-size: 20px;
+  letter-spacing: 6px;
+  text-align: center;
+  outline: none;
+}
+.appLockPinInput:focus {
+  border-color: var(--primaryColor);
+}
+.appLockError {
+  min-height: 22px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--dangerColor);
+}
+.appLockUnlockButton {
+  width: 100%;
+  margin-top: 12px;
+}
+.aboutShopMateContent {
+  text-align: center;
+}
+.aboutShopMateLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.aboutShopMateLogo img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+.aboutShopMateContent h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+.aboutShopMateContent p {
+  margin: 0 auto 20px;
+  max-width: 480px;
+  line-height: 1.6;
+}
+.aboutShopMateVersion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--borderColor);
+  border-bottom: 1px solid var(--borderColor);
+}
+.aboutShopMateCopyright {
+  font-size: 13px;
+  opacity: 0.7;
+}
+.legalContent {
+  text-align: left;
+  overflow-y: auto;
+}
+.legalIntro {
+  margin: 0 0 20px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.legalSection {
+  margin-bottom: 22px;
+}
+.legalSection h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.legalSection p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.feedbackContent {
+  text-align: left;
+}
+.feedbackDescription {
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+.feedbackTextarea {
+  width: 100%;
+  min-height: 140px;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.feedbackCharacterCount {
+  margin-top: 6px;
+  text-align: right;
+  font-size: 12px;
+  opacity: 0.65;
+}
+.warningMessage {
+  margin: 16px 0 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--borderColor);
+  border-radius: 12px;
+  line-height: 1.5;
+  font-size: 14px;
+}
+.themeOptions,
+.languageOptions,
+.measurementUnitOptions,
+.currencyOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.themeOption,
+.languageOption,
+.measurementUnitOption,
+.currencyOption {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusMedium);
+  background: var(--surfaceColor);
+  color: var(--textPrimary);
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    border-color var(--animationSpeed) ease,
+    background-color var(--animationSpeed) ease,
+    box-shadow var(--animationSpeed) ease,
+    transform var(--animationSpeed) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.themeOption:hover,
+.languageOption:hover,
+.measurementUnitOption:hover,
+.currencyOption:hover {
+  border-color: var(--primaryColor);
+}
+
+.themeOption:active,
+.languageOption:active,
+.measurementUnitOption:active,
+.currencyOption:active {
+  transform: scale(0.99);
+}
+
+.themeOption.selected,
+.languageOption.selected,
+.measurementUnitOption.selected,
+.currencyOption.selected {
+  border: 1.5px solid var(--primaryColor);
+  background: var(--surfaceColor);
+  box-shadow: 0 4px 12px var(--shadowLight);
+}
+
+.themeOptionContent,
+.languageOptionContent,
+.measurementUnitOptionContent,
+.currencyOptionContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.themeOptionContent strong,
+.languageOptionContent strong,
+.measurementUnitOptionContent strong,
+.currencyOptionContent strong {
+  color: var(--textPrimary);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.themeOptionContent span,
+.languageOptionContent span,
+.measurementUnitOptionContent span,
+.currencyOptionContent span {
+  color: var(--textSecondary);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.themeOptionCheck,
+.languageOptionCheck,
+.measurementUnitCheck,
+.currencyOptionSymbol {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 16px;
+  border: 1px solid var(--borderColor);
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.themeOption.selected .themeOptionCheck,
+.languageOption.selected .languageOptionCheck,
+.measurementUnitOption.selected .measurementUnitCheck,
+.currencyOption.selected .currencyOptionSymbol {
+  border-color: var(--primaryColor);
+  background: var(--primaryColor);
+  color: #ffffff;
+}
+
+.themeOption input[type="radio"],
+.languageOption input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.themeOption:focus-within,
+.languageOption:focus-within {
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 3px rgba(17, 138, 178, 0.12);
+}
+.themeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.themeOption {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusMedium);
+  background: var(--surfaceColor);
+  color: var(--textPrimary);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--animationSpeed) ease,
+    background-color var(--animationSpeed) ease,
+    box-shadow var(--animationSpeed) ease,
+    transform var(--animationSpeed) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.themeOption input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.themeOption:focus-within {
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 3px rgba(17, 138, 178, 0.12);
+}
+
+.themeOption.selected {
+  border-color: var(--primaryColor);
+  background: var(--surfaceColor);
+  box-shadow: 0 4px 12px var(--shadowLight);
+}
+
+.themeOption:active {
+  transform: scale(0.99);
+}
+
+.themeOptionContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.themeOptionContent strong {
+  color: var(--textPrimary);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.themeOptionContent span {
+  color: var(--textSecondary);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.themeOptionCheck {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 16px;
+  border: 1px solid var(--borderColor);
+  border-radius: 50%;
+  color: transparent;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.themeOption.selected .themeOptionCheck {
+  border-color: var(--primaryColor);
+  background: var(--primaryColor);
+  color: #ffffff;
+}
