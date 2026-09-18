@@ -854,7 +854,7 @@ function renderInviteMemberForm(groupName, familyGroupId) {
         </button>
         <button
           class="primaryButton"
-          onclick="sendMemberInvitation('${groupName}', ${familyGroupId})"
+          onclick="sendMemberInvitation(${familyGroupId})"
         >
           ${t("dashboard.sendInvitation")}
         </button>

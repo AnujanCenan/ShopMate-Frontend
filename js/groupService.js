@@ -133,9 +133,15 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
     return;
   }
 
+  const body = await res.json();
+
+  console.log("In sendInvitaiotn_mysql...");
+  console.log("Returned REST api body is")
+  console.log(body);
+
   const invitation = {
     fgpId: fgpId,
-    invId: null,
+    invId: body.InvId,
     invEmail: invitee_email,
     role: role,
     invStatus: "Pending",
