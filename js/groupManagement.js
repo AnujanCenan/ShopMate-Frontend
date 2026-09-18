@@ -670,7 +670,7 @@ async function makeAdmin(memberId, groupName) {
   */
 
   saveAppState();
-  renderGroupAccordion();
+  await renderGroupAccordion();
   closeBottomSheet();
 
   showToast(t("groupManagement.memberPromoted"));
@@ -926,18 +926,18 @@ async function sendInvitation() {
 
   const groupName = appState.activeGroup;
 
-  const invitation = {
-    id: crypto.randomUUID(),
-    groupId: groupName,
-    groupName: groupName,
-    email: email,
-    role: role,
-    invitedBy: currentUser.email,
-    invitedAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "pending",
-    createdAt: Date.now(),
-  };
+  // const invitation = {
+  //   id: crypto.randomUUID(),
+  //   groupId: groupName,
+  //   groupName: groupName,
+  //   email: email,
+  //   role: role,
+  //   invitedBy: currentUser.email,
+  //   invitedAt: new Date().toISOString(),
+  //   expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  //   status: "pending",
+  //   createdAt: Date.now(),
+  // };
   await sendInvititation_mysql(email, role);
   saveAppState();
   renderGroupAccordion();

@@ -881,7 +881,7 @@ function clearInviteMemberValidation() {
   emailError.textContent = "";
 }
 /* Send Member Invitation */
-function sendMemberInvitation(groupName) {
+async function sendMemberInvitation(familyGroupId) {
   const emailInput = document.getElementById("inviteMemberEmailInput");
   const emailError = document.getElementById("inviteMemberEmailError");
   if (!emailInput || !emailError) {
@@ -903,47 +903,49 @@ function sendMemberInvitation(groupName) {
     emailInput.focus();
     return;
   }
-  const members = appState.groupMembers[groupName] || [];
-  const memberExists = members.some(function (member) {
-    return member.email.toLowerCase() === email;
-  });
-  if (memberExists) {
-    emailInput.classList.add("formInputError");
-    emailError.textContent = t("dashboard.memberAlreadyExists");
-    emailInput.focus();
-    return;
-  }
-  const invitationExists = appState.pendingInvitations.some(
-    function (invitation) {
-      return (
-        invitation.groupName === groupName &&
-        invitation.email.toLowerCase() === email &&
-        invitation.status === "pending"
-      );
-    },
-  );
-  if (invitationExists) {
-    emailInput.classList.add("formInputError");
-    emailError.textContent = t("dashboard.pendingInvitationExists");
-    emailInput.focus();
-    return;
-  }
-  const currentUser = getCurrentUser();
-  if (!currentUser) {
-    showToast(t("dashboard.currentUserUnavailable"), "info");
-    return;
-  }
-  const invitation = {
-    id: crypto.randomUUID(),
-    groupId: groupName,
-    groupName: groupName,
-    email: email,
-    invitedBy: currentUser.email,
-    invitedAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "pending",
-  };
-  appState.pendingInvitations.push(invitation);
+
+  await sendInvititation_mysql(email, "Normal", familyGroupId);
+  // const members = appState.groupMembers[groupName] || [];
+  // const memberExists = members.some(function (member) {
+  //   return member.email.toLowerCase() === email;
+  // });
+  // if (memberExists) {
+  //   emailInput.classList.add("formInputError");
+  //   emailError.textContent = t("dashboard.memberAlreadyExists");
+  //   emailInput.focus();
+  //   return;
+  // }
+  // const invitationExists = appState.pendingInvitations.some(
+  //   function (invitation) {
+  //     return (
+  //       invitation.groupName === groupName &&
+  //       invitation.email.toLowerCase() === email &&
+  //       invitation.status === "pending"
+  //     );
+  //   },
+  // );
+  // if (invitationExists) {
+  //   emailInput.classList.add("formInputError");
+  //   emailError.textContent = t("dashboard.pendingInvitationExists");
+  //   emailInput.focus();
+  //   return;
+  // }
+  // const currentUser = getCurrentUser();
+  // if (!currentUser) {
+  //   showToast(t("dashboard.currentUserUnavailable"), "info");
+  //   return;
+  // }
+  // const invitation = {
+  //   id: crypto.randomUUID(),
+  //   groupId: groupName,
+  //   groupName: groupName,
+  //   email: email,
+  //   invitedBy: currentUser.email,
+  //   invitedAt: new Date().toISOString(),
+  //   expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  //   status: "pending",
+  // };
+  // appState.pendingInvitations.push(invitation);
   saveAppState();
   closeBottomSheet();
   showToast(t("dashboard.invitationSent"));

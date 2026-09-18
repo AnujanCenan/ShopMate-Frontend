@@ -99,16 +99,19 @@ async function getGroupManagementData()
 }
 
 
-async function sendInvititation_mysql(inputEmail, inputRole) {
+async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId) {
   const invitee_email = inputEmail || document
     .getElementById("inviteMemberEmail")
     .value.trim()
     .toLowerCase();
   const role = inputRole || document.getElementById("inviteMemberRole").value || "Normal";
-  console.log("In mysql send invite");
-  console.log(`Role = ${role}`);
-  console.log(`FgpId: ${state.activeCategoryId}`);
-  console.log(`Invitee email: ${invitee_email}`);
+  const fgpId = Number(inputFamilyGroupId) || Number(state.activeGroupId) || null;
+
+  if (fgpId === null) {
+    console.error("Unable to determine family group id");
+    return;
+  }
+
   if (!invitee_email) {
     console.error("Email not effectively sent to the sendInvitation_mysql function")
   }
@@ -118,7 +121,7 @@ async function sendInvititation_mysql(inputEmail, inputRole) {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      FgpId: Number(state.activeGroupId),
+      FgpId: fgpId,
       InviteeEmail: invitee_email,
       Role: role
     })
@@ -129,6 +132,18 @@ async function sendInvititation_mysql(inputEmail, inputRole) {
     console.error(msg);
     return;
   }
+
+  const invitation = {
+    fgpId: fgpId,
+    invId: null,
+    invEmail: invitee_email,
+    role: role,
+    invStatus: "Pending",
+    invSentAt: new Date().toISOString(),
+    invExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  };
+
+  state.tempPendingInvites[fgpId].push()
 }
 
 async function deleteInvitation_mysql(invitationId) {
