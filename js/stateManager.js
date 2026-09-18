@@ -556,12 +556,6 @@ const defaultState = {
       },
     ],
   },
-  pendingInvites: [
-    {
-      // code: "INVITE123",
-      // groupName: "Family Group",
-    },
-  ],
   budgets: {
     groupBudgets: [
       {

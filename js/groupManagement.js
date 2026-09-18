@@ -323,13 +323,13 @@ function openInviteActions(groupId, invitationId) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="resendInvitation('${invitation.id}')"
+          onclick="resendInvitation('${invitation.invId}')"
         >
           ${t("groupManagement.resend")}
         </button>
         <button
           class="bottomSheetDeleteButton"
-          onclick="cancelInvitation('${invitation.id}')"
+          onclick="cancelInvitation('${invitation.invId}')"
         >
           ${t("groupManagement.cancelInvitation")}
         </button>
@@ -385,13 +385,13 @@ function cancelInvitation(invitationId) {
   showConfirmDialog(
     t("groupManagement.cancelInvitation"),
     t("groupManagement.confirmCancelInvitation"),
-    function () {
-      revokeInvite(invitationId);
+    async function () {
+      await revokeInvite(invitationId);
     },
   );
 }
 /* Revoke Invitation */
-function revokeInvite(invitationId) {
+async function revokeInvite(invitationId) {
   if (!canManageGroup()) {
     showDialog(
       t("common.permissionDenied"),
@@ -399,20 +399,8 @@ function revokeInvite(invitationId) {
     );
     return;
   }
-  const invitation = (appState.pendingInvitations || []).find(
-    function (invitation) {
-      return invitation.id === invitationId;
-    },
-  );
-  if (!invitation) {
-    return;
-  }
-  appState.pendingInvitations = appState.pendingInvitations.filter(
-    function (pendingInvitation) {
-      return pendingInvitation.id !== invitationId;
-    },
-  );
-  saveAppState();
+  const deletedInvEmail = await deleteInvitation_mysql(invitationId);
+
   renderGroupAccordion();
   closeBottomSheet();
   showToast(t("groupManagement.invitationCancelled"));
@@ -420,7 +408,7 @@ function revokeInvite(invitationId) {
     "group",
     t("groupManagement.invitationCancelled"),
     t("groupManagement.invitationCancelledTo", {
-      email: invitation.email,
+      email: deletedInvEmail,
     }),
     null,
     null,
@@ -428,7 +416,7 @@ function revokeInvite(invitationId) {
       titleKey: "groupManagement.invitationCancelled",
       messageKey: "groupManagement.invitationCancelledTo",
       params: {
-        email: invitation.email,
+        email: deletedInvEmail,
       },
     },
   );

@@ -677,7 +677,7 @@ async function createItem() {
     OptionalNotes: itemNotes,
     ShopName: itemShop,
     // imageUrl: imageUrl,
-    estimatedPrice: itemPrice,
+    EstimatedPrice: itemPrice,
     ActualPrice: 0,
     purchaseDate: null,
     Purchased: false,
@@ -711,6 +711,10 @@ async function createItem() {
     }
     favoriteItemToAdd = null;
   }
+
+
+  console.log(state.listItems);
+
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
