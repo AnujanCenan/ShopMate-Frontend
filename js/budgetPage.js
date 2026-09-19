@@ -86,42 +86,6 @@ function getTopSpendingCategory() {
   };
 }
 
-async function getFamilyBudgetMySql() {
-  const groupId = state.activeGroupId;
-  const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${groupId}`, {
-    method: "GET",
-    credentials: "include",
-    headers: { "Content-Type": "application/json"},
-  });
-
-  if (!res.ok) {
-    const msg = await res.text();
-    console.error(msg);
-    return null;
-  }
-  const body = await res.json();
-
-  state.groupBudgets = [];
-
-  state.groupBudgets.push({
-    groupId: groupId,
-    limit: body.budgetValue
-  })
-
-  state.categoryBudgets = [];
-
-  for (budget of body.shoppingListBudgets)
-  state.categoryBudgets.push({
-    shoppingListId: budget.shoppingListId,
-    shoppingListName: budget.shoppingListName,
-    limit: budget.budgetLimit,
-    spent: budget.budgetSpent
-  })
-
-  saveState();
-
-  return body;
-}
 
 /* Open Bottom Sheet */
 function openBottomSheet() {
@@ -497,23 +461,12 @@ function renderCategoryBudgetCards() {
   }
   const categorySummary = [];
   categoryBudgets.forEach(function (budget) {
-    // const budget =
-    //   appState.budgets.categoryBudgets?.[appState.activeGroup]?.[
-    //     category.name
-    //   ] || {};
+
     const limit = budget.budgetLimit ?? 0;
     let spent = budget.budgetSpent;
-    let highestItem = "";
-    let highestPrice = 0;
-    // category.items.forEach(function (item) {
-    //   if (item.purchased && item.estimatedPrice) {
-    //     spent += Number(item.estimatedPrice);
-    //     if (Number(item.estimatedPrice) > highestPrice) {
-    //       highestPrice = Number(item.estimatedPrice);
-    //       highestItem = item.name;
-    //     }
-    //   }
-    // });
+    let highestItem = budget.mostExpensiveItemName;
+    let highestPrice = budget.mostExpensiveItemPrice;
+
     categorySummary.push({
       name: budget.shoppingListName,
       spent,

@@ -1,4 +1,24 @@
-async function getCategoryBudgets(familyGroupId) {
+/**
+ * Pulls from the database information regarding the a family group's budget
+ * @param {int} familyGroupId 
+ * @returns {Object} json-parsed object detailing the budget information
+ * Structure is as follows:
+ * {
+ *      budgetValue: decimal | null,
+ *      shoppingListBudgets: [
+ *          {
+ *              shoppingListId: int,
+ *              shoppingListName: str,
+ *              budgetSpent: decimal
+ *              numPurcahsed: int
+ *              budgetLimit: decimal | null,
+ *              userType: str (Admin or Normal)
+ *          }
+ *      ]
+ * }
+ * 
+ */
+async function getGroupBudgetAndCategoryBudgets(familyGroupId) {
     if (!familyGroupId) {
         console.error("invalid family group id given");
         return;
@@ -15,21 +35,12 @@ async function getCategoryBudgets(familyGroupId) {
         return;
     }
 
-    // Body Structure:
-    // - budgetValue: decimal | null
-    // - shoppingListBudgets: [
-    //      {
-    //          shoppingListId: int,
-    //          shoppingListName: str,
-    //          budgetSpent: decimal,
-    //          numPurchased: int,
-    //          budgetLimit: decimal | null
-    //          userType: Enum("Admin", "Normal")
-    //      }    
-    // ]
-
-    const body = res.json();
-    return body;
+    const budgets = await res.json();
+    console.log("GET GROUP BUDGET AND CATEGORY BUDGETS...");
+    console.log(budgets);
+    state.budgets.categoryBudgets = budgets.shoppingListBudgets;
+    saveState();
+    return budgets;
 }
 
 async function createGroupBudget(familyGroupId, budgetValue) {

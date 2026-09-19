@@ -77,9 +77,11 @@ async function renderCategories() {
 
   emptyStateSection.innerHTML = "";
   categories.forEach(function (category) {
-
-    const categoryBudget = category.limit || 0;
-    const categorySpent = category.spent || 0;
+    const listId = category.listId;
+    const categoryBudgetInfo = state.budgets.categoryBudgets?.find(b => b.shoppingListId === listId);
+    
+    const categoryBudget = categoryBudgetInfo?.budgetLimit || 0;
+    const categorySpent = categoryBudgetInfo?.budgetSpent || 0;
 
     const categoryRemaining =
       categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
@@ -1225,24 +1227,23 @@ function renderSideDrawer() {
   `;
 }
 
-// Gets the 
 async function getGroupListBudgets() {
-  const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${state.activeGroupId}`, {
-    method: "GET",
-    credentials: "include",
-  });
+  // const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${state.activeGroupId}`, {
+  //   method: "GET",
+  //   credentials: "include",
+  // });
 
-  if (!res.ok) {
-    const msg = await res.text();
-    console.error(`Failure at getGroupListBudgets(): ${msg}`);
-    return null;
-  }
+  // if (!res.ok) {
+  //   const msg = await res.text();
+  //   console.error(`Failure at getGroupListBudgets(): ${msg}`);
+  //   return null;
+  // }
 
-  const budgets = await res.json();
-  
+  // const budgets = await res.json();
 
-  state.budgets.categoryBudgets = budgets.shoppingListBudgets;
-  saveState();
+  const familyGroupId = state.activeGroupId;
+  const budgets = await getGroupBudgetAndCategoryBudgets(familyGroupId);
+
   return budgets.shoppingListBudgets;
 }
 
@@ -1262,6 +1263,7 @@ async function renderBudgetDashboardWidget() {
     credentials: "include",
     headers: { "Content-Type": "application/json"},
   });
+
 
   if (!res.ok) {
     const msg = await res.text();
@@ -1676,12 +1678,6 @@ async function saveCategoryBudget(categoryName, categoryId) {
     state.budgets.categoryBudgets = [];
   }
 
-  // dont want this anymore - categoryBudgets is a list not an object
-  // if (!state.budgets.categoryBudgets[state.activeGroup]) {
-  //   state.budgets.categoryBudgets[state.activeGroup] = {};
-  // }
-
-  
   const groupBudget =
     state.budgets.groupBudgets?.find(b => b.familyGroupId === state.activeGroupId)?.monthlyLimit ?? 0;
   let allocated = 0;
@@ -1720,7 +1716,7 @@ async function saveCategoryBudget(categoryName, categoryId) {
 
 /* Save Group Budget */
 async function saveGroupBudget() {
-  const groupAndListBudgets = await getCategoryBudgets(state.activeGroupId);
+  const groupAndListBudgets = await getGroupBudgetAndCategoryBudgets(state.activeGroupId);
 
   const amount = Number(document.getElementById("groupBudgetInput").value);
   
@@ -1745,15 +1741,19 @@ async function saveGroupBudget() {
     );
     return;
   }
-  if (!appState.budgets.groupBudgets) {
-    appState.budgets.groupBudgets = {};
+  if (!state.budgets.groupBudgets) {
+    state.budgets.groupBudgets = [];
   }
-  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
-    appState.budgets.groupBudgets[appState.activeGroup] = {};
+  if (!state.budgets.groupBudgets[state.activeGroupId]) {
+    state.budgets.groupBudgets[state.activeGroupId] = {};
   }
 
-  appState.budgets.groupBudgets[appState.activeGroup].monthlyLimit = amount;
-  saveAppState();
+  // appState.budgets.groupBudgets[appState.activeGroup].monthlyLimit = amount;
+  // saveAppState();
+  
+  // state?.budgets?.groupBudgets[appState?.activeGroupId]?.monthlyLimit = amount;
+  // saveState();
+
   
   const bgtId = await createGroupBudget(state.activeGroupId, amount);
 
