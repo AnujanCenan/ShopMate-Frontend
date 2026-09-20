@@ -276,57 +276,58 @@ function renderEditProfileForm() {
   `;
 }
 /* Save Profile Changes - Saves the edited profile information. */
-function saveProfileChanges() {
-  const firstName = document
-    .getElementById("profileFirstNameInput")
-    .value.trim();
+async function saveProfileChanges() {
+  const firstName = document.getElementById("profileFirstNameInput").value.trim();
   const lastName = document.getElementById("profileLastNameInput").value.trim();
   const phone = document.getElementById("profilePhoneInput").value.trim();
   const gender = document.getElementById("profileGenderInput").value;
   const dateOfBirth = document.getElementById("profileDobInput").value;
+
   if (!firstName) {
     showSnackbar("First name is required.");
     return;
   }
-  currentUser.name = `${firstName} ${lastName}`.trim();
-  currentUser.phone = phone;
-  currentUser.gender = gender;
-  currentUser.dateOfBirth = dateOfBirth;
-  currentUser.profileCompleted = true;
-  saveAppState();
-  renderProfile();
-  closeBottomSheet();
-  showSnackbar("Profile updated successfully.");
+
+  const payload = {
+    firstName,
+    lastName,
+    phone,
+    gender,
+    dateOfBirth: dateOfBirth ? dateOfBirth : null
+  };
+
+  try {
+    const response = await fetch("/api/user-profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // Authorization header included if cookies are not used exclusively
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      showSnackbar(err.message || "Failed to update profile.");
+      return;
+    }
+
+    currentUser.name = `${firstName} ${lastName}`.trim();
+    currentUser.phone = phone;
+    currentUser.gender = gender;
+    currentUser.dateOfBirth = dateOfBirth;
+    currentUser.profileCompleted = true;
+
+    saveState();
+    renderProfile();
+    closeBottomSheet();
+    showSnackbar("Profile updated successfully.");
+  } catch (error) {
+    console.error(error);
+    showSnackbar("Network error. Please try again.");
+  }
 }
-/* Change Profile Photo */
-function renderChangeProfilePhotoForm() {
-  bottomSheetContent.innerHTML = `
-    <div class="bottomSheetHeader">
-      <h2>
-        Profile Photo
-      </h2>
-      <button
-        class="closeButton"
-        onclick="closeBottomSheet()"
-      >
-        <img
-          src="${getIconPath("navigation", "close")}"
-          class="icon actionIcon"
-          alt="Close"
-        >
-      </button>
-    </div>
-    <div class="bottomSheetBody">
-      <button
-        class="primaryButton"
-        onclick="document.getElementById('profilePhotoInput').click()"
-      >
-        Choose Photo
-      </button>
-    </div>
-  `;
-  openBottomSheet();
-}
+
 /* Preview Profile Photo */
 function previewProfilePhoto(event) {
   const file = event.target.files[0];
@@ -412,7 +413,7 @@ function changePassword() {
   openBottomSheet();
 }
 /* Update Password - Validates the entered passwords. */
-function updatePassword() {
+async function updatePassword() {
   const currentPassword = document
     .getElementById("currentPasswordInput")
     .value.trim();
@@ -420,6 +421,7 @@ function updatePassword() {
   const confirmPassword = document
     .getElementById("confirmPasswordInput")
     .value.trim();
+
   if (!currentPassword) {
     showSnackbar("Please enter your current password.");
     return;
@@ -432,15 +434,39 @@ function updatePassword() {
     showSnackbar("Passwords do not match.");
     return;
   }
-  /*
-   * Backend Integration
-   *
-   * Validate the current password.
-   * Update the password.
-   */
-  closeBottomSheet();
-  showSnackbar("Password updated successfully.");
+
+  try {
+    const response = await fetch("/api/change-password", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      showSnackbar(data.message || "Failed to update password.");
+      return;
+    }
+
+    // Clear input fields
+    document.getElementById("currentPasswordInput").value = "";
+    document.getElementById("newPasswordInput").value = "";
+    document.getElementById("confirmPasswordInput").value = "";
+
+    closeBottomSheet();
+    showSnackbar("Password updated successfully.");
+  } catch (error) {
+    console.error(error);
+    showSnackbar("Network error. Please try again.");
+  }
 }
+
 /* Toggle Biometric Authentication */
 function toggleBiometricAuthentication() {
   currentUser.biometricEnabled = !currentUser.biometricEnabled;

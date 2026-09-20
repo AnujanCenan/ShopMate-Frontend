@@ -429,7 +429,7 @@ async function createGroup() {
 }
 /* Render Create Category Form */
 function renderCreateCategoryForm() {
-  if (!appState.activeGroup) {
+  if (!state.activeGroup) {
     showDialog(
       t("dashboard.selectGroupTitle"),
       t("dashboard.selectGroupMessage"),
@@ -1139,7 +1139,7 @@ function renderSideDrawer() {
         </div>
         <div class="drawerProfileDetails">
           <div class="drawerProfileName">
-            ${currentUser}
+            ${currentUser.name}
           </div>
         </div>
       </div>
@@ -1785,7 +1785,7 @@ async function saveGroupBudget() {
     t("dashboard.groupBudgetUpdatedMessage")
       .replace(
         "${groupName}",
-        appState.activeGroup || t("dashboard.noGroupSelected"),
+        state.activeGroup || t("dashboard.noGroupSelected"),
       )
       .replace("${amount}", amount),
     "budget",
@@ -1796,7 +1796,7 @@ async function saveGroupBudget() {
       titleKey: "dashboard.budgetUpdated",
       messageKey: "dashboard.groupBudgetUpdatedMessage",
       params: {
-        groupName: appState.activeGroup || t("dashboard.noGroupSelected"),
+        groupName: state.activeGroup || t("dashboard.noGroupSelected"),
         amount: amount,
       },
     },

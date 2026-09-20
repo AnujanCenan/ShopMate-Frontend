@@ -85,7 +85,7 @@
  ***************************************************************************************************/
 /* Get Current User - Returns the currently logged-in user. */
 function getCurrentUser() {
-  return appState.currentUser || null;
+  return state.currentUser || null;
 }
 /* Check Login Status - Returns whether a valid user session currently exists. */
 function isUserLoggedIn() {
@@ -172,6 +172,30 @@ function handleLoginInviteFlow() {
   }
 }
 
+// assumes user has a valid session token provided by the server
+async function obtainUserProfile() {
+  const res = await fetch("http://localhost:5113/api/user-profile", {
+    method: "GET",
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!res.ok) {
+    console.error("An error occured while obtaining the user profile");
+    return null;
+  }
+
+  const user = await res.json();
+
+  console.log("Obtained the user...");
+  console.log(user);
+
+  state.currentUser = user;
+  saveState();
+
+  return user;
+}
+
 async function loginUserMySQL(event) {
   if (event) {
     event.preventDefault();
@@ -205,6 +229,8 @@ async function loginUserMySQL(event) {
     }
 
     state.loggedIn = true;
+    await obtainUserProfile();
+
     saveState();
 
     window.location.href = "./dashboardPage.html";

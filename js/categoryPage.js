@@ -72,10 +72,6 @@ function getFilteredItems() {
   if (state.activeTab === "favorites") {
     filteredItems = [...state.favoriteItems];
   } else {
-    // const currentCategory = getActiveCategory();
-    // if (!currentCategory) {
-    //   return [];
-    // }
 
     filteredItems = state.listItems;
     if (state.activeTab === "lists") {
@@ -130,6 +126,8 @@ function renderItems(items) {
     return;
   }
   itemEmptyState.innerHTML = "";
+  console.log("Rendering items:")
+  console.log(items);
   items.forEach(function (item) {
     const normalizedItemName = item.ItemName.trim().toLowerCase();
     const isFavorite = state.favoriteItems.some(function (favoriteItem) {
@@ -186,7 +184,7 @@ function renderItems(items) {
                 item.ItemMasterId
                }"
                onclick=" event.stopPropagation();
-            if (appState.selectionMode){
+            if (state.selectionMode){
                 toggleItemSelection(${item.ListItemId});
             }" oncontextmenu=" event.preventDefault(); toggleItemSelection(${item.ListItemId});">
                <div class="itemCardTopRow">
@@ -200,10 +198,7 @@ function renderItems(items) {
               renderEditItemForm(${item.ListItemId});
             }
           "
-          oncontextmenu="
-            event.preventDefault();
-            toggleItemSelection('${item.ListItemId}');
-          "
+
         >
           <div class="itemCardTopRow">
             <div class="itemTitleSection">
@@ -211,7 +206,7 @@ function renderItems(items) {
                 class="itemName"
                 onclick="
                   event.stopPropagation();
-                  if(!appState.selectionMode){
+                  if(!state.selectionMode){
                     renderEditItemForm('${item.ListItemId}');
                   }
                 "
@@ -223,7 +218,7 @@ function renderItems(items) {
                   ? ""
                   : `
                     <p class="itemQuantityBadge">
-                      ${t("category.quantity")}: ${item.Quantity} ${getQuantityUnitLabel(item.quantityUnit)}
+                      ${t("category.quantity")}: ${item.Quantity} ${getSpecificUnit(item.GeneralUnit).label}
                     </p>
                   `
               }
@@ -266,7 +261,7 @@ function renderItems(items) {
                       class="
                         modernActionButton
                         purchasedActionButton
-                        ${item.purchased ? "activePurchasedButton" : ""}
+                        ${item.Purchased ? "activePurchasedButton" : ""}
                       "
                       onclick="
                         event.stopPropagation();

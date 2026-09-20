@@ -1,20 +1,28 @@
 /* Toggle Selection */
 function toggleItemSelection(listItemId) {
+  console.log("Gotta toggle that selection");
   state.selectionMode = true;
   /* Remove Selection */
   if (state.selectedItems.some(other => listItemId === other)) {
+    console.log("Gotta remove the selection");
     state.selectedItems = state.selectedItems.filter(function (other) {
       return listItemId !== other;
     });
   } else {
+    console.log("Gotta add the selection");
+
     /* Add Selection */
     state.selectedItems.push(listItemId);
   }
+  console.log("state.selectedItems ===");
+  console.log(state.selectedItems);
   updateBulkActionCount();
   /* Exit Selection Mode */
   if (state.selectedItems.length === 0) {
+    console.log("Gotta clear the selection");
     clearSelectionMode();
   } else {
+    console.log("Gotta keep the selection");
     showBulkActionBar();
   }
   renderFilteredItems();
@@ -52,22 +60,26 @@ function clearSelectionMode() {
 }
 /* Bulk Favorite */
 function bulkFavoriteItems() {
-  state.selectedItems.forEach(function (itemName) {
-    toggleFavorite(itemName);
+  state.selectedItems.forEach(async function (listItemId) {
+    const itemMasterId = state.listItems.find(item => item.ListItemId === listItemId)?.ItemMasterId;
+    if (itemMasterId === null || itemMasterId === undefined) {
+      console.error("itemMasterId not found");
+    }
+    await toggleFavorite_mysql(itemMasterId);
   });
   clearSelectionMode();
 }
 /* Bulk Purchased */
 function bulkPurchasedItems() {
-  state.selectedItems.forEach(function (itemName) {
-    openPurchaseConfirmation(itemName);
+  state.selectedItems.forEach(async function (listItemId) {
+    await openPurchaseConfirmation(listItemId);
   });
   clearSelectionMode();
 }
 /* Bulk Delete */
-function bulkDeleteItems() {
-  state.selectedItems.forEach(function (itemId) {
-    deleteItem(itemId);
+async function bulkDeleteItems() {
+  state.selectedItems.forEach(async function (itemId) {
+    await deleteItem(itemId);
   });
   clearSelectionMode();
 }

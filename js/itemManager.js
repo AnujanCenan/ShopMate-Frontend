@@ -566,7 +566,10 @@ async function createItem() {
     showSnackbar(t("item.enterItemDetails"));
     return;
   }
+  console.log(`In create item: itemQuantityUnits === ${itemQuantityUnit}`);
 
+  const generalUnit = getGeneralUnit(itemQuantityUnit, state.settings?.measurementUnit || "metric");
+  console.log(`\tgeneral unit === ${generalUnit}`);
   const categoryId = state.activeCategoryId; 
   const recurrenceFrequency =
     document.getElementById("itemRecurrenceFrequency")?.value || "none";
@@ -643,6 +646,7 @@ async function createItem() {
       quantity: itemQuantity,
       optionalNotes: itemNotes,
       estimatedPrice: itemPrice,
+      generalUnit: generalUnit,
       listId: categoryId,
       shopName: itemShop,
       itemRecurrenceInterval: recurrenceFrequency,
@@ -681,6 +685,7 @@ async function createItem() {
     ActualPrice: 0,
     purchaseDate: null,
     Purchased: false,
+    GeneralUnit: generalUnit,
     recurrence: {
       enabled: recurrenceFrequency !== "none",
       frequency: recurrenceFrequency,

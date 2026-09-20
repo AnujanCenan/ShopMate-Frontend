@@ -28,19 +28,19 @@ function initializeSwipeGestures() {
       card.style.transition = "transform 0.2s ease";
       card.style.transform = "translateX(0px)";
       if (diffX > 120) {
-        if (appState.activeTab === "favorites") {
+        if (state.activeTab === "favorites") {
           setTimeout(function () {
             addFavoriteToList(itemName);
           }, 200);
         } else {
           setTimeout(function () {
-            openPurchaseConfirmation(itemName);
+            openPurchaseConfirmation(listItemId);
           }, 200);
         }
       } else if (diffX < -120) {
-        if (appState.activeTab === "favorites") {
+        if (state.activeTab === "favorites") {
           setTimeout(function () {
-            toggleFavorite(itemName);
+            toggleFavorite_mysql(itemMasterId);
           }, 200);
         } else {
           setTimeout(function () {

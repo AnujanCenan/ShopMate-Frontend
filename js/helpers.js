@@ -873,9 +873,9 @@ function getCurrencySymbol() {
 }
 
 function getMeasurementUnits() {
-  const measurementUnit = appState.settings?.measurementUnit || "metric";
+  const measurementSystem = state.settings?.measuringSystem || "metric";
 
-  if (measurementUnit === "imperial") {
+  if (measurementSystem === "imperial") {
     return [
       { value: "pcs", label: "pcs" },
       { value: "lb", label: "lb" },

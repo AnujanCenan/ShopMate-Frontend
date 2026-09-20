@@ -229,7 +229,7 @@ function openPinSetup() {
   openBottomSheet();
 }
 /* Save PIN from Security Settings */
-function savePinFromSettings() {
+async function savePinFromSettings() {
   const currentPinInput = document.getElementById("currentSecurityPinInput");
   const pinInput = document.getElementById("securityPinInput");
   const confirmPinInput = document.getElementById("securityPinConfirmInput");
@@ -240,6 +240,7 @@ function savePinFromSettings() {
   const pin = pinInput.value.trim();
   const confirmPin = confirmPinInput.value.trim();
   if (setApplicationPin(pin, confirmPin, currentPin)) {
+    await changeSecuritySettings_mysql({ "pinOn": true })
     closeBottomSheet();
     openSecuritySettings();
   }
@@ -257,11 +258,13 @@ async function toggleBiometricFromSettings() {
   }
   if (currentUser.biometricEnabled === true) {
     disableBiometricAuthentication();
+    await changeSecuritySettings_mysql({ biometricOn: false });
     openSecuritySettings();
     return;
   }
   const enabled = await enableBiometricAuthentication();
   if (enabled) {
+    await changeSecuritySettings_mysql({ biometricOn: true });
     openSecuritySettings();
     showDialog(
       t("security.biometricEnabledTitle"),
@@ -371,7 +374,7 @@ function openThemeSettings() {
   initializeRadioOptionSelection("theme", ".themeOption", ".themeOptionCheck");
 }
 /* Save Theme Preference - Saves and immediately applies the selected application theme. */
-function saveThemePreference() {
+async function saveThemePreference() {
   const selectedTheme = document.querySelector('input[name="theme"]:checked');
   if (!selectedTheme) {
     return;
@@ -390,6 +393,8 @@ function saveThemePreference() {
     }
   }
   appState.settings.theme = selectedTheme.value;
+  await changeTheme_mysql(selectedTheme.value);
+
   applyTheme();
   closeBottomSheet();
   showDialog(
@@ -476,7 +481,7 @@ function openNotificationSettings() {
   openBottomSheet();
 }
 /* Save Notification Settings - Saves the user's notification preferences. */
-function saveNotificationSettings() {
+async function saveNotificationSettings() {
   appState.settings.notifications.group = document.getElementById(
     "groupNotificationToggle",
   ).checked;
@@ -489,6 +494,15 @@ function saveNotificationSettings() {
   appState.settings.notifications.general = document.getElementById(
     "generalNotificationToggle",
   ).checked;
+
+  const notificationSettings = {
+    groupNotifsOn: document.getElementById("groupNotificationToggle").checked,
+    shoppingNotifsOn: document.getElementById("shoppingNotificationToggle").checked,
+    budgetNotifsOn: document.getElementById("budgetNotificationToggle").checked,
+    generalNotifsOn: document.getElementById("generalNotificationToggle").checked,
+  }
+
+  await changeNotificationSettings_mysql(notificationSettings);
   saveAppState();
   closeBottomSheet();
   showDialog(
@@ -648,7 +662,9 @@ async function saveLanguagePreference() {
   if (!selectedLanguage) {
     return;
   }
-  await changeLanguage(selectedLanguage.value);
+  await changeLanguage_mysql(selectedLanguage.value);
+  appState.settings.language = selectedLanguage.value;
+  saveAppState();
   closeBottomSheet();
   showDialog(
     t("dialogs.languageUpdatedTitle"),
@@ -724,11 +740,13 @@ function setCurrency() {
   openBottomSheet();
 }
 /* Select Currency */
-function selectCurrency(currency) {
+async function selectCurrency(currency) {
   const supportedCurrencies = ["AUD", "LKR", "INR"];
   if (!supportedCurrencies.includes(currency)) {
     return;
   }
+  await changeCurrency_mysql(currency);
+
   appState.settings.currency = currency;
   saveAppState();
   closeBottomSheet();
@@ -794,10 +812,12 @@ function setMeasurementUnit() {
   openBottomSheet();
 }
 /* Select Measurement Unit */
-function selectMeasurementUnit(unit) {
+async function selectMeasurementUnit(unit) {
   if (unit !== "metric" && unit !== "imperial") {
     return;
   }
+  await changeMeasuringSystem_mysql(unit);
+  
   appState.settings.measurementUnit = unit;
   saveAppState();
   closeBottomSheet();
