@@ -112,15 +112,15 @@ async function renderGroupAccordion() {
                           </div>
                         </div>
                         ${
-                          canManageGroup() && member?.id !== getCurrentUser()?.id
+                          canManageGroup() && member?.usrId !== getCurrentUser()?.usrId
                             ? `
                               <button
                                 class="groupMoreButton"
                                 onclick="
                                   event.stopPropagation();
                                   openMemberActions(
-                                    '${member.id}',
-                                    '${groupName}'
+                                    ${member.usrId},
+                                    ${groupId}
                                   );
                                 "
                               >
@@ -221,6 +221,7 @@ async function renderGroupAccordion() {
       </div>
     `;
   });
+  saveState();
 }
 /* Toggle Group Accordion */
 function toggleGroupAccordion(groupName) {
@@ -520,16 +521,16 @@ function openMemberProfile(memberId) {
   window.location.href = "../pages/profilePage.html";
 }
 /* Member Actions */
-function openMemberActions(memberId, groupName) {
+function openMemberActions(memberId, groupId) {
   if (!canManageGroup()) {
     console.log("TSK TSK Cant manage group");
     return;
   }
 
-  const members =
-    appState.groupMembers && appState.groupMembers[groupName]
-      ? appState.groupMembers[groupName]
-      : [];
+  // const members =
+  //   appState.groupMembers && appState.groupMembers[groupName]
+  //     ? appState.groupMembers[groupName]
+  //     : [];
 
   // const member = members.find(function (member) {
   //   return member.id === memberId;
@@ -538,11 +539,13 @@ function openMemberActions(memberId, groupName) {
   // if (!member) {
   //   return;
   // }
+  const member = state.tempMembers[groupId].find(member => member.usrId === memberId) || null;
+
 
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        ${member.name}
+        ${member.usrName}
       </h2>
 
       <button
@@ -567,8 +570,8 @@ function openMemberActions(memberId, groupName) {
               type="button"
               onclick="
                 makeAdmin(
-                  '${member.id}',
-                  '${groupName}'
+                  ${memberId},
+                  ${groupId} 
                 )
               "
             >
@@ -593,8 +596,7 @@ function openMemberActions(memberId, groupName) {
               type="button"
               onclick="
                 transferOwnership(
-                  '${member.id}',
-                  '${groupName}'
+                  ${member.usrId},
                 )
               "
             >
@@ -619,8 +621,8 @@ function openMemberActions(memberId, groupName) {
         type="button"
         onclick="
           openRemoveMemberDialog(
-            '${member.id}',
-            '${groupName}'
+            ${memberId},
+            ${groupId}
           )
         "
       >
@@ -639,7 +641,7 @@ function openMemberActions(memberId, groupName) {
   openBottomSheet();
 }
 /* Make Admin */
-async function makeAdmin(memberId, groupName) {
+async function makeAdmin(otherUserId, familyGroupId) {
   if (!canManageGroup()) {
     showDialog(
       t("common.permissionDenied"),
@@ -648,26 +650,47 @@ async function makeAdmin(memberId, groupName) {
     return;
   }
 
-  const members =
-    appState.groupMembers && appState.groupMembers[groupName]
-      ? appState.groupMembers[groupName]
-      : [];
+  // const members =
+  //   appState.groupMembers && appState.groupMembers[groupName]
+  //     ? appState.groupMembers[groupName]
+  //     : [];
 
-  const member = members.find(function (member) {
-    return member.id === memberId;
-  });
+  // const member = members.find(function (member) {
+  //   return member.id === memberId;
+  // });
 
-  if (!member) {
-    return;
-  }
+  // if (!member) {
+  //   return;
+  // }
 
-  member.role = "admin";
+  // member.role = "admin";
 
   /*
     Backend
     PATCH
     /group/member/role
   */
+
+
+  const member = state.tempMembers[familyGroupId].find(member => member.usrId === otherUserId);
+
+  const res = await fetch("http://localhost:5113/api/change-member-role", {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      TargetUserId: otherUserId,
+      FamilyGroupId: familyGroupId,
+      MemberType: "Admin"
+    })
+  });
+
+  member.role = "Admin";
+
+  if (!res.ok) {
+    console.error("someting went wrong with promoting admin");
+    return;
+  }
 
   saveAppState();
   await renderGroupAccordion();
@@ -679,7 +702,7 @@ async function makeAdmin(memberId, groupName) {
     "group",
     t("groupManagement.memberPromotedTitle"),
     t("groupManagement.memberPromotedMessage", {
-      name: member.name,
+      name: member.usrName,
     }),
     null,
     null,
@@ -687,7 +710,7 @@ async function makeAdmin(memberId, groupName) {
       titleKey: "groupManagement.memberPromotedTitle",
       messageKey: "groupManagement.memberPromotedMessage",
       params: {
-        name: member.name,
+        name: member.usrName,
       },
     },
   );
@@ -741,7 +764,7 @@ function transferOwnership(memberId) {
   );
 }
 /* Remove Dialog */
-function openRemoveMemberDialog(memberId) {
+function openRemoveMemberDialog(memberId, groupId) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -773,7 +796,8 @@ function openRemoveMemberDialog(memberId) {
           class="bottomSheetDeleteButton"
           onclick="
             removeMember(
-              '${memberId}'
+              ${memberId},
+              ${groupId}
             )
           "
         >
@@ -784,7 +808,7 @@ function openRemoveMemberDialog(memberId) {
   `;
 }
 /* Remove Member */
-async function removeMember(memberId) {
+async function removeMember(memberId, groupId) {
   if (!canManageGroup()) {
     showDialog(
       t("common.permissionDenied"),
@@ -792,30 +816,38 @@ async function removeMember(memberId) {
     );
     return;
   }
-  const members = getCurrentGroupMembers();
-  const removedMember = members.find(function (member) {
-    return member.id === memberId;
+  // const members = getCurrentGroupMembers();
+  // const removedMember = members.find(function (member) {
+  //   return member.id === memberId;
+  // });
+  // appState.groupMembers[appState.activeGroup] = members.filter(
+  //   function (member) {
+  //     return member.id !== memberId;
+  //   },
+  // );
+  
+  const member = state.tempMembers[groupId].find(member => member.usrId === memberId);
+  const res = await fetch(`http://localhost:5113/api/group-member-remove?familyGroupId=${groupId}&targetUserId=${memberId}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" }
   });
-  appState.groupMembers[appState.activeGroup] = members.filter(
-    function (member) {
-      return member.id !== memberId;
-    },
-  );
-  /*
-    Backend
-    DELETE
-    /group/member
-  */
+
+  if (!res.ok) {
+    console.error("Something went wrong with removing the member");
+    return;
+  }
+  state.tempMembers[groupId] = state.tempMembers[groupId].filter(member => member.usrId !== memberId);
   saveAppState();
   renderGroupAccordion();
   closeBottomSheet();
   showToast(t("groupManagement.memberRemoved"));
-  if (removedMember) {
+  if (member) {
     createNotification(
       "group",
       t("groupManagement.memberRemovedTitle"),
       t("groupManagement.memberRemovedMessage", {
-        name: removedMember.name,
+        name: member.usrName,
       }),
       null,
       null,
@@ -823,7 +855,7 @@ async function removeMember(memberId) {
         titleKey: "groupManagement.memberRemovedTitle",
         messageKey: "groupManagement.memberRemovedMessage",
         params: {
-          name: removedMember.name,
+          name: member.usrName,
         },
       },
     );
@@ -1106,11 +1138,9 @@ async function completeLeaveGroup(familyGroupId, shouldDelete) {
   // }
   saveAppState();
   closeBottomSheet();
-  // showToast(
-  //   remainingMembers.length === 0
-  //     ? t("groupManagement.groupDeleted")
-  //     : t("groupManagement.youLeftGroup"),
-  // );
+  showToast(
+      t("groupManagement.youLeftGroup"),
+  );
   window.location.href = "../pages/dashboardPage.html";
 }
 /* Bottom Sheet */
