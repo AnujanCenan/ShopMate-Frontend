@@ -1084,59 +1084,11 @@ async function leaveCurrentGroup(familyGroupId) {
 async function completeLeaveGroup(familyGroupId, shouldDelete) {
   await leaveGroup(familyGroupId, shouldDelete);
   state.groups = state.groups.filter(group => group.familyGroupId !== familyGroupId);
+  state.activeGroupId = null;
+  state.activeGroup = null;
+  restoreLastGroup();
 
-  // if (remainingMembers.length === 0) {
-  //   delete appState.groupMembers[appState.activeGroup];
-  //   delete appState.groups[appState.activeGroup];
-  //   if (appState.budgets && appState.budgets.groupBudgets) {
-  //     delete appState.budgets.groupBudgets[appState.activeGroup];
-  //   }
-  //   if (appState.pendingInvitations) {
-  //     appState.pendingInvitations = appState.pendingInvitations.filter(
-  //       function (invite) {
-  //         return invite.groupName !== appState.activeGroup;
-  //       },
-  //     );
-  //   }
-  //   if (appState.budgets && appState.budgets.categoryBudgets) {
-  //     delete appState.budgets.categoryBudgets[appState.activeGroup];
-  //   }
-  // } else {
-  //   appState.groupMembers[appState.activeGroup] = remainingMembers;
-  // }
-  /*
-    Backend
-    DELETE
-    /group/leave
-    {
-      groupId
-    }
-  */
-  // createNotification(
-  //   "group",
-  //   t("groupManagement.leftGroup"),
-  //   t("groupManagement.leftGroupMessage", {
-  //     name: currentUser.name,
-  //   }),
-  //   null,
-  //   null,
-  //   {
-  //     titleKey: "groupManagement.leftGroup",
-  //     messageKey: "groupManagement.leftGroupMessage",
-  //     params: {
-  //       name: currentUser.name,
-  //     },
-  //   },
-  // );
-  // const remainingGroups = Object.keys(appState.groups);
-  // if (remainingGroups.length > 0) {
-  //   appState.activeGroup = remainingGroups[0];
-  //   localStorage.setItem("activeGroup", remainingGroups[0]);
-  // } else {
-  //   appState.activeGroup = null;
-  //   localStorage.removeItem("activeGroup");
-  // }
-  saveAppState();
+  saveState();
   closeBottomSheet();
   showToast(
       t("groupManagement.youLeftGroup"),

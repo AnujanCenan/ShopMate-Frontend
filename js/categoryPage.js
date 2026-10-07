@@ -286,9 +286,7 @@ function renderItems(items) {
           </div>
           <div class="itemCardContent">
             ${
-              state.activeTab === "favorites"
-                ? ""
-                : `
+                `
                   <div class="itemDetailsSection">
                     <p class="itemDetails">
                       ${t("category.notes")}: ${item.OptionalNotes || "-"}

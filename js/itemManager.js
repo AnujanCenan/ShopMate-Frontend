@@ -1088,7 +1088,7 @@ async function confirmPurchase(listItemId) {
   saveState();
   renderFilteredItems();
   if (typeof renderBudgetDashboardWidget === "function") {
-    renderBudgetDashboardWidget();
+    await renderBudgetDashboardWidget();
   }
   closeBottomSheet();
   showSnackbar(

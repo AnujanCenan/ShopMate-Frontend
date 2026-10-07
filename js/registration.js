@@ -119,13 +119,14 @@ async function registerUser(event) {
   event.preventDefault();
 
   const inviteToken = document.getElementById("inviteTokenInput")?.value || null;
-
+  
   const payload = {
     Name: document.getElementById("registerFirstNameInput")?.value + " " + document.getElementById("registerLastNameInput")?.value,
     Email: document.getElementById("registerEmailInput")?.value,
     Password: document.getElementById("registerPasswordInput")?.value,
     Phone: null,
-    // groupName: document.getElementById("groupNameInput")?.value || null,
+
+    GroupName: document.getElementById("groupNameInput")?.value || null,
     InviteToken: inviteToken
   };
 
@@ -141,6 +142,7 @@ async function registerUser(event) {
 
     if (response.ok) {
       localStorage.setItem("authToken", result.token);
+      resetState();
       window.location.href = "./dashboardPage.html";
     } else {
       alert(result.message || "Registration failed.");

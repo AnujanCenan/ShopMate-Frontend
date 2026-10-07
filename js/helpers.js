@@ -83,6 +83,7 @@ async function loadProductCatalog() {
     productDatabase = [];
   }
 }
+
 /* Normalize Search Text - Normalizes text to improve search consistency. */
 function normalizeSearchText(text) {
   return text.trim().toLowerCase().replace(/\s+/g, " ");
@@ -96,7 +97,7 @@ function searchProducts(searchText, maxResults = 8) {
   const startsWithMatches = [];
   const containsMatches = [];
   productDatabase.forEach(function (product) {
-    const productName = normalizeSearchText(product.name);
+    const productName = normalizeSearchText(product);
     if (productName.startsWith(query)) {
       startsWithMatches.push(product);
       return;
@@ -124,50 +125,92 @@ function getQuickPickProducts(maxResults = 5) {
     })
     .slice(0, maxResults);
 }
+
+async function getCatalogue() {
+  const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+  const hasValidCache = state.catalogue?.items && 
+    (new Date() - new Date(state.catalogue.timeFetched) < CACHE_TTL_MS);
+
+  if (hasValidCache) {
+    return state.catalogue.items;
+  }
+
+  const res = await fetch('http://localhost:5113/api/get-catalogue', {
+    method: "GET",
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!res.ok) {
+    const msg = await res.text();
+    console.error(msg);
+    return [];
+  }
+  console.log(res.body);
+  const items = await res.json();
+
+  state.catalogue = { items, timeFetched: new Date() };
+  return state.catalogue.items;
+}
+
+
 /* Product Suggestions - Renders matching products below the search box as the user types. */
-function renderProductSuggestions(searchText) {
+async function renderProductSuggestions(searchText) {
   const suggestionContainer = document.getElementById("productSuggestions");
   if (!suggestionContainer) {
     return;
   }
   suggestionContainer.innerHTML = "";
-  let products = [];
+  let products = await getCatalogue();
   const search = searchText.trim();
-  if (search === "") {
-    products = getQuickPickProducts();
-  } else {
-    products = searchProducts(search);
+
+  if (search && search !== "") {
+    // Normalize query ONCE outside the loop
+    const normalizedQuery = normalizeSearchText ? normalizeSearchText(search) : search.toLowerCase();
+
+    products = products.filter(product => {
+      // Normalize product name as well for comparison
+      const normalizedProduct = normalizeSearchText ? normalizeSearchText(product) : product.toLowerCase();
+      return normalizedProduct.includes(normalizedQuery);
+    });
   }
+
   if (products.length === 0) {
     suggestionContainer.classList.remove("showSuggestions");
     return;
   }
   suggestionContainer.classList.add("showSuggestions");
-  const heading =
-    search === ""
-      ? `
-        <div class="quickPickHeading">
-          ⭐ ${t("item.quickPicks")}
-        </div>
-      `
-      : "";
+
+  const heading = search === "" 
+    ? `<div class="quickPickHeading">⭐ ${t("item.quickPicks")}</div>` 
+    : "";
+
+  // Helper to escape regex special characters safely
+  const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
   suggestionContainer.innerHTML =
     heading +
     products
       .map(function (product) {
-        const image = getProductImage(product.name);
-        let displayName = product.name;
+        const image = getProductImage(product);
+        let displayName = product;
+
         if (search !== "") {
-          const regex = new RegExp("(" + search + ")", "ig");
-          displayName = product.name.replace(
+          const safeSearch = escapeRegex(search);
+          const regex = new RegExp("(" + safeSearch + ")", "ig");
+          displayName = product.replace(
             regex,
-            "<span class='matchedText'>$1</span>",
+            "<span class='matchedText'>$1</span>"
           );
         }
+
+        // Escape single quotes in product name for the inline onclick handler
+        const safeProductAttribute = product.replace(/'/g, "\\'");
+
         return `
           <div
             class="productSuggestionItem"
-            onclick="selectSuggestedProduct('${product.name}')"
+            onclick="selectSuggestedProduct('${safeProductAttribute}')"
           >
             <div class="productSuggestionImage">
               ${image ? `<img src="${image}">` : "📦"}
@@ -180,26 +223,28 @@ function renderProductSuggestions(searchText) {
       })
       .join("");
 }
+
+
 /* Select Suggested Product - Populates the item form using the selected product details. */
 function selectSuggestedProduct(productName) {
   const product = findProduct(productName);
-  if (!product) {
-    return;
-  }
+  // if (!product) {
+  //   return;
+  // }
   const itemNameInput = document.getElementById("itemNameInput");
   const itemQuantityInput = document.getElementById("itemQuantityInput");
   const itemPriceInput = document.getElementById("itemPriceInput");
   const itemShopInput = document.getElementById("itemShopInput");
   const imagePreview = document.getElementById("itemImagePreview");
   const suggestionContainer = document.getElementById("productSuggestions");
-  itemNameInput.value = product.name;
+  itemNameInput.value = productName;
   if (!itemPriceInput.value) {
-    itemPriceInput.value = product.defaultPrice || "";
+    itemPriceInput.value = product?.defaultPrice || "";
   }
   if (!itemShopInput.value) {
-    itemShopInput.value = product.preferredShop || "";
+    itemShopInput.value = product?.preferredShop || "";
   }
-  const image = getProductImage(product.name);
+  const image = getProductImage(productName);
   if (image) {
     imagePreview.src = image;
     imagePreview.classList.remove("hidden");

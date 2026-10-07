@@ -662,7 +662,7 @@ async function saveLanguagePreference() {
   if (!selectedLanguage) {
     return;
   }
-  await changeLanguage_mysql(selectedLanguage.value);
+  await changeLanguage_mysql(selectedLanguage.value);     // call changeLanguage code as well
   appState.settings.language = selectedLanguage.value;
   saveAppState();
   closeBottomSheet();

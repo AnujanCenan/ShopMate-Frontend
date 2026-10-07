@@ -546,16 +546,6 @@ const defaultState = {
     //   },
     // ]},
   },
-  groupMembers: {
-    0: [
-      {
-        id: "user_1",
-        name: "Hari",
-        email: "admin@shopmate.app",
-        role: "admin",
-      },
-    ],
-  },
   budgets: {
     groupBudgets: [
       {
@@ -589,6 +579,14 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(STATE_KEY, JSON.stringify(state));
+}
+
+function resetState() {
+  localStorage.removeItem(STATE_KEY);
+  state.activeGroup = null;
+  state.activeGroupId = null;
+  state.activeCategory = null;
+  state.activeCategoryId = null;
 }
 
 

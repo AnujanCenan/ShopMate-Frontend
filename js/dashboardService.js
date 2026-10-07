@@ -17,6 +17,10 @@ async function renameGroupMySql(familyGroupId, newName) {
 
 
   state.groups.find(group => group.familyGroupId == familyGroupId).name = newName;
+  if (state.activeGroupId === familyGroupId) {
+    state.activeGroup = newName;
+    selectedGroupName.textContent = newName;
+  }
   saveState();
 };
 
@@ -33,7 +37,11 @@ async function deleteGroupMySql(familyGroupId) {
     return;
   }
 
-  // delete state.groups[familyGroupId];
+  if (state.activeGroupId === familyGroupId) {
+    state.activeGroupId = null;
+    state.activeGroup = null;
+  }
+
   state.groups = state.groups.filter(group => group.familyGroupId != familyGroupId);
   saveState();
   

@@ -297,7 +297,7 @@ async function saveProfileChanges() {
   };
 
   try {
-    const response = await fetch("/api/user-profile", {
+    const response = await fetch("http://localhost:5113/api/user-profile", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -436,11 +436,12 @@ async function updatePassword() {
   }
 
   try {
-    const response = await fetch("/api/change-password", {
+    const response = await fetch("http://localhost:5113/api/change-password", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
+      credentials: "include",
       body: JSON.stringify({
         currentPassword: currentPassword,
         newPassword: newPassword
