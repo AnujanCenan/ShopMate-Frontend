@@ -30,6 +30,9 @@
  * Business logic belongs in the respective manager files.
  ***************************************************************************************************/
 const STORAGE_KEY = "shopMateData";
+function createItemId() {
+  return "item-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+}
 const defaultAppState = {
   loggedIn: false,
   currentUser: null,
@@ -410,6 +413,28 @@ function loadAppState() {
       category.items.forEach(function (item) {
         if (!item || typeof item !== "object") {
           return;
+        }
+
+        if (typeof item.id !== "string" || !item.id) {
+          item.id = createItemId();
+          stateUpdated = true;
+        }
+
+        if (item.purchaseShop === undefined) {
+          item.purchaseShop = "";
+          stateUpdated = true;
+        }
+
+        if (!Array.isArray(item.purchaseEvents)) {
+          item.purchaseEvents = item.purchased
+            ? [{
+                quantity: item.quantity,
+                actualPrice: item.actualPrice || 0,
+                purchaseDate: item.purchaseDate || null,
+                purchaseShop: item.purchaseShop || "",
+              }]
+            : [];
+          stateUpdated = true;
         }
 
         if (item.estimatedPrice === undefined) {

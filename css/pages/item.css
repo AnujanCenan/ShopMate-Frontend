@@ -175,6 +175,12 @@
   transition: transform 0.2s ease;
   z-index: 2;
 }
+
+/* Distinguish recurring items with a border while keeping the card surface uniform. */
+.recurringItemCard {
+  border: 2px solid var(--primaryColor);
+  background: var(--cardColor);
+}
 /* Swipe Active */
 .swipeCard:active {
   opacity: 1;

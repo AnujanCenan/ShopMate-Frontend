@@ -52,22 +52,26 @@ function clearSelectionMode() {
 }
 /* Bulk Favorite */
 function bulkFavoriteItems() {
-  appState.selectedItems.forEach(function (itemName) {
+  appState.selectedItems.forEach(function (itemId) {
+    const category = getActiveCategory();
+    const selected = category?.items.find(function (item) { return item.id === itemId || item.name === itemId; });
+    const itemName = selected?.name || itemId;
     toggleFavorite(itemName);
   });
   clearSelectionMode();
 }
 /* Bulk Purchased */
 function bulkPurchasedItems() {
-  appState.selectedItems.forEach(function (itemName) {
-    openPurchaseConfirmation(itemName);
+  const selectedIds = [...appState.selectedItems];
+  selectedIds.forEach(function (itemId) {
+    openPurchaseConfirmation(itemId);
   });
   clearSelectionMode();
 }
 /* Bulk Delete */
 function bulkDeleteItems() {
-  appState.selectedItems.forEach(function (itemName) {
-    deleteItem(itemName);
+  appState.selectedItems.forEach(function (itemId) {
+    deleteItem(itemId);
   });
   clearSelectionMode();
 }

@@ -195,13 +195,13 @@ function renderAddItemForm(itemName = "") {
   initializeItemForm();
 }
 /* Render Edit Item Form */
-function renderEditItemForm(itemName) {
+function renderEditItemForm(itemId) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
   }
   const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+    return item.id === itemId;
   });
   if (!item) {
     return;
@@ -396,7 +396,7 @@ function renderEditItemForm(itemName) {
         </button>
         <button
           class="primaryButton"
-          onclick="updateItem('${item.name}')"
+          onclick="updateItem('${item.id}')"
         >
           ${t("common.saveChanges")}
         </button>
@@ -557,10 +557,17 @@ function createItem() {
   if (!currentCategory) {
     return;
   }
+  const recurrenceFrequency =
+    document.getElementById("itemRecurrenceFrequency")?.value || "none";
   const normalizedItemName = itemName.trim().toLowerCase();
-  const existingItem = currentCategory.items.find(function (item) {
-    return item.name.trim().toLowerCase() === normalizedItemName;
-  });
+  const existingItem = recurrenceFrequency === "none"
+    ? currentCategory.items.find(function (item) {
+        return item.name.trim().toLowerCase() === normalizedItemName &&
+          !item.purchased &&
+          (item.quantityUnit || "pcs") === itemQuantityUnit &&
+          !(item.recurrence && item.recurrence.enabled === true && item.recurrence.frequency !== "none");
+      })
+    : null;
   /* Existing Item Found */
   if (existingItem) {
     bottomSheetContent.innerHTML = `
@@ -600,7 +607,7 @@ function createItem() {
           <button
             class="primaryButton"
             onclick="updateDuplicateQuantity(
-              '${existingItem.name}',
+              '${existingItem.id}',
               '${itemQuantity}'
             )"
           >
@@ -611,13 +618,12 @@ function createItem() {
     `;
     return;
   }
-  const recurrenceFrequency =
-    document.getElementById("itemRecurrenceFrequency")?.value || "none";
   const recurrenceStartDate =
     document.getElementById("itemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("itemRecurrenceEndDate")?.value || null;
   const newItem = {
+    id: createItemId(),
     name: itemName,
     quantity: itemQuantity,
     quantityUnit: itemQuantityUnit,
@@ -681,13 +687,13 @@ function createItem() {
   favoriteItemToAdd = null;
 }
 /* Update Duplicate Quantity */
-function updateDuplicateQuantity(itemName, newQuantity) {
+function updateDuplicateQuantity(itemId, newQuantity) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
   }
   const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+    return item.id === itemId;
   });
   if (!item) {
     return;
@@ -699,13 +705,13 @@ function updateDuplicateQuantity(itemName, newQuantity) {
   showSnackbar(t("item.quantityUpdated"));
 }
 /* Update Item */
-function updateItem(originalItemName) {
+function updateItem(originalItemId) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
   }
   const item = currentCategory.items.find(function (item) {
-    return item.name === originalItemName;
+    return item.id === originalItemId;
   });
   if (!item) {
     return;
@@ -724,17 +730,6 @@ function updateItem(originalItemName) {
   const newShop = document.getElementById("editItemShopInput").value.trim();
   if (!newName || !newQuantity) {
     showSnackbar(t("item.enterItemDetails"));
-    return;
-  }
-  const normalizedNewName = newName.toLowerCase();
-  const duplicateItem = currentCategory.items.find(function (existingItem) {
-    return (
-      existingItem.name !== originalItemName &&
-      existingItem.name.trim().toLowerCase() === normalizedNewName
-    );
-  });
-  if (duplicateItem) {
-    showSnackbar(t("item.duplicateItemName"));
     return;
   }
   const recurrenceFrequency =
@@ -762,13 +757,13 @@ function updateItem(originalItemName) {
   showSnackbar(t("item.itemUpdated"));
 }
 /* Open Purchase Confirmation */
-function openPurchaseConfirmation(itemName) {
+function openPurchaseConfirmation(itemId) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
   }
   const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+    return item.id === itemId;
   });
   if (!item) {
     return;
@@ -778,6 +773,9 @@ function openPurchaseConfirmation(itemName) {
     item.purchased = false;
     item.purchaseDate = null;
     item.actualPrice = 0;
+    item.lastPurchasePrice = null;
+    item.purchaseShop = "";
+    item.purchaseEvents = [];
     if (item.recurrence && item.recurrence.enabled === true) {
       item.recurrence.lastGeneratedDate = null;
     }
@@ -840,6 +838,10 @@ function openPurchaseConfirmation(itemName) {
           >
         </div>
       </div>
+      <div class="formField">
+        <label class="formLabel">${t("category.shop")}</label>
+        <input type="text" id="actualShopInput" class="bottomSheetInput" value="" placeholder="${t("category.shop")} (optional)">
+      </div>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
@@ -849,7 +851,7 @@ function openPurchaseConfirmation(itemName) {
         </button>
         <button
           class="primaryButton"
-          onclick="confirmPurchase('${item.name}')"
+          onclick="confirmPurchase('${item.id}')"
         >
           ${t("common.confirm")}
         </button>
@@ -859,20 +861,38 @@ function openPurchaseConfirmation(itemName) {
   openBottomSheet();
 }
 /* Confirm Purchase */
-function confirmPurchase(itemName) {
+function confirmPurchase(itemId) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
   }
   const item = currentCategory.items.find(function (item) {
-    return item.name === itemName;
+    return item.id === itemId;
   });
   if (!item) {
     return;
   }
   const actualPrice =
     Number(document.getElementById("actualPriceInput").value) || 0;
+  const actualShop =
+    document.getElementById("actualShopInput")?.value.trim() || "";
+  const isRecurring =
+    item.recurrence &&
+    item.recurrence.enabled === true &&
+    item.recurrence.frequency !== "none";
+  const normalizedName = item.name.trim().toLowerCase();
+  const normalizedShop = actualShop.trim().toLowerCase();
+  const mergeTarget = !isRecurring &&
+    currentCategory.items.find(function (candidate) {
+      return candidate.id !== item.id && candidate.purchased &&
+        !(candidate.recurrence && candidate.recurrence.enabled === true && candidate.recurrence.frequency !== "none") &&
+        candidate.name.trim().toLowerCase() === normalizedName &&
+        Number(candidate.lastPurchasePrice ?? candidate.actualPrice) === actualPrice &&
+        (candidate.purchaseShop || "").trim().toLowerCase() === normalizedShop &&
+        (candidate.quantityUnit || "pcs") === (item.quantityUnit || "pcs");
+    });
   item.actualPrice = actualPrice;
+  item.purchaseShop = actualShop;
   item.purchased = !item.purchased;
   if (item.purchased) {
     item.purchaseDate = new Date().toISOString();
@@ -881,6 +901,36 @@ function confirmPurchase(itemName) {
     }
   } else {
     item.purchaseDate = null;
+  }
+  if (item.purchased && mergeTarget) {
+    if (!Array.isArray(mergeTarget.purchaseEvents)) {
+      mergeTarget.purchaseEvents = [{
+        quantity: mergeTarget.quantity,
+        actualPrice: Number(mergeTarget.actualPrice) || 0,
+        purchaseDate: mergeTarget.purchaseDate || null,
+        purchaseShop: mergeTarget.purchaseShop || "",
+      }];
+    }
+    mergeTarget.purchaseEvents.push({
+      quantity: item.quantity,
+      actualPrice: actualPrice,
+      purchaseDate: item.purchaseDate,
+      purchaseShop: actualShop,
+    });
+    mergeTarget.quantity = Number(mergeTarget.quantity) + Number(item.quantity);
+    mergeTarget.actualPrice = Number(mergeTarget.actualPrice) + actualPrice;
+    mergeTarget.lastPurchasePrice = actualPrice;
+    mergeTarget.purchaseDate = item.purchaseDate;
+    mergeTarget.purchaseShop = actualShop;
+    currentCategory.items.splice(currentCategory.items.indexOf(item), 1);
+  } else if (item.purchased) {
+    item.lastPurchasePrice = actualPrice;
+    item.purchaseEvents = [{
+      quantity: item.quantity,
+      actualPrice: actualPrice,
+      purchaseDate: item.purchaseDate,
+      purchaseShop: actualShop,
+    }];
   }
   if (item.purchased) {
     item.purchaseDate = new Date().toISOString();
@@ -952,13 +1002,13 @@ function updateBudgetTracking(categoryName, amount) {
   saveAppState();
 }
 /* Delete Item */
-function deleteItem(itemName) {
+function deleteItem(itemId) {
   const currentCategory = getActiveCategory();
   if (!currentCategory) {
     return;
   }
   const itemIndex = currentCategory.items.findIndex(function (item) {
-    return item.name === itemName;
+    return item.id === itemId;
   });
   if (itemIndex === -1) {
     return;

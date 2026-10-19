@@ -573,6 +573,7 @@ function processRecurringItems() {
           return;
         }
         const newItem = {
+          id: createItemId(),
           name: item.name,
           quantity: item.quantity,
           notes: item.notes,

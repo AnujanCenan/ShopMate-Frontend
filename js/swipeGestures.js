@@ -21,6 +21,7 @@ function initializeSwipeGestures() {
       dragging = false;
       const diffX = currentX - startX;
       const itemName = card.dataset.itemName;
+      const itemId = card.dataset.itemId || itemName;
       /* Always reset the card first */
       card.style.transition = "transform 0.2s ease";
       card.style.transform = "translateX(0px)";
@@ -31,7 +32,7 @@ function initializeSwipeGestures() {
           }, 200);
         } else {
           setTimeout(function () {
-            openPurchaseConfirmation(itemName);
+            openPurchaseConfirmation(itemId);
           }, 200);
         }
       } else if (diffX < -120) {
@@ -41,7 +42,7 @@ function initializeSwipeGestures() {
           }, 200);
         } else {
           setTimeout(function () {
-            deleteItem(itemName);
+            deleteItem(itemId);
           }, 200);
         }
       }

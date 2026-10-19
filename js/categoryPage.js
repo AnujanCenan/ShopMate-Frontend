@@ -141,18 +141,20 @@ function renderItems(items) {
         </div>
         <div
           class="itemCard swipeCard ${
-            appState.selectedItems.includes(item.name) ? "selectedItem" : " "
-          }"
+            item.recurrence && item.recurrence.enabled === true && item.recurrence.frequency !== "none" ? "recurringItemCard" : ""
+          } ${appState.selectedItems.includes(item.id || item.name) ? "selectedItem" : ""}"
           data-item-name="${item.name}"
+          data-item-id="${item.id || item.name}"
+          data-item-recurring="${item.recurrence && item.recurrence.enabled === true && item.recurrence.frequency !== "none" ? "true" : "false"}"
           onclick="
             event.stopPropagation();
             if(appState.selectionMode){
-              toggleItemSelection('${item.name}');
+              toggleItemSelection('${item.id || item.name}');
             }
           "
           oncontextmenu="
             event.preventDefault();
-            toggleItemSelection('${item.name}');
+            toggleItemSelection('${item.id || item.name}');
           "
         >
           <div class="itemCardTopRow">
@@ -162,7 +164,7 @@ function renderItems(items) {
                 onclick="
                   event.stopPropagation();
                   if(!appState.selectionMode){
-                    renderEditItemForm('${item.name}');
+                    renderEditItemForm('${item.id}');
                   }
                 "
               >
@@ -220,7 +222,7 @@ function renderItems(items) {
                       "
                       onclick="
                         event.stopPropagation();
-                        openPurchaseConfirmation('${item.name}');
+                        openPurchaseConfirmation('${item.id}');
                       "
                     >
                       <span class="actionButtonIcon">
@@ -271,7 +273,7 @@ function renderItems(items) {
                       ${t("category.notes")}: ${item.notes || "-"}
                     </p>
                     <p class="itemDetails">
-                      ${t("category.shop")}: ${item.preferredShop || "-"}
+                      ${t("category.shop")}: ${item.purchased ? (item.purchaseShop || "-") : (item.preferredShop || "-")}
                     </p>
                     <p class="itemDetails">
                       ${t("category.estimatedPrice")}: ${getCurrencySymbol()}${item.estimatedPrice || 0}
