@@ -10,8 +10,13 @@ const screenOverlay = document.getElementById("screenOverlay");
 const menuButton = document.querySelector(".menuButton");
 const sideDrawer = document.getElementById("sideDrawer");
 const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
+let selectedGroupColor = "";
+let colorEditingGroupName = null;
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 function initializeDashboard() {
+  if (ensureGroupColorsForCurrentUser()) {
+    saveAppState();
+  }
   restoreLastGroup();
   renderCategories();
   renderBudgetDashboardWidget();
@@ -34,7 +39,7 @@ function restoreLastGroup() {
     savedGroup && appState.groups[savedGroup] ? savedGroup : stateGroup;
   if (groupToRestore) {
     appState.activeGroup = groupToRestore;
-    selectedGroupName.textContent = groupToRestore;
+    selectedGroupName.innerHTML = renderGroupNameWithColor(groupToRestore);
     localStorage.setItem("activeGroup", groupToRestore);
     return;
   }
@@ -137,7 +142,7 @@ function renderCategories() {
 /* Select Group */
 function selectGroup(groupName) {
   appState.activeGroup = groupName;
-  selectedGroupName.textContent = groupName;
+  selectedGroupName.innerHTML = renderGroupNameWithColor(groupName);
   localStorage.setItem("activeGroup", groupName);
   renderCategories();
   renderBudgetDashboardWidget();
@@ -160,8 +165,11 @@ function renderGroupDropdown() {
         onclick="selectGroup('${groupName}')"
       >
         <span class="groupItemName">
-          ${groupName}
+          ${renderGroupNameWithColor(groupName)}
         </span>
+        <button type="button" class="groupColorEditButton" aria-label="${t("dashboard.changeGroupColor")}" title="${t("dashboard.changeGroupColor")}" onclick="event.stopPropagation(); renderGroupColorForm('${groupName}')">
+          <img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt="">
+        </button>
         ${
           canManageGroup()
             ? `
@@ -217,6 +225,9 @@ function renderGroupDropdown() {
 }
 /* Render Create Group Form */
 function renderCreateGroupForm() {
+  ensureGroupColorsForCurrentUser();
+  colorEditingGroupName = null;
+  selectedGroupColor = "";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -253,6 +264,13 @@ function renderCreateGroupForm() {
           class="validationMessage"
         ></div>
       </div>
+      <div class="formField">
+        <label class="formLabel">${t("dashboard.groupColor")}</label>
+        <div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">
+          ${renderGroupColorSwatches(null)}
+        </div>
+        <div id="groupColorError" class="validationMessage"></div>
+      </div>
       <div class="bottomSheetButtonRow">
         <button
           type="button"
@@ -279,6 +297,83 @@ function renderCreateGroupForm() {
     }
     groupNameInput.focus();
   }, 100);
+}
+function renderGroupColorSwatches(groupName) {
+  const colorMap = getGroupColorMap();
+  const options = getGroupColorOptions();
+  const usedBy = new Map();
+  Object.keys(colorMap).forEach(function (name) {
+    usedBy.set(colorMap[name].toLowerCase(), name);
+  });
+  return options
+    .map(function (color, index) {
+      const owner = usedBy.get(color.toLowerCase());
+      const unavailable = owner && owner !== groupName;
+      const selected = color === selectedGroupColor;
+      return `<button type="button" class="groupColorSwatch ${selected ? "selected" : ""}" style="--swatch-color:${color}" role="radio" aria-checked="${selected}" aria-label="${t("dashboard.groupColorOption", { number: index + 1 })}" title="${unavailable ? t("dashboard.groupColorInUse") : t("dashboard.groupColorOption", { number: index + 1 })}" ${unavailable ? "disabled" : ""} onclick="selectGroupColor('${color}', this)"></button>`;
+    })
+    .join("");
+}
+function selectGroupColor(color, button) {
+  const colorMap = getGroupColorMap();
+  const owner = Object.keys(colorMap).find(function (name) {
+    return colorMap[name].toLowerCase() === color.toLowerCase();
+  });
+  if (owner && owner !== colorEditingGroupName) return;
+  selectedGroupColor = color;
+  const swatches =
+    button?.parentElement?.querySelectorAll(".groupColorSwatch") || [];
+  swatches.forEach(function (swatch) {
+    const selected = swatch === button;
+    swatch.classList.toggle("selected", selected);
+    swatch.setAttribute("aria-checked", String(selected));
+  });
+  const error = document.getElementById("groupColorError");
+  if (error) error.textContent = "";
+}
+function renderGroupColorForm(groupName) {
+  ensureGroupColorsForCurrentUser();
+  colorEditingGroupName = groupName;
+  selectedGroupColor = getGroupColor(groupName);
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader"><h2>${t("dashboard.groupColorTitle")}</h2><button class="closeButton" onclick="closeBottomSheet()" aria-label="${t("common.close")}"><img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt=""></button></div>
+    <div class="bottomSheetBody"><p>${renderGroupNameWithColor(groupName)}</p><div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">${renderGroupColorSwatches(groupName)}</div><div id="groupColorError" class="validationMessage"></div><div class="bottomSheetButtonRow"><button class="secondaryButton" onclick="closeBottomSheet()">${t("common.cancel")}</button><button class="primaryButton" onclick="saveGroupColor()">${t("common.save")}</button></div></div>`;
+  openBottomSheet();
+}
+function saveGroupColor() {
+  const colorMap = getGroupColorMap();
+  const error = document.getElementById("groupColorError");
+  const duplicateOwner = Object.keys(colorMap).find(function (name) {
+    return (
+      name !== colorEditingGroupName &&
+      colorMap[name].toLowerCase() === selectedGroupColor.toLowerCase()
+    );
+  });
+  if (!selectedGroupColor || duplicateOwner) {
+    if (error) error.textContent = t("dashboard.groupColorUnavailable");
+    return;
+  }
+  const updatedGroupName = colorEditingGroupName;
+  colorMap[updatedGroupName] = selectedGroupColor;
+  saveAppState();
+  renderGroupDropdown();
+  if (selectedGroupName) {
+    selectedGroupName.innerHTML =
+      appState.activeGroup && appState.groups[appState.activeGroup]
+        ? renderGroupNameWithColor(appState.activeGroup)
+        : t("dashboard.noGroupSelected");
+  }
+  if (updatedGroupName === appState.activeGroup) {
+    const budgetGroupName = document.querySelector(
+      "#budgetDashboardWidget .budgetGroupName",
+    );
+    if (budgetGroupName) {
+      budgetGroupName.innerHTML = renderGroupNameWithColor(updatedGroupName);
+    }
+  }
+  colorEditingGroupName = null;
+  closeBottomSheet();
+  showSnackbar(t("dashboard.groupColorUpdated"));
 }
 /* Clear Group Validation */
 function clearGroupValidation() {
@@ -345,6 +440,12 @@ function createGroup() {
     groupNameInput.focus();
     return;
   }
+  if (!selectedGroupColor) {
+    const groupColorError = document.getElementById("groupColorError");
+    if (groupColorError)
+      groupColorError.textContent = t("dashboard.groupColorUnavailable");
+    return;
+  }
   const groupExists = Object.keys(appState.groups).some(
     function (existingGroup) {
       return existingGroup.toLowerCase() === groupName.toLowerCase();
@@ -358,6 +459,7 @@ function createGroup() {
     return;
   }
   appState.groups[groupName] = [];
+  getGroupColorMap()[groupName] = selectedGroupColor;
   if (!appState.budgets) {
     appState.budgets = {};
   }
@@ -765,7 +867,7 @@ function renderInviteMemberForm(groupName) {
           ${t("dashboard.invitingMemberTo")}
         </label>
         <div class="inviteGroupName">
-          ${groupName}
+          ${renderGroupNameWithColor(groupName)}
         </div>
       </div>
       <div class="formField">
@@ -1004,9 +1106,10 @@ function saveRenamedGroup(oldGroupName) {
       appState.budgets.categoryBudgets[oldGroupName];
     delete appState.budgets.categoryBudgets[oldGroupName];
   }
+  renameGroupColorPreferences(oldGroupName, newGroupName);
   if (appState.activeGroup === oldGroupName) {
     appState.activeGroup = newGroupName;
-    selectedGroupName.textContent = newGroupName;
+    selectedGroupName.innerHTML = renderGroupNameWithColor(newGroupName);
     localStorage.setItem("activeGroup", newGroupName);
   }
   saveAppState();
@@ -1025,6 +1128,7 @@ ${t("dashboard.deleteGroupConfirmationDetails")}
 ${t("dashboard.deleteGroupConfirmationWarning")}`,
     function () {
       delete appState.groups[groupName];
+      removeGroupColorPreferences(groupName);
       if (appState.groupMembers?.[groupName]) {
         delete appState.groupMembers[groupName];
       }
@@ -1038,7 +1142,9 @@ ${t("dashboard.deleteGroupConfirmationWarning")}`,
         const remainingGroups = Object.keys(appState.groups);
         if (remainingGroups.length > 0) {
           appState.activeGroup = remainingGroups[0];
-          selectedGroupName.textContent = appState.activeGroup;
+          selectedGroupName.innerHTML = renderGroupNameWithColor(
+            appState.activeGroup,
+          );
           localStorage.setItem("activeGroup", appState.activeGroup);
         } else {
           appState.activeGroup = null;
@@ -1281,7 +1387,11 @@ function renderBudgetDashboardWidget() {
             ${t("dashboard.monthlyBudget")}
           </h3>
           <p class="budgetGroupName">
-            ${appState.activeGroup || t("dashboard.noGroupSelected")}
+            ${
+              appState.activeGroup
+                ? renderGroupNameWithColor(appState.activeGroup)
+                : t("dashboard.noGroupSelected")
+            }
           </p>
         </div>
         <span id="budgetCollapseIcon">

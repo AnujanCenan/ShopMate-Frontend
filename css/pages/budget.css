@@ -65,6 +65,7 @@
 .budgetSummaryHeader {
   display: flex;
   align-items: center;
+  text-align: left;
   justify-content: space-between;
   width: 100%;
   padding: 20px 15px 15px;

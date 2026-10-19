@@ -342,6 +342,96 @@ function canManageGroup() {
   const member = getCurrentMember();
   return member ? member.role === "admin" || member.role === "owner" : false;
 }
+/* Personal group colors are stored per user so they do not change other members' view. */
+const GROUP_COLOR_PALETTE = [
+  "#d1495b", "#ed9b40", "#00798c", "#30638e", "#6a4c93", "#2a9d8f",
+  "#688e26", "#b56576", "#5b5f97", "#bc6c25", "#3a7d44", "#8f3985",
+];
+
+function getGroupColorMap(userId) {
+  if (!appState.groupColorPreferences || typeof appState.groupColorPreferences !== "object" || Array.isArray(appState.groupColorPreferences)) {
+    appState.groupColorPreferences = {};
+  }
+  const ownerId = String(userId || getCurrentUser()?.id || "local-user");
+  if (!appState.groupColorPreferences[ownerId] || typeof appState.groupColorPreferences[ownerId] !== "object" || Array.isArray(appState.groupColorPreferences[ownerId])) {
+    appState.groupColorPreferences[ownerId] = {};
+  }
+  return appState.groupColorPreferences[ownerId];
+}
+
+function getGroupColorOptions() {
+  const colorMap = getGroupColorMap();
+  const used = new Set(Object.values(colorMap).filter(function (color) {
+    return typeof color === "string";
+  }).map(function (color) { return color.toLowerCase(); }));
+  const options = GROUP_COLOR_PALETTE.slice();
+  Object.values(colorMap).forEach(function (color) {
+    if (typeof color === "string" && color.startsWith("hsl(")) options.push(color.toLowerCase());
+  });
+  const paletteExhausted = GROUP_COLOR_PALETTE.every(function (color) { return used.has(color); });
+  if (!paletteExhausted) return [...new Set(options)];
+  const needed = Object.keys(appState.groups || {}).length + 8;
+  for (let index = 0; index < needed; index += 1) {
+    const hue = Math.round((index * 137.508) % 360);
+    options.push(`hsl(${hue} 62% 42%)`);
+  }
+  return [...new Set(options)];
+}
+
+function ensureGroupColorsForCurrentUser() {
+  const colorMap = getGroupColorMap();
+  const used = new Set();
+  let changed = false;
+  Object.keys(colorMap).forEach(function (groupName) {
+    if (!Object.prototype.hasOwnProperty.call(appState.groups || {}, groupName)) {
+      delete colorMap[groupName];
+      changed = true;
+    }
+  });
+  Object.keys(appState.groups || {}).forEach(function (groupName) {
+    const current = colorMap[groupName];
+    const options = getGroupColorOptions();
+    if (typeof current === "string" && options.includes(current.toLowerCase()) && !used.has(current.toLowerCase())) {
+      colorMap[groupName] = current.toLowerCase();
+      used.add(colorMap[groupName]);
+      return;
+    }
+    const available = options.find(function (color) { return !used.has(color.toLowerCase()); });
+    colorMap[groupName] = available || options[0];
+    used.add(colorMap[groupName].toLowerCase());
+    changed = true;
+  });
+  return changed;
+}
+
+function getGroupColor(groupName) {
+  ensureGroupColorsForCurrentUser();
+  return getGroupColorMap()[groupName] || GROUP_COLOR_PALETTE[0];
+}
+
+function renderGroupNameWithColor(groupName) {
+  const safeName = String(groupName).replace(/[&<>"']/g, function (character) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[character];
+  });
+  const color = getGroupColor(groupName);
+  return `<span class="groupNameWithColor"><span class="groupColorDot" style="background-color:${color}" aria-hidden="true"></span><span>${safeName}</span></span>`;
+}
+
+function renameGroupColorPreferences(oldGroupName, newGroupName) {
+  if (oldGroupName === newGroupName) return;
+  Object.values(appState.groupColorPreferences || {}).forEach(function (colorMap) {
+    if (colorMap && colorMap[oldGroupName]) {
+      colorMap[newGroupName] = colorMap[oldGroupName];
+      delete colorMap[oldGroupName];
+    }
+  });
+}
+
+function removeGroupColorPreferences(groupName) {
+  Object.values(appState.groupColorPreferences || {}).forEach(function (colorMap) {
+    if (colorMap) delete colorMap[groupName];
+  });
+}
 /* Calculate Group Budget - Calculates the total amount spent for the specified shopping group. */
 function calculateGroupBudget(groupName) {
   if (!groupName) {

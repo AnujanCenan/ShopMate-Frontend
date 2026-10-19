@@ -27,6 +27,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-align: left;
   width: 100%;
   padding: 18px 20px;
   border: none;
@@ -37,6 +38,10 @@
   margin: 0;
   font-size: 17px;
   font-weight: 700;
+}
+
+.groupAccordionTitle .groupNameWithColor {
+  justify-content: flex-start;
 }
 .groupAccordionSubtitle {
   margin-top: 4px;

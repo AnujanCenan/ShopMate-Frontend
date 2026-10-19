@@ -6,6 +6,9 @@ const bottomSheetContent = document.getElementById("bottomSheetContent");
 const screenOverlay = document.getElementById("screenOverlay");
 /* Initialize */
 function initializeGroupManagement() {
+  if (ensureGroupColorsForCurrentUser()) {
+    saveAppState();
+  }
   renderGroupAccordion();
   setupPermissions();
 }
@@ -38,7 +41,7 @@ function renderGroupAccordion() {
         >
           <div>
             <h3 class="groupAccordionTitle">
-              ${groupName}
+              ${renderGroupNameWithColor(groupName)}
             </h3>
             <p class="groupAccordionSubtitle">
               ${members.length} ${t("groupManagement.members")} •

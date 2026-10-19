@@ -45,9 +45,45 @@
 /* Group Item Name */
 .groupItemName {
   flex: 1;
-  text-align: center;
+  text-align: left;
   font-size: 17px;
   font-weight: 500;
+}
+
+.groupNameWithColor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+
+.groupColorDot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 12px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: 50%;
+}
+
+.groupColorEditButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.groupColorEditButton:focus-visible,
+.groupColorSwatch:focus-visible {
+  outline: 3px solid var(--primaryColor);
+  outline-offset: 2px;
 }
 /* Group Item Row */
 .groupItemRow {

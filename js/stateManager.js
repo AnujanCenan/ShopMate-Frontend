@@ -89,6 +89,7 @@ const defaultAppState = {
       },
     ],
   },
+  groupColorPreferences: {},
   groupMembers: {
     "My Shopping Group": [
       {
@@ -165,6 +166,15 @@ function loadAppState() {
     Array.isArray(parsedState.groupMembers)
   ) {
     parsedState.groupMembers = {};
+    stateUpdated = true;
+  }
+
+  if (
+    !parsedState.groupColorPreferences ||
+    typeof parsedState.groupColorPreferences !== "object" ||
+    Array.isArray(parsedState.groupColorPreferences)
+  ) {
+    parsedState.groupColorPreferences = {};
     stateUpdated = true;
   }
 
