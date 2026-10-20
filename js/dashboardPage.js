@@ -77,9 +77,7 @@ function renderCategories() {
         ?.monthlyLimit ?? 0;
     let categorySpent = 0;
     category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        categorySpent += Number(item.estimatedPrice);
-      }
+      categorySpent += getItemSpentAmount(item);
     });
     const categoryRemaining =
       categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
@@ -1258,7 +1256,6 @@ function renderSideDrawer() {
         >
         <span>${t("dashboard.notifications")}</span>
       </button>
-
       <button
         class="drawerItem"
         onclick="window.location.href='../pages/settingsPage.html'"
@@ -1300,7 +1297,6 @@ function renderSideDrawer() {
         onchange="importAppData(event)"
       >
     </div>
-
     <div class="drawerLogout">
       <button
         type="button"
@@ -1328,7 +1324,6 @@ function renderBudgetDashboardWidget() {
   if (!budgetWidget || !appState.activeGroup) {
     return;
   }
-  calculateGroupBudget();
   if (!appState.budgets.groupBudgets) {
     appState.budgets.groupBudgets = {};
   }
@@ -1339,7 +1334,7 @@ function renderBudgetDashboardWidget() {
   }
   const groupBudget = appState.budgets.groupBudgets[appState.activeGroup];
   const limit = groupBudget.monthlyLimit ?? 0;
-  const spent = calculateGroupBudget();
+  const spent = calculateGroupBudget(appState.activeGroup);
   const remaining = Math.max(limit - spent, 0);
   let allocated = 0;
   const categoryBudgets =
@@ -1490,31 +1485,29 @@ function renderBudgetDashboardWidget() {
             `
         }
         <div class="budgetActionButtons">
-  ${
-    canManageBudget()
-      ? `
-        <button
-          class="primaryButton budgetEditButton"
-          onclick="renderEditGroupBudgetForm()"
-        >
-          Edit Budget
-        </button>
-      `
-      : ""
-  }
-
-  <button
-    class="secondaryButton budgetAnalysisButton"
-    onclick="
-      window.location.href =
-        '../pages/budgetPage.html?group=' +
-        encodeURIComponent(appState.activeGroup)
-    "
-  >
-    Budget Analysis
-  </button>
-</div>
-
+          ${
+            canManageBudget()
+              ? `
+                <button
+                  class="primaryButton budgetEditButton"
+                  onclick="renderEditGroupBudgetForm()"
+                >
+                  Edit Budget
+                </button>
+              `
+              : ""
+          }
+          <button
+            class="secondaryButton budgetAnalysisButton"
+            onclick="
+              window.location.href =
+                '../pages/budgetPage.html?group=' +
+                encodeURIComponent(appState.activeGroup)
+            "
+          >
+            Budget Analysis
+          </button>
+        </div>
       </div>
     </div>
   `;

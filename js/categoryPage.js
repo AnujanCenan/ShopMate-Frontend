@@ -20,6 +20,63 @@ const categoryPageTitle = document.getElementById("categoryPageTitle");
 const itemList = document.getElementById("itemList");
 const itemEmptyState = document.getElementById("itemEmptyState");
 const searchInput = document.querySelector(".searchInput");
+
+/* Use delegated listeners so item names never need to appear in inline JavaScript. */
+if (itemList && !itemList.dataset.itemActionsBound) {
+  itemList.dataset.itemActionsBound = "true";
+
+  itemList.addEventListener("click", function (event) {
+    const card = event.target.closest(".itemCard");
+    if (!card) {
+      return;
+    }
+
+    const actionElement = event.target.closest("[data-item-action]");
+    if (actionElement) {
+      event.stopPropagation();
+      const itemKey = card.dataset.itemId;
+      const item = getFilteredItems().find(function (candidate) {
+        return String(candidate.id || candidate.name) === itemKey;
+      });
+      if (!item) {
+        return;
+      }
+
+      switch (actionElement.dataset.itemAction) {
+        case "edit":
+          if (!appState.selectionMode && item.id) {
+            renderEditItemForm(item.id);
+          }
+          break;
+        case "favorite":
+          toggleFavorite(item.name);
+          break;
+        case "add-favorite":
+          addFavoriteToList(item.name);
+          break;
+        case "purchase":
+          if (item.id) {
+            openPurchaseConfirmation(item.id);
+          }
+          break;
+      }
+      return;
+    }
+
+    if (appState.selectionMode) {
+      toggleItemSelection(card.dataset.itemId);
+    }
+  });
+
+  itemList.addEventListener("contextmenu", function (event) {
+    const card = event.target.closest(".itemCard");
+    if (!card) {
+      return;
+    }
+    event.preventDefault();
+    toggleItemSelection(card.dataset.itemId);
+  });
+}
 /* Render Category Page */
 function renderCategoryPage() {
   if (!categoryPageTitle) {
@@ -91,12 +148,23 @@ function renderItems(items) {
     return;
   }
   itemEmptyState.innerHTML = "";
-  items.forEach(function (item) {
-    const normalizedItemName = item.name.trim().toLowerCase();
-    const isFavorite = appState.favoriteItems.some(function (favoriteItem) {
-      return favoriteItem.name.trim().toLowerCase() === normalizedItemName;
-    });
-    itemList.innerHTML += `
+  itemList.innerHTML = items
+    .map(function (item) {
+      const normalizedItemName = item.name.trim().toLowerCase();
+      const isFavorite = appState.favoriteItems.some(function (favoriteItem) {
+        return favoriteItem.name.trim().toLowerCase() === normalizedItemName;
+      });
+      const itemKey = item.id || item.name;
+      const safeItemName = escapeHtml(item.name);
+      const safeItemKey = escapeHtml(itemKey);
+      const safeNotes = escapeHtml(item.notes || "-");
+      const safeShop = escapeHtml(
+        item.purchased ? item.purchaseShop || "-" : item.preferredShop || "-",
+      );
+      const safeProductImage = escapeHtml(getProductImage(item.name) || "");
+      const hasProductImage = Boolean(getProductImage(item.name));
+
+      return `
       <div class="swipeWrapper">
         <div class="swipeBackground">
           <div class="swipePurchased">
@@ -141,34 +209,23 @@ function renderItems(items) {
         </div>
         <div
           class="itemCard swipeCard ${
-            item.recurrence && item.recurrence.enabled === true && item.recurrence.frequency !== "none" ? "recurringItemCard" : ""
+            item.recurrence &&
+            item.recurrence.enabled === true &&
+            item.recurrence.frequency !== "none"
+              ? "recurringItemCard"
+              : ""
           } ${appState.selectedItems.includes(item.id || item.name) ? "selectedItem" : ""}"
-          data-item-name="${item.name}"
-          data-item-id="${item.id || item.name}"
+          data-item-name="${safeItemName}"
+          data-item-id="${safeItemKey}"
           data-item-recurring="${item.recurrence && item.recurrence.enabled === true && item.recurrence.frequency !== "none" ? "true" : "false"}"
-          onclick="
-            event.stopPropagation();
-            if(appState.selectionMode){
-              toggleItemSelection('${item.id || item.name}');
-            }
-          "
-          oncontextmenu="
-            event.preventDefault();
-            toggleItemSelection('${item.id || item.name}');
-          "
         >
           <div class="itemCardTopRow">
             <div class="itemTitleSection">
               <h2
                 class="itemName"
-                onclick="
-                  event.stopPropagation();
-                  if(!appState.selectionMode){
-                    renderEditItemForm('${item.id}');
-                  }
-                "
+                data-item-action="edit"
               >
-                ${item.name}
+                ${safeItemName}
               </h2>
               ${
                 appState.activeTab === "favorites"
@@ -185,10 +242,7 @@ function renderItems(items) {
                 class="modernActionButton favoriteActionButton ${
                   isFavorite ? "activeFavoriteButton" : ""
                 }"
-                onclick="
-                  event.stopPropagation();
-                  toggleFavorite('${item.name}');
-                "
+                data-item-action="favorite"
               >
                 <img
                   src="${getIconPath(
@@ -204,7 +258,7 @@ function renderItems(items) {
                   ? `
                     <button
                       class="modernActionButton addActionButton"
-                      onclick="addFavoriteToList('${item.name}')"
+                      data-item-action="add-favorite"
                     >
                       <img
                         src="${getIconPath("actions", "add")}"
@@ -220,10 +274,7 @@ function renderItems(items) {
                         purchasedActionButton
                         ${item.purchased ? "activePurchasedButton" : ""}
                       "
-                      onclick="
-                        event.stopPropagation();
-                        openPurchaseConfirmation('${item.id}');
-                      "
+                      data-item-action="purchase"
                     >
                       <span class="actionButtonIcon">
                         <img
@@ -247,12 +298,12 @@ function renderItems(items) {
                 ? `
                   <div class="itemImageContainer">
                     ${
-                      getProductImage(item.name)
+                      hasProductImage
                         ? `
                           <img
-                            src="${getProductImage(item.name)}"
+                            src="${safeProductImage}"
                             class="itemImage"
-                            alt="${item.name}"
+                            alt="${safeItemName}"
                           >
                         `
                         : `
@@ -270,10 +321,10 @@ function renderItems(items) {
                 : `
                   <div class="itemDetailsSection">
                     <p class="itemDetails">
-                      ${t("category.notes")}: ${item.notes || "-"}
+                      ${t("category.notes")}: ${safeNotes}
                     </p>
                     <p class="itemDetails">
-                      ${t("category.shop")}: ${item.purchased ? (item.purchaseShop || "-") : (item.preferredShop || "-")}
+                      ${t("category.shop")}: ${safeShop}
                     </p>
                     <p class="itemDetails">
                       ${t("category.estimatedPrice")}: ${getCurrencySymbol()}${item.estimatedPrice || 0}
@@ -281,12 +332,12 @@ function renderItems(items) {
                   </div>
                   <div class="itemImageContainer">
                     ${
-                      getProductImage(item.name)
+                      hasProductImage
                         ? `
                           <img
-                            src="${getProductImage(item.name)}"
+                            src="${safeProductImage}"
                             class="itemImage"
-                            alt="${item.name}"
+                            alt="${safeItemName}"
                           >
                         `
                         : `
@@ -306,7 +357,8 @@ function renderItems(items) {
         </div>
       </div>
     `;
-  });
+    })
+    .join("");
 }
 /* Initialize Tabs */
 function initializeTabs() {

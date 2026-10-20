@@ -261,9 +261,7 @@ function getBudgetSummary(groupName) {
   categories.forEach(function (category) {
     let total = 0;
     category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        total += Number(item.estimatedPrice);
-      }
+      total += getItemSpentAmount(item);
     });
     if (total > highestSpent) {
       highestSpent = total;
@@ -452,12 +450,11 @@ function renderCategoryBudgetCards() {
     let highestItem = "";
     let highestPrice = 0;
     category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        spent += Number(item.estimatedPrice);
-        if (Number(item.estimatedPrice) > highestPrice) {
-          highestPrice = Number(item.estimatedPrice);
-          highestItem = item.name;
-        }
+      const itemSpent = getItemSpentAmount(item);
+      spent += itemSpent;
+      if (itemSpent > highestPrice) {
+        highestPrice = itemSpent;
+        highestItem = item.name;
       }
     });
     categorySummary.push({

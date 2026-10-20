@@ -156,21 +156,27 @@ function renderProductSuggestions(searchText) {
     products
       .map(function (product) {
         const image = getProductImage(product.name);
-        let displayName = product.name;
+        let displayName = escapeHtml(product.name);
         if (search !== "") {
-          const regex = new RegExp("(" + search + ")", "ig");
-          displayName = product.name.replace(
-            regex,
-            "<span class='matchedText'>$1</span>",
-          );
+          const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp("(" + escapedSearch + ")", "ig");
+          displayName = product.name
+            .split(regex)
+            .map(function (part) {
+              const safePart = escapeHtml(part);
+              return part.toLowerCase() === search.toLowerCase()
+                ? `<span class="matchedText">${safePart}</span>`
+                : safePart;
+            })
+            .join("");
         }
         return `
           <div
             class="productSuggestionItem"
-            onclick="selectSuggestedProduct('${product.name}')"
+            data-product-name="${escapeHtml(product.name)}"
           >
             <div class="productSuggestionImage">
-              ${image ? `<img src="${image}">` : "📦"}
+              ${image ? `<img src="${escapeHtml(image)}" alt="">` : "📦"}
             </div>
             <div class="productSuggestionName">
               ${displayName}
@@ -179,6 +185,14 @@ function renderProductSuggestions(searchText) {
         `;
       })
       .join("");
+
+  suggestionContainer
+    .querySelectorAll(".productSuggestionItem")
+    .forEach(function (suggestion) {
+      suggestion.addEventListener("click", function () {
+        selectSuggestedProduct(suggestion.dataset.productName);
+      });
+    });
 }
 /* Select Suggested Product - Populates the item form using the selected product details. */
 function selectSuggestedProduct(productName) {
@@ -209,6 +223,19 @@ function selectSuggestedProduct(productName) {
   itemQuantityInput.focus();
 }
 const ICON_BASE_PATH = "../assets/icons";
+
+/* Escape untrusted values before inserting them into HTML text or attributes. */
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function (character) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[character];
+  });
+}
 
 /* Get Currency Symbol */
 function getCurrencySymbol() {
@@ -344,16 +371,34 @@ function canManageGroup() {
 }
 /* Personal group colors are stored per user so they do not change other members' view. */
 const GROUP_COLOR_PALETTE = [
-  "#d1495b", "#ed9b40", "#00798c", "#30638e", "#6a4c93", "#2a9d8f",
-  "#688e26", "#b56576", "#5b5f97", "#bc6c25", "#3a7d44", "#8f3985",
+  "#d1495b",
+  "#ed9b40",
+  "#00798c",
+  "#30638e",
+  "#6a4c93",
+  "#2a9d8f",
+  "#688e26",
+  "#b56576",
+  "#5b5f97",
+  "#bc6c25",
+  "#3a7d44",
+  "#8f3985",
 ];
 
 function getGroupColorMap(userId) {
-  if (!appState.groupColorPreferences || typeof appState.groupColorPreferences !== "object" || Array.isArray(appState.groupColorPreferences)) {
+  if (
+    !appState.groupColorPreferences ||
+    typeof appState.groupColorPreferences !== "object" ||
+    Array.isArray(appState.groupColorPreferences)
+  ) {
     appState.groupColorPreferences = {};
   }
   const ownerId = String(userId || getCurrentUser()?.id || "local-user");
-  if (!appState.groupColorPreferences[ownerId] || typeof appState.groupColorPreferences[ownerId] !== "object" || Array.isArray(appState.groupColorPreferences[ownerId])) {
+  if (
+    !appState.groupColorPreferences[ownerId] ||
+    typeof appState.groupColorPreferences[ownerId] !== "object" ||
+    Array.isArray(appState.groupColorPreferences[ownerId])
+  ) {
     appState.groupColorPreferences[ownerId] = {};
   }
   return appState.groupColorPreferences[ownerId];
@@ -361,14 +406,23 @@ function getGroupColorMap(userId) {
 
 function getGroupColorOptions() {
   const colorMap = getGroupColorMap();
-  const used = new Set(Object.values(colorMap).filter(function (color) {
-    return typeof color === "string";
-  }).map(function (color) { return color.toLowerCase(); }));
+  const used = new Set(
+    Object.values(colorMap)
+      .filter(function (color) {
+        return typeof color === "string";
+      })
+      .map(function (color) {
+        return color.toLowerCase();
+      }),
+  );
   const options = GROUP_COLOR_PALETTE.slice();
   Object.values(colorMap).forEach(function (color) {
-    if (typeof color === "string" && color.startsWith("hsl(")) options.push(color.toLowerCase());
+    if (typeof color === "string" && color.startsWith("hsl("))
+      options.push(color.toLowerCase());
   });
-  const paletteExhausted = GROUP_COLOR_PALETTE.every(function (color) { return used.has(color); });
+  const paletteExhausted = GROUP_COLOR_PALETTE.every(function (color) {
+    return used.has(color);
+  });
   if (!paletteExhausted) return [...new Set(options)];
   const needed = Object.keys(appState.groups || {}).length + 8;
   for (let index = 0; index < needed; index += 1) {
@@ -383,7 +437,9 @@ function ensureGroupColorsForCurrentUser() {
   const used = new Set();
   let changed = false;
   Object.keys(colorMap).forEach(function (groupName) {
-    if (!Object.prototype.hasOwnProperty.call(appState.groups || {}, groupName)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(appState.groups || {}, groupName)
+    ) {
       delete colorMap[groupName];
       changed = true;
     }
@@ -391,12 +447,18 @@ function ensureGroupColorsForCurrentUser() {
   Object.keys(appState.groups || {}).forEach(function (groupName) {
     const current = colorMap[groupName];
     const options = getGroupColorOptions();
-    if (typeof current === "string" && options.includes(current.toLowerCase()) && !used.has(current.toLowerCase())) {
+    if (
+      typeof current === "string" &&
+      options.includes(current.toLowerCase()) &&
+      !used.has(current.toLowerCase())
+    ) {
       colorMap[groupName] = current.toLowerCase();
       used.add(colorMap[groupName]);
       return;
     }
-    const available = options.find(function (color) { return !used.has(color.toLowerCase()); });
+    const available = options.find(function (color) {
+      return !used.has(color.toLowerCase());
+    });
     colorMap[groupName] = available || options[0];
     used.add(colorMap[groupName].toLowerCase());
     changed = true;
@@ -411,7 +473,13 @@ function getGroupColor(groupName) {
 
 function renderGroupNameWithColor(groupName) {
   const safeName = String(groupName).replace(/[&<>"']/g, function (character) {
-    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[character];
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[character];
   });
   const color = getGroupColor(groupName);
   return `<span class="groupNameWithColor"><span class="groupColorDot" style="background-color:${color}" aria-hidden="true"></span><span>${safeName}</span></span>`;
@@ -419,18 +487,34 @@ function renderGroupNameWithColor(groupName) {
 
 function renameGroupColorPreferences(oldGroupName, newGroupName) {
   if (oldGroupName === newGroupName) return;
-  Object.values(appState.groupColorPreferences || {}).forEach(function (colorMap) {
-    if (colorMap && colorMap[oldGroupName]) {
-      colorMap[newGroupName] = colorMap[oldGroupName];
-      delete colorMap[oldGroupName];
-    }
-  });
+  Object.values(appState.groupColorPreferences || {}).forEach(
+    function (colorMap) {
+      if (colorMap && colorMap[oldGroupName]) {
+        colorMap[newGroupName] = colorMap[oldGroupName];
+        delete colorMap[oldGroupName];
+      }
+    },
+  );
 }
 
 function removeGroupColorPreferences(groupName) {
-  Object.values(appState.groupColorPreferences || {}).forEach(function (colorMap) {
-    if (colorMap) delete colorMap[groupName];
-  });
+  Object.values(appState.groupColorPreferences || {}).forEach(
+    function (colorMap) {
+      if (colorMap) delete colorMap[groupName];
+    },
+  );
+}
+/* Get Purchased Item Spend - Uses the recorded purchase amount, with a fallback for legacy data that has no actual price. */
+function getItemSpentAmount(item) {
+  if (!item || !item.purchased) {
+    return 0;
+  }
+  if (item.actualPrice !== null && item.actualPrice !== undefined) {
+    const actualPrice = Number(item.actualPrice);
+    return Number.isFinite(actualPrice) ? actualPrice : 0;
+  }
+  const estimatedPrice = Number(item.estimatedPrice);
+  return Number.isFinite(estimatedPrice) ? estimatedPrice : 0;
 }
 /* Calculate Group Budget - Calculates the total amount spent for the specified shopping group. */
 function calculateGroupBudget(groupName) {
@@ -444,9 +528,7 @@ function calculateGroupBudget(groupName) {
       return;
     }
     category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        spent += Number(item.estimatedPrice);
-      }
+      spent += getItemSpentAmount(item);
     });
   });
   return spent;
@@ -582,6 +664,34 @@ function showToast(message, type = "success") {
     }
   }, 2500);
 }
+/* Get Recurrence Series ID - Generated occurrences retain the identity of their original recurring item. */
+function getRecurrenceSeriesId(item) {
+  if (!item || !item.recurrence) {
+    return null;
+  }
+  if (item.recurrence.seriesId) {
+    return item.recurrence.seriesId;
+  }
+  /* Older saved entries have no series ID. Use their recurrence details to keep
+     generated legacy occurrences together without joining unrelated products. */
+  return [
+    "legacy",
+    String(item.name || "")
+      .trim()
+      .toLowerCase(),
+    item.recurrence.frequency || "none",
+    String(item.quantity ?? ""),
+    item.quantityUnit || "pcs",
+    String(item.preferredShop || "")
+      .trim()
+      .toLowerCase(),
+    String(item.estimatedPrice ?? ""),
+    String(item.notes || "")
+      .trim()
+      .toLowerCase(),
+    item.recurrence.endDate || "",
+  ].join("|");
+}
 /* Process Recurring Items */
 function processRecurringItems() {
   const today = new Date();
@@ -600,6 +710,11 @@ function processRecurringItems() {
         );
       });
       recurringItems.forEach(function (item) {
+        const seriesId = getRecurrenceSeriesId(item);
+        if (!item.recurrence.seriesId && seriesId) {
+          item.recurrence.seriesId = seriesId;
+          stateUpdated = true;
+        }
         if (!item.purchased || !item.purchaseDate) {
           return;
         }
@@ -627,9 +742,10 @@ function processRecurringItems() {
           const existingOccurrence = category.items.some(
             function (existingItem) {
               return (
-                existingItem.name === item.name &&
+                getRecurrenceSeriesId(existingItem) === seriesId &&
                 existingItem.purchaseDate &&
                 existingItem.recurrence &&
+                existingItem.recurrence.enabled === true &&
                 existingItem.recurrence.frequency === recurrence.frequency &&
                 existingItem.purchaseDate.startsWith(
                   nextOccurrenceDate.toISOString().split("T")[0],
@@ -666,6 +782,7 @@ function processRecurringItems() {
           id: createItemId(),
           name: item.name,
           quantity: item.quantity,
+          quantityUnit: item.quantityUnit || "pcs",
           notes: item.notes,
           preferredShop: item.preferredShop,
           estimatedPrice: item.estimatedPrice,
@@ -675,6 +792,7 @@ function processRecurringItems() {
           recurrence: {
             enabled: true,
             frequency: recurrence.frequency,
+            seriesId: seriesId,
             startDate: nextOccurrenceDate.toISOString().split("T")[0],
             endDate: recurrence.endDate || null,
             lastGeneratedDate: nextOccurrenceDate.toISOString(),
@@ -683,7 +801,7 @@ function processRecurringItems() {
         const duplicatePendingItem = category.items.some(
           function (existingItem) {
             return (
-              existingItem.name === newItem.name &&
+              getRecurrenceSeriesId(existingItem) === seriesId &&
               !existingItem.purchased &&
               existingItem.recurrence &&
               existingItem.recurrence.enabled === true &&

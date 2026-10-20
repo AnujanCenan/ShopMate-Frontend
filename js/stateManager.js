@@ -439,7 +439,7 @@ function loadAppState() {
           item.purchaseEvents = item.purchased
             ? [{
                 quantity: item.quantity,
-                actualPrice: item.actualPrice || 0,
+                actualPrice: item.actualPrice ?? null,
                 purchaseDate: item.purchaseDate || null,
                 purchaseShop: item.purchaseShop || "",
               }]
@@ -466,8 +466,9 @@ function loadAppState() {
         }
 
         if (
-          typeof item.actualPrice !== "number" ||
-          Number.isNaN(item.actualPrice)
+          item.actualPrice !== null &&
+          (typeof item.actualPrice !== "number" ||
+            !Number.isFinite(item.actualPrice))
         ) {
           item.actualPrice = 0;
           stateUpdated = true;

@@ -533,6 +533,16 @@ function initializeEditImagePreview() {
     reader.readAsDataURL(file);
   });
 }
+/* Identify recurring entries so one-off additions never alter a recurrence series. */
+function isRecurringShoppingItem(item) {
+  return Boolean(
+    item &&
+    item.recurrence &&
+    item.recurrence.enabled === true &&
+    item.recurrence.frequency !== "none",
+  );
+}
+
 /* Create Item */
 function createItem() {
   const itemNameInput = document.getElementById("itemNameInput");
@@ -559,15 +569,21 @@ function createItem() {
   }
   const recurrenceFrequency =
     document.getElementById("itemRecurrenceFrequency")?.value || "none";
-  const normalizedItemName = itemName.trim().toLowerCase();
-  const existingItem = recurrenceFrequency === "none"
-    ? currentCategory.items.find(function (item) {
-        return item.name.trim().toLowerCase() === normalizedItemName &&
-          !item.purchased &&
-          (item.quantityUnit || "pcs") === itemQuantityUnit &&
-          !(item.recurrence && item.recurrence.enabled === true && item.recurrence.frequency !== "none");
-      })
-    : null;
+  const newItemIsRecurring = recurrenceFrequency !== "none";
+  const normalizedItemName = itemName.toLowerCase();
+
+  // Merge only with a pending one-off item. A one-off addition matching a
+  // pending recurring item stays separate so it cannot increase future recurrences.
+  const existingItem = newItemIsRecurring
+    ? null
+    : currentCategory.items.find(function (candidate) {
+        return (
+          candidate.name.trim().toLowerCase() === normalizedItemName &&
+          candidate.purchased !== true &&
+          (candidate.quantityUnit || "pcs") === itemQuantityUnit &&
+          !isRecurringShoppingItem(candidate)
+        );
+      });
   /* Existing Item Found */
   if (existingItem) {
     bottomSheetContent.innerHTML = `
@@ -588,7 +604,7 @@ function createItem() {
       </div>
       <div class="bottomSheetBody">
         <p class="duplicateMessage">
-          "${existingItem.name}"
+          "${escapeHtml(existingItem.name)}"
           ${t("item.alreadyExistsWithQuantity")}
           ${existingItem.quantity}.
         </p>
@@ -622,8 +638,9 @@ function createItem() {
     document.getElementById("itemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("itemRecurrenceEndDate")?.value || null;
+  const newItemId = createItemId();
   const newItem = {
-    id: createItemId(),
+    id: newItemId,
     name: itemName,
     quantity: itemQuantity,
     quantityUnit: itemQuantityUnit,
@@ -634,10 +651,11 @@ function createItem() {
     purchaseDate: null,
     purchased: false,
     recurrence: {
-      enabled: recurrenceFrequency !== "none",
+      enabled: newItemIsRecurring,
       frequency: recurrenceFrequency,
-      startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
-      endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+      startDate: newItemIsRecurring ? recurrenceStartDate : null,
+      endDate: newItemIsRecurring ? recurrenceEndDate : null,
+      seriesId: newItemIsRecurring ? newItemId : null,
     },
   };
   currentCategory.items.unshift(newItem);
@@ -695,10 +713,14 @@ function updateDuplicateQuantity(itemId, newQuantity) {
   const item = currentCategory.items.find(function (item) {
     return item.id === itemId;
   });
-  if (!item) {
+  if (!item || item.purchased || isRecurringShoppingItem(item)) {
     return;
   }
-  item.quantity = Number(item.quantity) + Number(newQuantity);
+  const quantityToAdd = Number(newQuantity);
+  if (!Number.isFinite(quantityToAdd) || quantityToAdd <= 0) {
+    return;
+  }
+  item.quantity = Number(item.quantity) + quantityToAdd;
   saveAppState();
   renderFilteredItems();
   closeBottomSheet();
@@ -720,10 +742,8 @@ function updateItem(originalItemId) {
   const newQuantity = document
     .getElementById("editItemQuantityInput")
     .value.trim();
-
   const newQuantityUnit =
     document.getElementById("editItemQuantityUnitInput")?.value || "pcs";
-
   const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
   const newNotes = document.getElementById("editItemNotesInput").value.trim();
@@ -738,6 +758,10 @@ function updateItem(originalItemId) {
     document.getElementById("editItemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
+  const recurrenceSeriesId =
+    recurrenceFrequency !== "none"
+      ? item.recurrence?.seriesId || item.id
+      : null;
   item.name = newName;
   item.quantity = newQuantity;
   item.quantityUnit = newQuantityUnit;
@@ -750,6 +774,7 @@ function updateItem(originalItemId) {
     frequency: recurrenceFrequency,
     startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
     endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+    seriesId: recurrenceSeriesId,
   };
   saveAppState();
   renderFilteredItems();
@@ -872,8 +897,32 @@ function confirmPurchase(itemId) {
   if (!item) {
     return;
   }
+  const actualPriceInput = document.getElementById("actualPriceInput");
+  const rawActualPrice = actualPriceInput?.value.trim() ?? "";
+  const enteredActualPrice =
+    rawActualPrice === "" ? null : Number(rawActualPrice);
+  if (
+    enteredActualPrice !== null &&
+    (!Number.isFinite(enteredActualPrice) || enteredActualPrice < 0)
+  ) {
+    actualPriceInput?.focus();
+    actualPriceInput?.reportValidity();
+    return;
+  }
+  const estimatedPrice = Number(item.estimatedPrice);
+  const hasEstimatedPrice =
+    item.estimatedPrice !== null &&
+    item.estimatedPrice !== undefined &&
+    String(item.estimatedPrice).trim() !== "" &&
+    Number.isFinite(estimatedPrice) &&
+    estimatedPrice > 0;
+  // Prefer the entered actual price, then the estimate, then zero.
   const actualPrice =
-    Number(document.getElementById("actualPriceInput").value) || 0;
+    enteredActualPrice !== null
+      ? enteredActualPrice
+      : hasEstimatedPrice
+        ? estimatedPrice
+        : 0;
   const actualShop =
     document.getElementById("actualShopInput")?.value.trim() || "";
   const isRecurring =
@@ -882,17 +931,35 @@ function confirmPurchase(itemId) {
     item.recurrence.frequency !== "none";
   const normalizedName = item.name.trim().toLowerCase();
   const normalizedShop = actualShop.trim().toLowerCase();
-  const mergeTarget = !isRecurring &&
+  const mergeTarget =
+    !isRecurring &&
     currentCategory.items.find(function (candidate) {
-      return candidate.id !== item.id && candidate.purchased &&
-        !(candidate.recurrence && candidate.recurrence.enabled === true && candidate.recurrence.frequency !== "none") &&
+      const candidatePrice =
+        candidate.lastPurchasePrice ?? candidate.actualPrice;
+      return (
+        candidate.id !== item.id &&
+        candidate.purchased &&
+        !(
+          candidate.recurrence &&
+          candidate.recurrence.enabled === true &&
+          candidate.recurrence.frequency !== "none"
+        ) &&
         candidate.name.trim().toLowerCase() === normalizedName &&
-        Number(candidate.lastPurchasePrice ?? candidate.actualPrice) === actualPrice &&
-        (candidate.purchaseShop || "").trim().toLowerCase() === normalizedShop &&
-        (candidate.quantityUnit || "pcs") === (item.quantityUnit || "pcs");
+        candidatePrice !== null &&
+        candidatePrice !== undefined &&
+        Number.isFinite(Number(candidatePrice)) &&
+        Number(candidatePrice) === actualPrice &&
+        (candidate.purchaseShop || "").trim().toLowerCase() ===
+          normalizedShop &&
+        (candidate.quantityUnit || "pcs") === (item.quantityUnit || "pcs")
+      );
     });
   item.actualPrice = actualPrice;
   item.purchaseShop = actualShop;
+  // Update the estimate from the entered price only for recurring items.
+  if (isRecurring && enteredActualPrice !== null) {
+    item.estimatedPrice = actualPrice;
+  }
   item.purchased = !item.purchased;
   if (item.purchased) {
     item.purchaseDate = new Date().toISOString();
@@ -904,12 +971,14 @@ function confirmPurchase(itemId) {
   }
   if (item.purchased && mergeTarget) {
     if (!Array.isArray(mergeTarget.purchaseEvents)) {
-      mergeTarget.purchaseEvents = [{
-        quantity: mergeTarget.quantity,
-        actualPrice: Number(mergeTarget.actualPrice) || 0,
-        purchaseDate: mergeTarget.purchaseDate || null,
-        purchaseShop: mergeTarget.purchaseShop || "",
-      }];
+      mergeTarget.purchaseEvents = [
+        {
+          quantity: mergeTarget.quantity,
+          actualPrice: Number(mergeTarget.actualPrice) || 0,
+          purchaseDate: mergeTarget.purchaseDate || null,
+          purchaseShop: mergeTarget.purchaseShop || "",
+        },
+      ];
     }
     mergeTarget.purchaseEvents.push({
       quantity: item.quantity,
@@ -925,12 +994,14 @@ function confirmPurchase(itemId) {
     currentCategory.items.splice(currentCategory.items.indexOf(item), 1);
   } else if (item.purchased) {
     item.lastPurchasePrice = actualPrice;
-    item.purchaseEvents = [{
-      quantity: item.quantity,
-      actualPrice: actualPrice,
-      purchaseDate: item.purchaseDate,
-      purchaseShop: actualShop,
-    }];
+    item.purchaseEvents = [
+      {
+        quantity: item.quantity,
+        actualPrice: actualPrice,
+        purchaseDate: item.purchaseDate,
+        purchaseShop: actualShop,
+      },
+    ];
   }
   if (item.purchased) {
     item.purchaseDate = new Date().toISOString();

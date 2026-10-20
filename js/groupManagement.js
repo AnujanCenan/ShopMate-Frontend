@@ -9,8 +9,59 @@ function initializeGroupManagement() {
   if (ensureGroupColorsForCurrentUser()) {
     saveAppState();
   }
+  const groupContainer = document.getElementById("groupManagementContainer");
+  [groupContainer, bottomSheetContent].forEach(function (container) {
+    if (container && !container.dataset.safeGroupActionsBound) {
+      container.dataset.safeGroupActionsBound = "true";
+      container.addEventListener("click", handleGroupManagementAction);
+    }
+  });
   renderGroupAccordion();
   setupPermissions();
+}
+
+/* Handle actions using data attributes instead of interpolated inline JavaScript. */
+function handleGroupManagementAction(event) {
+  const actionElement = event.target.closest("[data-group-action]");
+  if (!actionElement) {
+    return;
+  }
+
+  const groupName = actionElement.dataset.groupName;
+  const memberId = actionElement.dataset.memberId;
+  event.stopPropagation();
+
+  switch (actionElement.dataset.groupAction) {
+    case "toggle":
+      toggleGroupAccordion(actionElement);
+      break;
+    case "member-actions":
+      openMemberActions(memberId, groupName);
+      break;
+    case "invite-actions":
+      openInviteActions(actionElement.dataset.invitationId);
+      break;
+    case "send-invitation":
+      appState.activeGroup = groupName;
+      renderInviteMemberForm();
+      break;
+    case "leave-group":
+      appState.activeGroup = groupName;
+      openLeaveGroupDialog();
+      break;
+    case "make-admin":
+      appState.activeGroup = groupName;
+      makeAdmin(memberId, groupName);
+      break;
+    case "transfer-ownership":
+      appState.activeGroup = groupName;
+      transferOwnership(memberId);
+      break;
+    case "remove-member":
+      appState.activeGroup = groupName;
+      openRemoveMemberDialog(memberId);
+      break;
+  }
 }
 /* Render Group Accordion */
 function renderGroupAccordion() {
@@ -33,11 +84,8 @@ function renderGroupAccordion() {
       <div class="groupAccordionCard">
         <button
           class="groupAccordionHeader"
-          onclick="
-            toggleGroupAccordion(
-              '${groupName}'
-            )
-          "
+          data-group-action="toggle"
+          data-group-name="${escapeHtml(groupName)}"
         >
           <div>
             <h3 class="groupAccordionTitle">
@@ -48,10 +96,7 @@ function renderGroupAccordion() {
               ${categories.length} ${t("groupManagement.categories")}
             </p>
           </div>
-          <span
-            id="accordionIcon_${groupName}"
-            class="accordionIcon"
-          >
+          <span class="accordionIcon">
             <img
               src="${getIconPath("navigation", "expand")}"
               class="icon actionIcon"
@@ -59,13 +104,10 @@ function renderGroupAccordion() {
             >
           </span>
         </button>
-        <div
-          id="accordionBody_${groupName}"
-          class="
+        <div class="
             groupAccordionBody
             hidden
-          "
-        >
+          ">
           <h4 class="groupSectionTitle">
             ${t("groupManagement.members")}
           </h4>
@@ -82,7 +124,7 @@ function renderGroupAccordion() {
                       <div class="groupMemberRow">
                         <div class="groupMemberInformation">
                           <div class="groupMemberName">
-                            ${member.name}
+                            ${escapeHtml(member.name)}
                           </div>
                           <div
                             class="
@@ -106,13 +148,9 @@ function renderGroupAccordion() {
                             ? `
                               <button
                                 class="groupMoreButton"
-                                onclick="
-                                  event.stopPropagation();
-                                  openMemberActions(
-                                    '${member.id}',
-                                    '${groupName}'
-                                  );
-                                "
+                                data-group-action="member-actions"
+                                data-group-name="${escapeHtml(groupName)}"
+                                data-member-id="${escapeHtml(member.id)}"
                               >
                                 <img
                                   src="${getIconPath("navigation", "more")}"
@@ -150,7 +188,7 @@ function renderGroupAccordion() {
                       <div class="groupInviteRow">
                         <div class="groupInviteInformation">
                           <div class="groupMemberName">
-                            ${invitation.email}
+                            ${escapeHtml(invitation.email)}
                           </div>
                           <div class="groupMemberRole">
                             ${
@@ -164,12 +202,8 @@ function renderGroupAccordion() {
                         </div>
                         <button
                           class="groupMoreButton"
-                          onclick="
-                            event.stopPropagation();
-                            openInviteActions(
-                              '${invitation.id}'
-                            );
-                          "
+                          data-group-action="invite-actions"
+                          data-invitation-id="${escapeHtml(invitation.id)}"
                         >
                           <img
                             src="${getIconPath("navigation", "more")}"
@@ -184,19 +218,15 @@ function renderGroupAccordion() {
           }
           <button
             class="primaryButton"
-            onclick="
-              appState.activeGroup='${groupName}';
-              renderInviteMemberForm();
-            "
+            data-group-action="send-invitation"
+            data-group-name="${escapeHtml(groupName)}"
           >
             ${t("groupManagement.sendInvitation")}
           </button>
           <button
             class="secondaryButton"
-            onclick="
-              appState.activeGroup='${groupName}';
-              openLeaveGroupDialog();
-            "
+            data-group-action="leave-group"
+            data-group-name="${escapeHtml(groupName)}"
           >
             ${t("groupManagement.leaveGroup")}
           </button>
@@ -206,9 +236,16 @@ function renderGroupAccordion() {
   });
 }
 /* Toggle Group Accordion */
-function toggleGroupAccordion(groupName) {
-  const body = document.getElementById(`accordionBody_${groupName}`);
-  const icon = document.getElementById(`accordionIcon_${groupName}`);
+function toggleGroupAccordion(header) {
+  const card = header.closest(".groupAccordionCard");
+  if (!card) {
+    return;
+  }
+  const body = card.querySelector(".groupAccordionBody");
+  const icon = card.querySelector(".accordionIcon");
+  if (!body || !icon) {
+    return;
+  }
   const isHidden = body.classList.contains("hidden");
   document.querySelectorAll(".groupAccordionBody").forEach(function (item) {
     item.classList.add("hidden");
@@ -290,7 +327,7 @@ function openInviteActions(invitationId) {
           ${t("groupManagement.emailAddress")}
         </label>
         <div class="bottomSheetStaticValue">
-          ${invitation.email}
+          ${escapeHtml(invitation.email)}
         </div>
       </div>
       <div class="formField">
@@ -534,7 +571,7 @@ function openMemberActions(memberId, groupName) {
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
-        ${member.name}
+        ${escapeHtml(member.name)}
       </h2>
 
       <button
@@ -557,12 +594,9 @@ function openMemberActions(memberId, groupName) {
             <button
               class="bottomSheetActionButton"
               type="button"
-              onclick="
-                makeAdmin(
-                  '${member.id}',
-                  '${groupName}'
-                )
-              "
+              data-group-action="make-admin"
+              data-member-id="${escapeHtml(member.id)}"
+              data-group-name="${escapeHtml(groupName)}"
             >
               <img
                 src="${getIconPath("features", "admin")}"
@@ -583,12 +617,9 @@ function openMemberActions(memberId, groupName) {
             <button
               class="bottomSheetActionButton"
               type="button"
-              onclick="
-                transferOwnership(
-                  '${member.id}',
-                  '${groupName}'
-                )
-              "
+              data-group-action="transfer-ownership"
+              data-member-id="${escapeHtml(member.id)}"
+              data-group-name="${escapeHtml(groupName)}"
             >
               <img
                 src="${getIconPath("features", "admin")}"
@@ -609,12 +640,9 @@ function openMemberActions(memberId, groupName) {
           destructiveActionButton
         "
         type="button"
-        onclick="
-          openRemoveMemberDialog(
-            '${member.id}',
-            '${groupName}'
-          )
-        "
+        data-group-action="remove-member"
+        data-member-id="${escapeHtml(member.id)}"
+        data-group-name="${escapeHtml(groupName)}"
       >
         <img
           src="${getIconPath("actions", "delete")}"
