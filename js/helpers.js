@@ -265,22 +265,24 @@ function getIconPath(folder, iconName) {
 function refreshIcons() {
   document.querySelectorAll("img.icon").forEach(function (icon) {
     const source = icon.getAttribute("src");
-    if (!source) {
-      return;
-    }
-    const parts = source.split("/");
-    const iconFile = parts.pop();
-    const folder = parts.pop();
-    icon.src = getIconPath(folder, iconFile.replace(".svg", ""));
-    const fingerprintIcon = document.getElementById("fingerprintIcon");
-    if (fingerprintIcon) {
-      fingerprintIcon.src = getIconPath("biometric", "fingerprint");
-    }
-    const faceIdIcon = document.getElementById("faceIdIcon");
-    if (faceIdIcon) {
-      faceIdIcon.src = getIconPath("biometric", "faceid");
+    const parts = source ? source.split("/") : [];
+    const iconFile = parts.pop() || "";
+    const folder = icon.dataset.iconFolder || parts.pop();
+    const iconName = icon.dataset.iconName ||
+      iconFile.replace(/\.svg(?:[?#].*)?$/, "");
+    if (folder && iconName) {
+      icon.src = getIconPath(folder, iconName);
     }
   });
+
+  const fingerprintIcon = document.getElementById("fingerprintIcon");
+  if (fingerprintIcon) {
+    fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+  }
+  const faceIdIcon = document.getElementById("faceIdIcon");
+  if (faceIdIcon) {
+    faceIdIcon.src = getIconPath("biometric", "faceid");
+  }
 }
 /* Open Bottom Sheet - Displays the bottom sheet and prevents background interaction. */
 function openBottomSheet() {
@@ -692,152 +694,187 @@ function getRecurrenceSeriesId(item) {
     item.recurrence.endDate || "",
   ].join("|");
 }
-/* Process Recurring Items */
+function parseRecurrenceDate(value) {
+  if (!value) return null;
+  const dateText = String(value);
+  const dateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateText);
+  const date = dateParts
+    ? new Date(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3]))
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function formatRecurrenceDate(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function nextRecurrenceDate(date, frequency, monthlyDay) {
+  const nextDate = new Date(date);
+  if (frequency === "daily") {
+    nextDate.setDate(nextDate.getDate() + 1);
+  } else if (frequency === "weekly") {
+    nextDate.setDate(nextDate.getDate() + 7);
+  } else if (frequency === "monthly") {
+    const day = Number(monthlyDay) || nextDate.getDate();
+    nextDate.setDate(1);
+    nextDate.setMonth(nextDate.getMonth() + 1);
+    const finalDay = new Date(
+      nextDate.getFullYear(),
+      nextDate.getMonth() + 1,
+      0,
+    ).getDate();
+    nextDate.setDate(Math.min(day, finalDay));
+  }
+  nextDate.setHours(0, 0, 0, 0);
+  return nextDate;
+}
+
+/* Replace overdue pending occurrences with one current occurrence per series. */
 function processRecurringItems() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   let stateUpdated = false;
+
   Object.values(appState.groups || {}).forEach(function (categories) {
+    if (!Array.isArray(categories)) return;
     categories.forEach(function (category) {
-      if (!Array.isArray(category.items)) {
-        return;
-      }
-      const recurringItems = category.items.filter(function (item) {
-        return (
-          item.recurrence &&
-          item.recurrence.enabled === true &&
-          item.recurrence.frequency !== "none"
-        );
-      });
-      recurringItems.forEach(function (item) {
+      if (!Array.isArray(category.items)) return;
+      const seriesMap = new Map();
+
+      category.items.forEach(function (item) {
+        if (
+          !item.recurrence ||
+          item.recurrence.enabled !== true ||
+          item.recurrence.frequency === "none"
+        ) return;
         const seriesId = getRecurrenceSeriesId(item);
-        if (!item.recurrence.seriesId && seriesId) {
+        if (!item.recurrence.seriesId) {
           item.recurrence.seriesId = seriesId;
           stateUpdated = true;
         }
-        if (!item.purchased || !item.purchaseDate) {
-          return;
-        }
-        if (item.recurrence.startDate) {
-          const recurrenceStartDate = new Date(
-            item.recurrence.startDate + "T00:00:00",
+        if (!seriesMap.has(seriesId)) seriesMap.set(seriesId, []);
+        seriesMap.get(seriesId).push(item);
+      });
+
+      seriesMap.forEach(function (seriesItems, seriesId) {
+        const pendingItems = seriesItems.filter(function (item) {
+          return item.purchased !== true;
+        });
+        const purchasedItems = seriesItems.filter(function (item) {
+          return item.purchased === true && item.purchaseDate;
+        });
+        const pendingDate = function (item) {
+          return parseRecurrenceDate(
+            item.recurrence.occurrenceDate ||
+              item.recurrence.startDate ||
+              item.recurrence.lastGeneratedDate,
           );
-          recurrenceStartDate.setHours(0, 0, 0, 0);
-          if (today < recurrenceStartDate) {
-            return;
+        };
+        pendingItems.sort(function (a, b) {
+          return (pendingDate(b)?.getTime() || 0) -
+            (pendingDate(a)?.getTime() || 0);
+        });
+        purchasedItems.sort(function (a, b) {
+          return new Date(b.purchaseDate).getTime() -
+            new Date(a.purchaseDate).getTime();
+        });
+
+        const currentPending = pendingItems[0] || null;
+        const template = currentPending || purchasedItems[0];
+        if (!template) return;
+        const recurrence = template.recurrence;
+        const frequency = recurrence.frequency;
+        if (!["daily", "weekly", "monthly"].includes(frequency)) return;
+
+        const startDate = parseRecurrenceDate(recurrence.startDate);
+        const endDate = parseRecurrenceDate(recurrence.endDate);
+        const monthlyDay = Number(recurrence.dayOfMonth) ||
+          (startDate || today).getDate();
+        let dueDate = null;
+
+        if (currentPending) {
+          const existingDueDate = pendingDate(currentPending) || startDate || today;
+          dueDate = new Date(existingDueDate);
+          while (nextRecurrenceDate(dueDate, frequency, monthlyDay) <= today) {
+            dueDate = nextRecurrenceDate(dueDate, frequency, monthlyDay);
           }
-        }
-        const recurrence = item.recurrence;
-        const lastOccurrenceDate = new Date(item.purchaseDate);
-        lastOccurrenceDate.setHours(0, 0, 0, 0);
-        let nextOccurrenceDate = new Date(lastOccurrenceDate);
-        if (recurrence.frequency === "daily") {
-          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
-        } else if (recurrence.frequency === "weekly") {
-          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
-        } else if (recurrence.frequency === "monthly") {
-          nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
-        }
-        while (nextOccurrenceDate <= today) {
-          const existingOccurrence = category.items.some(
-            function (existingItem) {
-              return (
-                getRecurrenceSeriesId(existingItem) === seriesId &&
-                existingItem.purchaseDate &&
-                existingItem.recurrence &&
-                existingItem.recurrence.enabled === true &&
-                existingItem.recurrence.frequency === recurrence.frequency &&
-                existingItem.purchaseDate.startsWith(
-                  nextOccurrenceDate.toISOString().split("T")[0],
-                )
-              );
-            },
-          );
-          if (existingOccurrence) {
-            nextOccurrenceDate = new Date(nextOccurrenceDate);
-            if (recurrence.frequency === "daily") {
-              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
-            } else if (recurrence.frequency === "weekly") {
-              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
-            } else if (recurrence.frequency === "monthly") {
-              nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
+          if (dueDate.getTime() === existingDueDate.getTime()) dueDate = null;
+        } else {
+          const lastPurchaseDate = parseRecurrenceDate(purchasedItems[0].purchaseDate);
+          if (lastPurchaseDate) {
+            dueDate = nextRecurrenceDate(lastPurchaseDate, frequency, monthlyDay);
+            while (nextRecurrenceDate(dueDate, frequency, monthlyDay) <= today) {
+              dueDate = nextRecurrenceDate(dueDate, frequency, monthlyDay);
             }
-          } else {
-            break;
           }
         }
-        const endDate = recurrence.endDate
-          ? new Date(recurrence.endDate + "T00:00:00")
-          : null;
-        if (endDate) {
-          endDate.setHours(0, 0, 0, 0);
-        }
-        if (endDate && nextOccurrenceDate > endDate) {
+
+        if (!dueDate || dueDate > today) {
+          if (pendingItems.length > 1) {
+            pendingItems.slice(1).forEach(function (duplicate) {
+              category.items.splice(category.items.indexOf(duplicate), 1);
+            });
+            stateUpdated = true;
+          }
           return;
         }
-        if (nextOccurrenceDate > today) {
-          return;
-        }
+        if (startDate && dueDate < startDate) return;
+        if (endDate && dueDate > endDate) return;
+
         const newItem = {
           id: createItemId(),
-          name: item.name,
-          quantity: item.quantity,
-          quantityUnit: item.quantityUnit || "pcs",
-          notes: item.notes,
-          preferredShop: item.preferredShop,
-          estimatedPrice: item.estimatedPrice,
+          name: template.name,
+          quantity: template.quantity,
+          quantityUnit: template.quantityUnit || "pcs",
+          notes: template.notes,
+          preferredShop: template.preferredShop,
+          estimatedPrice: template.estimatedPrice,
           actualPrice: 0,
           purchaseDate: null,
           purchased: false,
           recurrence: {
             enabled: true,
-            frequency: recurrence.frequency,
+            frequency: frequency,
             seriesId: seriesId,
-            startDate: nextOccurrenceDate.toISOString().split("T")[0],
+            occurrenceDate: formatRecurrenceDate(dueDate),
+            dayOfMonth: monthlyDay,
+            startDate: formatRecurrenceDate(dueDate),
             endDate: recurrence.endDate || null,
-            lastGeneratedDate: nextOccurrenceDate.toISOString(),
+            lastGeneratedDate: dueDate.toISOString(),
           },
         };
-        const duplicatePendingItem = category.items.some(
-          function (existingItem) {
-            return (
-              getRecurrenceSeriesId(existingItem) === seriesId &&
-              !existingItem.purchased &&
-              existingItem.recurrence &&
-              existingItem.recurrence.enabled === true &&
-              existingItem.recurrence.frequency === newItem.recurrence.frequency
-            );
+
+        pendingItems.forEach(function (pending) {
+          const index = category.items.indexOf(pending);
+          if (index !== -1) category.items.splice(index, 1);
+        });
+        category.items.unshift(newItem);
+        createNotification(
+          "item",
+          t("notifications.recurringItemAdded"),
+          t("notifications.recurringItemAddedMessage", {
+            itemName: newItem.name,
+          }),
+          "category",
+          { group: appState.activeGroup, category: category.name },
+          {
+            titleKey: "notifications.recurringItemAdded",
+            messageKey: "notifications.recurringItemAddedMessage",
+            params: { itemName: newItem.name },
           },
         );
-        if (!duplicatePendingItem) {
-          category.items.unshift(newItem);
-          createNotification(
-            "item",
-            t("notifications.recurringItemAdded"),
-            t("notifications.recurringItemAddedMessage", {
-              itemName: newItem.name,
-            }),
-            "category",
-            {
-              group: appState.activeGroup,
-              category: category.name,
-            },
-            {
-              titleKey: "notifications.recurringItemAdded",
-              messageKey: "notifications.recurringItemAddedMessage",
-              params: {
-                itemName: newItem.name,
-              },
-            },
-          );
-          stateUpdated = true;
-        }
+        stateUpdated = true;
       });
     });
   });
-  if (stateUpdated) {
-    saveAppState();
-  }
+
+  if (stateUpdated) saveAppState();
 }
 /* Create Notification - Creates a new notification and updates the notification badge. */
 function createNotification(

@@ -653,6 +653,12 @@ function createItem() {
     recurrence: {
       enabled: newItemIsRecurring,
       frequency: recurrenceFrequency,
+      occurrenceDate: newItemIsRecurring
+        ? recurrenceStartDate || formatRecurrenceDate(new Date())
+        : null,
+      dayOfMonth: recurrenceFrequency === "monthly"
+        ? (parseRecurrenceDate(recurrenceStartDate) || new Date()).getDate()
+        : null,
       startDate: newItemIsRecurring ? recurrenceStartDate : null,
       endDate: newItemIsRecurring ? recurrenceEndDate : null,
       seriesId: newItemIsRecurring ? newItemId : null,
@@ -758,10 +764,39 @@ function updateItem(originalItemId) {
     document.getElementById("editItemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
+  const previousRecurrenceSeriesId = item.recurrence?.seriesId ||
+    getRecurrenceSeriesId(item);
   const recurrenceSeriesId =
     recurrenceFrequency !== "none"
-      ? item.recurrence?.seriesId || item.id
+      ? item.recurrence?.seriesId || previousRecurrenceSeriesId || item.id
       : null;
+  const recurrenceOccurrenceDate =
+    recurrenceFrequency === "none"
+      ? null
+      : recurrenceStartDate ||
+        item.recurrence?.occurrenceDate ||
+        formatRecurrenceDate(new Date());
+  const recurrenceDayOfMonth = recurrenceFrequency === "monthly"
+    ? (parseRecurrenceDate(recurrenceStartDate) ||
+        parseRecurrenceDate(item.recurrence?.occurrenceDate) ||
+        new Date()).getDate()
+    : null;
+
+  if (previousRecurrenceSeriesId) {
+    currentCategory.items.forEach(function (seriesItem) {
+      if (getRecurrenceSeriesId(seriesItem) !== previousRecurrenceSeriesId) return;
+      seriesItem.recurrence = {
+        ...seriesItem.recurrence,
+        enabled: recurrenceFrequency !== "none",
+        frequency: recurrenceFrequency,
+        seriesId: recurrenceSeriesId,
+        dayOfMonth: recurrenceDayOfMonth,
+        startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
+        endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+      };
+    });
+  }
+
   item.name = newName;
   item.quantity = newQuantity;
   item.quantityUnit = newQuantityUnit;
@@ -772,6 +807,8 @@ function updateItem(originalItemId) {
   item.recurrence = {
     enabled: recurrenceFrequency !== "none",
     frequency: recurrenceFrequency,
+    occurrenceDate: recurrenceOccurrenceDate,
+    dayOfMonth: recurrenceDayOfMonth,
     startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
     endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
     seriesId: recurrenceSeriesId,
@@ -795,6 +832,26 @@ function openPurchaseConfirmation(itemId) {
   }
   /* Re-adding a purchased item */
   if (appState.activeTab === "purchased" && item.purchased) {
+    const seriesId = item.recurrence?.enabled === true &&
+      item.recurrence.frequency !== "none"
+        ? item.recurrence.seriesId || getRecurrenceSeriesId(item)
+        : null;
+    if (seriesId) {
+      item.recurrence.seriesId = seriesId;
+      currentCategory.items.slice().forEach(function (candidate) {
+        if (
+          candidate.id !== item.id &&
+          candidate.purchased !== true &&
+          getRecurrenceSeriesId(candidate) === seriesId
+        ) {
+          const candidateIndex = currentCategory.items.indexOf(candidate);
+          if (candidateIndex !== -1) {
+            currentCategory.items.splice(candidateIndex, 1);
+          }
+        }
+      });
+      item.recurrence.occurrenceDate = formatRecurrenceDate(new Date());
+    }
     item.purchased = false;
     item.purchaseDate = null;
     item.actualPrice = 0;

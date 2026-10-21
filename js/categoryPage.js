@@ -1,6 +1,7 @@
 /* Initialize Category Page */
 function initializeCategoryPage() {
-  appState.activeTab = "lists";
+  const requestedTab = new URLSearchParams(window.location.search).get("tab");
+  appState.activeTab = requestedTab === "favorites" ? "favorites" : "lists";
   appState.searchQuery = "";
   initializeTabs();
   activateDefaultTab();
@@ -11,7 +12,7 @@ function activateDefaultTab() {
   const tabButtons = document.querySelectorAll(".tabButton");
   tabButtons.forEach(function (tab) {
     tab.classList.remove("activeTab");
-    if (tab.dataset.tab === "lists") {
+    if (tab.dataset.tab === appState.activeTab) {
       tab.classList.add("activeTab");
     }
   });

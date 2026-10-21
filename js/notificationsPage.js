@@ -248,7 +248,7 @@ function openNotification(notificationId) {
       window.location.href = "../pages/familyManagementPage.html";
       break;
     case "favorites":
-      window.location.href = "../pages/favoritesPage.html";
+      window.location.href = "../pages/categoryPage.html?tab=favorites";
       break;
     case "category":
       if (notification.actionData) {
