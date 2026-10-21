@@ -556,26 +556,6 @@
   min-width: 200px;
   flex: 0 0 auto;
 }
-.appLockPinButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 54px;
-  margin-top: 16px;
-  padding: 0 20px;
-  border: none;
-  border-radius: var(--radiusMedium);
-  background: linear-gradient(135deg, var(--primaryColor), var(--primaryDark));
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.2;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(17, 138, 178, 0.22);
-}
-
 /* Selected Item Card */
 .darkMode .itemCard .selected {
   background: var(--cardColor);

@@ -36,6 +36,7 @@ function createItemId() {
 const defaultAppState = {
   loggedIn: false,
   currentUser: null,
+  lockedUserId: null,
   activeGroup: null,
   activeCategory: null,
   activeTab: "lists",
@@ -148,6 +149,18 @@ function loadAppState() {
 
   if (!Array.isArray(parsedState.users)) {
     parsedState.users = [];
+    stateUpdated = true;
+  }
+
+  if (
+    (parsedState.lockedUserId !== null &&
+      typeof parsedState.lockedUserId !== "string") ||
+    (typeof parsedState.lockedUserId === "string" &&
+      !parsedState.users.some(function (user) {
+        return user && user.id === parsedState.lockedUserId;
+      }))
+  ) {
+    parsedState.lockedUserId = null;
     stateUpdated = true;
   }
 
