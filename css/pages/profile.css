@@ -24,13 +24,13 @@
 .profileAvatar {
   width: 90px;
   height: 90px;
-  border-radius: 24px;
-  background: #dcebff;
+  border-radius: var(--radiusExtraLarge);
+  background: var(--infoSurface);
   color: var(--primaryColor);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 48px;
+  font-size: var(--fontSizeStatLarge);
   font-weight: 700;
   margin-bottom: 18px;
 }
@@ -52,7 +52,7 @@
 /* Profile Name */
 .profileName {
   margin: 0;
-  font-size: 34px;
+  font-size: var(--fontSizeHeroLarge);
   font-weight: 700;
   color: var(--textPrimary);
 }
@@ -60,20 +60,20 @@
 .profileRole {
   color: var(--mutedTextColor);
   text-transform: capitalize;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
 }
 /* Profile Information Row */
 .profileInfoRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: var(--spacingMedium) 0;
   border-bottom: 1px solid var(--borderColor);
 }
 /* Profile Email */
 .profileEmail {
-  margin: 8px 0 22px;
-  font-size: 15px;
+  margin: var(--spacingSmall) 0 22px;
+  font-size: var(--fontSizeBodySmall);
   color: var(--textSecondary);
 }
 /* Last Profile Information Row */
@@ -91,14 +91,14 @@
   align-items: center;
   justify-content: center;
   margin: 20px 0;
-  padding: 24px;
-  border-radius: 16px;
+  padding: var(--spacingLarge);
+  border-radius: var(--radiusComfortable);
   background: var(--cardColor);
   border: 1px solid var(--borderColor);
 }
 /* Profile Summary Value */
 .profileSummaryValue {
-  font-size: 42px;
+  font-size: var(--fontSizeStat);
   font-weight: 700;
   color: var(--primaryColor);
   line-height: 1;
@@ -106,14 +106,14 @@
 /* Profile Summary Label */
 .profileSummaryLabel {
   margin-top: 10px;
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
   font-weight: 600;
   color: var(--textPrimary);
 }
 /* Profile Summary Description */
 .profileSummaryDescription {
-  margin-bottom: 12px;
-  font-size: 13px;
+  margin-bottom: var(--spacingCompact);
+  font-size: var(--fontSizeCaption);
   text-align: center;
   color: var(--textSecondary);
 }
@@ -128,30 +128,30 @@
 }
 /* Group Switcher */
 .groupSwitcher {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacingLarge);
 }
 /* Group Switcher Title */
 .groupSwitcherTitle {
   margin-bottom: 14px;
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
   font-weight: 700;
 }
 /* Group Switcher Button */
 .groupSwitcherButton {
   width: 100%;
   min-height: 54px;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacingCompact);
   background: var(--cardColor);
   border: none;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radiusRoomy);
+  box-shadow: 0 6px 18px var(--shadowAmbient);
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
 }
 /* Active Group Switcher Button */
 .activeGroupSwitcherButton {
-  background: #118ab2;
+  background: var(--primaryColor);
   color: var(--textPrimary);
 }
 /* Profile Hero Card */
@@ -162,5 +162,5 @@
   justify-content: center;
   text-align: center;
   padding: 20px 0 28px;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacingLarge);
 }

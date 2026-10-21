@@ -19,7 +19,7 @@
 /* Settings Section Title */
 .settingsSectionTitle {
   margin-bottom: 14px;
-  font-size: 20px;
+  font-size: var(--fontSizeXLarge);
   font-weight: 700;
 }
 /* Settings Card */
@@ -33,11 +33,11 @@
   padding: 0 18px;
   background: var(--cardColor);
   border: none;
-  border-radius: 20px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radiusMedium);
+  box-shadow: 0 6px 18px var(--shadowAmbient);
   cursor: pointer;
   text-align: left;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 600;
 }
 /* Security Settings */
@@ -45,9 +45,9 @@
   flex: 0 0 auto;
   min-height: 42px;
   height: 42px;
-  padding: 0 16px;
-  border-radius: 14px;
-  font-size: 14px;
+  padding: 0 var(--spacingMedium);
+  border-radius: var(--radiusSmall);
+  font-size: var(--fontSizeSmall);
 }
 .aboutShopMateContent {
   text-align: center;
@@ -56,7 +56,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacingMedium);
 }
 .aboutShopMateLogo img {
   width: 72px;
@@ -64,8 +64,8 @@
   object-fit: contain;
 }
 .aboutShopMateContent h3 {
-  margin: 0 0 12px;
-  font-size: 22px;
+  margin: 0 0 var(--spacingCompact);
+  font-size: var(--fontSizeXLargePlus);
 }
 .aboutShopMateContent p {
   margin: 0 auto 20px;
@@ -82,7 +82,7 @@
   border-bottom: 1px solid var(--borderColor);
 }
 .aboutShopMateCopyright {
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   opacity: 0.7;
 }
 .legalContent {
@@ -91,20 +91,20 @@
 }
 .legalIntro {
   margin: 0 0 20px;
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   opacity: 0.7;
 }
 .legalSection {
   margin-bottom: 22px;
 }
 .legalSection h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
+  margin: 0 0 var(--spacingSmall);
+  font-size: var(--fontSizeBody);
 }
 .legalSection p {
   margin: 0;
   line-height: 1.6;
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
 }
 .feedbackContent {
   text-align: left;
@@ -124,16 +124,16 @@
 .feedbackCharacterCount {
   margin-top: 6px;
   text-align: right;
-  font-size: 12px;
+  font-size: var(--fontSizeXSmall);
   opacity: 0.65;
 }
 .warningMessage {
-  margin: 16px 0 24px;
-  padding: 14px 16px;
+  margin: var(--spacingMedium) 0 var(--spacingLarge);
+  padding: 14px var(--spacingMedium);
   border: 1px solid var(--borderColor);
-  border-radius: 12px;
+  border-radius: var(--radiusCompact);
   line-height: 1.5;
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
 }
 .themeOptions,
 .languageOptions,
@@ -141,7 +141,7 @@
 .currencyOptions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacingCompact);
   width: 100%;
 }
 
@@ -154,7 +154,7 @@
   align-items: center;
   width: 100%;
   min-height: 72px;
-  padding: 14px 16px;
+  padding: 14px var(--spacingMedium);
   border: 1px solid var(--borderColor);
   border-radius: var(--radiusMedium);
   background: var(--surfaceColor);
@@ -190,7 +190,7 @@
 .currencyOption.selected {
   border: 1.5px solid var(--primaryColor);
   background: var(--surfaceColor);
-  box-shadow: 0 4px 12px var(--shadowLight);
+  box-shadow: var(--shadowSmall);
 }
 
 .themeOptionContent,
@@ -201,7 +201,7 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
-  gap: 4px;
+  gap: var(--spacingXSmall);
 }
 
 .themeOptionContent strong,
@@ -209,7 +209,7 @@
 .measurementUnitOptionContent strong,
 .currencyOptionContent strong {
   color: var(--textPrimary);
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 600;
   line-height: 1.3;
 }
@@ -219,7 +219,7 @@
 .measurementUnitOptionContent span,
 .currencyOptionContent span {
   color: var(--textSecondary);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   font-weight: 400;
   line-height: 1.4;
 }
@@ -234,12 +234,12 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  margin-left: 16px;
+  margin-left: var(--spacingMedium);
   border: 1px solid var(--borderColor);
   border-radius: 50%;
   background: transparent;
   color: transparent;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 700;
   line-height: 1;
   box-sizing: border-box;
@@ -251,7 +251,7 @@
 .currencyOption.selected .currencyOptionSymbol {
   border-color: var(--primaryColor);
   background: var(--primaryColor);
-  color: #ffffff;
+  color: var(--textOnPrimary);
 }
 
 .themeOption input[type="radio"],
@@ -270,14 +270,14 @@
 .themeOption:focus-within,
 .languageOption:focus-within {
   border-color: var(--primaryColor);
-  box-shadow: 0 0 0 3px rgba(17, 138, 178, 0.12);
+  box-shadow: 0 0 0 3px var(--primaryTint);
 }
 .themeOptions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacingCompact);
   width: 100%;
-  margin-top: 4px;
+  margin-top: var(--spacingXSmall);
 }
 
 .themeOption {
@@ -286,7 +286,7 @@
   align-items: center;
   width: 100%;
   min-height: 72px;
-  padding: 14px 16px;
+  padding: 14px var(--spacingMedium);
   border: 1px solid var(--borderColor);
   border-radius: var(--radiusMedium);
   background: var(--surfaceColor);
@@ -315,13 +315,13 @@
 
 .themeOption:focus-within {
   border-color: var(--primaryColor);
-  box-shadow: 0 0 0 3px rgba(17, 138, 178, 0.12);
+  box-shadow: 0 0 0 3px var(--primaryTint);
 }
 
 .themeOption.selected {
   border-color: var(--primaryColor);
   background: var(--surfaceColor);
-  box-shadow: 0 4px 12px var(--shadowLight);
+  box-shadow: var(--shadowSmall);
 }
 
 .themeOption:active {
@@ -333,19 +333,19 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
-  gap: 4px;
+  gap: var(--spacingXSmall);
 }
 
 .themeOptionContent strong {
   color: var(--textPrimary);
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 600;
   line-height: 1.3;
 }
 
 .themeOptionContent span {
   color: var(--textSecondary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 400;
   line-height: 1.4;
 }
@@ -357,11 +357,11 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  margin-left: 16px;
+  margin-left: var(--spacingMedium);
   border: 1px solid var(--borderColor);
   border-radius: 50%;
   color: transparent;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 700;
   line-height: 1;
 }
@@ -369,5 +369,5 @@
 .themeOption.selected .themeOptionCheck {
   border-color: var(--primaryColor);
   background: var(--primaryColor);
-  color: #ffffff;
+  color: var(--textOnPrimary);
 }

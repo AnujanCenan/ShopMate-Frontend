@@ -673,6 +673,9 @@ registerLanguage("fr", {
     appLockDescription: "Exiger une authentification pour accéder à ShopMate.",
     biometricLoginDescription:
       "Utilisez l’authentification biométrique pour vous connecter à ShopMate.",
+    biometricEnabledTitle: "Biométrie activée",
+    biometricEnabledMessage:
+      "La connexion biométrique a été activée avec succès.",
     appLocked: "ShopMate verrouillé",
     enterPinToUnlock: "Saisissez votre code PIN pour continuer.",
     pinPlaceholder: "PIN",

@@ -21,20 +21,20 @@
   bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacingCompact);
   min-width: 260px;
   max-width: 90%;
   padding: 14px 18px;
   background: var(--cardColor);
-  border-radius: 16px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  border-radius: var(--radiusComfortable);
+  box-shadow: 0 12px 28px var(--shadowAmbientStrong);
   transform: translateX(-50%);
   animation: toastSlideUp 0.25s ease;
   z-index: 10000;
 }
 /* Success Toast */
 .toastSuccess {
-  border-left: 5px solid #16a34a;
+  border-left: 5px solid var(--successColor);
 }
 /* Information Toast */
 .toastInfo {
@@ -42,10 +42,10 @@
 }
 /* Toast Icon */
 .toastIcon {
-  font-size: 20px;
+  font-size: var(--fontSizeXLarge);
 }
 /* Toast Text */
 .toastText {
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 600;
 }

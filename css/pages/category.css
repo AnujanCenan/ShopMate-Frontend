@@ -17,7 +17,7 @@
   margin: 0;
   padding-bottom: 15px;
   color: var(--textPrimary);
-  font-size: 22px;
+  font-size: var(--fontSizeXLargePlus);
   font-weight: 700;
 }
 /* Category Information */
@@ -25,10 +25,10 @@
   margin-top: 6px;
   color: var(--mutedTextColor);
   opacity: 0.7;
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
 }
 /* Category Page Title */
 .categoryPageTitle {
   color: var(--primaryColor);
-  font-size: 24px;
+  font-size: var(--fontSizeXXLarge);
 }

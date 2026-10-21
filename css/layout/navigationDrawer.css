@@ -19,7 +19,7 @@
 .sideDrawerOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--overlayColor);
   opacity: 0;
   visibility: hidden;
   transition: all 0.25s ease;
@@ -40,7 +40,7 @@
   height: 100vh;
   overflow-y: auto;
   background: var(--cardColor);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 30px var(--shadowAmbient);
   transition: transform 0.25s ease;
   z-index: 999;
 }
@@ -87,11 +87,11 @@
   border: none;
   cursor: pointer;
   padding: 6px 10px;
-  border-radius: 20px;
+  border-radius: var(--radiusMedium);
   transition: background 0.2s;
 }
 .sidebarProfileButton:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--surfaceHover);
 }
 .sidebarProfileAvatar {
   width: 34px;
@@ -103,10 +103,10 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
 }
 .sidebarProfileName {
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
   color: var(--textPrimary);
 }
@@ -120,26 +120,26 @@
 }
 /* Drawer Title */
 .drawerTitle {
-  font-size: 22px;
+  font-size: var(--fontSizeXLargePlus);
   font-weight: 700;
 }
 /* Drawer Menu */
 .drawerMenu {
-  padding: 12px;
+  padding: var(--spacingCompact);
 }
 /* Drawer Item */
 .drawerItem {
   width: 100%;
   display: flex;
   gap: 14px;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: var(--spacingMedium);
+  margin-bottom: var(--spacingSmall);
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radiusCompact);
   cursor: pointer;
   text-align: left;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
 }
 .drawerItem:hover {
   background: var(--surfaceColor);
@@ -150,7 +150,7 @@
   align-items: center;
   gap: 14px;
   cursor: pointer;
-  padding: 8px 0;
+  padding: var(--spacingSmall) 0;
 }
 .drawerAvatar {
   width: 56px;
@@ -161,7 +161,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: var(--fontSizeXXLarge);
   font-weight: 700;
   overflow: hidden;
   flex-shrink: 0;
@@ -177,13 +177,13 @@
 }
 
 .drawerProfileSubtitle {
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   color: var(--textSecondary);
 }
 
 /* Drawer Profile Name */
 .drawerProfileName {
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
   color: var(--textPrimary);
   white-space: nowrap;
@@ -191,7 +191,7 @@
 
 .drawerLogout {
   margin-top: auto;
-  padding: 12px 14px 16px;
+  padding: var(--spacingCompact) 14px var(--spacingMedium);
   border-top: 1px solid var(--borderColor);
 }
 

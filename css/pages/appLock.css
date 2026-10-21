@@ -10,21 +10,13 @@
   background: var(--backgroundColor);
 }
 
-.appLockPageBody {
-  min-height: 100vh;
-  min-height: 100dvh;
-  margin: 0;
-  overflow: hidden;
-  background: var(--backgroundColor);
-}
-
 .appLockPage {
   display: grid;
-  grid-template-rows: 43% 57%;
+  grid-template-rows: minmax(300px, 43vh) minmax(0, 1fr);
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--backgroundColor);
+  background: var(--appLockBrandBackground);
   color: var(--textPrimary);
 }
 
@@ -32,15 +24,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px;
+  padding: 28px var(--spacingLarge);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .appLockBrand {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacingSmall);
 }
 
 .appLockLogo {
@@ -52,7 +45,7 @@
 
 .appLockTagline {
   color: var(--primaryDark);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
   line-height: 1.4;
 }
@@ -62,9 +55,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px calc(112px + var(--safeAreaBottom));
-  border-radius: 30px 30px 0 0;
-  background: linear-gradient(145deg, #d9f1f7 0%, #dff3f1 52%, #e3f4e9 100%);
+  padding: 28px var(--spacingLarge) calc(112px + var(--safeAreaBottom));
+  border-radius: var(--radiusLarge) var(--radiusLarge) 0 0;
+  background: linear-gradient(
+    145deg,
+    var(--appLockAccessStart) 0%,
+    var(--appLockAccessMiddle) 52%,
+    var(--appLockAccessEnd) 100%
+  );
   box-sizing: border-box;
 }
 
@@ -75,16 +73,16 @@
 }
 
 .appLockTitle {
-  margin: 0 0 8px;
-  color: #123b49;
-  font-size: 24px;
+  margin: 0 0 var(--spacingSmall);
+  color: var(--appLockTitleColor);
+  font-size: var(--fontSizeXXLarge);
   font-weight: 700;
 }
 
 .appLockDescription {
-  margin: 0 0 24px;
-  color: #42616a;
-  font-size: 14px;
+  margin: 0 0 var(--spacingLarge);
+  color: var(--appLockDescriptionColor);
+  font-size: var(--fontSizeSmall);
   line-height: 1.5;
 }
 
@@ -95,22 +93,22 @@
 .appLockPinInput {
   width: 100%;
   height: 52px;
-  padding: 0 16px;
-  border: 1px solid #a9d5df;
-  border-radius: 16px;
-  background: #ffffff;
-  color: #111827;
+  padding: 0 var(--spacingMedium);
+  border: 1px solid var(--appLockInputBorder);
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
   box-sizing: border-box;
   font: inherit;
-  font-size: 20px;
+  font-size: var(--fontSizeXLarge);
   letter-spacing: 7px;
   text-align: center;
   outline: none;
 }
 
 .appLockPinInput:focus-visible {
-  border-color: #0f789d;
-  box-shadow: 0 0 0 3px rgba(15, 120, 157, 0.18);
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 3px var(--focusRing);
 }
 
 .appLockPinButton {
@@ -122,14 +120,14 @@
   margin-top: 14px;
   padding: 0 20px;
   border: 0;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #118ab2, #0f6d8d);
-  color: #ffffff;
+  border-radius: var(--radiusControl);
+  background: linear-gradient(135deg, var(--primaryColor), var(--primaryDark));
+  color: var(--textOnPrimary);
   font: inherit;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(15, 109, 141, 0.22);
+  box-shadow: 0 8px 22px var(--primaryGlow);
 }
 
 .appLockPinButton:active,
@@ -140,9 +138,9 @@
 .appLockError,
 .appLockBiometricError {
   min-height: 20px;
-  margin-top: 8px;
-  color: #b42318;
-  font-size: 13px;
+  margin-top: var(--spacingSmall);
+  color: var(--dangerText);
+  font-size: var(--fontSizeCaption);
 }
 
 .appLockBiometricError {
@@ -164,12 +162,12 @@
   width: 72px;
   height: 72px;
   margin: 0 auto;
-  padding: 16px;
-  border: 1px solid rgba(15, 109, 141, 0.2);
+  padding: var(--spacingMedium);
+  border: 1px solid var(--borderColor);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--cardColor);
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(5, 55, 74, 0.2);
+  box-shadow: var(--shadowLarge);
   transition: transform 160ms ease;
 }
 
@@ -199,12 +197,11 @@
 
 @media (max-height: 620px) {
   .appLockPage {
-    grid-template-rows: 34% 66%;
+    grid-template-rows: minmax(220px, 40vh) minmax(300px, 1fr);
   }
 
   .appLockBrandSection {
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding: var(--spacingMedium) 20px;
   }
 
   .appLockLogo {
@@ -225,5 +222,24 @@
     bottom: calc(12px + var(--safeAreaBottom));
     width: 60px;
     height: 60px;
+  }
+}
+
+@media (max-height: 480px) {
+  .appLockPage {
+    grid-template-rows: 172px minmax(300px, 1fr);
+  }
+
+  .appLockLogo {
+    width: 120px;
+    height: 120px;
+  }
+
+  .appLockBrandSection {
+    padding: 10px 20px;
+  }
+
+  .appLockBrand {
+    gap: var(--spacingXSmall);
   }
 }

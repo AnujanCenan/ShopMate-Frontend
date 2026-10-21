@@ -15,16 +15,16 @@
 .budgetProgressBar {
   width: 100%;
   height: 10px;
-  margin-top: 16px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
+  margin-top: var(--spacingMedium);
+  background: var(--surfaceShine);
+  border-radius: var(--radiusPill);
   overflow: hidden;
 }
 /* Budget Progress Fill */
 .budgetProgressFill {
   height: 100%;
-  background: linear-gradient(90deg, #22c55e, #10b981);
-  border-radius: 999px;
+  background: linear-gradient(90deg, var(--successBright), var(--successColor));
+  border-radius: var(--radiusPill);
   transition: width 0.4s ease;
 }
 /* Analysis Progress Bar */
@@ -33,13 +33,13 @@
   margin-top: 14px;
   margin-bottom: 14px;
   background: var(--borderColor);
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
   overflow: hidden;
 }
 /* Analysis Progress Fill */
 .analysisProgressFill {
   height: 100%;
-  background: #2563eb;
-  border-radius: 999px;
+  background: var(--infoColor);
+  border-radius: var(--radiusPill);
   transition: 0.3s;
 }

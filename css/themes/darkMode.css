@@ -13,24 +13,70 @@ body.darkMode {
 
   --overlayColor: rgba(0, 0, 0, 0.7);
   /* Text */
-  --textPrimary: #f8fafc;
+  --textPrimary: var(--textOnDark);
   --textSecondary: #cbd5e1;
   --mutedTextColor: #94a3b8;
+  --dangerText: #fca5a5;
+  --dangerBorder: #7f1d1d;
+  --successText: #4ade80;
+  --warningText: #fbbf24;
+  --infoStrong: #38bdf8;
   /* Borders */
   --borderColor: #3e4c61;
   /* Brand */
-  --primaryColor: #118ab2;
+  --primaryColor: #0c7898;
+  --primaryDark: #0a637f;
+  --infoColor: #38bdf8;
   /* Status */
-  --successColor: #22c55e;
+  --successColor: #15803d;
   --warningColor: #facc15;
-  --dangerColor: #ef4444;
+  --accentSurface: #7c4a12;
+  --dangerColor: #dc2626;
+  --dangerBright: #f87171;
   /* Shadows */
   --shadowSmall: 0 4px 12px rgba(0, 0, 0, 0.2);
   --shadowMedium: 0 8px 20px rgba(0, 0, 0, 0.28);
   --shadowLarge: 0 14px 34px rgba(0, 0, 0, 0.38);
   --surfaceColor: #334155;
+  --surfaceRaised: #31445b;
+  --surfaceHover: #405168;
+  --surfaceShine: rgba(255, 255, 255, 0.12);
+  --shadowAmbient: rgba(0, 0, 0, 0.2);
+  --shadowAmbientSoft: rgba(0, 0, 0, 0.15);
+  --shadowAmbientExtraSoft: rgba(0, 0, 0, 0.1);
+  --shadowAmbientMid: rgba(0, 0, 0, 0.28);
+  --shadowAmbientStrong: rgba(0, 0, 0, 0.38);
+  --neutralTint: rgba(148, 163, 184, 0.12);
   --headerBackground: #243244;
   --drawerBackground: #243244;
-  --iconColor: #f8fafc;
+  --footerColor: #243244;
+  --borderSubtle: rgba(62, 76, 97, 0.85);
+  --iconColor: var(--textOnDark);
   --dividerColor: #3e4c61;
+  --infoSurface: rgba(12, 120, 152, 0.18);
+  --successSurface: rgba(34, 197, 94, 0.16);
+  --warningSurface: rgba(245, 158, 11, 0.16);
+  --dangerSurface: rgba(239, 68, 68, 0.16);
+  --budgetBackground: #243b4c;
+  --groupBackground: #243b4c;
+  --productBackground: #25463b;
+  --notificationBackground: #443322;
+  --focusRing: rgba(56, 189, 248, 0.55);
+  --primaryTint: rgba(56, 189, 248, 0.18);
+  --primaryGlow: rgba(56, 189, 248, 0.3);
+  --favoriteSurface: rgba(225, 29, 72, 0.2);
+  --favoriteSurfaceStrong: rgba(225, 29, 72, 0.28);
+  --favoriteGlow: rgba(225, 29, 72, 0.38);
+  --successTint: rgba(34, 197, 94, 0.18);
+  --successGlow: rgba(34, 197, 94, 0.3);
+  --dangerTint: rgba(239, 68, 68, 0.18);
+  --dangerGlow: rgba(239, 68, 68, 0.28);
+  --dangerGlowStrong: rgba(239, 68, 68, 0.32);
+  --appLockBrandBackground: #1b2230;
+  --appLockAccessStart: #243b4c;
+  --appLockAccessMiddle: #234348;
+  --appLockAccessEnd: #25463b;
+  --appLockTitleColor: var(--textOnDark);
+  --appLockDescriptionColor: #cbd5e1;
+  --appLockInputBorder: #52697b;
 }

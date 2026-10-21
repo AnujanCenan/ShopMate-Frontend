@@ -41,16 +41,16 @@
 /* Form Validation Error */
 .inputError {
   border: 2px solid var(--dangerColor) !important;
-  background: #fff5f5;
+  background: var(--dangerSurface);
 }
 
 /* Form Validation Message */
 .formError {
   min-height: 18px;
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--fontSizeXSmall);
   font-weight: 500;
-  color: var(--dangerColor);
+  color: var(--dangerText);
 }
 
 /* Tablet Layout */
@@ -66,7 +66,7 @@
 @media (min-width: 1024px) {
   .pageContent {
     max-width: 1100px;
-    padding-right: 32px;
-    padding-left: 32px;
+    padding-right: var(--spacingXLarge);
+    padding-left: var(--spacingXLarge);
   }
 }

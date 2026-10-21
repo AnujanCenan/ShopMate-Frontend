@@ -36,8 +36,8 @@
   margin-bottom: 14px;
   overflow: hidden;
   background: var(--cardColor);
-  border-radius: 18px;
-  box-shadow: 0 10px 24px var(--shadowMedium);
+  border-radius: var(--radiusRoomy);
+  box-shadow: 0 10px 24px var(--shadowAmbientMid);
   opacity: 0;
   transform: translateY(-6px);
   transition:
@@ -57,7 +57,7 @@
   align-items: center;
   gap: 14px;
   min-height: 56px;
-  padding: 14px 16px;
+  padding: 14px var(--spacingMedium);
   cursor: pointer;
   transition: background 0.18s;
 }
@@ -65,7 +65,7 @@
   background: var(--surfaceColor);
 }
 .productSuggestionItem:active {
-  background: rgba(17, 138, 178, 0.12);
+  background: var(--primaryTint);
 }
 /* Product Suggestion Image */
 .productSuggestionImage {
@@ -76,7 +76,7 @@
   height: 46px;
   overflow: hidden;
   background: var(--surfaceColor);
-  border-radius: 12px;
+  border-radius: var(--radiusCompact);
   flex-shrink: 0;
 }
 .productSuggestionImage img {
@@ -87,12 +87,12 @@
 /* Product Suggestion Name */
 .productSuggestionName {
   color: var(--textPrimary);
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 600;
 }
 /* Matched Text */
 .matchedText {
-  color: #118ab2;
+  color: var(--primaryColor);
   font-weight: 800;
 }
 /* Catalog Search */

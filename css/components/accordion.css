@@ -16,11 +16,11 @@
  ***************************************************************************************************/
 /* Accordion Container */
 .groupAccordionCard {
-  margin-bottom: 16px;
+  margin-bottom: var(--spacingMedium);
   background: var(--cardColor);
-  border-radius: 18px;
+  border-radius: var(--radiusRoomy);
   overflow: hidden;
-  box-shadow: 0 6px 18px var(--shadowMedium);
+  box-shadow: 0 6px 18px var(--shadowAmbientMid);
 }
 /* Accordion Header */
 .groupAccordionHeader {
@@ -36,7 +36,7 @@
 }
 .groupAccordionTitle {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--fontSizeBodyLarge);
   font-weight: 700;
 }
 
@@ -44,30 +44,30 @@
   justify-content: flex-start;
 }
 .groupAccordionSubtitle {
-  margin-top: 4px;
+  margin-top: var(--spacingXSmall);
   color: var(--mutedTextColor);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
 }
 .accordionIcon {
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
   transition: 0.25s;
 }
 /* Accordion Body */
 .groupAccordionBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacingCompact);
   padding: 18px 20px;
 }
 /* Group Members */
 
 /* Badges */
 .activeGroupBadge {
-  margin-left: 8px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: #dbeafe;
-  color: #2563eb;
-  font-size: 11px;
+  margin-left: var(--spacingSmall);
+  padding: 3px var(--spacingSmall);
+  border-radius: var(--radiusPill);
+  background: var(--infoSurface);
+  color: var(--infoColor);
+  font-size: var(--fontSizeMicro);
   font-weight: 700;
 }

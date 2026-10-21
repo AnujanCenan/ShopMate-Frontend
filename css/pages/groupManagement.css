@@ -23,14 +23,14 @@
 }
 /* Group Management Title */
 .groupManagementTitle {
-  margin-bottom: 8px;
-  font-size: 28px;
+  margin-bottom: var(--spacingSmall);
+  font-size: var(--fontSizeDisplay);
   font-weight: 700;
 }
 /* Group Management Subtitle */
 .groupManagementSubtitle {
   color: var(--mutedTextColor);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
 }
 /* Group Management Hero */
 .groupManagementHero {
@@ -43,7 +43,7 @@
 .memberList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacingMedium);
   margin-bottom: 28px;
 }
 /* Member Information */
@@ -59,22 +59,22 @@
   justify-content: center;
   width: 52px;
   height: 52px;
-  background: #dbeafe;
-  color: #2563eb;
-  border-radius: 18px;
-  font-size: 20px;
+  background: var(--infoSurface);
+  color: var(--infoColor);
+  border-radius: var(--radiusRoomy);
+  font-size: var(--fontSizeXLarge);
   font-weight: 700;
 }
 /* Member Name */
 .memberName {
-  margin-bottom: 4px;
-  font-size: 17px;
+  margin-bottom: var(--spacingXSmall);
+  font-size: var(--fontSizeBodyLarge);
 }
 /* Member Role */
 .memberRole {
   color: var(--mutedTextColor);
   text-transform: capitalize;
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
 }
 /* Member Actions */
 .memberActions {
@@ -86,13 +86,13 @@
 .inviteFloatingButton {
   width: 52px;
   height: 52px;
-  background: #118ab2;
+  background: var(--primaryColor);
   color: var(--textPrimary);
   border: none;
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(17, 138, 178, 0.25);
+  border-radius: var(--radiusRoomy);
+  box-shadow: 0 8px 24px var(--primaryGlowStrong);
   cursor: pointer;
-  font-size: 28px;
+  font-size: var(--fontSizeDisplay);
 }
 /* Invite Code Label */
 .inviteCodeLabel {
@@ -102,30 +102,30 @@
 /* Invite Code Value */
 .inviteCodeValue {
   letter-spacing: 2px;
-  font-size: 28px;
+  font-size: var(--fontSizeDisplay);
   font-weight: 700;
 }
 /* Destructive Action */
 .destructiveAction {
-  color: #ef4444;
+  color: var(--dangerBright);
 }
 .inviteGroupInformation {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacingLarge);
 }
 .inviteGroupName {
-  margin-top: 8px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: var(--surfaceSecondary);
+  margin-top: var(--spacingSmall);
+  padding: 14px var(--spacingMedium);
+  border-radius: var(--radiusCompact);
+  background: var(--surfaceColor);
   border: 0px solid var(--borderColor);
   font-weight: 600;
-  color: var(--primaryText);
+  color: var(--textPrimary);
 }
 .groupMemberRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacingCompact);
   padding: 10px 0;
 }
 .groupMemberInformation {
@@ -142,12 +142,12 @@
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 12px;
-  padding: 8px 0;
+  gap: var(--spacingCompact);
+  padding: var(--spacingSmall) 0;
 }
 .groupMemberInformation,
 .groupInviteInformation {
-  padding: 4px 0;
+  padding: var(--spacingXSmall) 0;
   line-height: 1.5;
 }
 .groupInviteRow {
@@ -162,23 +162,23 @@
 .memberRoleAdmin {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: var(--spacingXSmall) 10px;
   margin-top: 6px;
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
-  font-size: 12px;
+  border-radius: var(--radiusPill);
+  background: var(--infoTint);
+  color: var(--infoColor);
+  font-size: var(--fontSizeXSmall);
   font-weight: 600;
 }
 .memberRoleMember {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: var(--spacingXSmall) 10px;
   margin-top: 6px;
-  border-radius: 999px;
-  background: rgba(107, 114, 128, 0.12);
+  border-radius: var(--radiusPill);
+  background: var(--neutralTint);
   color: var(--mutedTextColor);
-  font-size: 12px;
+  font-size: var(--fontSizeXSmall);
   font-weight: 600;
 }
 .emptyPendingInvitationState {
@@ -187,72 +187,72 @@
 }
 .emptyStateTitle {
   font-weight: 600;
-  color: #999999;
+  color: var(--mutedTextColor);
 }
 .emptyStateSubtitle {
   margin-top: 6px;
-  font-size: 13px;
-  color: #777;
+  font-size: var(--fontSizeCaption);
+  color: var(--mutedTextColor);
 }
 /* =========================================
    GROUP ACCORDION - DARK MODE
    ========================================= */
 .darkMode .groupAccordionCard {
-  background: #27364a;
-  color: #f8fafc;
+  background: var(--surfaceRaised);
+  color: var(--textOnDark);
 }
 /* Group Name */
 .darkMode .groupAccordionTitle {
-  color: #f8fafc !important;
+  color: var(--textOnDark) !important;
 }
 /* Members / Categories count */
 .darkMode .groupAccordionSubtitle {
-  color: #cbd5e1 !important;
+  color: var(--textSecondary) !important;
 }
 /* Section headings */
 .darkMode .groupSectionTitle {
-  color: #f8fafc !important;
+  color: var(--textOnDark) !important;
 }
 /* Member names */
 .darkMode .groupMemberName {
-  color: #f8fafc !important;
+  color: var(--textOnDark) !important;
 }
 /* Member role */
 .darkMode .groupMemberRole {
-  color: #cbd5e1 !important;
+  color: var(--textSecondary) !important;
 }
 /* Admin / Member role badges */
 .darkMode .memberRoleAdmin {
-  color: #2563eb !important;
-  background: #dbeafe;
+  color: var(--infoColor) !important;
+  background: var(--infoSurface);
 }
 .darkMode .memberRoleMember {
-  color: #0f766e !important;
-  background: #ccfbf1;
+  color: var(--successText) !important;
+  background: var(--successSurface);
 }
 /* Pending invitation email */
 .darkMode .groupInviteInformation .groupMemberName {
-  color: #f8fafc !important;
+  color: var(--textOnDark) !important;
 }
 /* Pending invitation date / status */
 .darkMode .groupInviteInformation .groupMemberRole {
-  color: #cbd5e1 !important;
+  color: var(--textSecondary) !important;
 }
 /* Divider */
 .darkMode .groupDivider {
-  border-color: #94a3b8 !important;
+  border-color: var(--mutedTextColor) !important;
   opacity: 0.8;
 }
 /* Empty invitation text */
 .darkMode .emptyStateTitle {
-  color: #f8fafc !important;
+  color: var(--textOnDark) !important;
 }
 .darkMode .emptyStateSubtitle {
-  color: #cbd5e1 !important;
+  color: var(--textSecondary) !important;
 }
 /* More buttons */
 .darkMode .groupMoreButton {
-  background: #31445b;
+  background: var(--surfaceRaised);
 }
 .darkMode .groupMoreButton .actionIcon {
   filter: brightness(0) invert(1);

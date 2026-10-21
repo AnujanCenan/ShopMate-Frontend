@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--spacingMedium);
   width: calc(100% - 40px);
   max-width: 80%;
   padding: 18px 20px;
@@ -39,10 +39,10 @@
   padding: 0;
   margin: 0;
   background: transparent;
-  color: #4fc3f7;
+  color: var(--undoButtonBackground);
   border: none;
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
 }
 
@@ -54,28 +54,28 @@
 /* Snackbar UNDO Button */
 .snackbarButton {
   min-width: fit-content;
-  padding: 6px 4px;
+  padding: 6px var(--spacingXSmall);
   margin: 0;
   background: transparent;
   color: var(--undoButtonBackground);
   border: none;
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
 }
 
 /* Dark Mode Selected Item */
 .darkMode .selectedItem {
-  background: #eff6ff;
-  border-color: #2563eb;
+  background: var(--infoSurface);
+  border-color: var(--infoColor);
 }
 
 .darkMode .selectedItem .itemName {
-  color: #111827 !important;
+  color: var(--textPrimary) !important;
 }
 
 .darkMode .selectedItem .itemQuantityBadge {
-  color: #2563eb;
+  color: var(--infoColor);
 }
 
 /* Bulk Action Bar */
@@ -86,13 +86,13 @@
   transform: translateX(-50%);
   width: calc(100% - 32px);
   max-width: 380px;
-  background: white;
+  background: var(--cardColor);
   border-radius: 22px;
   padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px var(--shadowAmbient);
   z-index: 9999;
 }
 
@@ -101,9 +101,9 @@
 }
 
 .bulkSelectionCount {
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
-  color: #111827;
+  color: var(--textPrimary);
   white-space: nowrap;
 }
 
@@ -146,7 +146,7 @@
 
 /* Favorite */
 .bulkActionButtonFavorite {
-  background: #fce7ef !important;
+  background: var(--favoriteSurface) !important;
 }
 
 .bulkActionButtonFavorite .actionIcon {
@@ -156,7 +156,7 @@
 
 /* Purchased */
 .bulkActionButtonPurchased {
-  background: #dff5ef !important;
+  background: var(--successSurface) !important;
 }
 
 .bulkActionButtonPurchased .actionIcon {
@@ -166,7 +166,7 @@
 
 /* Delete */
 .bulkActionButtonDelete {
-  background: #fee2e2 !important;
+  background: var(--dangerSurface) !important;
 }
 
 .bulkActionButtonDelete .actionIcon {
@@ -176,16 +176,16 @@
 
 /* Dark Mode Bulk Action Bar */
 .darkMode .bulkActionBar {
-  background: #243244;
+  background: var(--headerBackground);
 }
 
 .darkMode .bulkSelectionCount {
-  color: #f8fafc;
+  color: var(--textOnDark);
 }
 
 /* Dark Mode - Favorite */
 .darkMode .bulkActionButtonFavorite {
-  background: #f16f9c !important;
+  background: var(--favoriteDarkBackground) !important;
 }
 
 .darkMode .bulkActionButtonFavorite .actionIcon {
@@ -195,7 +195,7 @@
 
 /* Dark Mode - Purchased */
 .darkMode .bulkActionButtonPurchased {
-  background: #5ee6d3 !important;
+  background: var(--purchasedDarkBackground) !important;
 }
 
 .darkMode .bulkActionButtonPurchased .actionIcon {
@@ -205,7 +205,7 @@
 
 /* Dark Mode - Delete */
 .darkMode .bulkActionButtonDelete {
-  background: #fc5a5a !important;
+  background: var(--deleteDarkBackground) !important;
 }
 
 .darkMode .bulkActionButtonDelete .actionIcon {

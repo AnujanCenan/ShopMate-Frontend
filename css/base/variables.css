@@ -22,17 +22,71 @@
 
 /* Global Design Tokens */
 :root {
-  --primaryColor: #118ab2;
-  --primaryDark: #0f6d8d;
-  --successColor: #16a34a;
+  /* ShopMate brand and semantic palette */
+  --primaryColor: #0c7898;
+  --primaryDark: #0a637f;
+  --primaryBright: #4fc3f7;
+  --accentColor: #f59e0b;
+  --accentSurface: #f5c288;
+  --successColor: #15803d;
+  --successDeep: #166534;
+  --successBright: #16a34a;
+  --successText: #166534;
   --dangerColor: #dc2626;
+  --dangerDeep: #b91c1c;
+  --dangerBright: #b91c1c;
+  --dangerText: #b42318;
+  --dangerBorder: #fecaca;
   --warningColor: #f59e0b;
+  --warningDeep: #c2410c;
+  --warningText: #c2410c;
+  --infoColor: #0a637f;
+  --infoStrong: #0a637f;
+  --infoSurface: #e8f5fa;
+  --successSurface: #dcfce7;
+  --warningSurface: #fff7ed;
+  --dangerSurface: #fef2f2;
+  --textOnPrimary: #ffffff;
+  --textOnDark: #f8fafc;
+  --focusRing: rgba(12, 120, 152, 0.32);
+  --primaryTint: rgba(12, 120, 152, 0.12);
+  --primaryGlow: rgba(12, 120, 152, 0.22);
+  --primaryGlowSoft: rgba(12, 120, 152, 0.08);
+  --primaryGlowStrong: rgba(12, 120, 152, 0.25);
+  --primaryGlowModerate: rgba(12, 120, 152, 0.18);
+  --primaryTintSoft: rgba(12, 120, 152, 0.1);
+  --primaryTintModerate: rgba(12, 120, 152, 0.14);
+  --primaryGlowVerySoft: rgba(12, 120, 152, 0.06);
+  --infoTint: rgba(12, 120, 152, 0.12);
+  --neutralTint: rgba(100, 116, 139, 0.12);
+  --favoriteColor: #e11d48;
+  --favoriteSurface: rgba(225, 29, 72, 0.12);
+  --favoriteSurfaceStrong: rgba(225, 29, 72, 0.18);
+  --favoriteGlow: rgba(225, 29, 72, 0.28);
+  --favoriteDarkBackground: #f16f9c;
+  --purchasedDarkBackground: #5ee6d3;
+  --deleteDarkBackground: #fc5a5a;
+  --successTint: rgba(21, 128, 61, 0.12);
+  --successGlow: rgba(21, 128, 61, 0.28);
+  --dangerTint: rgba(220, 38, 38, 0.12);
+  --dangerGlow: rgba(220, 38, 38, 0.18);
+  --dangerGlowStrong: rgba(220, 38, 38, 0.22);
+  --shadowAmbient: rgba(15, 23, 42, 0.06);
+  --shadowAmbientSoft: rgba(15, 23, 42, 0.04);
+  --shadowAmbientExtraSoft: rgba(15, 23, 42, 0.02);
+  --shadowAmbientMid: rgba(15, 23, 42, 0.14);
+  --shadowAmbientStrong: rgba(15, 23, 42, 0.18);
+  --surfaceShine: rgba(255, 255, 255, 0.8);
 
+  /* Surfaces */
   --backgroundColor: #f4f7fb;
   --cardColor: #ffffff;
   --surfaceColor: #f1f5f9;
+  --surfaceRaised: #ffffff;
+  --surfaceHover: #edf2f7;
   --headerBackground: #ffffff;
   --drawerBackground: #ffffff;
+  --footerColor: #ffffff;
   --closeButtonBackground: #b8dbfd;
   --favoriteButtonBackground: #f795cb;
   --purchasedButtonBackground: #d1fae5;
@@ -46,27 +100,77 @@
   --iconColor: #111827;
 
   --borderColor: #e5e7eb;
+  --borderSubtle: rgba(229, 231, 235, 0.8);
   --dividerColor: #e5e7eb;
 
   --appBackground: #f7f9fc;
-  --budgetBackground: #f0f9ff;
-  --groupBackground: #f5f3ff;
+  --budgetBackground: #e8f5fa;
+  --groupBackground: #eff7fb;
   --productBackground: #f0fdf4;
   --notificationBackground: #fff7ed;
 
   --overlayColor: rgba(0, 0, 0, 0.45);
 
-  --shadowSmall: 0 4px 12px rgba(0, 0, 0, 0.04);
-  --shadowMedium: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --shadowLarge: 0 12px 36px rgba(0, 0, 0, 0.14);
+  --shadowSmall: 0 4px 12px var(--shadowAmbientSoft);
+  --shadowMedium: 0 8px 24px var(--shadowAmbient);
+  --shadowLarge: 0 12px 36px var(--shadowAmbientMid);
+  --shadowPrimary: 0 10px 24px var(--primaryGlow);
 
   --radiusSmall: 14px;
   --radiusMedium: 20px;
   --radiusLarge: 28px;
+  --radiusXSmall: 8px;
+  --radiusCompact: 12px;
+  --radiusComfortable: 16px;
+  --radiusRoomy: 18px;
+  --radiusExtraLarge: 24px;
+  --radiusCard: 20px;
+  --radiusControl: 14px;
+  --radiusPill: 999px;
 
   --spacingSmall: 8px;
+  --spacingCompact: 12px;
   --spacingMedium: 16px;
   --spacingLarge: 24px;
+  --spacingXSmall: 4px;
+  --spacingXLarge: 32px;
+
+  /* Shared typography scale */
+  --fontFamily: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --fontSizeMicro: 11px;
+  --fontSizeXSmall: 12px;
+  --fontSizeCaption: 13px;
+  --fontSizeSmall: 14px;
+  --fontSizeBodySmall: 15px;
+  --fontSizeBody: 16px;
+  --fontSizeBodyLarge: 17px;
+  --fontSizeLarge: 18px;
+  --fontSizeXLarge: 20px;
+  --fontSizeCompactHeading: 21px;
+  --fontSizeXLargePlus: 22px;
+  --fontSizeXXLarge: 24px;
+  --fontSizeHeroSmall: 27px;
+  --fontSizeDisplay: 28px;
+  --fontSizeHero: 32px;
+  --fontSizeHeroLarge: 34px;
+  --fontSizeHeroXLarge: 38px;
+  --fontSizeStat: 42px;
+  --fontSizeStatLarge: 48px;
+  --fontSizeWideHeading: 26px;
+  --fontSizeFluidHeading: clamp(20px, 5vw, 24px);
+  --fontSizeFluidTitle: clamp(21px, 5vw, 26px);
+  --fontSizeFluidHero: clamp(28px, 7vw, 38px);
+  --lineHeightCompact: 1.2;
+  --lineHeightBody: 1.5;
+
+  /* App Lock surfaces adapt with the selected theme */
+  --appLockBrandBackground: #f4f7fb;
+  --appLockAccessStart: #d9f1f7;
+  --appLockAccessMiddle: #dff3f1;
+  --appLockAccessEnd: #e3f4e9;
+  --appLockTitleColor: #123b49;
+  --appLockDescriptionColor: #42616a;
+  --appLockInputBorder: #a9d5df;
 
   --headerHeight: 72px;
   --footerHeight: 50px;
@@ -97,9 +201,15 @@ body {
   min-height: 100%;
   background: var(--appBackground);
   color: var(--textColor);
-  font-family: Arial, sans-serif;
+  font-family: var(--fontFamily);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: contain;
+}
+
+/* Consistent, visible keyboard focus across shared controls. */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--focusRing) !important;
+  outline-offset: 2px !important;
 }

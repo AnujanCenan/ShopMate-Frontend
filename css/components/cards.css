@@ -24,8 +24,8 @@
   padding: 20px;
   margin-bottom: 14px;
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusLarge);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   box-shadow: var(--shadowMedium);
   transition:
     transform var(--animationSpeed) ease,
@@ -46,8 +46,8 @@
   padding: 18px;
   margin-bottom: 0;
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusLarge);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   box-shadow: var(--shadowMedium);
   transition:
     transform var(--animationSpeed) ease,
@@ -65,8 +65,8 @@
   padding: 18px;
   margin-bottom: 14px;
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusLarge);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   box-shadow: var(--shadowMedium);
   transition:
     transform var(--animationSpeed) ease,
@@ -84,7 +84,7 @@
   margin-bottom: 18px;
   background: var(--surfaceColor);
   border: 1px solid var(--borderColor);
-  border-radius: var(--radiusMedium);
+  border-radius: var(--radiusCard);
   text-align: center;
 }
 
@@ -92,18 +92,18 @@
 .profileInfoCard {
   padding: 18px;
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusMedium);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   box-shadow: var(--shadowMedium);
 }
 
 /* Notification Card */
 .notificationCard {
-  padding: 16px;
-  margin-bottom: 12px;
+  padding: var(--spacingMedium);
+  margin-bottom: var(--spacingCompact);
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusMedium);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   box-shadow: var(--shadowSmall);
   transition:
     transform var(--animationSpeed) ease,
@@ -116,11 +116,11 @@
 
 /* Catalog Card */
 .catalogCard {
-  padding: 16px;
+  padding: var(--spacingMedium);
   margin-bottom: 14px;
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusMedium);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   box-shadow: var(--shadowMedium);
 }
 
@@ -134,10 +134,10 @@
 
 /* Empty State Card */
 .emptyStateCard {
-  padding: 24px 20px;
+  padding: var(--spacingLarge) 20px;
   background: var(--cardColor);
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  border-radius: var(--radiusMedium);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
   color: var(--textSecondary);
   text-align: center;
   box-shadow: var(--shadowSmall);

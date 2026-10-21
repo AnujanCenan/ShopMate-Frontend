@@ -21,7 +21,7 @@
 .itemList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacingMedium);
   margin-top: 0;
 }
 /* Item Name */
@@ -29,15 +29,15 @@
   margin: 0;
   letter-spacing: -0.4px;
   color: var(--textPrimary);
-  font-size: 22px;
+  font-size: var(--fontSizeXLargePlus);
   font-weight: 700;
   line-height: 1.2;
 }
 /* Item Details */
 .itemDetails {
-  margin: 4px 0 0;
+  margin: var(--spacingXSmall) 0 0;
   color: var(--mutedTextColor);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   line-height: 1.5;
 }
 /* Item Card Top Row */
@@ -45,14 +45,14 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--spacingMedium);
   margin-bottom: 14px;
 }
 /* Item Action Buttons */
 .itemActionButtons {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--spacingSmall);
   position: relative;
   z-index: 20;
 }
@@ -63,7 +63,7 @@
   border: none;
   cursor: pointer;
   pointer-events: auto;
-  font-size: 22px;
+  font-size: var(--fontSizeXLargePlus);
   z-index: 30;
 }
 /* Item Title Section */
@@ -94,14 +94,14 @@
   flex-shrink: 0;
   width: 90px;
   height: 90px;
-  margin-left: 12px;
+  margin-left: var(--spacingCompact);
 }
 /* Item Image */
 .itemImage {
   width: 90px;
   height: 90px;
   object-fit: cover;
-  border-radius: 18px;
+  border-radius: var(--radiusRoomy);
   display: block;
 }
 /* Item Image Placeholder */
@@ -112,26 +112,26 @@
   width: 90px;
   height: 90px;
   background: var(--surfaceColor);
-  border: 2px dashed #d1d5db;
-  border-radius: 18px;
-  font-size: 32px;
+  border: 2px dashed var(--borderColor);
+  border-radius: var(--radiusRoomy);
+  font-size: var(--fontSizeHero);
 }
 /* Item Image Preview */
 .itemImagePreview {
   width: 100%;
   max-height: 140px;
-  margin-top: 12px;
+  margin-top: var(--spacingCompact);
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: var(--radiusSmall);
 }
 /* Swipe Wrapper */
 .swipeWrapper {
   position: relative;
   display: inline-block;
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacingMedium);
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: var(--radiusLarge);
 }
 /* Swipe Background */
 .swipeBackground {
@@ -150,9 +150,9 @@
   justify-content: flex-start;
   flex: 1;
   padding-left: 28px;
-  background: #16a34a;
-  color: var(--textPrimary);
-  font-size: 15px;
+  background: var(--successColor);
+  color: var(--textOnPrimary);
+  font-size: var(--fontSizeBodySmall);
   font-weight: 700;
 }
 /* Swipe Delete */
@@ -162,16 +162,16 @@
   justify-content: flex-end;
   flex: 1;
   padding-right: 28px;
-  background: #ef4444;
-  color: var(--textPrimary);
-  font-size: 15px;
+  background: var(--dangerBright);
+  color: var(--textOnPrimary);
+  font-size: var(--fontSizeBodySmall);
   font-weight: 700;
 }
 /* Swipe Card */
 .swipeCard {
   position: relative;
   background: var(--cardColor);
-  border-radius: 28px;
+  border-radius: var(--radiusLarge);
   transition: transform 0.2s ease;
   z-index: 2;
 }
@@ -188,9 +188,9 @@
 }
 /* Selected Item */
 .selectedItem {
-  background: #eff6ff;
-  border: 2px solid #2563eb;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
+  background: var(--infoSurface);
+  border: 2px solid var(--infoColor);
+  box-shadow: 0 8px 24px var(--primaryGlowModerate);
 }
 /* Product Lookup Section */
 .productLookupSection {
@@ -202,32 +202,32 @@
 }
 /* Product Name */
 .productName {
-  margin-bottom: 8px;
-  font-size: 20px;
+  margin-bottom: var(--spacingSmall);
+  font-size: var(--fontSizeXLarge);
   font-weight: 700;
 }
 /* Product Price */
 .productPrice {
   color: var(--primaryColor);
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
   font-weight: 600;
 }
 /* Product Store */
 .productStore {
-  margin-top: 4px;
-  color: var(--secondaryTextColor);
-  font-size: 14px;
+  margin-top: var(--spacingXSmall);
+  color: var(--textSecondary);
+  font-size: var(--fontSizeSmall);
 }
 /* Product Image */
 .productImage {
   width: 90px;
   height: 90px;
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: var(--radiusComfortable);
 }
 /* Product Actions */
 .productActions {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  gap: var(--spacingCompact);
+  margin-top: var(--spacingMedium);
 }

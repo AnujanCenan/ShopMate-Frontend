@@ -29,7 +29,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacingMedium);
-  margin-bottom: 24px;
+  margin-bottom: var(--spacingLarge);
 }
 /* Group Item */
 .groupItem {
@@ -46,7 +46,7 @@
 .groupItemName {
   flex: 1;
   text-align: left;
-  font-size: 17px;
+  font-size: var(--fontSizeBodyLarge);
   font-weight: 500;
 }
 
@@ -63,7 +63,7 @@
   width: 14px;
   height: 14px;
   flex: 0 0 12px;
-  border: 1px solid rgba(17, 24, 39, 0.2);
+  border: 1px solid var(--borderColor);
   border-radius: 50%;
 }
 

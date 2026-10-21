@@ -25,33 +25,33 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 24px;
+  padding: var(--spacingLarge);
   background: var(--surfaceColor);
 }
 /* Authentication Card */
 .authCard {
   width: 100%;
   max-width: 420px;
-  padding: 32px 24px;
+  padding: var(--spacingXLarge) var(--spacingLarge);
   background: var(--cardColor);
-  border-radius: 32px;
-  box-shadow: 0 12px 40px var(--shadowMedium);
+  border-radius: var(--radiusExtraLarge);
+  box-shadow: 0 12px 40px var(--shadowAmbientMid);
 }
 /* Authentication Title */
 .authTitle {
-  margin-bottom: 24px;
-  font-size: 28px;
+  margin-bottom: var(--spacingLarge);
+  font-size: var(--fontSizeDisplay);
   font-weight: 700;
 }
 /* Authentication Subtitle */
 .authSubtitle {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacingLarge);
   color: var(--mutedTextColor);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
 }
 /* Authentication Logo Section */
 .authLogoSection {
-  margin-bottom: 32px;
+  margin-bottom: var(--spacingXLarge);
   text-align: center;
 }
 /* Authentication Logo Placeholder */
@@ -61,8 +61,8 @@
   justify-content: center;
   width: 100px;
   height: 100px;
-  margin: 0 auto 16px;
-  border-radius: 24px;
+  margin: 0 auto var(--spacingMedium);
+  border-radius: var(--radiusExtraLarge);
   font-weight: 700;
 }
 /* Authentication Logo */
@@ -71,14 +71,14 @@
 }
 /* Authentication Brand */
 .authBrand {
-  margin-bottom: 8px;
-  font-size: 32px;
+  margin-bottom: var(--spacingSmall);
+  font-size: var(--fontSizeHero);
   font-weight: 700;
 }
 /* Authentication Tagline */
 .authTagline {
   color: var(--mutedTextColor);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
 }
 /* Authentication Biometric Row */
 .authBiometricRow {
@@ -91,7 +91,7 @@
 /* Authentication OR Text */
 .authOrText {
   color: var(--mutedTextColor);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
 }
 /* Authentication Divider */
 .authDivider {
@@ -105,12 +105,12 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #d9e2ec;
+  background: var(--borderColor);
 }
 .authDivider span {
   padding: 0 14px;
-  color: #94a3b8;
-  font-size: 13px;
+  color: var(--mutedTextColor);
+  font-size: var(--fontSizeCaption);
   font-weight: 600;
 }
 /* Authentication Text Button */
@@ -122,15 +122,15 @@
   border: none;
   cursor: pointer;
   text-align: center;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
 }
 /* Authentication Invite Text */
 .authInviteText {
-  margin-top: 24px;
+  margin-top: var(--spacingLarge);
   color: var(--mutedTextColor);
   text-align: center;
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   line-height: 1.5;
 }
 /* Authentication Invite Sub Text */
@@ -138,7 +138,7 @@
   margin-top: 6px;
   color: var(--mutedTextColor);
   text-align: center;
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   line-height: 1.5;
 }
 /* Forgot Password Button */

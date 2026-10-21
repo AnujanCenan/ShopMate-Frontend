@@ -27,7 +27,7 @@
 .formRow {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--spacingCompact);
   width: 100%;
   margin-bottom: 18px;
 }
@@ -45,13 +45,13 @@
 .quantityUnitInput {
   width: 72px;
   min-width: 72px;
-  padding: 0 8px;
+  padding: 0 var(--spacingSmall);
   border: 1px solid var(--borderColor);
   border-left: 0;
-  border-radius: 0 18px 18px 0;
+  border-radius: 0 var(--radiusControl) var(--radiusControl) 0;
   background: var(--cardColor);
   color: var(--textPrimary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 600;
   cursor: pointer;
   outline: none;
@@ -73,22 +73,26 @@
   width: 90%;
   height: 56px;
   padding: 0 18px;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacingMedium);
   border: 1px solid var(--borderColor);
-  border-radius: 18px;
-  font-size: 16px;
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
+  font-size: var(--fontSizeBody);
   outline: none;
 }
 .authInput:focus {
-  border-color: #118ab2;
+  border-color: var(--primaryColor);
 }
 /* Search Input */
 .searchInput {
   width: 100%;
   padding: 18px;
   border: 1px solid var(--borderColor);
-  border-radius: var(--borderRadiusMedium);
-  font-size: 16px;
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
+  font-size: var(--fontSizeBody);
   outline: none;
 }
 /* Modern Search Input */
@@ -98,22 +102,22 @@
   height: 48px;
   padding: 0 18px 0 48px;
   border: 1px solid var(--borderColor);
-  border-radius: 18px;
+  border-radius: var(--radiusControl);
   background: var(--cardColor);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   outline: none;
   transition: all 0.2s ease;
 }
 .modernSearchInput:focus {
-  border-color: #118ab2;
-  box-shadow: 0 0 0 4px rgba(17, 138, 178, 0.08);
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 4px var(--primaryGlowSoft);
 }
 /* Currency Input */
 .currencyInputWrapper {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacingCompact);
   width: 100%;
 }
 .currencyInput {
@@ -122,10 +126,10 @@
 /* Form Label */
 .formLabel {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: var(--spacingXSmall);
   margin: 0;
   color: var(--textSecondary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 600;
 }
 /* Half Width Field */
@@ -137,21 +141,21 @@
 .biometricToggle {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 8px 0 18px;
-  font-size: 15px;
+  gap: var(--spacingCompact);
+  margin: var(--spacingSmall) 0 18px;
+  font-size: var(--fontSizeBodySmall);
 }
 /* Form Validation */
 .formInputError {
-  border: 2px solid #dc2626 !important;
-  background-color: #fef2f2;
+  border: 2px solid var(--dangerColor) !important;
+  background-color: var(--dangerSurface);
 }
 .validationMessage {
   min-height: 18px;
   margin-top: 6px;
-  padding-left: 4px;
-  color: #dc2626;
-  font-size: 12px;
+  padding-left: var(--spacingXSmall);
+  color: var(--dangerText);
+  font-size: var(--fontSizeXSmall);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -160,7 +164,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--spacingMedium);
   padding: 18px 0;
   border-bottom: 1px solid var(--borderColor);
 }
@@ -171,13 +175,13 @@
   flex: 1;
 }
 .toggleTitle {
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 600;
   color: var(--textPrimary);
 }
 .toggleDescription {
-  margin-top: 4px;
-  font-size: 13px;
+  margin-top: var(--spacingXSmall);
+  font-size: var(--fontSizeCaption);
   line-height: 1.4;
   color: var(--textSecondary);
 }
@@ -200,7 +204,7 @@
   inset: 0;
   cursor: pointer;
   background: var(--borderColor); /* OFF colour */
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
   transition: 0.25s ease;
 }
 /* Toggle Circle */
@@ -214,7 +218,7 @@
   background: var(--cardColor);
   border-radius: 50%;
   transition: 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px var(--shadowAmbientStrong);
 }
 /* ON State */
 .toggleSwitch input:checked + .toggleSlider {
@@ -226,14 +230,14 @@
 }
 /* Focus */
 .toggleSwitch input:focus + .toggleSlider {
-  outline: 2px solid rgba(0, 137, 186, 0.25);
+  outline: 2px solid var(--primaryGlowStrong);
   outline-offset: 2px;
 }
 /* Form Field Polish */
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacingSmall);
   width: 100%;
   margin-bottom: 18px;
 }
@@ -241,7 +245,7 @@
 .formLabel {
   display: block;
   color: var(--textPrimary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 700;
   line-height: 1.3;
 }
@@ -249,19 +253,19 @@
 .bottomSheetInput {
   width: 100%;
   min-height: 52px;
-  padding: 0 16px;
-  border: 1px solid #d7e0e8;
-  border-radius: var(--radiusSmall);
+  padding: 0 var(--spacingMedium);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusControl);
   outline: none;
   background: var(--surfaceColor);
   color: var(--textPrimary);
   font-family: inherit;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 500;
   line-height: 1.3;
   box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.02),
-    0 1px 2px rgba(0, 0, 0, 0.02);
+    inset 0 1px 2px var(--shadowAmbientExtraSoft),
+    0 1px 2px var(--shadowAmbientExtraSoft);
   transition:
     border-color var(--animationSpeed) ease,
     background-color var(--animationSpeed) ease,
@@ -270,15 +274,15 @@
   appearance: none;
 }
 .bottomSheetInput::placeholder {
-  color: #94a3b8;
+  color: var(--mutedTextColor);
   font-weight: 400;
 }
 .bottomSheetInput:focus {
   border-color: var(--primaryColor);
   background: var(--surfaceColor);
   box-shadow:
-    0 0 0 3px rgba(17, 138, 178, 0.12),
-    0 2px 8px rgba(17, 138, 178, 0.06);
+    0 0 0 3px var(--primaryTint),
+    0 2px 8px var(--primaryGlowVerySoft);
 }
 /* Number Input */
 .bottomSheetInput[type="number"] {
@@ -306,7 +310,7 @@ select.bottomSheetInput {
   left: 16px;
   z-index: 2;
   color: var(--textSecondary);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 700;
   line-height: 1;
   transform: translateY(-50%);
@@ -329,7 +333,7 @@ select.bottomSheetInput {
   width: 100%;
   max-width: 180px;
   max-height: 180px;
-  margin: 4px auto 8px;
+  margin: var(--spacingXSmall) auto var(--spacingSmall);
   object-fit: contain;
   border: 1px solid var(--borderColor);
   border-radius: var(--radiusMedium);
@@ -370,14 +374,14 @@ select.bottomSheetInput {
     min-height: 54px;
   }
   .formRow {
-    gap: 16px;
+    gap: var(--spacingMedium);
   }
 }
 .groupColorSwatches {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
-  padding: 4px 2px;
+  gap: var(--spacingCompact);
+  padding: var(--spacingXSmall) 2px;
 }
 
 .groupColorSwatch {

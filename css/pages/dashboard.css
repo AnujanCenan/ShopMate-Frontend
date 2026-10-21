@@ -27,9 +27,9 @@
 }
 /* Budget Widget Subtitle */
 .budgetWidgetSubtitle {
-  margin-top: 4px;
+  margin-top: var(--spacingXSmall);
   color: var(--mutedTextColor);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
 }
 /* Budget Widget Summary */
 .budgetWidgetSummary {
@@ -41,12 +41,12 @@
 .budgetSummaryItem {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--spacingXSmall);
 }
 /* Budget Widget Details */
 .budgetWidgetDetails {
   margin-top: 18px;
-  padding-top: 16px;
+  padding-top: var(--spacingMedium);
   border-top: 1px solid var(--borderColor);
 }
 /* Budget Detail Row */
@@ -57,8 +57,8 @@
 }
 /* Budget Widget Amount */
 .budgetWidgetAmount {
-  margin: 12px 0;
-  font-size: 24px;
+  margin: var(--spacingCompact) 0;
+  font-size: var(--fontSizeXXLarge);
   font-weight: 700;
 }
 /* Budget Widget Text */
@@ -66,7 +66,7 @@
   margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
 }
 /* Budget Allocation Text */
 .budgetAllocationText {
@@ -74,26 +74,26 @@
   margin-bottom: 10px;
   text-align: center;
   color: var(--mutedTextColor);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   font-weight: 600;
 }
 /* Budget Allocation Status */
 .budgetAllocationStatus {
   margin-top: 10px;
   margin-bottom: 10px;
-  color: #2563eb;
-  font-size: 14px;
+  color: var(--infoColor);
+  font-size: var(--fontSizeSmall);
   font-weight: 700;
   text-align: center;
 }
 /* Budget Warning Banner */
 .budgetWarningBanner {
   margin-top: 18px;
-  padding: 12px;
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: var(--spacingCompact);
+  background: var(--dangerSurface);
+  color: var(--dangerDeep);
+  border: 1px solid var(--dangerBorder);
+  border-radius: var(--radiusCompact);
+  font-size: var(--fontSizeSmall);
   font-weight: 600;
 }
