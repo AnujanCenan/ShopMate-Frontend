@@ -1333,6 +1333,7 @@ function renderBudgetDashboardWidget() {
     };
   }
   const groupBudget = appState.budgets.groupBudgets[appState.activeGroup];
+  const isExpanded = appState.dashboardBudgetExpanded === true;
   const limit = groupBudget.monthlyLimit ?? 0;
   const spent = calculateGroupBudget(appState.activeGroup);
   const remaining = Math.max(limit - spent, 0);
@@ -1376,6 +1377,8 @@ function renderBudgetDashboardWidget() {
       <button
         class="budgetSummaryHeader"
         onclick="toggleBudgetCard()"
+        aria-expanded="${isExpanded}"
+        aria-controls="budgetSummaryBody"
       >
         <div>
           <h3>
@@ -1391,25 +1394,31 @@ function renderBudgetDashboardWidget() {
         </div>
         <span id="budgetCollapseIcon">
           <img
-            src="${getIconPath("navigation", "collapse")}"
+            src="${getIconPath("navigation", isExpanded ? "collapse" : "expand")}"
             class="icon actionIcon"
-            alt=""
+            alt="${isExpanded ? t("common.collapse") : t("common.expand")}"
           >
         </span>
       </button>
       <div
-        id="budgetSummaryBody"
-        class="budgetSummaryBody"
+        id="budgetCompactSummary"
+        class="budgetCompactSummary${isExpanded ? " hidden" : ""}"
+        aria-hidden="${isExpanded}"
       >
-        <h2>
-          ${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}
-        </h2>
+        <span>${t("dashboard.allocated")} <strong>${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}</strong></span>
+        <span>${t("dashboard.spent")} <strong>${getCurrencySymbol()} ${spent}</strong></span>
+        <span>${t("dashboard.remaining")} <strong>${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + remaining}</strong></span>
+      </div>
+      <div
+        id="budgetSummaryBody"
+        class="budgetSummaryBody${isExpanded ? "" : " hidden"}"
+      >
         <div class="analysisValue">
           <span>
             ${t("dashboard.allocated")}
           </span>
           <span>
-            ${getCurrencySymbol()} ${allocated}
+            ${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}
           </span>
         </div>
         <div class="analysisValue">
@@ -1528,9 +1537,19 @@ function renderBudgetDashboardWidget() {
 /* Toggle Budget Card */
 function toggleBudgetCard() {
   const body = document.getElementById("budgetSummaryBody");
+  const compactSummary = document.getElementById("budgetCompactSummary");
   const icon = document.getElementById("budgetCollapseIcon");
-  body.classList.toggle("hidden");
-  if (body.classList.contains("hidden")) {
+  const header = document.querySelector(".budgetSummaryHeader");
+  if (!body || !compactSummary || !icon || !header) {
+    return;
+  }
+  appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
+  saveAppState();
+  body.classList.toggle("hidden", !appState.dashboardBudgetExpanded);
+  compactSummary.classList.toggle("hidden", appState.dashboardBudgetExpanded);
+  header.setAttribute("aria-expanded", String(appState.dashboardBudgetExpanded));
+  compactSummary.setAttribute("aria-hidden", String(appState.dashboardBudgetExpanded));
+  if (!appState.dashboardBudgetExpanded) {
     icon.innerHTML = `
       <img
         src="${getIconPath("navigation", "expand")}"
@@ -1737,6 +1756,8 @@ function saveCategoryBudget(categoryName) {
     monthlyLimit: amount,
   };
   saveAppState();
+  renderCategories();
+  renderBudgetDashboardWidget();
   closeBottomSheet();
   showToast(t("dashboard.categoryBudgetSaved"));
 }

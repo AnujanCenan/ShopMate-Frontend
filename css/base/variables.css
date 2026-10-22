@@ -54,6 +54,9 @@
   --primaryGlowSoft: rgba(12, 120, 152, 0.08);
   --primaryGlowStrong: rgba(12, 120, 152, 0.25);
   --primaryGlowModerate: rgba(12, 120, 152, 0.18);
+  --primaryButtonShadow: 0 0 8px rgba(12, 120, 152, 0.12),
+    0 1px 3px rgba(15, 23, 42, 0.06);
+  --primaryButtonShadowActive: 0 0 5px rgba(12, 120, 152, 0.1);
   --primaryTintSoft: rgba(12, 120, 152, 0.1);
   --primaryTintModerate: rgba(12, 120, 152, 0.14);
   --primaryGlowVerySoft: rgba(12, 120, 152, 0.06);
@@ -100,6 +103,7 @@
   --iconColor: #111827;
 
   --borderColor: #e5e7eb;
+  --secondaryButtonBorder: #cbd5e1;
   --borderSubtle: rgba(229, 231, 235, 0.8);
   --dividerColor: #e5e7eb;
 

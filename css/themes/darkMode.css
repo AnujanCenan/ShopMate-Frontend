@@ -23,6 +23,7 @@ body.darkMode {
   --infoStrong: #38bdf8;
   /* Borders */
   --borderColor: #3e4c61;
+  --secondaryButtonBorder: #64748b;
   /* Brand */
   --primaryColor: #0c7898;
   --primaryDark: #0a637f;
@@ -64,6 +65,9 @@ body.darkMode {
   --focusRing: rgba(56, 189, 248, 0.55);
   --primaryTint: rgba(56, 189, 248, 0.18);
   --primaryGlow: rgba(56, 189, 248, 0.3);
+  --primaryButtonShadow: 0 0 8px rgba(56, 189, 248, 0.14),
+    0 1px 3px rgba(0, 0, 0, 0.12);
+  --primaryButtonShadowActive: 0 0 5px rgba(56, 189, 248, 0.12);
   --favoriteSurface: rgba(225, 29, 72, 0.2);
   --favoriteSurfaceStrong: rgba(225, 29, 72, 0.28);
   --favoriteGlow: rgba(225, 29, 72, 0.38);

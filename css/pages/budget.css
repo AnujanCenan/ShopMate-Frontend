@@ -16,8 +16,35 @@
  * • Budget Page
  ***************************************************************************************************/
 /* Budget Summary Body */
+.budgetSummaryCard {
+  overflow: hidden;
+  background: var(--cardColor);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusComfortable);
+  box-shadow: var(--shadowSmall);
+}
 .budgetSummaryBody {
   padding: 0 20px 20px;
+}
+.budgetCompactSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 14px 14px;
+  color: var(--textSecondary);
+  font-size: var(--fontSizeCaption);
+}
+.budgetCompactSummary span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.budgetCompactSummary strong {
+  color: var(--textPrimary);
+  font-size: var(--fontSizeSmall);
+  white-space: nowrap;
 }
 /* Budget Healthy Text */
 .budgetHealthyText {
@@ -69,11 +96,10 @@
   justify-content: space-between;
   width: 100%;
   padding: 20px 15px 15px;
-  background: var(--cardColor);
+  background: transparent;
   border: none;
   cursor: pointer;
-  border-radius: var(--radiusComfortable);
-  overflow: hidden;
+  border-radius: 0;
 }
 .budgetSummaryHeader h3 {
   margin: 0;

@@ -31,7 +31,7 @@
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
-  box-shadow: 0 10px 24px var(--primaryGlow);
+  box-shadow: var(--primaryButtonShadow);
   -webkit-tap-highlight-color: transparent;
   transition:
     transform var(--animationSpeed) ease,
@@ -40,7 +40,7 @@
 }
 .primaryButton:active {
   transform: scale(0.98);
-  box-shadow: 0 6px 16px var(--primaryGlowModerate);
+  box-shadow: var(--primaryButtonShadowActive);
 }
 /* Secondary Button */
 .secondaryButton {
@@ -50,7 +50,7 @@
   flex: 1;
   min-height: 54px;
   padding: 0 20px;
-  border: 1px solid var(--borderColor);
+  border: 1px solid var(--secondaryButtonBorder);
   border-radius: var(--radiusMedium);
   background: var(--surfaceColor);
   color: var(--textPrimary);
