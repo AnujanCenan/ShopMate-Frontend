@@ -457,17 +457,12 @@ registerLanguage("fr", {
       "Seuls les administrateurs peuvent supprimer des membres.",
     onlyAdminsCanResend:
       "Seuls les administrateurs peuvent renvoyer les invitations.",
-    onlyAdminsCanTransferOwnership:
-      "Seuls les administrateurs peuvent transférer la propriété.",
-    ownershipTransferred: "Propriété transférée",
-    ownershipTransferredMessage:
-      "{{name}} est maintenant propriétaire du groupe.",
-    ownershipTransferredTitle: "Propriété transférée",
     pendingInvitation: "Invitation en attente",
     pendingInvitations: "Invitations en attente",
     promoteAnotherAdmin:
       "Veuillez nommer un autre membre administrateur avant de partir.",
-    readOnlyAccess: "Vous disposez d'un accès en lecture seule dans ce groupe.",
+    readOnlyAccess:
+      "Les paramètres du groupe sont réservés aux administrateurs. Vous pouvez gérer les catégories que vous créez et utiliser la liste de courses partagée.",
     rejoinRequiresInvite:
       "Pour rejoindre à nouveau le groupe, vous aurez besoin d'une nouvelle invitation.",
     removeMember: "Supprimer le membre",
@@ -475,7 +470,6 @@ registerLanguage("fr", {
     role: "Rôle",
     sendInvitation: "Envoyer une invitation",
     title: "Gestion du groupe",
-    transferOwnership: "Transférer la propriété",
     youLeftGroup: "Vous avez quitté le groupe.",
   },
   // Text shown when accepting a group invitation.

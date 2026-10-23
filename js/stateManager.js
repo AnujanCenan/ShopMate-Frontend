@@ -66,6 +66,7 @@ const defaultAppState = {
     "My Shopping Group": [
       {
         name: "Monthly Groceries",
+        createdByUserId: "user_1",
         items: [
           {
             name: "Milk",
@@ -92,6 +93,9 @@ const defaultAppState = {
     ],
   },
   groupColorPreferences: {},
+  groupCreators: {
+    "My Shopping Group": "user_1",
+  },
   groupMembers: {
     "My Shopping Group": [
       {
@@ -184,6 +188,52 @@ function loadAppState() {
   }
 
   if (
+    !parsedState.groupCreators ||
+    typeof parsedState.groupCreators !== "object" ||
+    Array.isArray(parsedState.groupCreators)
+  ) {
+    parsedState.groupCreators = {};
+    stateUpdated = true;
+  }
+
+  Object.keys(parsedState.groups).forEach(function (groupName) {
+    if (!Array.isArray(parsedState.groupMembers[groupName])) {
+      parsedState.groupMembers[groupName] = [];
+      stateUpdated = true;
+    }
+    const members = parsedState.groupMembers[groupName];
+    if (!Array.isArray(parsedState.groups[groupName])) {
+      parsedState.groups[groupName] = [];
+      stateUpdated = true;
+    }
+    members.forEach(function (member) {
+      if (member.role === "owner") {
+        member.role = "admin";
+        stateUpdated = true;
+      } else if (member.role !== "admin" && member.role !== "member") {
+        member.role = "member";
+        stateUpdated = true;
+      }
+    });
+
+    if (!Object.prototype.hasOwnProperty.call(parsedState.groupCreators, groupName)) {
+      const originalAdmin = members.find(function (member) {
+        return member.role === "admin";
+      });
+      parsedState.groupCreators[groupName] =
+        originalAdmin?.id || originalAdmin?.email || null;
+      stateUpdated = true;
+    }
+
+    parsedState.groups[groupName].forEach(function (category) {
+      if (!category.createdByUserId) {
+        category.createdByUserId = parsedState.groupCreators[groupName] || null;
+        stateUpdated = true;
+      }
+    });
+  });
+
+  if (
     !parsedState.groupColorPreferences ||
     typeof parsedState.groupColorPreferences !== "object" ||
     Array.isArray(parsedState.groupColorPreferences)
@@ -197,6 +247,17 @@ function loadAppState() {
     stateUpdated = true;
   }
   parsedState.pendingInvitations.forEach(function (invitation) {
+    if (invitation.role === "owner") {
+      invitation.role = "admin";
+      stateUpdated = true;
+    } else if (
+      invitation.role !== undefined &&
+      invitation.role !== "admin" &&
+      invitation.role !== "member"
+    ) {
+      invitation.role = "member";
+      stateUpdated = true;
+    }
     if (!invitation.id) {
       invitation.id = `invite_${Date.now()}_${Math.random()
         .toString(36)

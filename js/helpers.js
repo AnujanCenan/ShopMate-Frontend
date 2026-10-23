@@ -314,7 +314,7 @@ function initializeBottomSheetEvents() {
 function getActiveCategory() {
   const activeGroup = localStorage.getItem("activeGroup");
   const activeCategory = localStorage.getItem("activeCategory");
-  if (!activeGroup || !activeCategory) {
+  if (!activeGroup || !activeCategory || !getGroupMember(activeGroup)) {
     return null;
   }
   const categories = appState.groups[activeGroup];
@@ -329,35 +329,87 @@ function getActiveCategory() {
 function debugActiveCategory() {
   console.log("ACTIVE CATEGORY:", getActiveCategory());
 }
-/* Get Current Member - Returns the current user's membership details for the active group. */
-function getCurrentMember() {
-  const groupName = appState.activeGroup;
-  if (!groupName || !appState.currentUser) {
+/* Return the signed-in user's membership record for a selected group. */
+function getGroupMember(groupName = appState.activeGroup) {
+  const currentUser = appState.currentUser;
+  if (!groupName || !currentUser) {
     return null;
   }
-  const members = appState.groupMembers[groupName] || [];
+  const members = appState.groupMembers?.[groupName] || [];
   return members.find(function (member) {
-    return member.email === appState.currentUser.email;
+    return (
+      (currentUser.id && member.id === currentUser.id) ||
+      (currentUser.email &&
+        member.email?.toLowerCase() === currentUser.email.toLowerCase())
+    );
   });
 }
-/* Is Admin - Determines whether the current user is an administrator of the active group. */
-function isAdmin() {
-  const member = getCurrentMember();
-  return member ? member.role === "admin" : false;
+/* Keep active-group callers compatible while using the shared group lookup. */
+function getCurrentMember() {
+  return getGroupMember(appState.activeGroup);
 }
-/* Is Member - Determines whether the current user is a standard member of the active group. */
-function isMember() {
-  const member = getCurrentMember();
-  return member ? member.role === "member" : false;
+/* Return only the groups the signed-in user belongs to. */
+function getCurrentUserGroups() {
+  return Object.keys(appState.groups || {}).filter(function (groupName) {
+    return Boolean(getGroupMember(groupName));
+  });
 }
-/* Can Manage Budget - Determines whether the current user can manage group budgets. */
-function canManageBudget() {
-  return isAdmin();
+/* Check whether the signed-in user is an administrator in the selected group. */
+function isAdmin(groupName = appState.activeGroup) {
+  return getGroupMember(groupName)?.role === "admin";
 }
-/* Can Manage Group - Determines whether the current user can manage the active group. */
-function canManageGroup() {
-  const member = getCurrentMember();
-  return member ? member.role === "admin" || member.role === "owner" : false;
+/* Check whether the signed-in user is a standard member in the selected group. */
+function isMember(groupName = appState.activeGroup) {
+  return getGroupMember(groupName)?.role === "member";
+}
+/* Check whether a user created the selected group. */
+function isGroupCreator(groupName = appState.activeGroup) {
+  const currentUser = appState.currentUser;
+  if (!getGroupMember(groupName)) return false;
+  const creatorId = appState.groupCreators?.[groupName];
+  return Boolean(
+    currentUser &&
+      creatorId &&
+      ((currentUser.id && creatorId === currentUser.id) ||
+        (currentUser.email &&
+          String(creatorId).toLowerCase() === currentUser.email.toLowerCase())),
+  );
+}
+/* Admin-only permissions cover invitations and member administration. */
+function canManageGroup(groupName = appState.activeGroup) {
+  return isAdmin(groupName);
+}
+/* Group creators may manage their group; admins retain full control. */
+function canManageGroupSettings(groupName = appState.activeGroup) {
+  return isAdmin(groupName) || isGroupCreator(groupName);
+}
+/* Group creators and admins may change the group-level budget. */
+function canManageBudget(groupName = appState.activeGroup) {
+  return canManageGroupSettings(groupName);
+}
+/* Admins or the category creator may manage that category and its budget. */
+function canManageCategory(categoryName, groupName = appState.activeGroup) {
+  const currentMember = getGroupMember(groupName);
+  if (!currentMember) return false;
+  if (currentMember.role === "admin") {
+    return true;
+  }
+  const category = (appState.groups?.[groupName] || []).find(function (entry) {
+    return entry.name === categoryName;
+  });
+  const currentUser = appState.currentUser;
+  const creatorId = category?.createdByUserId;
+  return Boolean(
+    currentUser &&
+      creatorId &&
+      ((currentUser.id && creatorId === currentUser.id) ||
+        (currentUser.email &&
+          String(creatorId).toLowerCase() === currentUser.email.toLowerCase())),
+  );
+}
+/* Members cannot change group colors; admins may customize their own view. */
+function canManageGroupColor(groupName) {
+  return isAdmin(groupName);
 }
 /* Personal group colors are stored per user so they do not change other members' view. */
 const GROUP_COLOR_PALETTE = [

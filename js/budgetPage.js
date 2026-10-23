@@ -91,6 +91,8 @@ if (screenOverlay) {
 }
 /* Open Budget Menu - Displays the available actions for the selected budget category. */
 function openBudgetMenu(categoryName) {
+  const activeGroup = budgetDisplayGroup || appState.activeGroup;
+  if (!canManageCategory(categoryName, activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -149,26 +151,8 @@ function openBudgetMenu(categoryName) {
 /* Edit Category Budget - Opens the form to update the monthly budget limit. */
 function editCategoryBudget(categoryName) {
   const activeGroup = budgetDisplayGroup || appState.activeGroup;
-  if (!activeGroup) {
-    showDialog(t("budget.onlyAdminCanEdit"));
-    return;
-  }
-  /*
-   * Permission is checked against the Budget display group,
-   * not against the global appState.activeGroup.
-   */
-  const members = appState.groupMembers?.[activeGroup] || [];
-  const currentUser = appState.currentUser;
-  const currentMember = currentUser
-    ? members.find(function (member) {
-        return member.email === currentUser.email;
-      })
-    : null;
-  const canManageDisplayedGroup =
-    currentMember &&
-    (currentMember.role === "admin" || currentMember.role === "owner");
-  if (!canManageDisplayedGroup) {
-    showDialog(t("budget.onlyAdminCanEdit"));
+  if (!canManageCategory(categoryName, activeGroup)) {
+    showDialog(t("common.permissionDenied"));
     return;
   }
   const categoryBudget =
@@ -216,6 +200,10 @@ function editCategoryBudget(categoryName) {
 /* Save Edited Budget - Updates the monthly budget limit for the selected category. */
 function saveEditedBudget(categoryName) {
   const activeGroup = budgetDisplayGroup || appState.activeGroup;
+  if (!canManageCategory(categoryName, activeGroup)) {
+    showDialog(t("common.permissionDenied"));
+    return;
+  }
   const input = document.getElementById("editBudgetLimit");
   if (!activeGroup || !input) {
     return;
@@ -538,8 +526,15 @@ function renderCategoryBudgetCards() {
 function initializeBudgetPage() {
   const params = new URLSearchParams(window.location.search);
   const requestedGroup = params.get("group");
-  if (requestedGroup && appState.groups && appState.groups[requestedGroup]) {
+  const availableGroups = getCurrentUserGroups();
+  if (availableGroups.length === 0) {
+    window.location.href = "../pages/dashboardPage.html";
+    return;
+  }
+  if (requestedGroup && availableGroups.includes(requestedGroup)) {
     budgetDisplayGroup = requestedGroup;
+  } else if (!getGroupMember(appState.activeGroup)) {
+    budgetDisplayGroup = availableGroups[0];
   } else {
     budgetDisplayGroup = null;
   }

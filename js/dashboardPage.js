@@ -31,13 +31,16 @@ function restoreLastGroup() {
   ) {
     return;
   }
+  const availableGroups = getCurrentUserGroups();
   const savedGroup = localStorage.getItem("activeGroup");
   const stateGroup =
-    appState.activeGroup && appState.groups[appState.activeGroup]
+    appState.activeGroup && availableGroups.includes(appState.activeGroup)
       ? appState.activeGroup
       : null;
   const groupToRestore =
-    savedGroup && appState.groups[savedGroup] ? savedGroup : stateGroup;
+    savedGroup && availableGroups.includes(savedGroup)
+      ? savedGroup
+      : stateGroup || availableGroups[0] || null;
   if (groupToRestore) {
     appState.activeGroup = groupToRestore;
     selectedGroupName.innerHTML = renderGroupNameWithColor(groupToRestore);
@@ -54,7 +57,7 @@ function renderCategories() {
     return;
   }
   categoryList.innerHTML = "";
-  if (!appState.activeGroup) {
+  if (!appState.activeGroup || !getGroupMember(appState.activeGroup)) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
         ${t("dashboard.selectOrCreateGroup")}
@@ -97,19 +100,20 @@ function renderCategories() {
           <h2 class="categoryTitle">
             ${category.name}
           </h2>
-          <button
-            class="categoryMoreButton"
-            onclick="
-              event.stopPropagation();
-              renderCategoryActions('${category.name}');
-            "
-          >
-            <img
-              src="${getIconPath("navigation", "menu")}"
-              class="icon actionIcon"
-              alt="${t("common.more")}"
-            />
-          </button>
+          ${
+            canManageCategory(category.name, appState.activeGroup)
+              ? `<button
+                  class="categoryMoreButton"
+                  onclick="event.stopPropagation(); renderCategoryActions('${category.name}');"
+                >
+                  <img
+                    src="${getIconPath("navigation", "menu")}"
+                    class="icon actionIcon"
+                    alt="${t("common.more")}"
+                  />
+                </button>`
+              : ""
+          }
         </div>
         <div class="categoryBudgetSummary">
           ${t("dashboard.budget")}
@@ -140,6 +144,7 @@ function renderCategories() {
 }
 /* Select Group */
 function selectGroup(groupName) {
+  if (!getGroupMember(groupName)) return;
   appState.activeGroup = groupName;
   selectedGroupName.innerHTML = renderGroupNameWithColor(groupName);
   localStorage.setItem("activeGroup", groupName);
@@ -150,6 +155,14 @@ function selectGroup(groupName) {
 }
 /* Open Category Page */
 function openCategoryPage(categoryName) {
+  if (
+    !getGroupMember(appState.activeGroup) ||
+    !(appState.groups[appState.activeGroup] || []).some(function (category) {
+      return category.name === categoryName;
+    })
+  ) {
+    return;
+  }
   localStorage.setItem("activeGroup", appState.activeGroup);
   localStorage.setItem("activeCategory", categoryName);
   window.location.href = "../pages/categoryPage.html";
@@ -157,7 +170,7 @@ function openCategoryPage(categoryName) {
 /* Render Group Dropdown */
 function renderGroupDropdown() {
   let groupItemsHTML = "";
-  Object.keys(appState.groups).forEach(function (groupName) {
+  getCurrentUserGroups().forEach(function (groupName) {
     groupItemsHTML += `
       <div
         class="groupItem"
@@ -166,11 +179,15 @@ function renderGroupDropdown() {
         <span class="groupItemName">
           ${renderGroupNameWithColor(groupName)}
         </span>
-        <button type="button" class="groupColorEditButton" aria-label="${t("dashboard.changeGroupColor")}" title="${t("dashboard.changeGroupColor")}" onclick="event.stopPropagation(); renderGroupColorForm('${groupName}')">
-          <img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt="">
-        </button>
         ${
-          canManageGroup()
+          canManageGroupColor(groupName)
+            ? `<button type="button" class="groupColorEditButton" aria-label="${t("dashboard.changeGroupColor")}" title="${t("dashboard.changeGroupColor")}" onclick="event.stopPropagation(); renderGroupColorForm('${groupName}')">
+                <img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt="">
+              </button>`
+            : ""
+        }
+        ${
+          canManageGroupSettings(groupName)
             ? `
               <button
                 class="groupMoreButton"
@@ -316,6 +333,9 @@ function renderGroupColorSwatches(groupName) {
 }
 /* Update the selected swatch and clear any prior color-selection error. */
 function selectGroupColor(color, button) {
+  if (!colorEditingGroupName || !canManageGroupColor(colorEditingGroupName)) {
+    return;
+  }
   const colorMap = getGroupColorMap();
   const owner = Object.keys(colorMap).find(function (name) {
     return colorMap[name].toLowerCase() === color.toLowerCase();
@@ -334,6 +354,7 @@ function selectGroupColor(color, button) {
 }
 /* Open the color picker for a group with its current color preselected. */
 function renderGroupColorForm(groupName) {
+  if (!canManageGroupColor(groupName)) return;
   ensureGroupColorsForCurrentUser();
   colorEditingGroupName = groupName;
   selectedGroupColor = getGroupColor(groupName);
@@ -344,6 +365,12 @@ function renderGroupColorForm(groupName) {
 }
 /* Save the chosen color for the group and refresh its visible name markers. */
 function saveGroupColor() {
+  if (
+    !colorEditingGroupName ||
+    !canManageGroupColor(colorEditingGroupName)
+  ) {
+    return;
+  }
   const colorMap = getGroupColorMap();
   const error = document.getElementById("groupColorError");
   const duplicateOwner = Object.keys(colorMap).find(function (name) {
@@ -476,6 +503,7 @@ function createGroup() {
     appState.groupMembers = {};
   }
   const currentUser = getCurrentUser();
+  if (!currentUser) return;
   appState.groupMembers[groupName] = [
     {
       id: currentUser.id,
@@ -484,6 +512,8 @@ function createGroup() {
       role: "admin",
     },
   ];
+  if (!appState.groupCreators) appState.groupCreators = {};
+  appState.groupCreators[groupName] = currentUser.id || currentUser.email;
   saveAppState();
   selectGroup(groupName);
   showSnackbar(t("dashboard.groupCreated"));
@@ -541,6 +571,9 @@ function renderCreateCategoryForm() {
 }
 /* Create Category */
 function createCategory() {
+  if (!appState.activeGroup || !getCurrentMember()) return;
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
   const categoryNameInput = document.getElementById("categoryNameInput");
   const categoryName = categoryNameInput.value.trim();
   if (!categoryName) {
@@ -564,6 +597,7 @@ function createCategory() {
   }
   appState.groups[appState.activeGroup].unshift({
     name: categoryName,
+    createdByUserId: currentUser.id || currentUser.email,
     items: [],
   });
   if (!appState.budgets) {
@@ -588,6 +622,7 @@ function createCategory() {
 }
 /* Render Category Actions */
 function renderCategoryActions(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -640,6 +675,7 @@ function renderCategoryActions(categoryName) {
 }
 /* Rename Category */
 function renameCategory(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   const categories = appState.groups[appState.activeGroup];
   const category = categories.find(function (item) {
     return item.name === categoryName;
@@ -690,6 +726,7 @@ function renameCategory(categoryName) {
 }
 /* Save Renamed Category */
 function saveRenamedCategory(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   const renameCategoryInput = document.getElementById("renameCategoryInput");
   const newCategoryName = renameCategoryInput.value.trim();
   if (!newCategoryName) {
@@ -728,6 +765,7 @@ function saveRenamedCategory(categoryName) {
 }
 /* Delete Category */
 function deleteCategory(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -769,6 +807,7 @@ function deleteCategory(categoryName) {
 }
 /* Confirm Delete Category */
 function confirmDeleteCategory(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   appState.groups[appState.activeGroup] = appState.groups[
     appState.activeGroup
   ].filter(function (category) {
@@ -784,6 +823,7 @@ function confirmDeleteCategory(categoryName) {
 }
 /* Render Group Actions */
 function renderGroupActions(groupName) {
+  if (!canManageGroupSettings(groupName)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -815,19 +855,21 @@ function renderGroupActions(groupName) {
           ${t("dashboard.renameGroup")}
         </span>
       </button>
-      <button
-        class="bottomSheetActionButton"
-        onclick="renderInviteMemberForm('${groupName}')"
-      >
-        <img
-          src="${getIconPath("actions", "add")}"
-          class="icon actionIcon"
-          alt="${t("dashboard.inviteMember")}"
-        >
-        <span>
-          ${t("dashboard.inviteMember")}
-        </span>
-      </button>
+      ${
+        canManageGroup(groupName)
+          ? `<button
+              class="bottomSheetActionButton"
+              onclick="renderInviteMemberForm('${groupName}')"
+            >
+              <img
+                src="${getIconPath("actions", "add")}"
+                class="icon actionIcon"
+                alt="${t("dashboard.inviteMember")}"
+              >
+              <span>${t("dashboard.inviteMember")}</span>
+            </button>`
+          : ""
+      }
       <button
         class="bottomSheetDeleteButton"
         onclick="deleteGroup('${groupName}')"
@@ -847,6 +889,7 @@ function renderGroupActions(groupName) {
 }
 /* Render Invite Member Form */
 function renderInviteMemberForm(groupName) {
+  if (!canManageGroup(groupName)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -926,6 +969,7 @@ function clearInviteMemberValidation() {
 }
 /* Send Member Invitation */
 function sendMemberInvitation(groupName) {
+  if (!canManageGroup(groupName)) return;
   const emailInput = document.getElementById("inviteMemberEmailInput");
   const emailError = document.getElementById("inviteMemberEmailError");
   if (!emailInput || !emailError) {
@@ -994,6 +1038,7 @@ function sendMemberInvitation(groupName) {
 }
 /* Rename Group */
 function renameGroup(groupName) {
+  if (!canManageGroupSettings(groupName)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -1057,6 +1102,7 @@ function renameGroup(groupName) {
 }
 /* Save Renamed Group */
 function saveRenamedGroup(oldGroupName) {
+  if (!canManageGroupSettings(oldGroupName)) return;
   const renameGroupInput = document.getElementById("renameGroupInput");
   const renameGroupError = document.getElementById("renameGroupError");
   const newGroupName = renameGroupInput.value.trim().replace(/\s+/g, " ");
@@ -1095,10 +1141,20 @@ function saveRenamedGroup(oldGroupName) {
   }
   appState.groups[newGroupName] = appState.groups[oldGroupName];
   delete appState.groups[oldGroupName];
+  if (appState.groupCreators?.[oldGroupName]) {
+    appState.groupCreators[newGroupName] = appState.groupCreators[oldGroupName];
+    delete appState.groupCreators[oldGroupName];
+  }
   if (appState.groupMembers?.[oldGroupName]) {
     appState.groupMembers[newGroupName] = appState.groupMembers[oldGroupName];
     delete appState.groupMembers[oldGroupName];
   }
+  (appState.pendingInvitations || []).forEach(function (invitation) {
+    if (invitation.groupName === oldGroupName) {
+      invitation.groupName = newGroupName;
+      invitation.groupId = newGroupName;
+    }
+  });
   if (appState.budgets.groupBudgets?.[oldGroupName]) {
     appState.budgets.groupBudgets[newGroupName] =
       appState.budgets.groupBudgets[oldGroupName];
@@ -1124,13 +1180,21 @@ function saveRenamedGroup(oldGroupName) {
 }
 /* Delete Group */
 function deleteGroup(groupName) {
+  if (!canManageGroupSettings(groupName)) return;
   showConfirmDialog(
     t("dashboard.deleteGroup"),
     `${t("dashboard.deleteGroupConfirmationStart")} "${groupName}"?
 ${t("dashboard.deleteGroupConfirmationDetails")}
 ${t("dashboard.deleteGroupConfirmationWarning")}`,
     function () {
+      if (!canManageGroupSettings(groupName)) return;
       delete appState.groups[groupName];
+      if (appState.groupCreators) delete appState.groupCreators[groupName];
+      appState.pendingInvitations = (appState.pendingInvitations || []).filter(
+        function (invitation) {
+          return invitation.groupName !== groupName;
+        },
+      );
       removeGroupColorPreferences(groupName);
       if (appState.groupMembers?.[groupName]) {
         delete appState.groupMembers[groupName];
@@ -1142,7 +1206,7 @@ ${t("dashboard.deleteGroupConfirmationWarning")}`,
         delete appState.budgets.categoryBudgets[groupName];
       }
       if (appState.activeGroup === groupName) {
-        const remainingGroups = Object.keys(appState.groups);
+        const remainingGroups = getCurrentUserGroups();
         if (remainingGroups.length > 0) {
           appState.activeGroup = remainingGroups[0];
           selectedGroupName.innerHTML = renderGroupNameWithColor(
@@ -1574,6 +1638,7 @@ function toggleBudgetCard() {
 }
 /* Render Edit Group Budget Form */
 function renderEditGroupBudgetForm() {
+  if (!canManageBudget(appState.activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -1632,6 +1697,7 @@ function renderEditGroupBudgetForm() {
 }
 /* Render Category Budget Form */
 function renderCategoryBudgetForm(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   const currentBudget =
     appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
       ?.monthlyLimit ?? "";
@@ -1721,6 +1787,7 @@ function updateCategoryBudgetRemaining(categoryName) {
 }
 /* Save Category Budget */
 function saveCategoryBudget(categoryName) {
+  if (!canManageCategory(categoryName, appState.activeGroup)) return;
   const amount = Number(document.getElementById("categoryBudgetInput").value);
   if (amount < 0) {
     showDialog(
@@ -1768,6 +1835,7 @@ function saveCategoryBudget(categoryName) {
 }
 /* Save Group Budget */
 function saveGroupBudget() {
+  if (!canManageBudget(appState.activeGroup)) return;
   const amount = Number(document.getElementById("groupBudgetInput").value);
   let allocated = 0;
   const categoryBudgets =

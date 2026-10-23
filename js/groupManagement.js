@@ -43,6 +43,7 @@ function handleGroupManagementAction(event) {
       openInviteActions(actionElement.dataset.invitationId);
       break;
     case "send-invitation":
+      if (!canManageGroup(groupName)) return;
       appState.activeGroup = groupName;
       renderInviteMemberForm();
       break;
@@ -54,10 +55,6 @@ function handleGroupManagementAction(event) {
       appState.activeGroup = groupName;
       makeAdmin(memberId, groupName);
       break;
-    case "transfer-ownership":
-      appState.activeGroup = groupName;
-      transferOwnership(memberId);
-      break;
     case "remove-member":
       appState.activeGroup = groupName;
       openRemoveMemberDialog(memberId);
@@ -68,7 +65,7 @@ function handleGroupManagementAction(event) {
 function renderGroupAccordion() {
   const container = document.getElementById("groupManagementContainer");
   container.innerHTML = "";
-  Object.keys(appState.groups).forEach(function (groupName) {
+  getCurrentUserGroups().forEach(function (groupName) {
     const categories = appState.groups[groupName] || [];
     const members =
       appState.groupMembers && appState.groupMembers[groupName]
@@ -145,7 +142,7 @@ function renderGroupAccordion() {
                           </div>
                         </div>
                         ${
-                          canManageGroup() && member.id !== getCurrentUser().id
+                          canManageGroup(groupName) && member.id !== getCurrentUser().id
                             ? `
                               <button
                                 class="groupMoreButton"
@@ -201,29 +198,37 @@ function renderGroupAccordion() {
                             }
                           </div>
                         </div>
-                        <button
-                          class="groupMoreButton"
-                          data-group-action="invite-actions"
-                          data-invitation-id="${escapeHtml(invitation.id)}"
-                        >
-                          <img
-                            src="${getIconPath("navigation", "more")}"
-                            class="icon actionIcon"
-                            alt="${t("common.more")}"
-                          >
-                        </button>
+                        ${
+                          canManageGroup(groupName)
+                            ? `<button
+                                class="groupMoreButton"
+                                data-group-action="invite-actions"
+                                data-invitation-id="${escapeHtml(invitation.id)}"
+                              >
+                                <img
+                                  src="${getIconPath("navigation", "more")}"
+                                  class="icon actionIcon"
+                                  alt="${t("common.more")}"
+                                >
+                              </button>`
+                            : ""
+                        }
                       </div>
                     `;
                   })
                   .join("")
           }
-          <button
-            class="primaryButton"
-            data-group-action="send-invitation"
-            data-group-name="${escapeHtml(groupName)}"
-          >
-            ${t("groupManagement.sendInvitation")}
-          </button>
+          ${
+            canManageGroup(groupName)
+              ? `<button
+                  class="primaryButton"
+                  data-group-action="send-invitation"
+                  data-group-name="${escapeHtml(groupName)}"
+                >
+                  ${t("groupManagement.sendInvitation")}
+                </button>`
+              : ""
+          }
           <button
             class="secondaryButton"
             data-group-action="leave-group"
@@ -273,6 +278,7 @@ function toggleGroupAccordion(header) {
 }
 /* Switch Group */
 function switchGroup(groupName) {
+  if (!getGroupMember(groupName)) return;
   appState.activeGroup = groupName;
   saveAppState();
   window.location.reload();
@@ -280,14 +286,14 @@ function switchGroup(groupName) {
 /* Permissions */
 function setupPermissions() {
   const currentUser = getCurrentUser();
-  const members = getCurrentGroupMembers();
-  const currentMember = members.find(function (member) {
-    return member.id === currentUser.id;
-  });
+  if (!currentUser) {
+    return;
+  }
+  const currentMember = getCurrentMember();
   if (!currentMember) {
     return;
   }
-  if (currentMember.role !== "admin" && currentMember.role !== "owner") {
+  if (currentMember.role !== "admin") {
     readOnlyBanner.classList.remove("hidden");
   } else {
     readOnlyBanner.classList.add("hidden");
@@ -295,9 +301,6 @@ function setupPermissions() {
 }
 /* Open Invite Actions */
 function openInviteActions(invitationId) {
-  if (!canManageGroup()) {
-    return;
-  }
   const invitation = (appState.pendingInvitations || []).find(
     function (invitation) {
       return invitation.id === invitationId;
@@ -306,6 +309,7 @@ function openInviteActions(invitationId) {
   if (!invitation) {
     return;
   }
+  if (!canManageGroup(invitation.groupName)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -359,19 +363,16 @@ function openInviteActions(invitationId) {
 }
 /* Resend Invitation */
 function resendInvitation(invitationId) {
-  if (!canManageGroup()) {
+  const invitation = (appState.pendingInvitations || []).find(
+    function (entry) {
+      return entry.id === invitationId;
+    },
+  );
+  if (!invitation || !canManageGroup(invitation.groupName)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanResend"),
     );
-    return;
-  }
-  const invitation = (appState.pendingInvitations || []).find(
-    function (invitation) {
-      return invitation.id === invitationId;
-    },
-  );
-  if (!invitation) {
     return;
   }
   invitation.invitedAt = new Date().toISOString();
@@ -401,6 +402,12 @@ function resendInvitation(invitationId) {
 }
 /* Cancel Invitation */
 function cancelInvitation(invitationId) {
+  const invitation = (appState.pendingInvitations || []).find(
+    function (entry) {
+      return entry.id === invitationId;
+    },
+  );
+  if (!invitation || !canManageGroup(invitation.groupName)) return;
   showConfirmDialog(
     t("groupManagement.cancelInvitation"),
     t("groupManagement.confirmCancelInvitation"),
@@ -411,19 +418,16 @@ function cancelInvitation(invitationId) {
 }
 /* Revoke Invitation */
 function revokeInvite(invitationId) {
-  if (!canManageGroup()) {
+  const invitation = (appState.pendingInvitations || []).find(
+    function (entry) {
+      return entry.id === invitationId;
+    },
+  );
+  if (!invitation || !canManageGroup(invitation.groupName)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanCancel"),
     );
-    return;
-  }
-  const invitation = (appState.pendingInvitations || []).find(
-    function (invitation) {
-      return invitation.id === invitationId;
-    },
-  );
-  if (!invitation) {
     return;
   }
   appState.pendingInvitations = appState.pendingInvitations.filter(
@@ -552,7 +556,7 @@ function openMemberProfile(memberId) {
 }
 /* Member Actions */
 function openMemberActions(memberId, groupName) {
-  if (!canManageGroup()) {
+  if (!canManageGroup(groupName)) {
     return;
   }
 
@@ -590,7 +594,7 @@ function openMemberActions(memberId, groupName) {
 
     <div class="bottomSheetBody">
       ${
-        member.role !== "admin" && member.role !== "owner"
+        member.role !== "admin"
           ? `
             <button
               class="bottomSheetActionButton"
@@ -606,29 +610,6 @@ function openMemberActions(memberId, groupName) {
               >
               <span>
                 ${t("groupManagement.makeAdmin")}
-              </span>
-            </button>
-          `
-          : ""
-      }
-
-      ${
-        member.role !== "owner"
-          ? `
-            <button
-              class="bottomSheetActionButton"
-              type="button"
-              data-group-action="transfer-ownership"
-              data-member-id="${escapeHtml(member.id)}"
-              data-group-name="${escapeHtml(groupName)}"
-            >
-              <img
-                src="${getIconPath("features", "admin")}"
-                class="icon featureIcon"
-                alt=""
-              >
-              <span>
-                ${t("groupManagement.transferOwnership")}
               </span>
             </button>
           `
@@ -661,7 +642,7 @@ function openMemberActions(memberId, groupName) {
 }
 /* Make Admin */
 async function makeAdmin(memberId, groupName) {
-  if (!canManageGroup()) {
+  if (!canManageGroup(groupName)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanChangeRoles"),
@@ -713,56 +694,9 @@ async function makeAdmin(memberId, groupName) {
     },
   );
 }
-/* Transfer Ownership */
-function transferOwnership(memberId) {
-  if (!canManageGroup()) {
-    showDialog(
-      t("common.permissionDenied"),
-      t("groupManagement.onlyAdminsCanTransferOwnership"),
-    );
-    return;
-  }
-  const members = getCurrentGroupMembers();
-  members.forEach(function (member) {
-    if (member.role === "owner") {
-      member.role = "admin";
-    }
-  });
-  const selectedMember = members.find(function (member) {
-    return member.id === memberId;
-  });
-  if (!selectedMember) {
-    return;
-  }
-  selectedMember.role = "owner";
-  /*
-    Backend
-    PATCH
-    /group/owner
-  */
-  saveAppState();
-  renderGroupAccordion();
-  closeBottomSheet();
-  showToast(t("groupManagement.ownershipTransferred"));
-  createNotification(
-    "group",
-    t("groupManagement.ownershipTransferredTitle"),
-    t("groupManagement.ownershipTransferredMessage", {
-      name: selectedMember.name,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.ownershipTransferredTitle",
-      messageKey: "groupManagement.ownershipTransferredMessage",
-      params: {
-        name: selectedMember.name,
-      },
-    },
-  );
-}
 /* Remove Dialog */
 function openRemoveMemberDialog(memberId) {
+  if (!canManageGroup(appState.activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -806,7 +740,7 @@ function openRemoveMemberDialog(memberId) {
 }
 /* Remove Member */
 async function removeMember(memberId) {
-  if (!canManageGroup()) {
+  if (!canManageGroup(appState.activeGroup)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanRemoveMembers"),
@@ -817,6 +751,17 @@ async function removeMember(memberId) {
   const removedMember = members.find(function (member) {
     return member.id === memberId;
   });
+  if (!removedMember) return;
+  const adminCount = members.filter(function (member) {
+    return member.role === "admin";
+  }).length;
+  if (removedMember.role === "admin" && adminCount <= 1) {
+    showDialog(
+      t("groupManagement.cannotLeaveGroup"),
+      t("groupManagement.promoteAnotherAdmin"),
+    );
+    return;
+  }
   appState.groupMembers[appState.activeGroup] = members.filter(
     function (member) {
       return member.id !== memberId;
@@ -1078,6 +1023,10 @@ function leaveCurrentGroup() {
 /* Complete Leave Group */
 function completeLeaveGroup(currentUser, remainingMembers) {
   if (remainingMembers.length === 0) {
+    if (appState.groupCreators) {
+      delete appState.groupCreators[appState.activeGroup];
+    }
+    removeGroupColorPreferences(appState.activeGroup);
     delete appState.groupMembers[appState.activeGroup];
     delete appState.groups[appState.activeGroup];
     if (appState.budgets && appState.budgets.groupBudgets) {
@@ -1120,7 +1069,7 @@ function completeLeaveGroup(currentUser, remainingMembers) {
       },
     },
   );
-  const remainingGroups = Object.keys(appState.groups);
+  const remainingGroups = getCurrentUserGroups();
   if (remainingGroups.length > 0) {
     appState.activeGroup = remainingGroups[0];
     localStorage.setItem("activeGroup", remainingGroups[0]);
@@ -1169,7 +1118,6 @@ POST /group/invite
 GET /group/pending-invitations
 POST /group/accept-invitation
 PATCH /group/member-role
-PATCH /group/transfer-owner
 DELETE /group/member
 DELETE /group/leave
 ========================================

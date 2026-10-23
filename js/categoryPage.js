@@ -1,5 +1,19 @@
 /* Initialize Category Page */
 function initializeCategoryPage() {
+  const requestedGroup = localStorage.getItem("activeGroup");
+  if (requestedGroup && getGroupMember(requestedGroup)) {
+    appState.activeGroup = requestedGroup;
+  }
+  const activeCategoryName = localStorage.getItem("activeCategory");
+  const hasCategoryAccess =
+    getGroupMember(appState.activeGroup) &&
+    (appState.groups[appState.activeGroup] || []).some(function (category) {
+      return category.name === activeCategoryName;
+    });
+  if (!hasCategoryAccess) {
+    window.location.href = "../pages/dashboardPage.html";
+    return;
+  }
   const requestedTab = new URLSearchParams(window.location.search).get("tab");
   appState.activeTab = requestedTab === "favorites" ? "favorites" : "lists";
   appState.searchQuery = "";

@@ -456,24 +456,18 @@ registerLanguage("ta", {
       "நிர்வாகிகள் மட்டுமே உறுப்பினர்களை நீக்க முடியும்.",
     onlyAdminsCanResend:
       "நிர்வாகிகள் மட்டுமே அழைப்புகளை மீண்டும் அனுப்ப முடியும்.",
-    onlyAdminsCanTransferOwnership:
-      "நிர்வாகிகள் மட்டுமே உரிமையை மாற்ற முடியும்.",
-    ownershipTransferred: "உரிமை மாற்றப்பட்டது",
-    ownershipTransferredMessage:
-      "{{name}} இப்போது குழுவின் உரிமையாளராக உள்ளார்.",
-    ownershipTransferredTitle: "உரிமை மாற்றப்பட்டது",
     pendingInvitation: "நிலுவையிலுள்ள அழைப்பு",
     pendingInvitations: "நிலுவையிலுள்ள அழைப்புகள்",
     promoteAnotherAdmin:
       "வெளியேறுவதற்கு முன் மற்றொரு உறுப்பினரை நிர்வாகியாக மாற்றவும்.",
-    readOnlyAccess: "இந்தக் குழுவில் உங்களுக்கு படிக்க மட்டுமே அனுமதி உள்ளது.",
+    readOnlyAccess:
+      "குழு அமைப்புகளை நிர்வாகிகள் மட்டுமே மாற்றலாம். நீங்கள் உருவாக்கிய வகைகளை நிர்வகிக்கவும் பகிரப்பட்ட ஷாப்பிங் பட்டியலைப் பயன்படுத்தவும் முடியும்.",
     rejoinRequiresInvite: "மீண்டும் சேர புதிய அழைப்பு தேவைப்படும்.",
     removeMember: "உறுப்பினரை அகற்று",
     resend: "மீண்டும் அனுப்பவும்",
     role: "பொறுப்பு",
     sendInvitation: "அழைப்பை அனுப்பவும்",
     title: "குழு மேலாண்மை",
-    transferOwnership: "உரிமையை மாற்றவும்",
     youLeftGroup: "நீங்கள் குழுவிலிருந்து வெளியேறிவிட்டீர்கள்.",
   },
   // Text shown when accepting a group invitation.

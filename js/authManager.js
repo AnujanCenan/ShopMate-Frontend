@@ -44,7 +44,6 @@
 │   └── getUserPrimaryGroup()
 │
 ├── Authorization Helpers
-│   ├── isAdmin()
 │   ├── getCurrentGroupMembers()
 │   ├── getCurrentUserRole()
 │   └── isGroupMember()
@@ -355,6 +354,10 @@ function createUserAccount(
 /* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
 function createGroup(groupName, user) {
   appState.groups[groupName] = [];
+  if (!appState.groupCreators) {
+    appState.groupCreators = {};
+  }
+  appState.groupCreators[groupName] = user.id || user.email;
   if (!appState.groupMembers) {
     appState.groupMembers = {};
   }
@@ -471,20 +474,6 @@ function logoutUser() {
   clearUserSession();
   window.location.href = "../pages/loginPage.html";
 }
-/* Check Administrator Access - Returns whether the current user has administrator privileges. */
-function isAdmin() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) {
-    return false;
-  }
-  return getCurrentGroupMembers().some(function (member) {
-    return member.id === currentUser.id && member.role === "admin";
-  });
-}
-/* Can Manage Group - Returns whether the current user can manage the active group. */
-function canManageGroup() {
-  return isAdmin();
-}
 /* Get Current Group Members - Returns all members belonging to the active group. */
 function getCurrentGroupMembers() {
   if (!appState.activeGroup) {
@@ -535,7 +524,16 @@ function joinGroupFromInvite(inviteCode) {
     showDialog(t("auth.groupNotFound"), t("auth.groupNotFoundMessage"));
     return;
   }
-  if (isGroupMember(currentUser.id)) {
+  if (
+    groupMembers.some(function (member) {
+      return (
+        member.id === currentUser.id ||
+        (member.email &&
+          currentUser.email &&
+          member.email.toLowerCase() === currentUser.email.toLowerCase())
+      );
+    })
+  ) {
     showDialog(t("auth.alreadyMember"), t("auth.alreadyMemberMessage"));
     return;
   }
@@ -543,7 +541,7 @@ function joinGroupFromInvite(inviteCode) {
     id: currentUser.id,
     name: currentUser.name,
     email: currentUser.email,
-    role: "member",
+    role: invite.role === "admin" ? "admin" : "member",
   });
   appState.activeGroup = invite.groupName;
   saveAppState();
