@@ -70,10 +70,12 @@
   border-color: var(--infoColor);
 }
 
+/* Overrides selected item styling for the dark theme. */
 .darkMode .selectedItem .itemName {
   color: var(--textPrimary) !important;
 }
 
+/* Overrides selected item styling for the dark theme. */
 .darkMode .selectedItem .itemQuantityBadge {
   color: var(--infoColor);
 }
@@ -96,10 +98,12 @@
   z-index: 9999;
 }
 
+/* Styles the bulk action bar component and its layout. */
 .bulkActionBar.hidden {
   display: none !important;
 }
 
+/* Styles the bulk selection count component and its layout. */
 .bulkSelectionCount {
   font-size: var(--fontSizeBodySmall);
   font-weight: 600;
@@ -126,12 +130,19 @@
     background-color 0.2s ease;
 }
 
+/* Uses the shared surface tint for hover feedback on bulk action controls. */
+.bulkActionButton:hover {
+  background: var(--surfaceHover);
+}
+
+/* Defines the focus, focus-visible state styling for the bulk action button. */
 .bulkActionButton:focus,
 .bulkActionButton:focus-visible {
   outline: none;
   box-shadow: none !important;
 }
 
+/* Defines the active state styling for the bulk action button. */
 .bulkActionButton:active {
   transform: scale(0.92);
 }
@@ -149,6 +160,7 @@
   background: var(--favoriteSurface) !important;
 }
 
+/* Styles the bulk action button favorite, action icon component and its layout. */
 .bulkActionButtonFavorite .actionIcon {
   filter: invert(24%) sepia(71%) saturate(2031%) hue-rotate(324deg)
     brightness(83%) contrast(94%) !important;
@@ -159,6 +171,7 @@
   background: var(--successSurface) !important;
 }
 
+/* Styles the bulk action button purchased, action icon component and its layout. */
 .bulkActionButtonPurchased .actionIcon {
   filter: invert(35%) sepia(39%) saturate(1093%) hue-rotate(122deg)
     brightness(76%) contrast(96%) !important;
@@ -169,6 +182,7 @@
   background: var(--dangerSurface) !important;
 }
 
+/* Styles the bulk action button delete, action icon component and its layout. */
 .bulkActionButtonDelete .actionIcon {
   filter: invert(29%) sepia(73%) saturate(1668%) hue-rotate(339deg)
     brightness(79%) contrast(95%) !important;
@@ -179,6 +193,7 @@
   background: var(--headerBackground);
 }
 
+/* Overrides bulk selection count styling for the dark theme. */
 .darkMode .bulkSelectionCount {
   color: var(--textOnDark);
 }
@@ -188,6 +203,7 @@
   background: var(--favoriteDarkBackground) !important;
 }
 
+/* Overrides bulk action button favorite styling for the dark theme. */
 .darkMode .bulkActionButtonFavorite .actionIcon {
   filter: invert(75%) sepia(42%) saturate(1062%) hue-rotate(302deg)
     brightness(101%) contrast(98%) !important;
@@ -198,6 +214,7 @@
   background: var(--purchasedDarkBackground) !important;
 }
 
+/* Overrides bulk action button purchased styling for the dark theme. */
 .darkMode .bulkActionButtonPurchased .actionIcon {
   filter: invert(81%) sepia(39%) saturate(617%) hue-rotate(103deg)
     brightness(99%) contrast(91%) !important;
@@ -208,6 +225,7 @@
   background: var(--deleteDarkBackground) !important;
 }
 
+/* Overrides bulk action button delete styling for the dark theme. */
 .darkMode .bulkActionButtonDelete .actionIcon {
   filter: invert(76%) sepia(35%) saturate(1231%) hue-rotate(313deg)
     brightness(104%) contrast(96%) !important;

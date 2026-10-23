@@ -81,20 +81,10 @@
     transform var(--animationSpeed) ease;
 }
 
+/* Defines the active state styling for the menu button. */
 .menuButton:active {
   background: var(--primaryTintSoft);
   transform: scale(0.94);
-}
-
-/* Inner Page Header */
-.categoryHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--spacingCompact);
-  min-height: var(--headerHeight);
-  padding: 10px var(--pageHorizontalPadding);
-  background: var(--headerBackground);
-  border-bottom: 1px solid var(--borderColor);
 }
 
 /* Category Header Title Container */
@@ -154,6 +144,7 @@
     transform var(--animationSpeed) ease;
 }
 
+/* Defines the active state styling for the modern back button. */
 .modernBackButton:active,
 .backButton:active {
   background: var(--primaryTintSoft);
@@ -161,29 +152,33 @@
 }
 
 /* Tablet Header */
+/* Adjust header spacing and logo sizing for tablet and larger screens. */
 @media (min-width: 768px) {
+  /* Styles the dashboard header, category header, modern header component and its layout. */
   .dashboardHeader,
-  .categoryHeader,
-  .modernHeader {
+.modernHeader{
     padding-right: 28px;
     padding-left: 28px;
   }
 
+  /* Styles the app logo component and its layout. */
   .appLogo {
     width: 52px;
     height: 52px;
   }
 
+  /* Styles the app name component and its layout. */
   .appName {
     font-size: var(--fontSizeHeroXLarge);
   }
 }
 
 /* Large Tablet Header */
+/* Expand the header layout for desktop screens. */
 @media (min-width: 1024px) {
+  /* Styles the dashboard header, category header, modern header component and its layout. */
   .dashboardHeader,
-  .categoryHeader,
-  .modernHeader {
+.modernHeader{
     padding-right: var(--spacingXLarge);
     padding-left: var(--spacingXLarge);
   }

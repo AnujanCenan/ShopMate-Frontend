@@ -10,6 +10,7 @@
   background: var(--backgroundColor);
 }
 
+/* Styles the app lock page component and its layout. */
 .appLockPage {
   display: grid;
   grid-template-rows: minmax(300px, 43vh) minmax(0, 1fr);
@@ -20,6 +21,7 @@
   color: var(--textPrimary);
 }
 
+/* Styles the app lock brand section component and its layout. */
 .appLockBrandSection {
   display: flex;
   align-items: center;
@@ -29,6 +31,7 @@
   box-sizing: border-box;
 }
 
+/* Styles the app lock brand component and its layout. */
 .appLockBrand {
   display: flex;
   flex-direction: column;
@@ -36,6 +39,7 @@
   gap: var(--spacingSmall);
 }
 
+/* Styles the app lock logo component and its layout. */
 .appLockLogo {
   display: block;
   width: 220px;
@@ -43,6 +47,7 @@
   object-fit: contain;
 }
 
+/* Styles the app lock tagline component and its layout. */
 .appLockTagline {
   color: var(--primaryDark);
   font-size: var(--fontSizeBodySmall);
@@ -50,6 +55,7 @@
   line-height: 1.4;
 }
 
+/* Styles the app lock access section component and its layout. */
 .appLockAccessSection {
   position: relative;
   display: flex;
@@ -66,12 +72,14 @@
   box-sizing: border-box;
 }
 
+/* Styles the app lock access content component and its layout. */
 .appLockAccessContent {
   width: min(100%, 360px);
   margin-top: -8px;
   text-align: center;
 }
 
+/* Styles the app lock title component and its layout. */
 .appLockTitle {
   margin: 0 0 var(--spacingSmall);
   color: var(--appLockTitleColor);
@@ -79,6 +87,7 @@
   font-weight: 700;
 }
 
+/* Styles the app lock description component and its layout. */
 .appLockDescription {
   margin: 0 0 var(--spacingLarge);
   color: var(--appLockDescriptionColor);
@@ -86,10 +95,12 @@
   line-height: 1.5;
 }
 
+/* Styles the app lock pin section component and its layout. */
 .appLockPinSection {
   width: 100%;
 }
 
+/* Styles the app lock pin input component and its layout. */
 .appLockPinInput {
   width: 100%;
   height: 52px;
@@ -106,11 +117,13 @@
   outline: none;
 }
 
+/* Defines the focus-visible state styling for the app lock pin input. */
 .appLockPinInput:focus-visible {
   border-color: var(--primaryColor);
   box-shadow: 0 0 0 3px var(--focusRing);
 }
 
+/* Styles the app lock pin button component and its layout. */
 .appLockPinButton {
   display: flex;
   align-items: center;
@@ -130,11 +143,13 @@
   box-shadow: 0 8px 22px var(--primaryGlow);
 }
 
+/* Defines the active state styling for the app lock pin button. */
 .appLockPinButton:active,
 .appLockBiometricButton:active {
   transform: scale(0.97);
 }
 
+/* Styles the app lock error, app lock biometric error component and its layout. */
 .appLockError,
 .appLockBiometricError {
   min-height: 20px;
@@ -143,6 +158,7 @@
   font-size: var(--fontSizeCaption);
 }
 
+/* Styles the app lock biometric error component and its layout. */
 .appLockBiometricError {
   position: absolute;
   right: 12px;
@@ -151,6 +167,7 @@
   text-align: center;
 }
 
+/* Styles the app lock biometric button component and its layout. */
 .appLockBiometricButton {
   position: absolute;
   right: 0;
@@ -171,11 +188,13 @@
   transition: transform 160ms ease;
 }
 
+/* Styles the app lock biometric button, app lock pin section component and its layout. */
 .appLockBiometricButton[hidden],
 .appLockPinSection[hidden] {
   display: none !important;
 }
 
+/* Styles the app lock biometric icon component and its layout. */
 .appLockBiometricIcon {
   display: block;
   width: 40px;
@@ -183,6 +202,7 @@
   object-fit: contain;
 }
 
+/* Styles the visually hidden component and its layout. */
 .visuallyHidden {
   position: absolute;
   width: 1px;
@@ -195,29 +215,36 @@
   border: 0;
 }
 
+/* Compress the lock screen's brand and access regions on shorter viewports. */
 @media (max-height: 620px) {
+  /* Styles the app lock page component and its layout. */
   .appLockPage {
     grid-template-rows: minmax(220px, 40vh) minmax(300px, 1fr);
   }
 
+  /* Styles the app lock brand section component and its layout. */
   .appLockBrandSection {
     padding: var(--spacingMedium) 20px;
   }
 
+  /* Styles the app lock logo component and its layout. */
   .appLockLogo {
     width: 160px;
     height: 160px;
   }
 
+  /* Styles the app lock access section component and its layout. */
   .appLockAccessSection {
     padding-top: 18px;
     padding-bottom: calc(94px + var(--safeAreaBottom));
   }
 
+  /* Styles the app lock description component and its layout. */
   .appLockDescription {
     margin-bottom: 14px;
   }
 
+  /* Styles the app lock biometric button component and its layout. */
   .appLockBiometricButton {
     bottom: calc(12px + var(--safeAreaBottom));
     width: 60px;
@@ -225,20 +252,25 @@
   }
 }
 
+/* Apply a tighter lock-screen layout when available vertical space is very limited. */
 @media (max-height: 480px) {
+  /* Styles the app lock page component and its layout. */
   .appLockPage {
     grid-template-rows: 172px minmax(300px, 1fr);
   }
 
+  /* Styles the app lock logo component and its layout. */
   .appLockLogo {
     width: 120px;
     height: 120px;
   }
 
+  /* Styles the app lock brand section component and its layout. */
   .appLockBrandSection {
     padding: 10px 20px;
   }
 
+  /* Styles the app lock brand component and its layout. */
   .appLockBrand {
     gap: var(--spacingXSmall);
   }

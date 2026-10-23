@@ -30,6 +30,7 @@
  * Business logic belongs in the respective manager files.
  ***************************************************************************************************/
 const STORAGE_KEY = "shopMateData";
+/* Create a collision-resistant identifier for a locally stored shopping item. */
 function createItemId() {
   return "item-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
 }

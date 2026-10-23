@@ -15,7 +15,7 @@
  ***************************************************************************************************/
 /* Notification Title */
 .notificationTitle {
-  margin-bottom: 6px;
+  margin: 0;
   font-size: var(--fontSizeBody);
   font-weight: 700;
 }
@@ -30,10 +30,6 @@
   color: var(--mutedTextColor);
   font-size: var(--fontSizeSmall);
 }
-/* Unread Notification */
-.unreadNotification {
-  border-left: 5px solid var(--primaryColor);
-}
 /* Notification Filter Bar */
 .notificationFilterBar {
   display: flex;
@@ -43,6 +39,7 @@
   padding-bottom: 6px;
   scrollbar-width: none;
 }
+/* Styles the notification filter bar component and its layout. */
 .notificationFilterBar::-webkit-scrollbar {
   display: none;
 }
@@ -64,15 +61,6 @@
   background: var(--primaryColor);
   color: var(--textPrimary);
   border-color: var(--primaryColor);
-}
-/* Notification Card */
-.notificationCard {
-  margin-bottom: 14px;
-  padding: 18px;
-  border: 1px solid var(--borderColor);
-  border-radius: var(--radiusRoomy);
-  background: var(--cardColor);
-  transition: 0.2s ease;
 }
 /* Notification Card Hover */
 .notificationCard:hover {
@@ -104,6 +92,7 @@
   background: var(--dangerSurface);
   transform: scale(1.08);
 }
+/* Styles the notification delete button, action icon component and its layout. */
 .notificationDeleteButton .actionIcon {
   width: 18px;
   height: 18px;
@@ -134,15 +123,6 @@
   font-size: var(--fontSizeBody);
   line-height: 1.6;
 }
-/* Bottom Action Bar */
-.bottomActionBar {
-  display: flex;
-  gap: var(--spacingCompact);
-  margin-top: var(--spacingLarge);
-}
-.bottomActionBar button {
-  flex: 1;
-}
 /*Notification Icons*/
 /* Title Wrapper */
 .notificationTitleWrapper {
@@ -159,8 +139,4 @@
   height: 34px;
   font-size: var(--fontSizeXLarge);
   flex-shrink: 0;
-}
-/* Notification Title */
-.notificationTitle {
-  margin: 0;
 }

@@ -1,3 +1,4 @@
+/* Attach touch handlers that translate horizontal swipes into card actions. */
 function initializeSwipeGestures() {
   const cards = document.querySelectorAll(".swipeCard");
   cards.forEach(function (card) {

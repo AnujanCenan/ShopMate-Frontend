@@ -1,3 +1,4 @@
+/* Owns transient snackbar messages and the short-lived undo state for deletions. */
 const snackbar = document.getElementById("snackbar");
 const snackbarText = document.getElementById("snackbarText");
 const snackbarUndoButton = document.getElementById("snackbarUndoButton");
@@ -6,6 +7,7 @@ let undoItem = null;
 let undoIndex = null;
 let timeout = null;
 
+/* Show a temporary message without attaching an undo action. */
 function showSnackbar(message) {
   if (!snackbar || !snackbarText) {
     return;
@@ -26,6 +28,7 @@ function showSnackbar(message) {
   }, 3000);
 }
 
+/* Keep a deleted item and its position available while the undo notice is visible. */
 function showUndoSnackbar(item, index) {
   if (!snackbar || !snackbarText || !snackbarUndoButton) {
     return;
@@ -51,6 +54,7 @@ function showUndoSnackbar(item, index) {
   }, 5000);
 }
 
+/* Restore the most recently deleted item to its original list position. */
 function undoDelete() {
   if (!undoItem) {
     return;

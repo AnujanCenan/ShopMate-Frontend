@@ -46,6 +46,7 @@
   cursor: pointer;
   transition: transform 0.2s ease;
 }
+/* Defines the hover state styling for the clickable avatar. */
 .clickableAvatar:hover {
   transform: scale(1.05);
 }
@@ -55,12 +56,6 @@
   font-size: var(--fontSizeHeroLarge);
   font-weight: 700;
   color: var(--textPrimary);
-}
-/* Profile Role */
-.profileRole {
-  color: var(--mutedTextColor);
-  text-transform: capitalize;
-  font-size: var(--fontSizeBody);
 }
 /* Profile Information Row */
 .profileInfoRow {
@@ -79,10 +74,6 @@
 /* Last Profile Information Row */
 .profileInfoRow:last-child {
   border-bottom: none;
-}
-/* Profile Hero Button */
-.profileHeroCard .primaryButton {
-  width: 220px;
 }
 /* Profile Summary Card */
 .profileSummaryCard {
@@ -122,45 +113,8 @@
   display: flex;
   flex-direction: column;
 }
+/* Styles the profile security card, secondary button component and its layout. */
 .profileSecurityCard .secondaryButton {
   width: 100%;
   margin-top: 14px;
-}
-/* Group Switcher */
-.groupSwitcher {
-  margin-bottom: var(--spacingLarge);
-}
-/* Group Switcher Title */
-.groupSwitcherTitle {
-  margin-bottom: 14px;
-  font-size: var(--fontSizeLarge);
-  font-weight: 700;
-}
-/* Group Switcher Button */
-.groupSwitcherButton {
-  width: 100%;
-  min-height: 54px;
-  margin-bottom: var(--spacingCompact);
-  background: var(--cardColor);
-  border: none;
-  border-radius: var(--radiusRoomy);
-  box-shadow: 0 6px 18px var(--shadowAmbient);
-  cursor: pointer;
-  font-size: var(--fontSizeBodySmall);
-  font-weight: 600;
-}
-/* Active Group Switcher Button */
-.activeGroupSwitcherButton {
-  background: var(--primaryColor);
-  color: var(--textPrimary);
-}
-/* Profile Hero Card */
-.profileHeroCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 20px 0 28px;
-  margin-bottom: var(--spacingLarge);
 }

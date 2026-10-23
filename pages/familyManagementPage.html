@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Group collaboration screen for member roles, invitations, and group switching. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <!-- Group-management screen provides member, invitation, and group-switcher mount points. -->
     <div class="appContainer">
+      <!-- Shared page header returns to the previous screen and names this view. -->
       <header class="modernHeader">
         <button class="modernBackButton" onclick="goBack()">
           <img
@@ -20,9 +23,13 @@
           Group Management
         </h1>
       </header>
+      <!-- Group details and the read-only notice are mounted inside the main content. -->
       <main class="pageContent">
+        <!-- Group cards and their member/invitation details are rendered here. -->
         <div id="groupManagementContainer"></div>
+        <!-- The current group selector is rendered independently from group details. -->
         <div id="groupSwitcherContainer"></div>
+        <!-- Shows members that actions are restricted when the current role is read-only. -->
         <section
           class="readOnlyBanner hidden"
           id="readOnlyBanner"
@@ -41,6 +48,7 @@
         <div class="bottomSheetContent" id="bottomSheetContent"></div>
       </div>
     </div>
+    <!-- Load shared group services and screen handlers before the page bootstrap. -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
@@ -49,6 +57,7 @@
     <script src="../js/localization/languageManager.js"></script>
     <script src="../js/groupManagement.js"></script>
     <script src="../js/bootstrap.js"></script>
+    <!-- Initialize group data and render the page after the DOM is ready. -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();

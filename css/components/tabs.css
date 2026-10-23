@@ -14,12 +14,8 @@
  * PAGES
  * • Shared Across Multiple Pages
  ***************************************************************************************************/
-/* Tab Section */
-.tabSection {
-  display: flex;
-  gap: var(--spacingCompact);
-  margin-bottom: var(--spacingLarge);
-}
+
+
 /* Active Tab */
 .activeTab {
   background: var(--primaryColor);
@@ -52,6 +48,7 @@
     color 0.2s ease,
     box-shadow 0.2s ease;
 }
+/* Styles the modern tab button, active tab component and its layout. */
 .modernTabButton.activeTab {
   background: var(--primaryColor);
   color: var(--textPrimary);

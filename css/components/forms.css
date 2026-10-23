@@ -20,8 +20,10 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacingSmall);
+  width: 100%;
   margin-top: 10px;
+  margin-bottom: 18px;
 }
 /* Form Row */
 .formRow {
@@ -31,17 +33,20 @@
   width: 100%;
   margin-bottom: 18px;
 }
+/* Styles the quantity input wrapper component and its layout. */
 .quantityInputWrapper {
   display: flex;
   align-items: stretch;
   width: 100%;
 }
+/* Styles the quantity input wrapper, quantity input component and its layout. */
 .quantityInputWrapper .quantityInput {
   flex: 1;
   min-width: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+/* Styles the quantity unit input component and its layout. */
 .quantityUnitInput {
   width: 72px;
   min-width: 72px;
@@ -56,13 +61,16 @@
   cursor: pointer;
   outline: none;
 }
+/* Defines the focus state styling for the quantity unit input. */
 .quantityUnitInput:focus {
   border-color: var(--primaryColor);
 }
+/* Defines the focus state styling for the quantity input wrapper. */
 .quantityInputWrapper:focus-within .quantityInput,
 .quantityInputWrapper:focus-within .quantityUnitInput {
   border-color: var(--primaryColor);
 }
+/* Overrides quantity unit input styling for the dark theme. */
 .darkMode .quantityUnitInput {
   background: var(--cardColor);
   color: var(--textPrimary);
@@ -81,6 +89,7 @@
   font-size: var(--fontSizeBody);
   outline: none;
 }
+/* Defines the focus state styling for the auth input. */
 .authInput:focus {
   border-color: var(--primaryColor);
 }
@@ -108,6 +117,7 @@
   outline: none;
   transition: all 0.2s ease;
 }
+/* Defines the focus state styling for the modern search input. */
 .modernSearchInput:focus {
   border-color: var(--primaryColor);
   box-shadow: 0 0 0 4px var(--primaryGlowSoft);
@@ -120,20 +130,22 @@
   gap: var(--spacingCompact);
   width: 100%;
 }
+/* Styles the currency input component and its layout. */
 .currencyInput {
   padding-left: 30px;
 }
 /* Form Label */
 .formLabel {
   display: block;
-  margin-bottom: var(--spacingXSmall);
   margin: 0;
-  color: var(--textSecondary);
+  color: var(--textPrimary);
   font-size: var(--fontSizeSmall);
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.3;
 }
 /* Half Width Field */
 .halfWidthField {
+  min-width: 0;
   flex: 1;
   padding-right: 25px;
 }
@@ -150,6 +162,7 @@
   border: 2px solid var(--dangerColor) !important;
   background-color: var(--dangerSurface);
 }
+/* Styles the validation message component and its layout. */
 .validationMessage {
   min-height: 18px;
   margin-top: 6px;
@@ -168,17 +181,21 @@
   padding: 18px 0;
   border-bottom: 1px solid var(--borderColor);
 }
+/* Defines the last-child state styling for the toggle row. */
 .toggleRow:last-child {
   border-bottom: none;
 }
+/* Styles the toggle content component and its layout. */
 .toggleContent {
   flex: 1;
 }
+/* Styles the toggle title component and its layout. */
 .toggleTitle {
   font-size: var(--fontSizeBody);
   font-weight: 600;
   color: var(--textPrimary);
 }
+/* Styles the toggle description component and its layout. */
 .toggleDescription {
   margin-top: var(--spacingXSmall);
   font-size: var(--fontSizeCaption);
@@ -233,22 +250,6 @@
   outline: 2px solid var(--primaryGlowStrong);
   outline-offset: 2px;
 }
-/* Form Field Polish */
-.formField {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingSmall);
-  width: 100%;
-  margin-bottom: 18px;
-}
-/* Form Label */
-.formLabel {
-  display: block;
-  color: var(--textPrimary);
-  font-size: var(--fontSizeSmall);
-  font-weight: 700;
-  line-height: 1.3;
-}
 /* Bottom Sheet Input */
 .bottomSheetInput {
   width: 100%;
@@ -273,10 +274,12 @@
   -webkit-appearance: none;
   appearance: none;
 }
+/* Styles the bottom sheet input component and its layout. */
 .bottomSheetInput::placeholder {
   color: var(--mutedTextColor);
   font-weight: 400;
 }
+/* Defines the focus state styling for the bottom sheet input. */
 .bottomSheetInput:focus {
   border-color: var(--primaryColor);
   background: var(--surfaceColor);
@@ -297,11 +300,6 @@ select.bottomSheetInput {
   padding-right: 42px;
   cursor: pointer;
 }
-/* Half Width Field */
-.halfWidthField {
-  min-width: 0;
-  flex: 1;
-}
 
 /* Currency Symbol */
 .currencySymbol {
@@ -316,6 +314,7 @@ select.bottomSheetInput {
   transform: translateY(-50%);
   pointer-events: none;
 }
+/* Styles the currency input wrapper component and its layout. */
 .currencyInputWrapper input {
   padding-left: 40px !important;
 }
@@ -332,18 +331,20 @@ select.bottomSheetInput {
   display: block;
   width: 100%;
   max-width: 180px;
-  max-height: 180px;
-  margin: var(--spacingXSmall) auto var(--spacingSmall);
-  object-fit: contain;
+  max-height: 140px;
+  margin: var(--spacingCompact) auto var(--spacingSmall);
+  object-fit: cover;
   border: 1px solid var(--borderColor);
-  border-radius: var(--radiusMedium);
+  border-radius: var(--radiusSmall);
   background: var(--backgroundColor);
   box-shadow: var(--shadowSmall);
 }
+/* Styles the dropdown input wrapper component and its layout. */
 .dropdownInputWrapper {
   position: relative;
   width: 100%;
 }
+/* Styles the dropdown input wrapper, bottom sheet input component and its layout. */
 .dropdownInputWrapper .bottomSheetInput {
   width: 100%;
   padding-right: 44px;
@@ -351,6 +352,7 @@ select.bottomSheetInput {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
+/* Styles the dropdown input wrapper, dropdown arrow component and its layout. */
 .dropdownInputWrapper .dropdownArrow {
   position: absolute;
   top: 50%;
@@ -361,22 +363,28 @@ select.bottomSheetInput {
   transform: translateY(-50%);
   pointer-events: none;
 }
+/* Styles the dropdown input wrapper, dropdown arrow, small icon component and its layout. */
 .dropdownInputWrapper .dropdownArrow .smallIcon {
   width: 18px;
   height: 18px;
 }
 /* Tablet Form Layout */
+/* Increase form spacing and control size on tablet and desktop screens. */
 @media (min-width: 768px) {
+  /* Styles the form field component and its layout. */
   .formField {
     margin-bottom: 20px;
   }
+  /* Styles the bottom sheet input component and its layout. */
   .bottomSheetInput {
     min-height: 54px;
   }
+  /* Styles the form row component and its layout. */
   .formRow {
     gap: var(--spacingMedium);
   }
 }
+/* Styles the group color swatches component and its layout. */
 .groupColorSwatches {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -384,6 +392,7 @@ select.bottomSheetInput {
   padding: var(--spacingXSmall) 2px;
 }
 
+/* Styles the group color swatch component and its layout. */
 .groupColorSwatch {
   width: 38px;
   height: 38px;
@@ -395,16 +404,19 @@ select.bottomSheetInput {
   cursor: pointer;
 }
 
+/* Styles the group color swatch component and its layout. */
 .groupColorSwatch.selected {
   box-shadow: 0 0 0 3px var(--textPrimary);
 }
 
+/* Defines the disabled state styling for the group color swatch. */
 .groupColorSwatch:disabled {
   cursor: not-allowed;
   opacity: 0.28;
   position: relative;
 }
 
+/* Defines the disabled state styling for the group color swatch. */
 .groupColorSwatch:disabled::after {
   content: "";
   position: absolute;

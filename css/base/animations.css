@@ -46,7 +46,9 @@
   }
 }
 
+/* Reduce motion for users whose operating-system accessibility setting requests it. */
 @media (prefers-reduced-motion: reduce) {
+  /* Applies the shared global reset to all elements. */
   *,
   *::before,
   *::after {

@@ -25,6 +25,7 @@
   transition: all 0.25s ease;
   z-index: 998;
 }
+/* Styles the side drawer overlay component and its layout. */
 .sideDrawerOverlay.active {
   opacity: 1;
   visibility: visible;
@@ -44,24 +45,16 @@
   transition: transform 0.25s ease;
   z-index: 999;
 }
+/* Styles the side drawer component and its layout. */
 .sideDrawer.active {
   transform: translateX(0);
-}
-/* Right Drawer */
-.sideDrawerRight {
-  right: 0;
-  transform: translateX(100%);
-}
-/* Left Drawer */
-.sideDrawerLeft {
-  left: 0;
-  transform: translateX(-100%);
 }
 /* Right Drawer Mode */
 .sideDrawer.right {
   right: 0;
   transform: translateX(100%);
 }
+/* Styles the side drawer, right component and its layout. */
 .sideDrawer.right.active {
   transform: translateX(0);
 }
@@ -70,45 +63,9 @@
   left: 0;
   transform: translateX(-100%);
 }
+/* Styles the side drawer, left component and its layout. */
 .sideDrawer.left.active {
   transform: translateX(0);
-}
-/* Sidebar Profile */
-.sidebarHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.sidebarProfileButton {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: var(--radiusMedium);
-  transition: background 0.2s;
-}
-.sidebarProfileButton:hover {
-  background: var(--surfaceHover);
-}
-.sidebarProfileAvatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--primaryColor);
-  color: var(--textPrimary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: var(--fontSizeSmall);
-}
-.sidebarProfileName {
-  font-size: var(--fontSizeBodySmall);
-  font-weight: 600;
-  color: var(--textPrimary);
 }
 /* Drawer Header */
 .drawerHeader {
@@ -117,11 +74,6 @@
   align-items: center;
   padding: 18px 20px;
   border-bottom: 1px solid var(--borderColor);
-}
-/* Drawer Title */
-.drawerTitle {
-  font-size: var(--fontSizeXLargePlus);
-  font-weight: 700;
 }
 /* Drawer Menu */
 .drawerMenu {
@@ -141,6 +93,7 @@
   text-align: left;
   font-size: var(--fontSizeBody);
 }
+/* Defines the hover state styling for the drawer item. */
 .drawerItem:hover {
   background: var(--surfaceColor);
 }
@@ -152,6 +105,7 @@
   cursor: pointer;
   padding: var(--spacingSmall) 0;
 }
+/* Styles the drawer avatar component and its layout. */
 .drawerAvatar {
   width: 56px;
   height: 56px;
@@ -166,19 +120,16 @@
   overflow: hidden;
   flex-shrink: 0;
 }
+/* Styles the drawer avatar image component and its layout. */
 .drawerAvatarImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+/* Styles the drawer profile details component and its layout. */
 .drawerProfileDetails {
   display: flex;
   flex-direction: column;
-}
-
-.drawerProfileSubtitle {
-  font-size: var(--fontSizeSmall);
-  color: var(--textSecondary);
 }
 
 /* Drawer Profile Name */
@@ -189,16 +140,19 @@
   white-space: nowrap;
 }
 
+/* Styles the drawer logout component and its layout. */
 .drawerLogout {
   margin-top: auto;
   padding: var(--spacingCompact) 14px var(--spacingMedium);
   border-top: 1px solid var(--borderColor);
 }
 
+/* Styles the drawer logout item component and its layout. */
 .drawerLogoutItem {
   width: 100%;
 }
 
+/* Styles the drawer logout item, feature icon component and its layout. */
 .drawerLogoutItem .featureIcon {
   width: 22px;
   height: 22px;

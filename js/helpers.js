@@ -237,18 +237,6 @@ function escapeHtml(value) {
   });
 }
 
-/* Get Currency Symbol */
-function getCurrencySymbol() {
-  const currency = appState.settings?.currency || "AUD";
-
-  const currencySymbols = {
-    AUD: "$",
-    LKR: "Rs",
-    INR: "₹",
-  };
-
-  return currencySymbols[currency] || "$";
-}
 /* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {
   let themeFolder = "light";
@@ -387,6 +375,7 @@ const GROUP_COLOR_PALETTE = [
   "#8f3985",
 ];
 
+/* Return the saved group-color assignments for the selected user. */
 function getGroupColorMap(userId) {
   if (
     !appState.groupColorPreferences ||
@@ -406,6 +395,7 @@ function getGroupColorMap(userId) {
   return appState.groupColorPreferences[ownerId];
 }
 
+/* Build the color choices available to the current user, excluding assigned colors. */
 function getGroupColorOptions() {
   const colorMap = getGroupColorMap();
   const used = new Set(
@@ -434,6 +424,7 @@ function getGroupColorOptions() {
   return [...new Set(options)];
 }
 
+/* Assign available default colors to groups that do not yet have one. */
 function ensureGroupColorsForCurrentUser() {
   const colorMap = getGroupColorMap();
   const used = new Set();
@@ -468,11 +459,13 @@ function ensureGroupColorsForCurrentUser() {
   return changed;
 }
 
+/* Resolve a group's saved color, using the palette default when none is assigned. */
 function getGroupColor(groupName) {
   ensureGroupColorsForCurrentUser();
   return getGroupColorMap()[groupName] || GROUP_COLOR_PALETTE[0];
 }
 
+/* Render an escaped group name with its user-selected color marker. */
 function renderGroupNameWithColor(groupName) {
   const safeName = String(groupName).replace(/[&<>"']/g, function (character) {
     return {
@@ -487,6 +480,7 @@ function renderGroupNameWithColor(groupName) {
   return `<span class="groupNameWithColor"><span class="groupColorDot" style="background-color:${color}" aria-hidden="true"></span><span>${safeName}</span></span>`;
 }
 
+/* Keep each user's color assignment attached when a group is renamed. */
 function renameGroupColorPreferences(oldGroupName, newGroupName) {
   if (oldGroupName === newGroupName) return;
   Object.values(appState.groupColorPreferences || {}).forEach(
@@ -499,6 +493,7 @@ function renameGroupColorPreferences(oldGroupName, newGroupName) {
   );
 }
 
+/* Remove a deleted group from every user's saved color assignments. */
 function removeGroupColorPreferences(groupName) {
   Object.values(appState.groupColorPreferences || {}).forEach(
     function (colorMap) {
@@ -694,6 +689,7 @@ function getRecurrenceSeriesId(item) {
     item.recurrence.endDate || "",
   ].join("|");
 }
+/* Parse a recurrence date using local calendar fields to avoid timezone shifts. */
 function parseRecurrenceDate(value) {
   if (!value) return null;
   const dateText = String(value);
@@ -706,6 +702,7 @@ function parseRecurrenceDate(value) {
   return date;
 }
 
+/* Format a date as a stable local YYYY-MM-DD recurrence value. */
 function formatRecurrenceDate(date) {
   return [
     date.getFullYear(),
@@ -714,6 +711,7 @@ function formatRecurrenceDate(date) {
   ].join("-");
 }
 
+/* Calculate the next scheduled date while preserving the configured recurrence day. */
 function nextRecurrenceDate(date, frequency, monthlyDay) {
   const nextDate = new Date(date);
   if (frequency === "daily") {
@@ -769,6 +767,7 @@ function processRecurringItems() {
         const purchasedItems = seriesItems.filter(function (item) {
           return item.purchased === true && item.purchaseDate;
         });
+        /* Resolve the schedule date used to identify the current pending series entry. */
         const pendingDate = function (item) {
           return parseRecurrenceDate(
             item.recurrence.occurrenceDate ||
@@ -1023,6 +1022,7 @@ function getCurrencySymbol() {
   return currencySymbols[currency] || "$";
 }
 
+/* Return unit labels and conversion behavior for the selected measurement system. */
 function getMeasurementUnits() {
   const measurementUnit = appState.settings?.measurementUnit || "metric";
 
@@ -1045,6 +1045,7 @@ function getMeasurementUnits() {
   ];
 }
 
+/* Resolve a stored quantity-unit code to its user-facing label. */
 function getQuantityUnitLabel(unit) {
   const units = getMeasurementUnits();
   const selectedUnit = units.find(function (measurement) {
@@ -1054,6 +1055,7 @@ function getQuantityUnitLabel(unit) {
   return selectedUnit ? selectedUnit.label : "pcs";
 }
 
+/* Build the quantity-unit options and mark the currently selected value. */
 function getQuantityUnitOptions(selectedUnit = "pcs") {
   return getMeasurementUnits()
     .map(function (measurement) {

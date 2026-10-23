@@ -1,0 +1,619 @@
+/* Candidate unused CSS moved here for review. This file is intentionally not imported by app.css. */
+/* Preserved, unreferenced rules originally from css/base/utilities.css for review. */
+/* Clickable Elements */
+.clickable,
+.clickableMember {
+  cursor: pointer;
+}
+/* Full Width */
+.fullWidth {
+  width: 100%;
+}
+/* Preserved, unreferenced rules originally from css/components/accordion.css for review. */
+/* Group Members */
+/* Badges */
+.activeGroupBadge {
+  margin-left: var(--spacingSmall);
+  padding: 3px var(--spacingSmall);
+  border-radius: var(--radiusPill);
+  background: var(--infoSurface);
+  color: var(--infoColor);
+  font-size: var(--fontSizeMicro);
+  font-weight: 700;
+}
+/* Preserved, unreferenced rules originally from css/components/badges.css for review. */
+/* Member Status Badge */
+.memberStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px var(--spacingCompact);
+  margin-top: var(--spacingSmall);
+  border-radius: var(--radiusPill);
+  font-size: var(--fontSizeXSmall);
+  font-weight: 600;
+}
+/* Administrator Badge */
+.adminStatusBadge {
+  background: var(--infoSurface);
+  color: var(--infoColor);
+}
+/* Active Member Badge */
+.activeStatusBadge {
+  background: var(--successSurface);
+  color: var(--successText);
+}
+/* Preserved, unreferenced rules originally from css/components/bottomSheet.css for review. */
+/* Purchase Summary Card */
+.purchaseSummaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 14px;
+}
+/* Styles the purchase estimated price component and its layout. */
+.purchaseEstimatedPrice {
+  margin-top: var(--spacingXSmall);
+  color: var(--mutedTextColor);
+  font-size: var(--fontSizeXSmall);
+  padding: 0 5px 10px 0;
+}
+/* Styles the purchase estimated amount component and its layout. */
+.purchaseEstimatedAmount {
+  margin-top: 2px;
+  font-size: var(--fontSizeBodySmall);
+  font-weight: 600;
+}
+/* Preserved, unreferenced rules originally from css/components/buttons.css for review. */
+/* Action Button */
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacingSmall);
+  min-height: var(--touchTargetMinimum);
+  padding: 0 var(--spacingMedium);
+  border: none;
+  border-radius: var(--radiusSmall);
+  background: var(--primaryColor);
+  color: var(--textOnPrimary);
+  font-size: var(--fontSizeSmall);
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--animationSpeed) ease,
+    opacity var(--animationSpeed) ease;
+}
+/* Defines the active state styling for the action button. */
+.actionButton:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+/* Member Action Button */
+.memberActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  min-height: var(--touchTargetMinimum);
+  padding: 0 var(--spacingMedium);
+  border: none;
+  border-radius: var(--radiusSmall);
+  background: var(--primaryColor);
+  color: var(--textOnPrimary);
+  font-size: var(--fontSizeSmall);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Remove Member Button */
+.removeMemberButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  min-height: var(--touchTargetMinimum);
+  padding: 0 var(--spacingMedium);
+  border: none;
+  border-radius: var(--radiusSmall);
+  background: var(--dangerColor);
+  color: var(--textOnPrimary);
+  font-size: var(--fontSizeSmall);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Leave Group Button */
+.leaveGroupButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--radiusMedium);
+  background: var(--dangerColor);
+  color: var(--textOnPrimary);
+  font-size: var(--fontSizeBody);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Member More Button */
+.memberMoreButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--touchTargetMinimum);
+  height: var(--touchTargetMinimum);
+  padding: 0;
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusSmall);
+  background: var(--surfaceColor);
+  color: var(--textPrimary);
+  font-size: var(--fontSizeXLargePlus);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Preserved, unreferenced rules originally from css/components/cards.css for review. */
+/* Member Card */
+.memberCard {
+  padding: 18px;
+  margin-bottom: 14px;
+  background: var(--cardColor);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
+  box-shadow: var(--shadowMedium);
+  transition:
+    transform var(--animationSpeed) ease,
+    box-shadow var(--animationSpeed) ease;
+}
+/* Defines the active state styling for the member card. */
+.memberCard:active {
+  transform: scale(0.99);
+  box-shadow: var(--shadowSmall);
+}
+/* Invite Code Card */
+.inviteCodeCard {
+  padding: 20px;
+  margin-bottom: 18px;
+  background: var(--surfaceColor);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusCard);
+  text-align: center;
+}
+/* Profile Information Card */
+.profileInfoCard {
+  padding: 18px;
+  background: var(--cardColor);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
+  box-shadow: var(--shadowMedium);
+}
+/* Catalog Card */
+.catalogCard {
+  padding: var(--spacingMedium);
+  margin-bottom: 14px;
+  background: var(--cardColor);
+  border: 1px solid var(--borderSubtle);
+  border-radius: var(--radiusCard);
+  box-shadow: var(--shadowMedium);
+}
+/* Styles the catalog card header component and its layout. */
+.catalogCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+}
+/* Tablet Cards */
+/* Use a wider card grid when the screen can comfortably show multiple columns. */
+@media (min-width: 768px) {
+  /* Styles the member card, profile info card component and its layout. */
+  .memberCard,
+  .profileInfoCard {
+    padding: 20px;
+  }
+}
+/* Preserved, unreferenced rules originally from css/components/icons.css for review. */
+/* Icon Button */
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Styles the icon button component and its layout. */
+.iconButton img {
+  display: block;
+}
+/* Preserved, unreferenced rules originally from css/components/search.css for review. */
+/* Search Section */
+.searchSection {
+  margin-bottom: 20px;
+}
+/* Catalog Search */
+.catalogSearch {
+  margin-bottom: 20px;
+}
+/* Preserved, unreferenced rules originally from css/components/tabs.css for review. */
+/* Tab Section */
+.tabSection {
+  display: flex;
+  gap: var(--spacingCompact);
+  margin-bottom: var(--spacingLarge);
+}
+/* Preserved, unreferenced rules originally from css/layout/appLayout.css for review. */
+/* Form Validation Error */
+.inputError {
+  border: 2px solid var(--dangerColor) !important;
+  background: var(--dangerSurface);
+}
+/* Form Validation Message */
+.formError {
+  min-height: 18px;
+  margin-top: 6px;
+  font-size: var(--fontSizeXSmall);
+  font-weight: 500;
+  color: var(--dangerText);
+}
+/* Preserved, unreferenced rules originally from css/layout/header.css for review. */
+/* Inner Page Header */
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingCompact);
+  min-height: var(--headerHeight);
+  padding: 10px var(--pageHorizontalPadding);
+  background: var(--headerBackground);
+  border-bottom: 1px solid var(--borderColor);
+}
+/* Tablet Header */
+/* Adjust header spacing and logo sizing for tablet and larger screens. */
+@media (min-width: 768px) {
+  /* Styles the dashboard header, category header, modern header component and its layout. */
+  .categoryHeader {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+}
+/* Large Tablet Header */
+/* Expand the header layout for desktop screens. */
+@media (min-width: 1024px) {
+  /* Styles the dashboard header, category header, modern header component and its layout. */
+  .categoryHeader {
+    padding-right: var(--spacingXLarge);
+    padding-left: var(--spacingXLarge);
+  }
+}
+/* Preserved, unreferenced rules originally from css/layout/navigationDrawer.css for review. */
+/* Right Drawer */
+.sideDrawerRight {
+  right: 0;
+  transform: translateX(100%);
+}
+/* Left Drawer */
+.sideDrawerLeft {
+  left: 0;
+  transform: translateX(-100%);
+}
+/* Sidebar Profile */
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Styles the sidebar profile button component and its layout. */
+.sidebarProfileButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radiusMedium);
+  transition: background 0.2s;
+}
+/* Defines the hover state styling for the sidebar profile button. */
+.sidebarProfileButton:hover {
+  background: var(--surfaceHover);
+}
+/* Styles the sidebar profile avatar component and its layout. */
+.sidebarProfileAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--primaryColor);
+  color: var(--textPrimary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--fontSizeSmall);
+}
+/* Styles the sidebar profile name component and its layout. */
+.sidebarProfileName {
+  font-size: var(--fontSizeBodySmall);
+  font-weight: 600;
+  color: var(--textPrimary);
+}
+/* Drawer Title */
+.drawerTitle {
+  font-size: var(--fontSizeXLargePlus);
+  font-weight: 700;
+}
+/* Styles the drawer profile subtitle component and its layout. */
+.drawerProfileSubtitle {
+  font-size: var(--fontSizeSmall);
+  color: var(--textSecondary);
+}
+/* Preserved, unreferenced rules originally from css/layout/pageLayout.css for review. */
+/* Group Item Row */
+.groupItemRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10px;
+}
+/* Preserved, unreferenced rules originally from css/pages/authentication.css for review. */
+/* Authentication Brand */
+.authBrand {
+  margin-bottom: var(--spacingSmall);
+  font-size: var(--fontSizeHero);
+  font-weight: 700;
+}
+/* Authentication Biometric Row */
+.authBiometricRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+/* Authentication OR Text */
+.authOrText {
+  color: var(--mutedTextColor);
+  font-size: var(--fontSizeSmall);
+}
+/* Preserved, unreferenced rules originally from css/pages/dashboard.css for review. */
+/* Budget Widget Header */
+.budgetWidgetHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+/* Budget Widget Title */
+.budgetWidgetTitle {
+  margin: 0;
+}
+/* Budget Widget Subtitle */
+.budgetWidgetSubtitle {
+  margin-top: var(--spacingXSmall);
+  color: var(--mutedTextColor);
+  font-size: var(--fontSizeCaption);
+}
+/* Budget Widget Summary */
+.budgetWidgetSummary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+/* Budget Summary Item */
+.budgetSummaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingXSmall);
+}
+/* Budget Widget Details */
+.budgetWidgetDetails {
+  margin-top: 18px;
+  padding-top: var(--spacingMedium);
+  border-top: 1px solid var(--borderColor);
+}
+/* Budget Detail Row */
+.budgetDetailRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+/* Budget Widget Amount */
+.budgetWidgetAmount {
+  margin: var(--spacingCompact) 0;
+  font-size: var(--fontSizeXXLarge);
+  font-weight: 700;
+}
+/* Budget Widget Text */
+.budgetWidgetText {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: var(--fontSizeSmall);
+}
+/* Preserved, unreferenced rules originally from css/pages/groupManagement.css for review. */
+/* Group Management Header */
+.groupManagementHeader {
+  margin-bottom: 20px;
+}
+/* Group Management Title */
+.groupManagementTitle {
+  margin-bottom: var(--spacingSmall);
+  font-size: var(--fontSizeDisplay);
+  font-weight: 700;
+}
+/* Group Management Subtitle */
+.groupManagementSubtitle {
+  color: var(--mutedTextColor);
+  font-size: var(--fontSizeBodySmall);
+}
+/* Group Management Hero */
+.groupManagementHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+/* Member List */
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingMedium);
+  margin-bottom: 28px;
+}
+/* Member Information */
+.memberInfo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* Member Avatar */
+.memberAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: var(--infoSurface);
+  color: var(--infoColor);
+  border-radius: var(--radiusRoomy);
+  font-size: var(--fontSizeXLarge);
+  font-weight: 700;
+}
+/* Member Name */
+.memberName {
+  margin-bottom: var(--spacingXSmall);
+  font-size: var(--fontSizeBodyLarge);
+}
+/* Member Role */
+.memberRole {
+  color: var(--mutedTextColor);
+  text-transform: capitalize;
+  font-size: var(--fontSizeSmall);
+}
+/* Member Actions */
+.memberActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* Invite Floating Button */
+.inviteFloatingButton {
+  width: 52px;
+  height: 52px;
+  background: var(--primaryColor);
+  color: var(--textPrimary);
+  border: none;
+  border-radius: var(--radiusRoomy);
+  box-shadow: 0 8px 24px var(--primaryGlowStrong);
+  cursor: pointer;
+  font-size: var(--fontSizeDisplay);
+}
+/* Invite Code Label */
+.inviteCodeLabel {
+  margin-bottom: 10px;
+  color: var(--mutedTextColor);
+}
+/* Invite Code Value */
+.inviteCodeValue {
+  letter-spacing: 2px;
+  font-size: var(--fontSizeDisplay);
+  font-weight: 700;
+}
+/* Preserved, unreferenced rules originally from css/pages/item.css for review. */
+/* Item Action Button */
+.itemActionButton {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  font-size: var(--fontSizeXLargePlus);
+  z-index: 30;
+}
+/* Product Lookup Section */
+.productLookupSection {
+  padding: 20px;
+}
+/* Product Information */
+.productInfo {
+  flex: 1;
+}
+/* Product Price */
+.productPrice {
+  color: var(--primaryColor);
+  font-size: var(--fontSizeLarge);
+  font-weight: 600;
+}
+/* Product Store */
+.productStore {
+  margin-top: var(--spacingXSmall);
+  color: var(--textSecondary);
+  font-size: var(--fontSizeSmall);
+}
+/* Product Image */
+.productImage {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: var(--radiusComfortable);
+}
+/* Product Actions */
+.productActions {
+  display: flex;
+  gap: var(--spacingCompact);
+  margin-top: var(--spacingMedium);
+}
+/* Preserved, unreferenced rules originally from css/pages/profile.css for review. */
+/* Profile Role */
+.profileRole {
+  color: var(--mutedTextColor);
+  text-transform: capitalize;
+  font-size: var(--fontSizeBody);
+}
+/* Group Switcher */
+.groupSwitcher {
+  margin-bottom: var(--spacingLarge);
+}
+/* Group Switcher Title */
+.groupSwitcherTitle {
+  margin-bottom: 14px;
+  font-size: var(--fontSizeLarge);
+  font-weight: 700;
+}
+/* Group Switcher Button */
+.groupSwitcherButton {
+  width: 100%;
+  min-height: 54px;
+  margin-bottom: var(--spacingCompact);
+  background: var(--cardColor);
+  border: none;
+  border-radius: var(--radiusRoomy);
+  box-shadow: 0 6px 18px var(--shadowAmbient);
+  cursor: pointer;
+  font-size: var(--fontSizeBodySmall);
+  font-weight: 600;
+}
+/* Active Group Switcher Button */
+.activeGroupSwitcherButton {
+  background: var(--primaryColor);
+  color: var(--textPrimary);
+}
+/* Profile Hero Card */
+.profileHeroCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 0 28px;
+  margin-bottom: var(--spacingLarge);
+}
+/* Preserved profile-hero button rule; its parent card is also unreferenced. */
+.profileHeroCard .primaryButton {
+  width: 220px;
+}

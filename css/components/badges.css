@@ -26,34 +26,15 @@
   font-size: var(--fontSizeCaption);
   font-weight: 600;
 }
-/* Member Status Badge */
-.memberStatusBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px var(--spacingCompact);
-  margin-top: var(--spacingSmall);
-  border-radius: var(--radiusPill);
-  font-size: var(--fontSizeXSmall);
-  font-weight: 600;
-}
-/* Administrator Badge */
-.adminStatusBadge {
-  background: var(--infoSurface);
-  color: var(--infoColor);
-}
-/* Active Member Badge */
-.activeStatusBadge {
-  background: var(--successSurface);
-  color: var(--successText);
-}
 /* Budget Health Indicators */
 .budgetHealthy {
   background: var(--successBright);
 }
+/* Styles the budget warning component and its layout. */
 .budgetWarning {
   background: var(--warningColor);
 }
+/* Styles the budget critical component and its layout. */
 .budgetCritical {
   background: var(--dangerBright);
 }

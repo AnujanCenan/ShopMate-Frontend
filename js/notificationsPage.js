@@ -1,3 +1,4 @@
+/* Initializes notification preferences, filters, read state, and feed rendering. */
 const notificationList = document.getElementById("notificationList");
 /* Initialize */
 function initializeNotifications() {

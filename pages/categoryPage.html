@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Shows one category's shopping items, tabs, search, and bulk item actions. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -68,6 +69,7 @@
           />
         </div>
         <!-- EMPTY STATE -->
+        <!-- Empty-state message is shown when the active tab has no matching items. -->
         <section class="emptyStateSection" id="itemEmptyState"></section>
         <!-- ITEM LIST -->
         <section class="itemList" id="itemList"></section>
@@ -162,6 +164,7 @@
     <script src="../js/categoryPage.js"></script>
     <script src="../js/localization/languageManager.js"></script>
     <script src="../js/bootstrap.js"></script>
+    <!-- Initialize category tabs, item data, gestures, and localization after page load. -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();

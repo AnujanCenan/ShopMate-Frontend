@@ -223,20 +223,6 @@ function getTranslationValue(dictionary, key) {
   return value;
 }
 /* Get Translation */
-// function t(key) {
-//   if (!key) {
-//     return "";
-//   }
-//   const translatedValue = getTranslationValue(currentTranslations, key);
-//   if (translatedValue !== null && translatedValue !== undefined) {
-//     return translatedValue;
-//   }
-//   const fallbackValue = getTranslationValue(fallbackTranslations, key);
-//   if (fallbackValue !== null && fallbackValue !== undefined) {
-//     return fallbackValue;
-//   }
-//   return key;
-// }
 function t(key, params) {
   if (!key) {
     return "";

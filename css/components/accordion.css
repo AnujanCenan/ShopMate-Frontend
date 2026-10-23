@@ -34,20 +34,24 @@
   background: var(--cardColor);
   cursor: pointer;
 }
+/* Styles the group accordion title component and its layout. */
 .groupAccordionTitle {
   margin: 0;
   font-size: var(--fontSizeBodyLarge);
   font-weight: 700;
 }
 
+/* Styles the group accordion title, group name with color component and its layout. */
 .groupAccordionTitle .groupNameWithColor {
   justify-content: flex-start;
 }
+/* Styles the group accordion subtitle component and its layout. */
 .groupAccordionSubtitle {
   margin-top: var(--spacingXSmall);
   color: var(--mutedTextColor);
   font-size: var(--fontSizeCaption);
 }
+/* Styles the accordion icon component and its layout. */
 .accordionIcon {
   font-size: var(--fontSizeLarge);
   transition: 0.25s;
@@ -58,16 +62,4 @@
   flex-direction: column;
   gap: var(--spacingCompact);
   padding: 18px 20px;
-}
-/* Group Members */
-
-/* Badges */
-.activeGroupBadge {
-  margin-left: var(--spacingSmall);
-  padding: 3px var(--spacingSmall);
-  border-radius: var(--radiusPill);
-  background: var(--infoSurface);
-  color: var(--infoColor);
-  font-size: var(--fontSizeMicro);
-  font-weight: 700;
 }

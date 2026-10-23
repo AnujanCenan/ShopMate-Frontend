@@ -87,6 +87,7 @@
 function getCurrentUser() {
   return appState.currentUser || null;
 }
+/* Check whether the account has an enabled app lock method configured. */
 function isUserAppLockReady(user) {
   const security = user?.security || {};
   return (
@@ -123,9 +124,7 @@ function redirectIfLoggedOut() {
     window.location.href = "../pages/loginPage.html";
   }
 }
-/* Redirect Logged-In Users - Prevents authenticated users from accessing authentication pages,
-   except when App Lock has explicitly sent them to the login fallback. */
-
+/* Keep signed-in users out of auth pages, except during the App Lock login fallback. */
 function redirectIfLoggedIn() {
   if (!isUserLoggedIn()) {
     return;
@@ -900,6 +899,7 @@ async function unlockApplication() {
 let applicationLocked = false;
 const MAX_AUTH_ATTEMPTS = 3;
 
+/* Read the failed-attempt counter for the selected authentication method. */
 function getAuthenticationAttemptCount(type) {
   const key =
     type === "biometric" ? "shopMateBiometricAttempts" : "shopMatePinAttempts";
@@ -907,6 +907,7 @@ function getAuthenticationAttemptCount(type) {
   return Number(sessionStorage.getItem(key) || "0");
 }
 
+/* Increment and return the failed-attempt counter for one authentication method. */
 function incrementAuthenticationAttempt(type) {
   const key =
     type === "biometric" ? "shopMateBiometricAttempts" : "shopMatePinAttempts";
@@ -918,6 +919,7 @@ function incrementAuthenticationAttempt(type) {
   return attempts;
 }
 
+/* Clear failed biometric and PIN attempt counters after successful authentication. */
 function resetAuthenticationAttempts() {
   sessionStorage.removeItem("shopMateBiometricAttempts");
   sessionStorage.removeItem("shopMatePinAttempts");

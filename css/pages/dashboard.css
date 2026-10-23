@@ -14,60 +14,8 @@
  * PAGES
  * • Dashboard Page
  ***************************************************************************************************/
-/* Budget Widget Header */
-.budgetWidgetHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-/* Budget Widget Title */
-.budgetWidgetTitle {
-  margin: 0;
-}
-/* Budget Widget Subtitle */
-.budgetWidgetSubtitle {
-  margin-top: var(--spacingXSmall);
-  color: var(--mutedTextColor);
-  font-size: var(--fontSizeCaption);
-}
-/* Budget Widget Summary */
-.budgetWidgetSummary {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 18px;
-}
-/* Budget Summary Item */
-.budgetSummaryItem {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingXSmall);
-}
-/* Budget Widget Details */
-.budgetWidgetDetails {
-  margin-top: 18px;
-  padding-top: var(--spacingMedium);
-  border-top: 1px solid var(--borderColor);
-}
-/* Budget Detail Row */
-.budgetDetailRow {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-/* Budget Widget Amount */
-.budgetWidgetAmount {
-  margin: var(--spacingCompact) 0;
-  font-size: var(--fontSizeXXLarge);
-  font-weight: 700;
-}
-/* Budget Widget Text */
-.budgetWidgetText {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  text-align: center;
-  font-size: var(--fontSizeSmall);
-}
+
+
 /* Budget Allocation Text */
 .budgetAllocationText {
   margin-top: 10px;

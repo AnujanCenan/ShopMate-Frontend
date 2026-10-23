@@ -33,6 +33,7 @@
     border-color var(--animationSpeed) ease;
 }
 
+/* Defines the active state styling for the category card. */
 .categoryCard:active {
   transform: scale(0.985);
   box-shadow: var(--shadowSmall);
@@ -56,80 +57,25 @@
   touch-action: pan-y;
 }
 
+/* Defines the active state styling for the item card. */
 .itemCard:active {
   box-shadow: var(--shadowSmall);
 }
 
-/* Member Card */
-.memberCard {
-  padding: 18px;
-  margin-bottom: 14px;
-  background: var(--cardColor);
-  border: 1px solid var(--borderSubtle);
-  border-radius: var(--radiusCard);
-  box-shadow: var(--shadowMedium);
-  transition:
-    transform var(--animationSpeed) ease,
-    box-shadow var(--animationSpeed) ease;
-}
-
-.memberCard:active {
-  transform: scale(0.99);
-  box-shadow: var(--shadowSmall);
-}
-
-/* Invite Code Card */
-.inviteCodeCard {
-  padding: 20px;
-  margin-bottom: 18px;
-  background: var(--surfaceColor);
-  border: 1px solid var(--borderColor);
-  border-radius: var(--radiusCard);
-  text-align: center;
-}
-
-/* Profile Information Card */
-.profileInfoCard {
-  padding: 18px;
-  background: var(--cardColor);
-  border: 1px solid var(--borderSubtle);
-  border-radius: var(--radiusCard);
-  box-shadow: var(--shadowMedium);
-}
-
 /* Notification Card */
 .notificationCard {
-  padding: var(--spacingMedium);
-  margin-bottom: var(--spacingCompact);
-  background: var(--cardColor);
-  border: 1px solid var(--borderSubtle);
-  border-radius: var(--radiusCard);
-  box-shadow: var(--shadowSmall);
-  transition:
-    transform var(--animationSpeed) ease,
-    box-shadow var(--animationSpeed) ease;
-}
-
-.notificationCard:active {
-  transform: scale(0.99);
-}
-
-/* Catalog Card */
-.catalogCard {
-  padding: var(--spacingMedium);
+  padding: 18px;
   margin-bottom: 14px;
   background: var(--cardColor);
-  border: 1px solid var(--borderSubtle);
-  border-radius: var(--radiusCard);
-  box-shadow: var(--shadowMedium);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusRoomy);
+  box-shadow: var(--shadowSmall);
+  transition: 0.2s ease;
 }
 
-.catalogCardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  min-width: 0;
+/* Defines the active state styling for the notification card. */
+.notificationCard:active {
+  transform: scale(0.99);
 }
 
 /* Empty State Card */
@@ -144,17 +90,15 @@
 }
 
 /* Tablet Cards */
+/* Use a wider card grid when the screen can comfortably show multiple columns. */
 @media (min-width: 768px) {
+  /* Styles the category card component and its layout. */
   .categoryCard {
     padding: 22px;
   }
 
+  /* Styles the item card component and its layout. */
   .itemCard {
-    padding: 20px;
-  }
-
-  .memberCard,
-  .profileInfoCard {
     padding: 20px;
   }
 }

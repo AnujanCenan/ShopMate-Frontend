@@ -6,15 +6,17 @@
  *
  * IMPORTANT
  * This file registers itself with the localization registry.
- * The structure and keys must always match en.js.
+ * Keep namespace and key names aligned with en.js; translate values only.
  ***************************************************************************************************/
 registerLanguage("ta", {
+  // Text and metadata shown in the application information screen.
   about: {
     description:
       "ShopMate, நீங்கள் பகிர்ந்து கொள்ளும் பொருட்கள் வாங்கும் தேவைகளை ஒரே இடத்தில் ஒழுங்குபடுத்தி, எளிதாக நிர்வகிக்க உதவுகிறது",
     version: "பதிப்பு",
     copyright: "© 2026 ShopMate. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
   },
+  // Labels and messages for sign-in, registration, and authentication errors.
   auth: {
     alreadyMember: "ஏற்கனவே உறுப்பினர்",
     alreadyMemberMessage:
@@ -63,6 +65,7 @@ registerLanguage("ta", {
     tagline: "உங்கள் ஷாப்பிங்கை ஒன்றாக நிர்வகிக்கவும்",
     welcomeBack: "மீண்டும் வரவேற்கிறோம்",
   },
+  // Labels and guidance used by budget analysis views.
   budget: {
     amount: "தொகை",
     budget: "பாதீடு",
@@ -89,6 +92,7 @@ registerLanguage("ta", {
     title: "பாதீடு",
     totalBudget: "மொத்த பாதீடு",
   },
+  // Labels and messages for category creation and management.
   category: {
     add: "சேர்",
     addCategory: "வகையைச் சேர்",
@@ -126,6 +130,7 @@ registerLanguage("ta", {
     shop: "கடை",
     title: "ShopMate வகை",
   },
+  // Confirmation text shown before deleting local app data.
   clearLocalData: {
     title: "உள்ளூர் தரவை அழி",
     description:
@@ -134,6 +139,7 @@ registerLanguage("ta", {
       "இந்த சாதனத்தில் சேமிக்கப்பட்டுள்ள ShopMate தரவு நீக்கப்படும். உங்கள் ShopMate கணக்கும் சர்வரில் உள்ள தரவும் நீக்கப்படாது.",
     clear: "தரவை அழிக்கவும்",
   },
+  // Shared labels reused across multiple screens and dialogs.
   common: {
     add: "சேர்",
     appName: "ShopMate",
@@ -174,6 +180,7 @@ registerLanguage("ta", {
     itemDeleted: "{{itemName}} நீக்கப்பட்டது",
     quantityUnit: "அளவு அலகு",
   },
+  // Names and symbols for supported currencies.
   currency: {
     title: "நாணயம்",
     description: "ShopMate பயன்படுத்த வேண்டிய நாணயத்தைத் தேர்ந்தெடுக்கவும்.",
@@ -186,6 +193,7 @@ registerLanguage("ta", {
     savedTitle: "நாணயம் புதுப்பிக்கப்பட்டது",
     savedMessage: "உங்கள் நாணய விருப்பம் சேமிக்கப்பட்டது.",
   },
+  // Dashboard labels, budget states, and group/category actions.
   dashboard: {
     addItem: "பொருளைச் சேர்",
     addNewCategory: "புதிய வகையைச் சேர்",
@@ -323,6 +331,7 @@ registerLanguage("ta", {
     unlimitedBudget: "வரம்பற்ற பாதீடு",
     used: "பயன்படுத்தப்பட்டது",
   },
+  // Titles and messages for reusable confirmation dialogs.
   dialogs: {
     cancel: "ரத்து செய்",
     confirm: "உறுதிப்படுத்து",
@@ -339,6 +348,7 @@ registerLanguage("ta", {
       "உங்கள் விருப்பமான பயன்பாட்டு தோற்றம் சேமிக்கப்பட்டது.",
     themeUpdatedTitle: "தோற்றம் புதுப்பிக்கப்பட்டது",
   },
+  // Labels and messages for the favorites list.
   favorites: {
     addedToFavorites: "பிடித்தவற்றில் சேர்க்கப்பட்டது",
     addToFavorites: "பிடித்தவற்றில் சேர்",
@@ -347,6 +357,7 @@ registerLanguage("ta", {
     noFavorites: "பிடித்த பொருட்கள் எதுவும் இல்லை",
     removeFromFavorites: "பிடித்தவற்றிலிருந்து அகற்று",
   },
+  // Text used by the in-app feedback form.
   feedback: {
     title: "கருத்தை அனுப்பு",
     description:
@@ -360,6 +371,7 @@ registerLanguage("ta", {
     successMessage:
       "உங்கள் கருத்துக்கு நன்றி. உங்கள் கருத்து பரிசீலனைக்காக பதிவு செய்யப்பட்டுள்ளது.",
   },
+  // Labels and messages for password recovery.
   forgotPassword: {
     description:
       "கடவுச்சொல் மீட்டமைப்பு இணைப்பைப் பெற உங்கள் பதிவு செய்யப்பட்ட மின்னஞ்சல் முகவரியை உள்ளிடவும்.",
@@ -378,6 +390,7 @@ registerLanguage("ta", {
     sendButton: "மீட்டமைப்பு இணைப்பை அனுப்பு",
     title: "கடவுச்சொல்லை மறந்துவிட்டீர்களா?",
   },
+  // Labels and messages for groups, members, roles, and invitations.
   groupManagement: {
     acceptInvitation: "அழைப்பை ஏற்கவும்",
     addMember: "உறுப்பினரைச் சேர்",
@@ -463,6 +476,7 @@ registerLanguage("ta", {
     transferOwnership: "உரிமையை மாற்றவும்",
     youLeftGroup: "நீங்கள் குழுவிலிருந்து வெளியேறிவிட்டீர்கள்.",
   },
+  // Text shown when accepting a group invitation.
   invite: {
     acceptInvite: "அழைப்பை ஏற்கவும்",
     alreadyMember: "ஏற்கனவே உறுப்பினர்",
@@ -477,6 +491,7 @@ registerLanguage("ta", {
     joinGroup: "குழுவில் சேரவும்",
     title: "அழைப்பு",
   },
+  // Labels and validation messages for shopping items and purchases.
   item: {
     actualPricePaid: "செலுத்திய உண்மையான விலை",
     addItem: "பொருளைச் சேர்க்கவும்",
@@ -520,6 +535,7 @@ registerLanguage("ta", {
     startDate: "தொடக்க தேதி",
     endDate: "முடிவு தேதி",
   },
+  // Names and labels for supported quantity units.
   measurementUnits: {
     title: "அளவீட்டு அலகுகள்",
     description:
@@ -533,6 +549,7 @@ registerLanguage("ta", {
     savedTitle: "அளவீட்டு அலகுகள் புதுப்பிக்கப்பட்டன",
     savedMessage: "உங்கள் அளவீட்டு அலகு விருப்பம் சேமிக்கப்பட்டது.",
   },
+  // Labels and messages for the notification center.
   notifications: {
     all: "அனைத்தும்",
     allRead: "அனைத்து அறிவிப்புகளும் படிக்கப்பட்டன",
@@ -567,6 +584,7 @@ registerLanguage("ta", {
     recurringItemAddedMessage:
       "{{itemName}} மீண்டும் உங்கள் கடைவலப் பட்டியலில் சேர்க்கப்பட்டது.",
   },
+  // Copy displayed in the privacy policy view.
   privacy: {
     title: "தனியுரிமைக் கொள்கை",
     lastUpdated: "கடைசியாகப் புதுப்பிக்கப்பட்டது: 1 செப்டம்பர் 2026",
@@ -592,6 +610,7 @@ registerLanguage("ta", {
     contactMessage:
       "தனியுரிமை தொடர்பான கேள்விகள் அல்லது கோரிக்கைகளுக்கு ShopMate ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
   },
+  // Labels and messages for profile and account details.
   profile: {
     account: "கணக்கு",
     accountInformation: "கணக்கு தகவல்",
@@ -616,6 +635,7 @@ registerLanguage("ta", {
     title: "சுயவிவரம்",
     updateProfile: "சுயவிவரத்தைப் புதுப்பிக்கவும்",
   },
+  // Labels and validation messages for account registration.
   register: {
     accountExistsMessage:
       "இந்த மின்னஞ்சல் முகவரியுடன் ஏற்கனவே ஒரு கணக்கு உள்ளது.",
@@ -638,6 +658,7 @@ registerLanguage("ta", {
     title: "பதிவு",
   },
 
+  // Labels and messages for PIN, biometric, and app-lock settings.
   security: {
     invalidPinTitle: "தவறான PIN",
     invalidPinMessage: "PIN 4 முதல் 6 இலக்கங்களைக் கொண்டிருக்க வேண்டும்.",
@@ -700,6 +721,7 @@ registerLanguage("ta", {
     biometricUnavailableMessage:
       "இந்த சாதனத்தில் பயோமெட்ரிக் அங்கீகாரம் கிடைக்கவில்லை.",
   },
+  // Labels for preferences and settings actions.
   settings: {
     about: "ShopMate பற்றி",
     account: "கணக்கு",
@@ -725,6 +747,7 @@ registerLanguage("ta", {
     theme: "தீம்",
     title: "அமைப்புகள்",
   },
+  // Copy displayed in the terms and conditions view.
   terms: {
     title: "விதிமுறைகள் மற்றும் நிபந்தனைகள்",
     lastUpdated: "கடைசியாகப் புதுப்பிக்கப்பட்டது: 1 செப்டம்பர் 2026",

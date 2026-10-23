@@ -1,3 +1,4 @@
+/* Renders dashboard groups, category cards, budget summaries, and related forms. */
 const categoryList = document.getElementById("categoryList");
 const emptyStateSection = document.getElementById("emptyStateSection");
 const selectedGroupName = document.getElementById("selectedGroupName");
@@ -296,6 +297,7 @@ function renderCreateGroupForm() {
     groupNameInput.focus();
   }, 100);
 }
+/* Render the group's available color choices and mark its current selection. */
 function renderGroupColorSwatches(groupName) {
   const colorMap = getGroupColorMap();
   const options = getGroupColorOptions();
@@ -312,6 +314,7 @@ function renderGroupColorSwatches(groupName) {
     })
     .join("");
 }
+/* Update the selected swatch and clear any prior color-selection error. */
 function selectGroupColor(color, button) {
   const colorMap = getGroupColorMap();
   const owner = Object.keys(colorMap).find(function (name) {
@@ -329,6 +332,7 @@ function selectGroupColor(color, button) {
   const error = document.getElementById("groupColorError");
   if (error) error.textContent = "";
 }
+/* Open the color picker for a group with its current color preselected. */
 function renderGroupColorForm(groupName) {
   ensureGroupColorsForCurrentUser();
   colorEditingGroupName = groupName;
@@ -338,6 +342,7 @@ function renderGroupColorForm(groupName) {
     <div class="bottomSheetBody"><p>${renderGroupNameWithColor(groupName)}</p><div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">${renderGroupColorSwatches(groupName)}</div><div id="groupColorError" class="validationMessage"></div><div class="bottomSheetButtonRow"><button class="secondaryButton" onclick="closeBottomSheet()">${t("common.cancel")}</button><button class="primaryButton" onclick="saveGroupColor()">${t("common.save")}</button></div></div>`;
   openBottomSheet();
 }
+/* Save the chosen color for the group and refresh its visible name markers. */
 function saveGroupColor() {
   const colorMap = getGroupColorMap();
   const error = document.getElementById("groupColorError");

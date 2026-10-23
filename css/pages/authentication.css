@@ -69,29 +69,10 @@
 .authLogo {
   width: 100px;
 }
-/* Authentication Brand */
-.authBrand {
-  margin-bottom: var(--spacingSmall);
-  font-size: var(--fontSizeHero);
-  font-weight: 700;
-}
 /* Authentication Tagline */
 .authTagline {
   color: var(--mutedTextColor);
   font-size: var(--fontSizeBodySmall);
-}
-/* Authentication Biometric Row */
-.authBiometricRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-/* Authentication OR Text */
-.authOrText {
-  color: var(--mutedTextColor);
-  font-size: var(--fontSizeSmall);
 }
 /* Authentication Divider */
 .authDivider {
@@ -100,6 +81,7 @@
   justify-content: center;
   margin: 22px 0 18px;
 }
+/* Styles the auth divider component and its layout. */
 .authDivider::before,
 .authDivider::after {
   content: "";
@@ -107,6 +89,7 @@
   height: 1px;
   background: var(--borderColor);
 }
+/* Styles the auth divider component and its layout. */
 .authDivider span {
   padding: 0 14px;
   color: var(--mutedTextColor);

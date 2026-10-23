@@ -17,101 +17,17 @@
  * PAGES
  * • Group Management Page
  ***************************************************************************************************/
-/* Group Management Header */
-.groupManagementHeader {
-  margin-bottom: 20px;
-}
-/* Group Management Title */
-.groupManagementTitle {
-  margin-bottom: var(--spacingSmall);
-  font-size: var(--fontSizeDisplay);
-  font-weight: 700;
-}
-/* Group Management Subtitle */
-.groupManagementSubtitle {
-  color: var(--mutedTextColor);
-  font-size: var(--fontSizeBodySmall);
-}
-/* Group Management Hero */
-.groupManagementHero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-/* Member List */
-.memberList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingMedium);
-  margin-bottom: 28px;
-}
-/* Member Information */
-.memberInfo {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-/* Member Avatar */
-.memberAvatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  background: var(--infoSurface);
-  color: var(--infoColor);
-  border-radius: var(--radiusRoomy);
-  font-size: var(--fontSizeXLarge);
-  font-weight: 700;
-}
-/* Member Name */
-.memberName {
-  margin-bottom: var(--spacingXSmall);
-  font-size: var(--fontSizeBodyLarge);
-}
-/* Member Role */
-.memberRole {
-  color: var(--mutedTextColor);
-  text-transform: capitalize;
-  font-size: var(--fontSizeSmall);
-}
-/* Member Actions */
-.memberActions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-/* Invite Floating Button */
-.inviteFloatingButton {
-  width: 52px;
-  height: 52px;
-  background: var(--primaryColor);
-  color: var(--textPrimary);
-  border: none;
-  border-radius: var(--radiusRoomy);
-  box-shadow: 0 8px 24px var(--primaryGlowStrong);
-  cursor: pointer;
-  font-size: var(--fontSizeDisplay);
-}
-/* Invite Code Label */
-.inviteCodeLabel {
-  margin-bottom: 10px;
-  color: var(--mutedTextColor);
-}
-/* Invite Code Value */
-.inviteCodeValue {
-  letter-spacing: 2px;
-  font-size: var(--fontSizeDisplay);
-  font-weight: 700;
-}
+
+
 /* Destructive Action */
 .destructiveAction {
   color: var(--dangerBright);
 }
+/* Styles the invite group information component and its layout. */
 .inviteGroupInformation {
   margin-bottom: var(--spacingLarge);
 }
+/* Styles the invite group name component and its layout. */
 .inviteGroupName {
   margin-top: var(--spacingSmall);
   padding: 14px var(--spacingMedium);
@@ -121,22 +37,19 @@
   font-weight: 600;
   color: var(--textPrimary);
 }
-.groupMemberRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacingCompact);
-  padding: 10px 0;
-}
+/* Styles the group member information component and its layout. */
 .groupMemberInformation {
   flex: 1;
   min-width: 0;
+  padding: var(--spacingXSmall) 0;
+  line-height: 1.5;
 }
+/* Styles the group member row, group more button component and its layout. */
 .groupMemberRow .groupMoreButton {
   flex-shrink: 0;
-  margin-left: auto;
   background: var(--surfaceColor);
 }
+/* Keeps member and invitation rows aligned at the shared spacing. */
 .groupMemberRow,
 .groupInviteRow {
   display: flex;
@@ -145,20 +58,22 @@
   gap: var(--spacingCompact);
   padding: var(--spacingSmall) 0;
 }
-.groupMemberInformation,
-.groupInviteInformation {
-  padding: var(--spacingXSmall) 0;
-  line-height: 1.5;
+/* Maintains the existing spaced layout for member rows. */
+.groupMemberRow {
+  justify-content: space-between;
 }
+
+/* Preserves the extra vertical spacing used specifically for invitation rows. */
 .groupInviteRow {
   padding: 10px 0;
 }
+
+/* Keeps the invite details aligned and readable within each row. */
 .groupInviteInformation {
+  padding: var(--spacingXSmall) 0;
   line-height: 1.6;
 }
-.groupMoreButton {
-  margin-left: auto;
-}
+/* Styles the member role admin component and its layout. */
 .memberRoleAdmin {
   display: inline-flex;
   align-items: center;
@@ -170,6 +85,7 @@
   font-size: var(--fontSizeXSmall);
   font-weight: 600;
 }
+/* Styles the member role member component and its layout. */
 .memberRoleMember {
   display: inline-flex;
   align-items: center;
@@ -181,14 +97,17 @@
   font-size: var(--fontSizeXSmall);
   font-weight: 600;
 }
+/* Styles the empty pending invitation state component and its layout. */
 .emptyPendingInvitationState {
   padding: 18px 0;
   text-align: center;
 }
+/* Styles the empty state title component and its layout. */
 .emptyStateTitle {
   font-weight: 600;
   color: var(--mutedTextColor);
 }
+/* Styles the empty state subtitle component and its layout. */
 .emptyStateSubtitle {
   margin-top: 6px;
   font-size: var(--fontSizeCaption);
@@ -197,6 +116,7 @@
 /* =========================================
    GROUP ACCORDION - DARK MODE
    ========================================= */
+/* Overrides group accordion card styling for the dark theme. */
 .darkMode .groupAccordionCard {
   background: var(--surfaceRaised);
   color: var(--textOnDark);
@@ -226,6 +146,7 @@
   color: var(--infoColor) !important;
   background: var(--infoSurface);
 }
+/* Overrides member role member styling for the dark theme. */
 .darkMode .memberRoleMember {
   color: var(--successText) !important;
   background: var(--successSurface);
@@ -247,6 +168,7 @@
 .darkMode .emptyStateTitle {
   color: var(--textOnDark) !important;
 }
+/* Overrides empty state subtitle styling for the dark theme. */
 .darkMode .emptyStateSubtitle {
   color: var(--textSecondary) !important;
 }
@@ -254,6 +176,7 @@
 .darkMode .groupMoreButton {
   background: var(--surfaceRaised);
 }
+/* Overrides group more button styling for the dark theme. */
 .darkMode .groupMoreButton .actionIcon {
   filter: brightness(0) invert(1);
 }

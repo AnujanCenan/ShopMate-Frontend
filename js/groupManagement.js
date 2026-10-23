@@ -1,3 +1,4 @@
+/* Renders group membership and handles invitations, roles, switching, and leaving. */
 redirectIfLoggedOut();
 const pendingInviteList = document.getElementById("pendingInviteList");
 const readOnlyBanner = document.getElementById("readOnlyBanner");
@@ -1141,6 +1142,7 @@ function openBottomSheet() {
   bottomSheet.classList.remove("hidden");
   screenOverlay.classList.remove("hidden");
 }
+/* Hide the group-management sheet and return interaction to the page. */
 function closeBottomSheet() {
   bottomSheet.classList.add("hidden");
   screenOverlay.classList.add("hidden");

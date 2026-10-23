@@ -6,15 +6,17 @@
  *
  * IMPORTANT
  * This file registers itself with the localization registry.
- * The structure and keys must always match english.js.
+ * This dictionary defines the keys that all other language files must match.
  ***************************************************************************************************/
 registerLanguage("en", {
+  // Text and metadata shown in the application information screen.
   about: {
     description:
       "ShopMate helps you organise and manage your shared shopping needs in one place.",
     version: "Version",
     copyright: "© 2026 ShopMate. All rights reserved.",
   },
+  // Labels and messages for sign-in, registration, and authentication errors.
   auth: {
     alreadyMember: "Already a Member",
     alreadyMemberMessage: "You are already a member of this group.",
@@ -60,6 +62,7 @@ registerLanguage("en", {
     tagline: "Manage your shopping together",
     welcomeBack: "Welcome Back",
   },
+  // Labels and guidance used by budget analysis views.
   budget: {
     amount: "Amount",
     budget: "Budget",
@@ -86,6 +89,7 @@ registerLanguage("en", {
     title: "Budget",
     totalBudget: "Total Budget",
   },
+  // Labels and messages for category creation and management.
   category: {
     add: "Add",
     addCategory: "Add Category",
@@ -123,6 +127,7 @@ registerLanguage("en", {
     shop: "Shop",
     title: "ShopMate Category",
   },
+  // Confirmation text shown before deleting local app data.
   clearLocalData: {
     title: "Clear Local Data",
     description: "Remove ShopMate data stored locally on this device.",
@@ -130,6 +135,7 @@ registerLanguage("en", {
       "This will remove ShopMate data stored on this device. Your ShopMate account and server data will not be deleted.",
     clear: "Clear Data",
   },
+  // Shared labels reused across multiple screens and dialogs.
   common: {
     add: "Add",
     appName: "ShopMate",
@@ -170,6 +176,7 @@ registerLanguage("en", {
     itemDeleted: "{{itemName}} deleted",
     quantityUnit: "Quantity unit",
   },
+  // Names and symbols for supported currencies.
   currency: {
     title: "Currency",
     description: "Choose the currency you want ShopMate to use.",
@@ -182,6 +189,7 @@ registerLanguage("en", {
     savedTitle: "Currency Updated",
     savedMessage: "Your currency preference has been saved.",
   },
+  // Dashboard labels, budget states, and group/category actions.
   dashboard: {
     addItem: "Add Item",
     addNewCategory: "Add New Category",
@@ -315,6 +323,7 @@ registerLanguage("en", {
     unlimitedBudget: "Unlimited Budget",
     used: "Used",
   },
+  // Titles and messages for reusable confirmation dialogs.
   dialogs: {
     cancel: "Cancel",
     confirm: "Confirm",
@@ -330,6 +339,7 @@ registerLanguage("en", {
     themeUpdatedMessage: "Your preferred application theme has been saved.",
     themeUpdatedTitle: "Theme Updated",
   },
+  // Labels and messages for the favorites list.
   favorites: {
     addedToFavorites: "Added to Favorites",
     addToFavorites: "Add to Favorites",
@@ -338,6 +348,7 @@ registerLanguage("en", {
     noFavorites: "No Favorites",
     removeFromFavorites: "Remove from Favorites",
   },
+  // Text used by the in-app feedback form.
   feedback: {
     title: "Send Feedback",
     description:
@@ -351,6 +362,7 @@ registerLanguage("en", {
     successMessage:
       "Thank you for your feedback. Your feedback has been recorded for review.",
   },
+  // Labels and messages for password recovery.
   forgotPassword: {
     description:
       "Enter your registered email address to receive a password reset link.",
@@ -367,6 +379,7 @@ registerLanguage("en", {
     sendButton: "Send Reset Link",
     title: "Forgot Password",
   },
+  // Labels and messages for groups, members, roles, and invitations.
   groupManagement: {
     acceptInvitation: "Accept Invitation",
     addMember: "Add Member",
@@ -446,6 +459,7 @@ registerLanguage("en", {
     transferOwnership: "Transfer Ownership",
     youLeftGroup: "You left the group.",
   },
+  // Text shown when accepting a group invitation.
   invite: {
     acceptInvite: "Accept Invite",
     alreadyMember: "Already a Member",
@@ -460,6 +474,7 @@ registerLanguage("en", {
     joinGroup: "Join Group",
     title: "Invite",
   },
+  // Labels and validation messages for shopping items and purchases.
   item: {
     actualPricePaid: "Actual Price Paid",
     addItem: "Add Item",
@@ -503,6 +518,7 @@ registerLanguage("en", {
     startDate: "Start Date",
     endDate: "End Date",
   },
+  // Names and labels for supported quantity units.
   measurementUnits: {
     title: "Measurement Units",
     description: "Choose the measurement system you want ShopMate to use.",
@@ -515,6 +531,7 @@ registerLanguage("en", {
     savedTitle: "Measurement Units Updated",
     savedMessage: "Your measurement unit preference has been saved.",
   },
+  // Labels and messages for the notification center.
   notifications: {
     all: "All",
     allRead: "All notifications marked as read",
@@ -549,6 +566,7 @@ registerLanguage("en", {
     recurringItemAddedMessage:
       "{{itemName}} has been added to your shopping list again.",
   },
+  // Copy displayed in the privacy policy view.
   privacy: {
     title: "Privacy Policy",
     lastUpdated: "Last updated: 1 September 2026",
@@ -574,6 +592,7 @@ registerLanguage("en", {
     contactMessage:
       "For privacy-related questions or requests, please contact the ShopMate support team.",
   },
+  // Labels and messages for profile and account details.
   profile: {
     account: "Account",
     accountInformation: "Account Information",
@@ -598,6 +617,7 @@ registerLanguage("en", {
     title: "Profile",
     updateProfile: "Update Profile",
   },
+  // Labels and validation messages for account registration.
   register: {
     accountExistsMessage: "An account with this email address already exists.",
     accountExistsTitle: "Account Already Exists",
@@ -618,6 +638,7 @@ registerLanguage("en", {
     successTitle: "Welcome to ShopMate!",
     title: "Register",
   },
+  // Labels and messages for PIN, biometric, and app-lock settings.
   security: {
     invalidPinTitle: "Invalid PIN",
     invalidPinMessage: "PIN must contain 4 to 6 digits.",
@@ -677,6 +698,7 @@ registerLanguage("en", {
     biometricUnavailableMessage:
       "Biometric authentication is not available on this device.",
   },
+  // Labels for preferences and settings actions.
   settings: {
     about: "About ShopMate",
     account: "Account",
@@ -702,6 +724,7 @@ registerLanguage("en", {
     theme: "Theme",
     title: "Settings",
   },
+  // Copy displayed in the terms and conditions view.
   terms: {
     title: "Terms & Conditions",
     lastUpdated: "Last updated: 1 September 2026",

@@ -1,3 +1,4 @@
+/* Handles shopping-item creation, edits, purchases, recurrence, and item actions. */
 const openItemBottomSheetButton = document.getElementById(
   "openItemBottomSheetButton",
 );

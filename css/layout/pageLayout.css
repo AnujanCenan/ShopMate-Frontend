@@ -50,6 +50,7 @@
   font-weight: 500;
 }
 
+/* Styles the group name with color component and its layout. */
 .groupNameWithColor {
   display: inline-flex;
   align-items: center;
@@ -58,6 +59,7 @@
   min-width: 0;
 }
 
+/* Styles the group color dot component and its layout. */
 .groupColorDot {
   display: inline-block;
   width: 14px;
@@ -67,6 +69,7 @@
   border-radius: 50%;
 }
 
+/* Styles the group color edit button component and its layout. */
 .groupColorEditButton {
   display: inline-flex;
   align-items: center;
@@ -80,15 +83,9 @@
   cursor: pointer;
 }
 
+/* Defines the focus-visible state styling for the group color edit button. */
 .groupColorEditButton:focus-visible,
 .groupColorSwatch:focus-visible {
   outline: 3px solid var(--primaryColor);
   outline-offset: 2px;
-}
-/* Group Item Row */
-.groupItemRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 10px;
 }
