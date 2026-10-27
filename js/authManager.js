@@ -34,7 +34,7 @@
 │   ├── validateRegistrationDetails()
 │   ├── isEmailRegistered()
 │   ├── createUserAccount()
-│   └── createGroup()
+│   └── createRegistrationGroup()
 │
 ├── Session Management
 │   ├── createUserSession()
@@ -252,7 +252,7 @@ async function registerUser(event) {
     "",
   );
   /* Create Shopping Group */
-  createGroup(groupName, user);
+  createRegistrationGroup(groupName, user);
   /* Start User Session */
   createUserSession(user);
   /* Welcome New User */
@@ -351,8 +351,8 @@ function createUserAccount(
   saveAppState();
   return user;
 }
-/* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
-function createGroup(groupName, user) {
+/* Create the initial group during registration and assign the registering user as its administrator. */
+function createRegistrationGroup(groupName, user) {
   appState.groups[groupName] = [];
   if (!appState.groupCreators) {
     appState.groupCreators = {};
@@ -640,19 +640,6 @@ function isBiometricEnabled() {
   }
   return currentUser.biometricEnabled || false;
 }
-/* Base64URL Encode - Converts an ArrayBuffer into a WebAuthn-safe string. */
-function bufferToBase64Url(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  bytes.forEach(function (byte) {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-}
-
 /* Enable Biometric Authentication - Registers the current device authenticator. */
 async function enableBiometricAuthentication() {
   const currentUser = getCurrentUser();
@@ -790,14 +777,6 @@ function setApplicationPin(pin, confirmPin, currentPin = null) {
   );
 
   return true;
-}
-/* Check App Lock Status */
-function isAppLockEnabled() {
-  const currentUser = getCurrentUser();
-  if (!currentUser || !currentUser.security) {
-    return false;
-  }
-  return currentUser.security.appLockEnabled === true;
 }
 /* Enable / Disable App Lock */
 function toggleAppLock() {

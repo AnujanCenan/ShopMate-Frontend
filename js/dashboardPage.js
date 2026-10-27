@@ -1,6 +1,8 @@
 /* Renders dashboard groups, category cards, budget summaries, and related forms. */
 const categoryList = document.getElementById("categoryList");
 const emptyStateSection = document.getElementById("emptyStateSection");
+const categorySortControl = document.getElementById("categorySortControl");
+const categorySortSelect = document.getElementById("categorySortSelect");
 const selectedGroupName = document.getElementById("selectedGroupName");
 const groupDropdownButton = document.getElementById("groupDropdownButton");
 const openCategoryBottomSheetButton = document.getElementById(
@@ -13,6 +15,13 @@ const sideDrawer = document.getElementById("sideDrawer");
 const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
 let selectedGroupColor = "";
 let colorEditingGroupName = null;
+/* Save the category sort preference separately for each user and group. */
+if (categorySortSelect) {
+  categorySortSelect.addEventListener("change", function () {
+    localStorage.setItem(getCategorySortPreferenceKey(), categorySortSelect.value);
+    renderCategories();
+  });
+}
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 function initializeDashboard() {
   if (ensureGroupColorsForCurrentUser()) {
@@ -56,6 +65,7 @@ function renderCategories() {
   if (!categoryList) {
     return;
   }
+  categorySortControl?.classList.add("hidden");
   categoryList.innerHTML = "";
   if (!appState.activeGroup || !getGroupMember(appState.activeGroup)) {
     emptyStateSection.innerHTML = `
@@ -75,7 +85,11 @@ function renderCategories() {
     return;
   }
   emptyStateSection.innerHTML = "";
-  categories.forEach(function (category) {
+  categorySortControl?.classList.remove("hidden");
+  if (categorySortSelect) {
+    categorySortSelect.value = getCategorySortMode();
+  }
+  getSortedCategoriesForDisplay(categories).forEach(function (category) {
     const categoryBudget =
       appState.budgets.categoryBudgets?.[appState.activeGroup]?.[category.name]
         ?.monthlyLimit ?? 0;
@@ -141,6 +155,58 @@ function renderCategories() {
       </div>
     `;
   });
+}
+/* Build a per-user and per-group key for the dashboard category sort mode. */
+function getCategorySortPreferenceKey() {
+  const currentUser = getCurrentUser();
+  const keyParts = [
+    currentUser?.id || currentUser?.email || "local-user",
+    appState.activeGroup || "no-group",
+  ];
+  return `shopMate:category-sort:${keyParts.map(encodeURIComponent).join(":")}`;
+}
+/* Return a valid saved category sort mode or preserve the original order. */
+function getCategorySortMode() {
+  const savedMode = localStorage.getItem(getCategorySortPreferenceKey());
+  return ["default", "newest-first", "newest-last", "pending-desc"].includes(savedMode)
+    ? savedMode
+    : "default";
+}
+/* Sort a copy of category cards without changing the saved category order. */
+function getSortedCategoriesForDisplay(categories) {
+  const sortedCategories = categories.slice();
+  const sortMode = getCategorySortMode();
+  if (sortMode === "newest-first" || sortMode === "newest-last") {
+    const direction = sortMode === "newest-first" ? -1 : 1;
+    return sortedCategories.sort(function (left, right) {
+      // BACKEND TODO: Return category createdAt (ISO-8601) from SQL/API for chronological sorting.
+      const leftValue = left.createdAt;
+      const rightValue = right.createdAt;
+      const leftCreated = leftValue == null ? null : Date.parse(leftValue);
+      const rightCreated = rightValue == null ? null : Date.parse(rightValue);
+      const validLeft = leftCreated !== null && Number.isFinite(leftCreated);
+      const validRight = rightCreated !== null && Number.isFinite(rightCreated);
+      if (!validLeft && !validRight) return 0;
+      if (!validLeft) return 1;
+      if (!validRight) return -1;
+      return (leftCreated - rightCreated) * direction;
+    });
+  }
+  if (sortMode === "pending-desc") {
+    return sortedCategories.sort(function (left, right) {
+      const leftPending = left.items.filter(function (item) {
+        return !item.purchased;
+      }).length;
+      const rightPending = right.items.filter(function (item) {
+        return !item.purchased;
+      }).length;
+      return (
+        rightPending - leftPending ||
+        left.name.localeCompare(right.name, undefined, { sensitivity: "base" })
+      );
+    });
+  }
+  return sortedCategories;
 }
 /* Select Group */
 function selectGroup(groupName) {
@@ -298,7 +364,7 @@ function renderCreateGroupForm() {
         <button
           type="button"
           class="primaryButton"
-          onclick="createGroup()"
+          onclick="createDashboardGroup()"
         >
           ${t("dashboard.createGroupButton")}
         </button>
@@ -439,8 +505,8 @@ function clearRenameGroupValidation() {
   renameGroupInput.classList.remove("formInputError");
   renameGroupError.textContent = "";
 }
-/* Create Group - Creates a new shopping group after validating the group name. */
-function createGroup() {
+/* Create a dashboard group after validating its name, color, and uniqueness. */
+function createDashboardGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
   const groupNameError = document.getElementById("groupNameError");
   const groupName = groupNameInput.value.trim().replace(/\s+/g, " ");
@@ -1228,36 +1294,6 @@ ${t("dashboard.deleteGroupConfirmationWarning")}`,
     },
   );
 }
-/* Sort Categories */
-function sortCategories() {
-  if (!appState.activeGroup) {
-    return;
-  }
-  appState.groups[appState.activeGroup].sort(function (a, b) {
-    return a.name.localeCompare(b.name);
-  });
-  saveAppState();
-  renderCategories();
-  closeBottomSheet();
-}
-/* Sort Categories By Pending */
-function sortCategoriesByPending() {
-  if (!appState.activeGroup) {
-    return;
-  }
-  appState.groups[appState.activeGroup].sort(function (a, b) {
-    const pendingA = a.items.filter(function (item) {
-      return !item.purchased;
-    }).length;
-    const pendingB = b.items.filter(function (item) {
-      return !item.purchased;
-    }).length;
-    return pendingB - pendingA;
-  });
-  saveAppState();
-  renderCategories();
-  closeBottomSheet();
-}
 /* Render Dashboard Menu */
 /* Open Side Drawer */
 function openSideDrawer() {
@@ -1893,12 +1929,6 @@ function saveGroupBudget() {
   renderBudgetDashboardWidget();
   closeBottomSheet();
   showToast(t("dashboard.budgetUpdated"));
-}
-/* Toggle Budget Widget */
-function toggleBudgetWidget() {
-  appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
-  saveAppState();
-  renderBudgetDashboardWidget();
 }
 /* Export App Data */
 function exportAppData() {

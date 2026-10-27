@@ -37,10 +37,6 @@
  * │   ├── saveEditedBudget()
  * │   └── deleteCategoryBudget()
  * │
- * ├── Bottom Sheet
- * │   ├── openBottomSheet()
- * │   └── closeBottomSheet()
- * │
  * └── Initialization
  *     └── initializeBudgetPage()
  *
@@ -59,9 +55,7 @@
 const budgetHero = document.getElementById("budgetHero");
 const budgetStats = document.getElementById("budgetStats");
 const budgetCategoryList = document.getElementById("budgetCategoryList");
-const bottomSheet = document.getElementById("bottomSheet");
 const bottomSheetContent = document.getElementById("bottomSheetContent");
-const screenOverlay = document.getElementById("screenOverlay");
 let budgetDisplayGroup = null;
 /* Navigate Back - Returns the user to the dashboard page. */
 function goBack() {
@@ -84,10 +78,6 @@ function getTopSpendingCategory() {
     name: topCategory || t("budget.noSpendingYet"),
     amount: highestSpend,
   };
-}
-/* Close Bottom Sheet When Overlay Is Clicked */
-if (screenOverlay) {
-  screenOverlay.addEventListener("click", closeBottomSheet);
 }
 /* Open Budget Menu - Displays the available actions for the selected budget category. */
 function openBudgetMenu(categoryName) {
@@ -221,18 +211,6 @@ function saveEditedBudget(categoryName) {
   showToast(t("budget.budgetUpdated"));
   closeBottomSheet();
   renderBudgetAnalysis();
-}
-/* Open Bottom Sheet - Displays the bottom sheet and locks page scrolling. */
-function openBottomSheet() {
-  screenOverlay.classList.remove("hidden");
-  bottomSheet.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-/* Close Bottom Sheet - Hides the bottom sheet and restores page scrolling. */
-function closeBottomSheet() {
-  screenOverlay.classList.add("hidden");
-  bottomSheet.classList.add("hidden");
-  document.body.style.overflow = "";
 }
 /* Get Budget Summary - Calculates the budget summary for the selected group. */
 function getBudgetSummary(groupName) {

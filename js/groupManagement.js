@@ -2,9 +2,7 @@
 redirectIfLoggedOut();
 const pendingInviteList = document.getElementById("pendingInviteList");
 const readOnlyBanner = document.getElementById("readOnlyBanner");
-const bottomSheet = document.getElementById("bottomSheet");
 const bottomSheetContent = document.getElementById("bottomSheetContent");
-const screenOverlay = document.getElementById("screenOverlay");
 /* Initialize */
 function initializeGroupManagement() {
   if (ensureGroupColorsForCurrentUser()) {
@@ -1086,17 +1084,6 @@ function completeLeaveGroup(currentUser, remainingMembers) {
   );
   window.location.href = "../pages/dashboardPage.html";
 }
-/* Bottom Sheet */
-function openBottomSheet() {
-  bottomSheet.classList.remove("hidden");
-  screenOverlay.classList.remove("hidden");
-}
-/* Hide the group-management sheet and return interaction to the page. */
-function closeBottomSheet() {
-  bottomSheet.classList.add("hidden");
-  screenOverlay.classList.add("hidden");
-}
-screenOverlay.addEventListener("click", closeBottomSheet);
 /* Back */
 function goBack() {
   window.location.href = "../pages/dashboardPage.html";

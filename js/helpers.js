@@ -33,7 +33,6 @@
  * ├── openBottomSheet()
  * ├── closeBottomSheet()
  * ├── getActiveCategory()
- * └── debugActiveCategory()
  *
  * Permission Helpers
  * ├── getCurrentMember()
@@ -277,11 +276,12 @@ function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
-  if (!bottomSheet || !screenOverlay) {
-    return;
+  if (screenOverlay) {
+    screenOverlay.classList.remove("hidden");
   }
-  screenOverlay.classList.remove("hidden");
-  bottomSheet.classList.remove("hidden");
+  if (bottomSheet) {
+    bottomSheet.classList.remove("hidden");
+  }
   if (appFooter) {
     appFooter.classList.add("hiddenFooter");
   }
@@ -292,11 +292,12 @@ function closeBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
-  if (!bottomSheet || !screenOverlay) {
-    return;
+  if (screenOverlay) {
+    screenOverlay.classList.add("hidden");
   }
-  screenOverlay.classList.add("hidden");
-  bottomSheet.classList.add("hidden");
+  if (bottomSheet) {
+    bottomSheet.classList.add("hidden");
+  }
   if (appFooter) {
     appFooter.classList.remove("hiddenFooter");
   }
@@ -324,10 +325,6 @@ function getActiveCategory() {
   return categories.find(function (category) {
     return category.name === activeCategory;
   });
-}
-/* Debug Active Category - Logs the active category to the browser console. */
-function debugActiveCategory() {
-  console.log("ACTIVE CATEGORY:", getActiveCategory());
 }
 /* Return the signed-in user's membership record for a selected group. */
 function getGroupMember(groupName = appState.activeGroup) {
@@ -1013,7 +1010,7 @@ const PRODUCT_IMAGE_PATH = "../assets/images/products";
 /* Get Product Image - Returns the image path for the specified product. */
 function getProductImage(itemName) {
   const product = productDatabase.find(function (product) {
-    return product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
+    return normalizeItemName(product.name) === normalizeItemName(itemName);
   });
   if (!product) {
     return "";
@@ -1031,7 +1028,7 @@ function getProductImage(itemName) {
  *   imageUrl
  * }
  ***************************************************************************************************/
-/* Normalize Item Name */
+/* Normalize item names for comparison without changing the saved display text. */
 function normalizeItemName(itemName) {
   return itemName.trim().toLowerCase();
 }

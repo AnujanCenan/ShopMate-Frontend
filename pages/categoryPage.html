@@ -68,6 +68,29 @@
             data-i18n-placeholder="category.searchItems"
           />
         </div>
+        <!-- Lets users change item display order without changing saved item order. -->
+        <div class="sortControl itemSortControl">
+          <label for="itemSortSelect" data-i18n="category.sortItems">
+            Sort items
+          </label>
+          <select id="itemSortSelect" class="sortControlSelect">
+            <option value="default" data-i18n="category.sortDefault">
+              Default order
+            </option>
+            <option value="newest-first" data-i18n="category.sortNewestFirst">
+              Newest added first
+            </option>
+            <option value="newest-last" data-i18n="category.sortNewestLast">
+              Newest added last
+            </option>
+            <option value="recurring-first" data-recurrence-sort data-i18n="category.sortRecurringFirst">
+              Recurring first
+            </option>
+            <option value="one-off-first" data-recurrence-sort data-i18n="category.sortOneOffFirst">
+              One-off first
+            </option>
+          </select>
+        </div>
         <!-- EMPTY STATE -->
         <!-- Empty-state message is shown when the active tab has no matching items. -->
         <section class="emptyStateSection" id="itemEmptyState"></section>

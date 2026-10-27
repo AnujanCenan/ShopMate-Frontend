@@ -571,7 +571,7 @@ function createItem() {
   const recurrenceFrequency =
     document.getElementById("itemRecurrenceFrequency")?.value || "none";
   const newItemIsRecurring = recurrenceFrequency !== "none";
-  const normalizedItemName = itemName.toLowerCase();
+  const normalizedItemName = normalizeItemName(itemName);
 
   // Merge only with a pending one-off item. A one-off addition matching a
   // pending recurring item stays separate so it cannot increase future recurrences.
@@ -579,7 +579,7 @@ function createItem() {
     ? null
     : currentCategory.items.find(function (candidate) {
         return (
-          candidate.name.trim().toLowerCase() === normalizedItemName &&
+          normalizeItemName(candidate.name) === normalizedItemName &&
           candidate.purchased !== true &&
           (candidate.quantityUnit || "pcs") === itemQuantityUnit &&
           !isRecurringShoppingItem(candidate)
@@ -987,7 +987,7 @@ function confirmPurchase(itemId) {
     item.recurrence &&
     item.recurrence.enabled === true &&
     item.recurrence.frequency !== "none";
-  const normalizedName = item.name.trim().toLowerCase();
+  const normalizedName = normalizeItemName(item.name);
   const normalizedShop = actualShop.trim().toLowerCase();
   const mergeTarget =
     !isRecurring &&
@@ -1002,7 +1002,7 @@ function confirmPurchase(itemId) {
           candidate.recurrence.enabled === true &&
           candidate.recurrence.frequency !== "none"
         ) &&
-        candidate.name.trim().toLowerCase() === normalizedName &&
+        normalizeItemName(candidate.name) === normalizedName &&
         candidatePrice !== null &&
         candidatePrice !== undefined &&
         Number.isFinite(Number(candidatePrice)) &&

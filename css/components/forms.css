@@ -20,7 +20,7 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: var(--spacingSmall);
+  gap: var(--spacingXSmall);
   width: 100%;
   margin-top: 10px;
   margin-bottom: 18px;
@@ -33,48 +33,106 @@
   width: 100%;
   margin-bottom: 18px;
 }
+/* Align sorting labels and compact selectors consistently on list pages. */
+.sortControl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacingSmall);
+  width: 100%;
+  margin: var(--spacingSmall) 0 var(--spacingMedium);
+}
+/* Keep sorting selectors visually secondary to search and item content. */
+.sortControl label {
+  color: var(--textSecondary);
+  font-size: var(--fontSizeSmall);
+  font-weight: 600;
+}
+/* Style the shared compact sorting selector for dashboard and category pages. */
+.sortControlSelect {
+  max-width: 65%;
+  min-height: 38px;
+  padding: 0 var(--spacingMedium) 0 var(--spacingSmall);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
+  font: inherit;
+  font-size: var(--fontSizeSmall);
+}
 /* Styles the quantity input wrapper component and its layout. */
 .quantityInputWrapper {
   display: flex;
   align-items: stretch;
   width: 100%;
-}
-/* Styles the quantity input wrapper, quantity input component and its layout. */
-.quantityInputWrapper .quantityInput {
-  flex: 1;
-  min-width: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-/* Styles the quantity unit input component and its layout. */
-.quantityUnitInput {
-  width: 72px;
-  min-width: 72px;
-  padding: 0 var(--spacingSmall);
+  overflow: hidden;
   border: 1px solid var(--borderColor);
-  border-left: 0;
-  border-radius: 0 var(--radiusControl) var(--radiusControl) 0;
-  background: var(--cardColor);
+  border-radius: var(--radiusControl);
+  background: var(--surfaceColor);
+  transition:
+    border-color var(--animationSpeed) ease,
+    box-shadow var(--animationSpeed) ease;
+}
+/* Highlight the quantity and unit controls together as one combined field. */
+.quantityInputWrapper:focus-within {
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 3px rgba(12, 120, 152, 0.14);
+}
+/* Keep the quantity input borderless inside the shared wrapper. */
+.quantityInputWrapper .quantityInput {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+/* Keep the unit dropdown borderless and give it a matching chevron. */
+.quantityUnitInput {
+  flex: 0 0 72px;
+  width: 72px;
+  min-width: 0;
+  padding: 0 20px 0 var(--spacingSmall);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--textPrimary) 50%),
+    linear-gradient(135deg, var(--textPrimary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 12px) 50%,
+    calc(100% - 8px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
   color: var(--textPrimary);
   font-size: var(--fontSizeSmall);
   font-weight: 600;
   cursor: pointer;
   outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
-/* Defines the focus state styling for the quantity unit input. */
-.quantityUnitInput:focus {
-  border-color: var(--primaryColor);
+/* Remove the native dropdown bezel so the wrapper is the only visible outline. */
+.quantityInputWrapper > .quantityUnitInput,
+.quantityInputWrapper > .quantityUnitInput:focus,
+.quantityInputWrapper > .quantityUnitInput:focus-visible {
+  border: 0;
+  outline: none;
+  box-shadow: none;
 }
-/* Defines the focus state styling for the quantity input wrapper. */
-.quantityInputWrapper:focus-within .quantityInput,
-.quantityInputWrapper:focus-within .quantityUnitInput {
-  border-color: var(--primaryColor);
+/* Keep the focused quantity input visually integrated with its wrapper. */
+.quantityInputWrapper .quantityInput:focus {
+  border: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
 }
 /* Overrides quantity unit input styling for the dark theme. */
 .darkMode .quantityUnitInput {
-  background: var(--cardColor);
+  background-color: transparent;
   color: var(--textPrimary);
-  border-color: var(--borderColor);
 }
 /* Authentication Input */
 .authInput {
@@ -137,7 +195,7 @@
 /* Form Label */
 .formLabel {
   display: block;
-  margin: 0;
+  margin: 0 0 var(--spacingXSmall);
   color: var(--textPrimary);
   font-size: var(--fontSizeSmall);
   font-weight: 700;
