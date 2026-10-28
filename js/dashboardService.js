@@ -1,5 +1,5 @@
 async function renameGroupMySql(familyGroupId, newName) {
-  const res = await fetch(`http://localhost:5113/api/group-rename`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/group-rename`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -25,7 +25,7 @@ async function renameGroupMySql(familyGroupId, newName) {
 };
 
 async function deleteGroupMySql(familyGroupId) {
-  const res = await fetch(`http://localhost:5113/api/group-leave?familyGroupId=${familyGroupId}`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/group-leave?familyGroupId=${familyGroupId}`, {
     method: "DELETE",
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -49,7 +49,7 @@ async function deleteGroupMySql(familyGroupId) {
 
 
 async function renameCategoryMySql(newCategoryName, familyGroupId, listId) {
-  const res = await fetch(`http://localhost:5113/api/list-rename`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/list-rename`, {
     method: 'PUT',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -73,7 +73,7 @@ async function renameCategoryMySql(newCategoryName, familyGroupId, listId) {
 }
 
 async function getGroups() {
-  const res = await fetch(`http://localhost:5113/api/get-groups`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/get-groups`, {
     method: "GET",
     credentials: 'include',
     headers: { "Content-Type": "application/json" }

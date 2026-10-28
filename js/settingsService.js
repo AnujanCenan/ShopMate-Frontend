@@ -1,6 +1,6 @@
 async function changeLanguage_mysql(language) {
     console.log(`New language === ${language}`);
-    const res = await fetch("http://localhost:5113/api/change-language", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/change-language`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -23,7 +23,7 @@ async function changeLanguage_mysql(language) {
 
 
 async function changeMeasuringSystem_mysql(measuringSystem) {
-    const res = await fetch("http://localhost:5113/api/change-measuring-system", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/change-measuring-system`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -46,7 +46,7 @@ async function changeMeasuringSystem_mysql(measuringSystem) {
 
 
 async function changeCurrency_mysql(currency) {
-    const res = await fetch("http://localhost:5113/api/change-currency", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/change-currency`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -68,7 +68,7 @@ async function changeCurrency_mysql(currency) {
 }
 
 async function changeTheme_mysql(theme) {
-    const res = await fetch("http://localhost:5113/api/change-theme", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/change-theme`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -110,7 +110,7 @@ async function changeSecuritySettings_mysql(securitySettings) {
         BiometricOn: biometricOn
     }
 
-    const res = await fetch("http://localhost:5113/api/change-security", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/change-security`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -154,7 +154,7 @@ async function changeNotificationSettings_mysql(notificationSettings) {
     console.log("In changeNotiifcationSettings_mysql; body is:")
     console.log(notificationSettings);
 
-    const res = await fetch("http://localhost:5113/api/change-notifications", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/change-notifications`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -195,7 +195,7 @@ async function changeNotificationSettings_mysql(notificationSettings) {
  * }
  */
 async function getUserSettings_mysql() {
-    const res = await fetch("http://localhost:5113/api/get-settings", {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/get-settings`, {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

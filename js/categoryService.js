@@ -4,7 +4,7 @@ async function deleteCategoryMySql(shoppingListId) {
         return;
     }
 
-    const res = await fetch(`http://localhost:5113/api/list-delete?shoppingListId=${shoppingListId}&familyGroupId=${state.activeGroupId}`, {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/list-delete?shoppingListId=${shoppingListId}&familyGroupId=${state.activeGroupId}`, {
         method: "DELETE",
         credentials: "include",
         headers: { "Content-Type": "application/json"},

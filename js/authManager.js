@@ -198,7 +198,7 @@ function handleLoginInviteFlow() {
 
 // assumes user has a valid session token provided by the server
 async function obtainUserProfile() {
-  const res = await fetch("http://localhost:5113/api/user-profile", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/user-profile`, {
     method: "GET",
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -234,7 +234,7 @@ async function loginUserMySQL(event) {
   const inviteToken = hiddenTokenInput?.value || urlParams.get("token") || null;
 
   try {
-    const response = await fetch(`http://localhost:5113/api/login`, {
+    const response = await fetch(`${SERVER_ENDPOINT}/api/login`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

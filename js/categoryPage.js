@@ -2,7 +2,7 @@ async function getRenderingItems() {
   const categoryId = state.activeCategoryId;
   const groupId = state.activeGroupId;
 
-  const res = await fetch(`http://localhost:5113/api/get-rendering-items?listId=${categoryId}&familyGroupId=${groupId}`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/get-rendering-items?listId=${categoryId}&familyGroupId=${groupId}`, {
     method: "GET",
     credentials: "include",
     headers: { "Content-Type": "application/json"},

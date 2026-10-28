@@ -142,7 +142,7 @@ async function toggleFavorite_mysql(itemMasterId) {
 }
 
 async function removeFavorite_mysql(itemMasterId) {
-  const res = await fetch("http://localhost:5113/api/unfavourite-item", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/unfavourite-item`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json"},
@@ -159,7 +159,7 @@ async function removeFavorite_mysql(itemMasterId) {
 }
 
 async function addFavorite_mysql(itemMasterId) {
-  const res = await fetch("http://localhost:5113/api/favourite-item", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/favourite-item`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json"},

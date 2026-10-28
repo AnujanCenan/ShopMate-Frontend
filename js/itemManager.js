@@ -643,7 +643,7 @@ async function createItem() {
     return;
   }
 
-  const res = await fetch("http://localhost:5113/api/item-add", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/item-add`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -800,7 +800,7 @@ async function updateItemMySql(listItemId, newItem) {
   const recurrenceEndDate =
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
 
-  const res = await fetch("http://localhost:5113/api/edit-item", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/edit-item`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -909,7 +909,7 @@ function saveProductToCatalog(item) {
 
 async function unmarkPurchased_mysql(item) {
   const listId = state.activeCategoryId;
-  const res = await fetch("http://localhost:5113/api/unmark-purchase", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/unmark-purchase`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -922,7 +922,7 @@ async function unmarkPurchased_mysql(item) {
 
 async function markPurchased_mysql(item, price) {
   const listId = state.activeCategoryId;
-  const res = await fetch("http://localhost:5113/api/mark-purchase", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/mark-purchase`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -1188,7 +1188,7 @@ function updateBudgetTracking(categoryName, amount) {
 
 
 async function deleteItemMySql(listItemId) {
-  const res = await fetch(`http://localhost:5113/api/delete-item?listItemId=${listItemId}`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/delete-item?listItemId=${listItemId}`, {
     method: "DELETE",
     credentials: "include"
   });

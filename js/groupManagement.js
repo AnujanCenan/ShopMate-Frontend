@@ -715,7 +715,7 @@ async function makeAdmin(otherUserId, familyGroupId) {
 
   const member = state.tempMembers[familyGroupId].find(member => member.usrId === otherUserId);
 
-  const res = await fetch("http://localhost:5113/api/change-member-role", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/change-member-role`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -820,7 +820,7 @@ async function removeMember(memberId, groupId) {
   // );
   
   const member = state.tempMembers[groupId].find(member => member.usrId === memberId);
-  const res = await fetch(`http://localhost:5113/api/group-member-remove?familyGroupId=${groupId}&targetUserId=${memberId}`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/group-member-remove?familyGroupId=${groupId}&targetUserId=${memberId}`, {
     method: "DELETE",
     credentials: "include",
     headers: { "Content-Type": "application/json" }

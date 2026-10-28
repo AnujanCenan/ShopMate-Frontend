@@ -23,7 +23,7 @@ async function getGroupBudgetAndCategoryBudgets(familyGroupId) {
         console.error("invalid family group id given");
         return;
     }
-    const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${familyGroupId}`, {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/get-group-budget?familyGroupId=${familyGroupId}`, {
         method: "GET",
         credentials: "include",
         headers: { "Content-Type": "application/json" }, 
@@ -49,7 +49,7 @@ async function createGroupBudget(familyGroupId, budgetValue) {
         return;
     }
 
-    const res = await fetch(`http://localhost:5113/api/create-group-budget?familyGroupId=${familyGroupId}&budgetValue=${budgetValue}`, {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/create-group-budget?familyGroupId=${familyGroupId}&budgetValue=${budgetValue}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -70,7 +70,7 @@ async function createListBudget(familyGroupId, shoppingListId, budgetValue) {
         return;
     }
 
-    const res = await fetch(`http://localhost:5113/api/create-list-budget?familyGroupId=${familyGroupId}&shoppingListId=${shoppingListId}&budgetValue=${budgetValue}`, {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/create-list-budget?familyGroupId=${familyGroupId}&shoppingListId=${shoppingListId}&budgetValue=${budgetValue}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

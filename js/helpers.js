@@ -140,7 +140,7 @@ async function getCatalogue() {
   }
 
   console.log("No valid cache; need to fetch...");
-  const res = await fetch('http://localhost:5113/api/get-catalogue', {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/get-catalogue`, {
     method: "GET",
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -1023,7 +1023,7 @@ async function createNotification_mysql(
   type_id = null,
   family_group_id = null
 ) {
-  const res = await fetch(`http://localhost:5113/api/create-notification`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/create-notification`, {
     method: "POST",
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -1096,7 +1096,7 @@ function createNotification(
  * If null, will mark all notifications owned by the user as read in the database
  */
 async function markNotificationRead_mysql(notificationIds) {
-  const res = await fetch("http://localhost:5113/api/read-notifications", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/read-notifications`, {
     method: "PUT",
     credentials: 'include',
     headers: {

@@ -133,7 +133,7 @@ function getNotificationIcon(notificationType) {
 }
 
 async function getNotifications_mysql() {
-  const res = await fetch("http://localhost:5113/api/get-notifications", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/get-notifications`, {
     method: "GET",
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -349,7 +349,7 @@ async function clearNotifications() {
  */
 async function deleteNotification_mysql(notificationIds) {
 
-  const res = await fetch("http://localhost:5113/api/delete-notifications", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/delete-notifications`, {
     method: "DELETE",
     credentials: 'include',
     headers: {

@@ -14,7 +14,7 @@ async function removeGroupMember(memberId) {
   };
 }
 async function leaveGroup(groupId, shouldDelete) {
-  const res = await fetch(`http://localhost:5113/api/group-leave?familyGroupId=${groupId}&shouldDelete=${shouldDelete}`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/group-leave?familyGroupId=${groupId}&shouldDelete=${shouldDelete}`, {
     method: "DELETE",
     credentials: "include",
     headers: { "Content-Type": "application/json"},
@@ -27,7 +27,7 @@ async function leaveGroup(groupId, shouldDelete) {
 }
 
 async function canLeave(groupId) {
-  const res = await fetch(`http://localhost:5113/api/check-sole-admin?familyGroupId=${groupId}`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/check-sole-admin?familyGroupId=${groupId}`, {
     method: "GET",
     credentials: "include",
     headers: { "Content-Type": "application/json"},
@@ -83,7 +83,7 @@ async function canLeave(groupId) {
  */
 async function getGroupManagementData()
 {
-  const res = await fetch("http://localhost:5113/api/get-group-management-info", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/get-group-management-info`, {
     method: "GET",
     headers: { 'Content-Type': 'application/json' },
     credentials: "include"
@@ -117,7 +117,7 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
     console.error("Email not effectively sent to the sendInvitation_mysql function")
   }
 
-  const res = await fetch("http://localhost:5113/api/create-invitation", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/create-invitation`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -150,7 +150,7 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
 }
 
 async function deleteInvitation_mysql(invitationId) {
-    const res = await fetch(`http://localhost:5113/api/invitation-delete?invitationId=${invitationId}`, {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/invitation-delete?invitationId=${invitationId}`, {
       method: "DELETE",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

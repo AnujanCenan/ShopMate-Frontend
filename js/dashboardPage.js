@@ -78,7 +78,7 @@ async function renderCategories() {
     return;
   }
 
-   const res = await fetch(`http://localhost:5113/api/get-lists?family_group_id=${groupId}`, {
+   const res = await fetch(`${SERVER_ENDPOINT}/api/get-lists?family_group_id=${groupId}`, {
     method: "GET",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -585,7 +585,7 @@ async function createDashboardGroup() {
   getGroupColorMap()[groupName] = selectedGroupColor;   // local storage -- need to actually push the selected colour to the database and pull it from the database as well
   
   // put this fetch in createGroup In AuthManager
-  const res = await fetch(`http://localhost:5113/api/group-create`, {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/group-create`, {
     method: "POST",
     credentials: 'include',
     headers: {
@@ -597,8 +597,6 @@ async function createDashboardGroup() {
   });
 
   const body = await res.json();
-  console.log("Created Group; server returned");
-  console.log(body);
 
   if (state.groups.find(group => group.FamilyName === groupName)) {
     showDialog("Group Exists", "A group with this name already exists.");
@@ -701,7 +699,7 @@ async function createCategory() {
     return;
   }
 
-  const res = await fetch("http://localhost:5113/api/list-create", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/list-create`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -1389,7 +1387,7 @@ function renderSideDrawer() {
 }
 
 async function getGroupListBudgets() {
-  // const res = await fetch(`http://localhost:5113/api/get-group-budget?familyGroupId=${state.activeGroupId}`, {
+  // const res = await fetch(`${SERVER_ENDPOINT}/api/get-group-budget?familyGroupId=${state.activeGroupId}`, {
   //   method: "GET",
   //   credentials: "include",
   // });
@@ -1419,7 +1417,7 @@ function openProfilePage() {
 /* Render Budget Dashboard Widget */
 async function renderBudgetDashboardWidget() {
 
-  const res = await fetch("http://localhost:5113/api/get-budgets-and-expenditure", {
+  const res = await fetch(`${SERVER_ENDPOINT}/api/get-budgets-and-expenditure`, {
     method: "GET",
     credentials: "include",
     headers: { "Content-Type": "application/json"},

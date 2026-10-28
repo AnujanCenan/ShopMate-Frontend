@@ -6,7 +6,7 @@ async function handleInvitationFlow() {
   if (!token) return; // Standard registration without invitation
 
   try {
-    const response = await fetch(`http://localhost:5113/api/verify-invite?token=${token}`);
+    const response = await fetch(`${SERVER_ENDPOINT}/api/verify-invite?token=${token}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -67,7 +67,7 @@ async function registerUser_mysql(event) {
   };
 
   try {
-    const response = await fetch("http://localhost:5113/api/user-create", {
+    const response = await fetch(`${SERVER_ENDPOINT}/api/user-create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
