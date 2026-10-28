@@ -1,15 +1,14 @@
 <!doctype html>
+<!-- Entry page for sign-in, account recovery, group creation, and invitation guidance. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title data-i18n="auth.login">ShopMate Login</title>
-
     <link rel="stylesheet" href="../css/app.css" />
   </head>
-
   <body>
+    <!-- Sign-in screen with account login, recovery, group creation, and invite guidance. -->
     <div class="authPage">
       <div class="authCard">
         <!-- Logo and Tagline -->
@@ -21,12 +20,10 @@
               alt="ShopMate Logo"
             />
           </div>
-
           <p class="authTagline" data-i18n="auth.tagline">
             Manage your shopping together
           </p>
         </div>
-
         <!-- Login Form -->
         <form id="loginForm" onsubmit="loginUserMySQL(event)">
           <input
@@ -37,7 +34,6 @@
             id="loginEmailInput"
             autocomplete="email"
           />
-
           <input
             type="password"
             data-i18n-placeholder="auth.password"
@@ -46,13 +42,11 @@
             id="loginPasswordInput"
             autocomplete="current-password"
           />
-
           <!-- Login -->
           <button onClick="submit" class="authButton" data-i18n="auth.login">
             LOGIN
           </button>
         </form>
-
         <!-- Forgot Password -->
         <button
           type="button"
@@ -61,12 +55,10 @@
         >
           <span data-i18n="auth.forgotPassword"> Forgot Password? </span>
         </button>
-
         <!-- Divider -->
         <div class="authDivider">
           <span data-i18n="common.or"> OR </span>
         </div>
-
         <!-- Create Shopping Group -->
         <button
           type="button"
@@ -77,61 +69,48 @@
             Create Shopping Group
           </span>
         </button>
-
         <!-- Invitation Information -->
         <p class="authInviteText" data-i18n="auth.invitedText">
           Been invited to join a shopping group?
         </p>
-
         <p class="authInviteSubText" data-i18n="auth.invitedSubText">
           Use the invitation email sent to your registered email address.
         </p>
       </div>
     </div>
-
     <!-- Bottom Sheet Overlay -->
     <div
       id="screenOverlay"
       class="screenOverlay hidden"
       onclick="closeBottomSheet()"
     ></div>
-
     <!-- Bottom Sheet -->
     <div class="bottomSheet hidden" id="bottomSheet">
       <div class="bottomSheetHandle"></div>
-
       <div class="bottomSheetContent" id="bottomSheetContent"></div>
     </div>
-
     <!-- Core Application -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
-
     <!-- Language Architecture -->
     <script src="../js/localization/languageManager.js"></script>
-
     <!-- Application Bootstrap -->
     <script src="../js/bootstrap.js"></script>
-
     <!-- Initialize Application -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();
       });
     </script>
-
     <!-- Refresh Biometric Icons -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const fingerprintIcon = document.getElementById("fingerprintIcon");
-
         const faceIdIcon = document.getElementById("faceIdIcon");
-
         if (fingerprintIcon && typeof getIconPath === "function") {
           fingerprintIcon.src = getIconPath("biometric", "fingerprint");
         }
-
         if (faceIdIcon && typeof getIconPath === "function") {
           faceIdIcon.src = getIconPath("biometric", "faceid");
         }

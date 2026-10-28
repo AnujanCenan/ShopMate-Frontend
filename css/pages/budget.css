@@ -16,15 +16,46 @@
  * • Budget Page
  ***************************************************************************************************/
 /* Budget Summary Body */
+.budgetSummaryCard {
+  overflow: hidden;
+  background: var(--cardColor);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusComfortable);
+  box-shadow: var(--shadowSmall);
+}
+/* Styles the budget summary body component and its layout. */
 .budgetSummaryBody {
   padding: 0 20px 20px;
+}
+/* Styles the budget compact summary component and its layout. */
+.budgetCompactSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 14px 14px;
+  color: var(--textSecondary);
+  font-size: var(--fontSizeCaption);
+}
+/* Styles the budget compact summary component and its layout. */
+.budgetCompactSummary span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+/* Styles the budget compact summary component and its layout. */
+.budgetCompactSummary strong {
+  color: var(--textPrimary);
+  font-size: var(--fontSizeSmall);
+  white-space: nowrap;
 }
 /* Budget Healthy Text */
 .budgetHealthyText {
   margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
-  color: #16a34a;
+  color: var(--successText);
   font-weight: 700;
 }
 /* Budget Warning Text */
@@ -32,7 +63,7 @@
   margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
-  color: #ca8a04;
+  color: var(--warningText);
   font-weight: 700;
 }
 /* Budget Critical Text */
@@ -40,9 +71,10 @@
   margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
-  color: #dc2626;
+  color: var(--dangerText);
   font-weight: 700;
 }
+/* Styles the budget insight component and its layout. */
 .budgetInsight {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -50,41 +82,46 @@
   color: var(--textSecondary);
   font-weight: 600;
 }
+/* Styles the budget edit button component and its layout. */
 .budgetEditButton {
   margin-left: 10px;
 }
+/* Styles the budget analysis button component and its layout. */
 .budgetAnalysisButton {
   margin-top: 14px;
   border: 1px solid var(--borderColor);
   border-radius: var(--radiusMedium);
   color: var(--textPrimary);
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 700;
 }
 /* Budget Summary Header */
 .budgetSummaryHeader {
   display: flex;
   align-items: center;
+  text-align: left;
   justify-content: space-between;
   width: 100%;
   padding: 20px 15px 15px;
-  background: var(--cardColor);
+  background: transparent;
   border: none;
   cursor: pointer;
-  border-radius: 16px;
-  overflow: hidden;
+  border-radius: 0;
 }
+/* Styles the budget summary header component and its layout. */
 .budgetSummaryHeader h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
   font-weight: 700;
 }
+/* Styles the budget summary header component and its layout. */
 .budgetSummaryHeader p {
   margin-top: 10px;
   color: var(--mutedTextColor);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
 }
 
+/* Styles the budget analysis container component and its layout. */
 #budgetAnalysisContainer {
   display: flex;
   flex-direction: column;
@@ -92,6 +129,7 @@
   width: 100%;
 }
 
+/* Styles the budget analysis card, budget insight card, category budget card component and its layout. */
 .budgetAnalysisCard,
 .budgetInsightCard,
 .categoryBudgetCard {
@@ -104,24 +142,27 @@
   box-shadow: var(--shadowSmall);
 }
 
+/* Styles the budget analysis card, budget insight card, category budget card component and its layout. */
 .budgetAnalysisCard h2,
 .budgetInsightCard h3,
 .categoryBudgetCard h3 {
   margin: 0;
   color: var(--textPrimary);
-  font-size: 20px;
+  font-size: var(--fontSizeXLarge);
   font-weight: 700;
   line-height: 1.3;
 }
 
+/* Styles the budget subtitle component and its layout. */
 .budgetSubtitle {
   margin: 6px 0 18px;
   color: var(--textSecondary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 500;
   line-height: 1.4;
 }
 
+/* Styles the analysis value component and its layout. */
 .analysisValue {
   display: flex;
   align-items: center;
@@ -131,20 +172,23 @@
   padding: 10px 0;
   border-bottom: 1px solid var(--dividerColor);
   color: var(--textSecondary);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 500;
   line-height: 1.4;
 }
 
+/* Defines the last-child state styling for the analysis value. */
 .analysisValue:last-child {
   border-bottom: none;
 }
 
+/* Defines the first-child state styling for the analysis value. */
 .analysisValue > span:first-child {
   flex: 0 1 auto;
   min-width: 0;
 }
 
+/* Defines the last-child state styling for the analysis value. */
 .analysisValue > span:last-child {
   flex: 0 1 auto;
   min-width: 0;
@@ -154,114 +198,126 @@
   overflow-wrap: anywhere;
 }
 
+/* Styles the analysis progress section component and its layout. */
 .analysisProgressSection {
-  margin: 18px 0 8px;
-  padding: 14px 0 4px;
+  margin: 18px 0 var(--spacingSmall);
+  padding: 14px 0 var(--spacingXSmall);
   border-top: 1px solid var(--dividerColor);
 }
 
+/* Styles the analysis progress header component and its layout. */
 .analysisProgressHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--spacingMedium);
   margin-bottom: 9px;
 }
 
+/* Styles the analysis progress header component and its layout. */
 .analysisProgressHeader span {
   color: var(--textSecondary);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   font-weight: 600;
 }
 
+/* Styles the analysis progress header component and its layout. */
 .analysisProgressHeader strong {
   color: var(--textPrimary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 700;
 }
 
+/* Styles the analysis progress bar component and its layout. */
 .analysisProgressBar {
   width: 100%;
-  height: 10px;
-  overflow: hidden;
   background: var(--dividerColor);
-  border-radius: 999px;
 }
 
+/* Styles the analysis progress fill component and its layout. */
 .analysisProgressFill {
-  height: 100%;
   min-width: 0;
   background: linear-gradient(90deg, var(--primaryColor), var(--primaryDark));
-  border-radius: inherit;
   transition: width 0.3s ease;
 }
 
+/* Styles the budget insight card component and its layout. */
 .budgetInsightCard {
   padding-top: 22px;
 }
 
+/* Styles the budget insight card component and its layout. */
 .budgetInsightCard h3 {
-  margin-bottom: 8px;
+  margin-bottom: var(--spacingSmall);
 }
 
+/* Styles the budget recommendation component and its layout. */
 .budgetRecommendation {
   margin: 14px 0 0;
-  padding: 14px 16px;
+  padding: 14px var(--spacingMedium);
   background: var(--surfaceColor);
   border: 1px solid var(--borderColor);
   border-left: 3px solid var(--primaryColor);
   border-radius: var(--radiusMedium);
   color: var(--textSecondary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 500;
   line-height: 1.6;
 }
 
+/* Styles the category budget container component and its layout. */
 #categoryBudgetContainer {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacingMedium);
   width: 100%;
 }
 
+/* Styles the budget category section header component and its layout. */
 .budgetCategorySectionHeader {
   width: 100%;
   margin: 6px 0 -2px;
 }
 
+/* Styles the budget category section header component and its layout. */
 .budgetCategorySectionHeader h3 {
   margin: 0;
   color: var(--textPrimary);
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
   font-weight: 700;
   line-height: 1.3;
 }
 
+/* Styles the budget category section header component and its layout. */
 .budgetCategorySectionHeader p {
   margin: 5px 0 0;
   color: var(--textSecondary);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   line-height: 1.5;
 }
 
+/* Styles the category budget card component and its layout. */
 .categoryBudgetCard {
   padding: 20px;
 }
 
+/* Styles the analysis card header component and its layout. */
 .analysisCardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacingSmall);
 }
 
+/* Styles the analysis card header component and its layout. */
 .analysisCardHeader h3 {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.budgetStatusBadge {
+/* Styles the budget status badge component and its layout. */
+.categoryBudgetCard .budgetStatusBadge {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -269,23 +325,26 @@
   min-height: 30px;
   padding: 0 10px;
   border: 1px solid var(--borderColor);
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
   background: var(--surfaceColor);
   color: var(--textSecondary);
-  font-size: 12px;
+  font-size: var(--fontSizeXSmall);
   font-weight: 700;
   line-height: 1;
 }
 
+/* Styles the category budget card, analysis progress section component and its layout. */
 .categoryBudgetCard .analysisProgressSection {
-  margin-top: 16px;
+  margin-top: var(--spacingMedium);
 }
 
+/* Defines the last-child state styling for the category budget card. */
 .categoryBudgetCard .analysisValue:last-child {
-  margin-top: 4px;
+  margin-top: var(--spacingXSmall);
 }
 
-.emptyStateCard {
+/* Styles the empty state card component and its layout. */
+#categoryBudgetContainer .emptyStateCard {
   width: 100%;
   padding: 28px 20px;
   box-sizing: border-box;
@@ -294,36 +353,43 @@
   border-radius: var(--radiusLarge);
   color: var(--textSecondary);
   text-align: center;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
   line-height: 1.5;
 }
 
+/* Arrange budget analysis cards for the wider tablet and desktop layout. */
 @media (min-width: 768px) {
+  /* Styles the budget analysis container component and its layout. */
   #budgetAnalysisContainer {
     gap: 20px;
   }
 
+  /* Styles the budget analysis card, budget insight card component and its layout. */
   .budgetAnalysisCard,
   .budgetInsightCard {
-    padding: 24px;
+    padding: var(--spacingLarge);
   }
 
+  /* Styles the category budget card component and its layout. */
   .categoryBudgetCard {
     padding: 22px;
   }
 
+  /* Styles the budget analysis card, budget insight card, category budget card component and its layout. */
   .budgetAnalysisCard h2,
   .budgetInsightCard h3,
   .categoryBudgetCard h3 {
-    font-size: 21px;
+    font-size: var(--fontSizeCompactHeading);
   }
 
+  /* Styles the analysis value component and its layout. */
   .analysisValue {
     min-height: 44px;
-    font-size: 16px;
+    font-size: var(--fontSizeBody);
   }
 
+  /* Styles the analysis progress bar component and its layout. */
   .analysisProgressBar {
     height: 11px;
   }
@@ -332,10 +398,11 @@
 /* Category Budget Summary */
 .categoryBudgetSummary {
   color: var(--textSecondary);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   line-height: 1.5;
 }
 
+/* Styles the category budget summary component and its layout. */
 .categoryBudgetSummary strong {
   color: var(--textPrimary);
   font-weight: 700;
@@ -343,9 +410,10 @@
 
 /* Dark Mode */
 .darkMode .categoryBudgetSummary {
-  color: #cbd5e1;
+  color: var(--textSecondary);
 }
 
+/* Overrides category budget summary styling for the dark theme. */
 .darkMode .categoryBudgetSummary strong {
-  color: #f8fafc;
+  color: var(--textOnDark);
 }

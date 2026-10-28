@@ -14,86 +14,34 @@
  * PAGES
  * • Dashboard Page
  ***************************************************************************************************/
-/* Budget Widget Header */
-.budgetWidgetHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-/* Budget Widget Title */
-.budgetWidgetTitle {
-  margin: 0;
-}
-/* Budget Widget Subtitle */
-.budgetWidgetSubtitle {
-  margin-top: 4px;
-  color: var(--mutedTextColor);
-  font-size: 13px;
-}
-/* Budget Widget Summary */
-.budgetWidgetSummary {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 18px;
-}
-/* Budget Summary Item */
-.budgetSummaryItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-/* Budget Widget Details */
-.budgetWidgetDetails {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--borderColor);
-}
-/* Budget Detail Row */
-.budgetDetailRow {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-/* Budget Widget Amount */
-.budgetWidgetAmount {
-  margin: 12px 0;
-  font-size: 24px;
-  font-weight: 700;
-}
-/* Budget Widget Text */
-.budgetWidgetText {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  text-align: center;
-  font-size: 14px;
-}
+
+
 /* Budget Allocation Text */
 .budgetAllocationText {
   margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
   color: var(--mutedTextColor);
-  font-size: 13px;
+  font-size: var(--fontSizeCaption);
   font-weight: 600;
 }
 /* Budget Allocation Status */
 .budgetAllocationStatus {
   margin-top: 10px;
   margin-bottom: 10px;
-  color: #2563eb;
-  font-size: 14px;
+  color: var(--infoColor);
+  font-size: var(--fontSizeSmall);
   font-weight: 700;
   text-align: center;
 }
 /* Budget Warning Banner */
 .budgetWarningBanner {
   margin-top: 18px;
-  padding: 12px;
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: var(--spacingCompact);
+  background: var(--dangerSurface);
+  color: var(--dangerDeep);
+  border: 1px solid var(--dangerBorder);
+  border-radius: var(--radiusCompact);
+  font-size: var(--fontSizeSmall);
   font-weight: 600;
 }

@@ -15,29 +15,13 @@
  * • Shared Across Multiple Pages
  ***************************************************************************************************/
 
-/* Purchase Summary Card */
-.purchaseSummaryCard {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 14px;
-}
+
+/* Styles the purchase item name component and its layout. */
 .purchaseItemName {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--fontSizeBodyLarge);
   font-weight: 700;
   padding: 0 5px 15px 0;
-}
-.purchaseEstimatedPrice {
-  margin-top: 4px;
-  color: var(--mutedTextColor);
-  font-size: 12px;
-  padding: 0 5px 10px 0;
-}
-.purchaseEstimatedAmount {
-  margin-top: 2px;
-  font-size: 15px;
-  font-weight: 600;
 }
 /* Bottom Sheet Polish */
 .bottomSheet {
@@ -50,10 +34,10 @@
   flex-direction: column;
   width: 100%;
   max-height: calc(100dvh - var(--safeAreaTop) - 12px);
-  padding: 12px 16px calc(16px + var(--safeAreaBottom));
+  padding: var(--spacingCompact) var(--spacingMedium) calc(var(--spacingMedium) + var(--safeAreaBottom));
   background: var(--cardColor);
-  border-radius: 28px 28px 0 0;
-  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.18);
+  border-radius: var(--radiusLarge) 28px 0 0;
+  box-shadow: 0 -12px 36px var(--shadowAmbientStrong);
   overflow: hidden;
   transition: transform 0.25s ease;
 }
@@ -62,10 +46,11 @@
   flex-shrink: 0;
   width: 52px;
   height: 5px;
-  margin: 0 auto 12px;
+  margin: 0 auto var(--spacingCompact);
   background: var(--borderColor);
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
 }
+/* Styles the bottom sheet content component and its layout. */
 .bottomSheetContent {
   display: flex;
   flex-direction: column;
@@ -87,7 +72,7 @@
   margin: 0;
   overflow: hidden;
   color: var(--textPrimary);
-  font-size: clamp(20px, 5vw, 24px);
+  font-size: var(--fontSizeFluidHeading);
   font-weight: 700;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -112,10 +97,12 @@
     background 0.2s ease,
     box-shadow 0.2s ease;
 }
+/* Defines the hover state styling for the close button. */
 .closeButton:hover {
   background: var(--surfaceColor);
-  box-shadow: 0 4px 12px var(--shadowMedium);
+  box-shadow: 0 4px 12px var(--shadowAmbientMid);
 }
+/* Defines the active state styling for the close button. */
 .closeButton:active {
   transform: scale(0.94);
 }
@@ -129,33 +116,37 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  gap: 12px;
-  padding: 4px 4px 8px;
+  gap: var(--spacingCompact);
+  padding: var(--spacingXSmall) var(--spacingXSmall) var(--spacingSmall);
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 /* Bottom Sheet Action List */
 .bottomSheetBody > .bottomSheetActionButton {
-  margin-bottom: 12px;
+  margin-bottom: var(--spacingCompact);
 }
+/* Defines the last-child state styling for the bottom sheet body. */
 .bottomSheetBody > .bottomSheetActionButton:last-child {
   margin-bottom: 0;
 }
 /* Bottom Sheet Button Row */
 .bottomSheetButtonRow {
   display: flex;
-  gap: 12px;
-  margin-top: 12px;
-  padding-top: 4px;
+  gap: var(--spacingCompact);
+  margin-top: var(--spacingCompact);
+  padding-top: var(--spacingXSmall);
 }
 
+/* Styles the bottom sheet button row component and its layout. */
 .bottomSheetButtonRow button {
   flex: 1;
 }
 
 /* Tablet Bottom Sheet */
+/* Give bottom sheets more room on tablet and desktop screens. */
 @media (min-width: 768px) {
+  /* Styles the bottom sheet component and its layout. */
   .bottomSheet {
     left: 50%;
     right: auto;
@@ -165,9 +156,11 @@
     border-top-left-radius: var(--radiusLarge);
     border-top-right-radius: var(--radiusLarge);
   }
+  /* Defines the not state styling for the bottom sheet. */
   .bottomSheet:not(.hidden) {
     transform: translateX(-50%) translateY(0);
   }
+  /* Styles the bottom sheet component and its layout. */
   .bottomSheet.hidden {
     transform: translateX(-50%) translateY(100%);
   }

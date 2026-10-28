@@ -6,6 +6,7 @@ async function updateMemberRole(memberId, role) {
     success: true,
   };
 }
+/* Backend integration point for removing a member; this is currently a success stub. */
 async function removeGroupMember(memberId) {
   console.log("TODO Backend Remove:", memberId);
   return {

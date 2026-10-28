@@ -20,75 +20,146 @@
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacingXSmall);
+  width: 100%;
   margin-top: 10px;
+  margin-bottom: 18px;
 }
 /* Form Row */
 .formRow {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--spacingCompact);
   width: 100%;
   margin-bottom: 18px;
 }
+/* Align sorting labels and compact selectors consistently on list pages. */
+.sortControl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacingSmall);
+  width: 100%;
+  margin: var(--spacingSmall) 0 var(--spacingMedium);
+}
+/* Keep sorting selectors visually secondary to search and item content. */
+.sortControl label {
+  color: var(--textSecondary);
+  font-size: var(--fontSizeSmall);
+  font-weight: 600;
+}
+/* Style the shared compact sorting selector for dashboard and category pages. */
+.sortControlSelect {
+  max-width: 65%;
+  min-height: 38px;
+  padding: 0 var(--spacingMedium) 0 var(--spacingSmall);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
+  font: inherit;
+  font-size: var(--fontSizeSmall);
+}
+/* Styles the quantity input wrapper component and its layout. */
 .quantityInputWrapper {
   display: flex;
   align-items: stretch;
   width: 100%;
-}
-.quantityInputWrapper .quantityInput {
-  flex: 1;
-  min-width: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.quantityUnitInput {
-  width: 72px;
-  min-width: 72px;
-  padding: 0 8px;
+  overflow: hidden;
   border: 1px solid var(--borderColor);
-  border-left: 0;
-  border-radius: 0 18px 18px 0;
-  background: var(--cardColor);
+  border-radius: var(--radiusControl);
+  background: var(--surfaceColor);
+  transition:
+    border-color var(--animationSpeed) ease,
+    box-shadow var(--animationSpeed) ease;
+}
+/* Highlight the quantity and unit controls together as one combined field. */
+.quantityInputWrapper:focus-within {
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 3px rgba(12, 120, 152, 0.14);
+}
+/* Keep the quantity input borderless inside the shared wrapper. */
+.quantityInputWrapper .quantityInput {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+/* Keep the unit dropdown borderless and give it a matching chevron. */
+.quantityUnitInput {
+  flex: 0 0 72px;
+  width: 72px;
+  min-width: 0;
+  padding: 0 20px 0 var(--spacingSmall);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--textPrimary) 50%),
+    linear-gradient(135deg, var(--textPrimary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 12px) 50%,
+    calc(100% - 8px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
   color: var(--textPrimary);
-  font-size: 14px;
+  font-size: var(--fontSizeSmall);
   font-weight: 600;
   cursor: pointer;
   outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
-.quantityUnitInput:focus {
-  border-color: var(--primaryColor);
+/* Remove the native dropdown bezel so the wrapper is the only visible outline. */
+.quantityInputWrapper > .quantityUnitInput,
+.quantityInputWrapper > .quantityUnitInput:focus,
+.quantityInputWrapper > .quantityUnitInput:focus-visible {
+  border: 0;
+  outline: none;
+  box-shadow: none;
 }
-.quantityInputWrapper:focus-within .quantityInput,
-.quantityInputWrapper:focus-within .quantityUnitInput {
-  border-color: var(--primaryColor);
+/* Keep the focused quantity input visually integrated with its wrapper. */
+.quantityInputWrapper .quantityInput:focus {
+  border: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
 }
+/* Overrides quantity unit input styling for the dark theme. */
 .darkMode .quantityUnitInput {
-  background: var(--cardColor);
+  background-color: transparent;
   color: var(--textPrimary);
-  border-color: var(--borderColor);
 }
 /* Authentication Input */
 .authInput {
   width: 90%;
   height: 56px;
   padding: 0 18px;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacingMedium);
   border: 1px solid var(--borderColor);
-  border-radius: 18px;
-  font-size: 16px;
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
+  font-size: var(--fontSizeBody);
   outline: none;
 }
+/* Defines the focus state styling for the auth input. */
 .authInput:focus {
-  border-color: #118ab2;
+  border-color: var(--primaryColor);
 }
 /* Search Input */
 .searchInput {
   width: 100%;
   padding: 18px;
   border: 1px solid var(--borderColor);
-  border-radius: var(--borderRadiusMedium);
-  font-size: 16px;
+  border-radius: var(--radiusControl);
+  background: var(--cardColor);
+  color: var(--textPrimary);
+  font-size: var(--fontSizeBody);
   outline: none;
 }
 /* Modern Search Input */
@@ -98,38 +169,41 @@
   height: 48px;
   padding: 0 18px 0 48px;
   border: 1px solid var(--borderColor);
-  border-radius: 18px;
+  border-radius: var(--radiusControl);
   background: var(--cardColor);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   outline: none;
   transition: all 0.2s ease;
 }
+/* Defines the focus state styling for the modern search input. */
 .modernSearchInput:focus {
-  border-color: #118ab2;
-  box-shadow: 0 0 0 4px rgba(17, 138, 178, 0.08);
+  border-color: var(--primaryColor);
+  box-shadow: 0 0 0 4px var(--primaryGlowSoft);
 }
 /* Currency Input */
 .currencyInputWrapper {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacingCompact);
   width: 100%;
 }
+/* Styles the currency input component and its layout. */
 .currencyInput {
   padding-left: 30px;
 }
 /* Form Label */
 .formLabel {
   display: block;
-  margin-bottom: 4px;
-  margin: 0;
-  color: var(--textSecondary);
-  font-size: 14px;
-  font-weight: 600;
+  margin: 0 0 var(--spacingXSmall);
+  color: var(--textPrimary);
+  font-size: var(--fontSizeSmall);
+  font-weight: 700;
+  line-height: 1.3;
 }
 /* Half Width Field */
 .halfWidthField {
+  min-width: 0;
   flex: 1;
   padding-right: 25px;
 }
@@ -137,21 +211,22 @@
 .biometricToggle {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 8px 0 18px;
-  font-size: 15px;
+  gap: var(--spacingCompact);
+  margin: var(--spacingSmall) 0 18px;
+  font-size: var(--fontSizeBodySmall);
 }
 /* Form Validation */
 .formInputError {
-  border: 2px solid #dc2626 !important;
-  background-color: #fef2f2;
+  border: 2px solid var(--dangerColor) !important;
+  background-color: var(--dangerSurface);
 }
+/* Styles the validation message component and its layout. */
 .validationMessage {
   min-height: 18px;
   margin-top: 6px;
-  padding-left: 4px;
-  color: #dc2626;
-  font-size: 12px;
+  padding-left: var(--spacingXSmall);
+  color: var(--dangerText);
+  font-size: var(--fontSizeXSmall);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -160,24 +235,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--spacingMedium);
   padding: 18px 0;
   border-bottom: 1px solid var(--borderColor);
 }
+/* Defines the last-child state styling for the toggle row. */
 .toggleRow:last-child {
   border-bottom: none;
 }
+/* Styles the toggle content component and its layout. */
 .toggleContent {
   flex: 1;
 }
+/* Styles the toggle title component and its layout. */
 .toggleTitle {
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 600;
   color: var(--textPrimary);
 }
+/* Styles the toggle description component and its layout. */
 .toggleDescription {
-  margin-top: 4px;
-  font-size: 13px;
+  margin-top: var(--spacingXSmall);
+  font-size: var(--fontSizeCaption);
   line-height: 1.4;
   color: var(--textSecondary);
 }
@@ -200,7 +279,7 @@
   inset: 0;
   cursor: pointer;
   background: var(--borderColor); /* OFF colour */
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
   transition: 0.25s ease;
 }
 /* Toggle Circle */
@@ -214,7 +293,7 @@
   background: var(--cardColor);
   border-radius: 50%;
   transition: 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px var(--shadowAmbientStrong);
 }
 /* ON State */
 .toggleSwitch input:checked + .toggleSlider {
@@ -226,42 +305,26 @@
 }
 /* Focus */
 .toggleSwitch input:focus + .toggleSlider {
-  outline: 2px solid rgba(0, 137, 186, 0.25);
+  outline: 2px solid var(--primaryGlowStrong);
   outline-offset: 2px;
-}
-/* Form Field Polish */
-.formField {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  margin-bottom: 18px;
-}
-/* Form Label */
-.formLabel {
-  display: block;
-  color: var(--textPrimary);
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.3;
 }
 /* Bottom Sheet Input */
 .bottomSheetInput {
   width: 100%;
   min-height: 52px;
-  padding: 0 16px;
-  border: 1px solid #d7e0e8;
-  border-radius: var(--radiusSmall);
+  padding: 0 var(--spacingMedium);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusControl);
   outline: none;
   background: var(--surfaceColor);
   color: var(--textPrimary);
   font-family: inherit;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
   font-weight: 500;
   line-height: 1.3;
   box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.02),
-    0 1px 2px rgba(0, 0, 0, 0.02);
+    inset 0 1px 2px var(--shadowAmbientExtraSoft),
+    0 1px 2px var(--shadowAmbientExtraSoft);
   transition:
     border-color var(--animationSpeed) ease,
     background-color var(--animationSpeed) ease,
@@ -269,16 +332,18 @@
   -webkit-appearance: none;
   appearance: none;
 }
+/* Styles the bottom sheet input component and its layout. */
 .bottomSheetInput::placeholder {
-  color: #94a3b8;
+  color: var(--mutedTextColor);
   font-weight: 400;
 }
+/* Defines the focus state styling for the bottom sheet input. */
 .bottomSheetInput:focus {
   border-color: var(--primaryColor);
   background: var(--surfaceColor);
   box-shadow:
-    0 0 0 3px rgba(17, 138, 178, 0.12),
-    0 2px 8px rgba(17, 138, 178, 0.06);
+    0 0 0 3px var(--primaryTint),
+    0 2px 8px var(--primaryGlowVerySoft);
 }
 /* Number Input */
 .bottomSheetInput[type="number"] {
@@ -293,11 +358,6 @@ select.bottomSheetInput {
   padding-right: 42px;
   cursor: pointer;
 }
-/* Half Width Field */
-.halfWidthField {
-  min-width: 0;
-  flex: 1;
-}
 
 /* Currency Symbol */
 .currencySymbol {
@@ -306,12 +366,13 @@ select.bottomSheetInput {
   left: 16px;
   z-index: 2;
   color: var(--textSecondary);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 700;
   line-height: 1;
   transform: translateY(-50%);
   pointer-events: none;
 }
+/* Styles the currency input wrapper component and its layout. */
 .currencyInputWrapper input {
   padding-left: 40px !important;
 }
@@ -328,18 +389,20 @@ select.bottomSheetInput {
   display: block;
   width: 100%;
   max-width: 180px;
-  max-height: 180px;
-  margin: 4px auto 8px;
-  object-fit: contain;
+  max-height: 140px;
+  margin: var(--spacingCompact) auto var(--spacingSmall);
+  object-fit: cover;
   border: 1px solid var(--borderColor);
-  border-radius: var(--radiusMedium);
+  border-radius: var(--radiusSmall);
   background: var(--backgroundColor);
   box-shadow: var(--shadowSmall);
 }
+/* Styles the dropdown input wrapper component and its layout. */
 .dropdownInputWrapper {
   position: relative;
   width: 100%;
 }
+/* Styles the dropdown input wrapper, bottom sheet input component and its layout. */
 .dropdownInputWrapper .bottomSheetInput {
   width: 100%;
   padding-right: 44px;
@@ -347,6 +410,7 @@ select.bottomSheetInput {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
+/* Styles the dropdown input wrapper, dropdown arrow component and its layout. */
 .dropdownInputWrapper .dropdownArrow {
   position: absolute;
   top: 50%;
@@ -357,19 +421,67 @@ select.bottomSheetInput {
   transform: translateY(-50%);
   pointer-events: none;
 }
+/* Styles the dropdown input wrapper, dropdown arrow, small icon component and its layout. */
 .dropdownInputWrapper .dropdownArrow .smallIcon {
   width: 18px;
   height: 18px;
 }
 /* Tablet Form Layout */
+/* Increase form spacing and control size on tablet and desktop screens. */
 @media (min-width: 768px) {
+  /* Styles the form field component and its layout. */
   .formField {
     margin-bottom: 20px;
   }
+  /* Styles the bottom sheet input component and its layout. */
   .bottomSheetInput {
     min-height: 54px;
   }
+  /* Styles the form row component and its layout. */
   .formRow {
-    gap: 16px;
+    gap: var(--spacingMedium);
   }
+}
+/* Styles the group color swatches component and its layout. */
+.groupColorSwatches {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--spacingCompact);
+  padding: var(--spacingXSmall) 2px;
+}
+
+/* Styles the group color swatch component and its layout. */
+.groupColorSwatch {
+  width: 38px;
+  height: 38px;
+  justify-self: center;
+  border: 3px solid var(--cardColor);
+  border-radius: 50%;
+  background: var(--swatch-color);
+  box-shadow: 0 0 0 1px var(--borderColor);
+  cursor: pointer;
+}
+
+/* Styles the group color swatch component and its layout. */
+.groupColorSwatch.selected {
+  box-shadow: 0 0 0 3px var(--textPrimary);
+}
+
+/* Defines the disabled state styling for the group color swatch. */
+.groupColorSwatch:disabled {
+  cursor: not-allowed;
+  opacity: 0.28;
+  position: relative;
+}
+
+/* Defines the disabled state styling for the group color swatch. */
+.groupColorSwatch:disabled::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 2px;
+  background: var(--textPrimary);
+  transform: translate(-50%, -50%) rotate(-45deg);
 }

@@ -81,3 +81,4 @@ async function createListBudget(familyGroupId, shoppingListId, budgetValue) {
         console.error(msg);
     }
 }
+/* Reserved for a future budget API adapter; current budget calculations live in shared helpers and page modules. */

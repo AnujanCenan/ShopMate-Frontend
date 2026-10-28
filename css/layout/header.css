@@ -24,14 +24,14 @@
   padding: 10px var(--pageHorizontalPadding);
   background: var(--headerBackground);
   border-bottom: 1px solid var(--borderColor);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 10px var(--shadowAmbientSoft);
 }
 
 /* Dashboard Header Left Section */
 .headerLeftSection {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacingCompact);
   min-width: 0;
   flex: 1;
 }
@@ -53,7 +53,7 @@
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: clamp(28px, 7vw, 38px);
+  font-size: var(--fontSizeFluidHero);
   font-weight: 800;
   letter-spacing: -0.8px;
 }
@@ -66,13 +66,13 @@
   flex-shrink: 0;
   width: var(--touchTargetMinimum);
   height: var(--touchTargetMinimum);
-  margin-left: 8px;
+  margin-left: var(--spacingSmall);
   padding: 0;
   border: none;
   border-radius: 50%;
   background: transparent;
   color: var(--primaryDark);
-  font-size: 27px;
+  font-size: var(--fontSizeHeroSmall);
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -81,20 +81,10 @@
     transform var(--animationSpeed) ease;
 }
 
+/* Defines the active state styling for the menu button. */
 .menuButton:active {
-  background: rgba(17, 138, 178, 0.1);
+  background: var(--primaryTintSoft);
   transform: scale(0.94);
-}
-
-/* Inner Page Header */
-.categoryHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: var(--headerHeight);
-  padding: 10px var(--pageHorizontalPadding);
-  background: var(--headerBackground);
-  border-bottom: 1px solid var(--borderColor);
 }
 
 /* Category Header Title Container */
@@ -111,7 +101,7 @@
 .modernHeader {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacingCompact);
   min-height: var(--headerHeight);
   padding: 10px var(--pageHorizontalPadding);
   background: var(--headerBackground);
@@ -126,7 +116,7 @@
   color: var(--textPrimary);
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: clamp(21px, 5vw, 26px);
+  font-size: var(--fontSizeFluidTitle);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -145,7 +135,7 @@
   border-radius: 50%;
   background: transparent;
   color: var(--textPrimary);
-  font-size: 27px;
+  font-size: var(--fontSizeHeroSmall);
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -154,37 +144,42 @@
     transform var(--animationSpeed) ease;
 }
 
+/* Defines the active state styling for the modern back button. */
 .modernBackButton:active,
 .backButton:active {
-  background: rgba(17, 138, 178, 0.1);
+  background: var(--primaryTintSoft);
   transform: scale(0.94);
 }
 
 /* Tablet Header */
+/* Adjust header spacing and logo sizing for tablet and larger screens. */
 @media (min-width: 768px) {
+  /* Styles the dashboard header, category header, modern header component and its layout. */
   .dashboardHeader,
-  .categoryHeader,
-  .modernHeader {
+.modernHeader{
     padding-right: 28px;
     padding-left: 28px;
   }
 
+  /* Styles the app logo component and its layout. */
   .appLogo {
     width: 52px;
     height: 52px;
   }
 
+  /* Styles the app name component and its layout. */
   .appName {
-    font-size: 38px;
+    font-size: var(--fontSizeHeroXLarge);
   }
 }
 
 /* Large Tablet Header */
+/* Expand the header layout for desktop screens. */
 @media (min-width: 1024px) {
+  /* Styles the dashboard header, category header, modern header component and its layout. */
   .dashboardHeader,
-  .categoryHeader,
-  .modernHeader {
-    padding-right: 32px;
-    padding-left: 32px;
+.modernHeader{
+    padding-right: var(--spacingXLarge);
+    padding-left: var(--spacingXLarge);
   }
 }

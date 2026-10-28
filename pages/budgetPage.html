@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Displays group-level spending analysis and each category's budget summary. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,18 +8,22 @@
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <!-- Budget analysis screen mounts group and category spending summaries here. -->
     <div class="appContainer">
+      <!-- Shared page header returns to the dashboard and labels the budget view. -->
       <header class="modernHeader">
         <button class="modernBackButton" onclick="goBack()">
           <img
-            src="../assets/icons/navigation/back.svg"
+            data-icon-folder="navigation" data-icon-name="back"
             class="icon navigationIcon"
             alt="Back"
           />
         </button>
         <h1 class="modernPageTitle" data-i18n="budget.title">Budget</h1>
       </header>
+      <!-- Budget analysis content is rendered inside the page's main region. -->
       <main class="pageContent">
+        <!-- JavaScript builds the selected group's budget analysis in this container. -->
         <div id="budgetAnalysisContainer"></div>
       </main>
     </div>
@@ -33,11 +38,13 @@
       <div class="bottomSheetHandle"></div>
       <div id="bottomSheetContent"></div>
     </div>
+    <!-- Load budget dependencies before bootstrap chooses the page initializer. -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/budgetPage.js"></script>
     <script src="../js/localization/languageManager.js"></script>
     <script src="../js/bootstrap.js"></script>
+    <!-- Initialize budget state and populate the analysis view after the DOM is ready. -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();

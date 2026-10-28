@@ -1,13 +1,63 @@
+/* Renders group membership and handles invitations, roles, switching, and leaving. */
 redirectIfLoggedOut();
 const pendingInviteList = document.getElementById("pendingInviteList");
 const readOnlyBanner = document.getElementById("readOnlyBanner");
-const bottomSheet = document.getElementById("bottomSheet");
 const bottomSheetContent = document.getElementById("bottomSheetContent");
-const screenOverlay = document.getElementById("screenOverlay");
 /* Initialize */
 function initializeGroupManagement() {
+  if (ensureGroupColorsForCurrentUser()) {
+    saveAppState();
+  }
+  const groupContainer = document.getElementById("groupManagementContainer");
+  [groupContainer, bottomSheetContent].forEach(function (container) {
+    if (container && !container.dataset.safeGroupActionsBound) {
+      container.dataset.safeGroupActionsBound = "true";
+      container.addEventListener("click", handleGroupManagementAction);
+    }
+  });
   renderGroupAccordion();
   setupPermissions();
+}
+
+/* Handle actions using data attributes instead of interpolated inline JavaScript. */
+function handleGroupManagementAction(event) {
+  const actionElement = event.target.closest("[data-group-action]");
+  if (!actionElement) {
+    return;
+  }
+
+  const groupName = actionElement.dataset.groupName;
+  const memberId = actionElement.dataset.memberId;
+  event.stopPropagation();
+
+  switch (actionElement.dataset.groupAction) {
+    case "toggle":
+      toggleGroupAccordion(actionElement);
+      break;
+    case "member-actions":
+      openMemberActions(memberId, groupName);
+      break;
+    case "invite-actions":
+      openInviteActions(actionElement.dataset.invitationId);
+      break;
+    case "send-invitation":
+      if (!canManageGroup(groupName)) return;
+      appState.activeGroup = groupName;
+      renderInviteMemberForm();
+      break;
+    case "leave-group":
+      appState.activeGroup = groupName;
+      openLeaveGroupDialog();
+      break;
+    case "make-admin":
+      appState.activeGroup = groupName;
+      makeAdmin(memberId, groupName);
+      break;
+    case "remove-member":
+      appState.activeGroup = groupName;
+      openRemoveMemberDialog(memberId);
+      break;
+  }
 }
 /* Render Group Accordion */
 async function renderGroupAccordion() {
@@ -43,25 +93,19 @@ async function renderGroupAccordion() {
       <div class="groupAccordionCard">
         <button
           class="groupAccordionHeader"
-          onclick="
-            toggleGroupAccordion(
-              '${groupName}'
-            )
-          "
+          data-group-action="toggle"
+          data-group-name="${escapeHtml(groupName)}"
         >
           <div>
             <h3 class="groupAccordionTitle">
-              ${groupName}
+              ${renderGroupNameWithColor(groupName)}
             </h3>
             <p class="groupAccordionSubtitle">
               ${members.length} ${t("groupManagement.members")} •
               ${numCategories} ${t("groupManagement.categories")}
             </p>
           </div>
-          <span
-            id="accordionIcon_${groupName}"
-            class="accordionIcon"
-          >
+          <span class="accordionIcon">
             <img
               src="${getIconPath("navigation", "expand")}"
               class="icon actionIcon"
@@ -69,13 +113,10 @@ async function renderGroupAccordion() {
             >
           </span>
         </button>
-        <div
-          id="accordionBody_${groupName}"
-          class="
+        <div class="
             groupAccordionBody
             hidden
-          "
-        >
+          ">
           <h4 class="groupSectionTitle">
             ${t("groupManagement.members")}
           </h4>
@@ -224,9 +265,16 @@ async function renderGroupAccordion() {
   saveState();
 }
 /* Toggle Group Accordion */
-function toggleGroupAccordion(groupName) {
-  const body = document.getElementById(`accordionBody_${groupName}`);
-  const icon = document.getElementById(`accordionIcon_${groupName}`);
+function toggleGroupAccordion(header) {
+  const card = header.closest(".groupAccordionCard");
+  if (!card) {
+    return;
+  }
+  const body = card.querySelector(".groupAccordionBody");
+  const icon = card.querySelector(".accordionIcon");
+  if (!body || !icon) {
+    return;
+  }
   const isHidden = body.classList.contains("hidden");
   document.querySelectorAll(".groupAccordionBody").forEach(function (item) {
     item.classList.add("hidden");
@@ -253,6 +301,7 @@ function toggleGroupAccordion(groupName) {
 }
 /* Switch Group */
 function switchGroup(groupName) {
+  if (!getGroupMember(groupName)) return;
   appState.activeGroup = groupName;
   saveAppState();
   window.location.reload();
@@ -267,7 +316,7 @@ function setupPermissions() {
   if (!currentMember) {
     return;
   }
-  if (currentMember.role !== "admin" && currentMember.role !== "owner") {
+  if (currentMember.role !== "admin") {
     readOnlyBanner.classList.remove("hidden");
   } else {
     readOnlyBanner.classList.add("hidden");
@@ -288,6 +337,7 @@ function openInviteActions(groupId, invitationId) {
   if (!invitation) {
     return;
   }
+  if (!canManageGroup(invitation.groupName)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -341,19 +391,16 @@ function openInviteActions(groupId, invitationId) {
 }
 /* Resend Invitation */
 function resendInvitation(invitationId) {
-  if (!canManageGroup()) {
+  const invitation = (appState.pendingInvitations || []).find(
+    function (entry) {
+      return entry.id === invitationId;
+    },
+  );
+  if (!invitation || !canManageGroup(invitation.groupName)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanResend"),
     );
-    return;
-  }
-  const invitation = (appState.pendingInvitations || []).find(
-    function (invitation) {
-      return invitation.id === invitationId;
-    },
-  );
-  if (!invitation) {
     return;
   }
   invitation.invitedAt = new Date().toISOString();
@@ -383,6 +430,12 @@ function resendInvitation(invitationId) {
 }
 /* Cancel Invitation */
 function cancelInvitation(invitationId) {
+  const invitation = (appState.pendingInvitations || []).find(
+    function (entry) {
+      return entry.id === invitationId;
+    },
+  );
+  if (!invitation || !canManageGroup(invitation.groupName)) return;
   showConfirmDialog(
     t("groupManagement.cancelInvitation"),
     t("groupManagement.confirmCancelInvitation"),
@@ -523,22 +576,10 @@ function openMemberProfile(memberId) {
 /* Member Actions */
 function openMemberActions(memberId, groupId) {
   if (!canManageGroup()) {
-    console.log("TSK TSK Cant manage group");
     return;
   }
 
-  // const members =
-  //   appState.groupMembers && appState.groupMembers[groupName]
-  //     ? appState.groupMembers[groupName]
-  //     : [];
 
-  // const member = members.find(function (member) {
-  //   return member.id === memberId;
-  // });
-
-  // if (!member) {
-  //   return;
-  // }
   const member = state.tempMembers[groupId].find(member => member.usrId === memberId) || null;
 
 
@@ -563,7 +604,7 @@ function openMemberActions(memberId, groupId) {
 
     <div class="bottomSheetBody">
       ${
-        member.role !== "admin" && member.role !== "owner"
+        member.role !== "admin"
           ? `
             <button
               class="bottomSheetActionButton"
@@ -711,54 +752,6 @@ async function makeAdmin(otherUserId, familyGroupId) {
       messageKey: "groupManagement.memberPromotedMessage",
       params: {
         name: member.usrName,
-      },
-    },
-  );
-}
-/* Transfer Ownership */
-function transferOwnership(memberId) {
-  if (!canManageGroup()) {
-    showDialog(
-      t("common.permissionDenied"),
-      t("groupManagement.onlyAdminsCanTransferOwnership"),
-    );
-    return;
-  }
-  const members = getCurrentGroupMembers();
-  members.forEach(function (member) {
-    if (member.role === "owner") {
-      member.role = "admin";
-    }
-  });
-  const selectedMember = members.find(function (member) {
-    return member.id === memberId;
-  });
-  if (!selectedMember) {
-    return;
-  }
-  selectedMember.role = "owner";
-  /*
-    Backend
-    PATCH
-    /group/owner
-  */
-  saveAppState();
-  renderGroupAccordion();
-  closeBottomSheet();
-  showToast(t("groupManagement.ownershipTransferred"));
-  createNotification(
-    "group",
-    t("groupManagement.ownershipTransferredTitle"),
-    t("groupManagement.ownershipTransferredMessage", {
-      name: selectedMember.name,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.ownershipTransferredTitle",
-      messageKey: "groupManagement.ownershipTransferredMessage",
-      params: {
-        name: selectedMember.name,
       },
     },
   );
@@ -1087,6 +1080,22 @@ async function completeLeaveGroup(familyGroupId, shouldDelete) {
   state.activeGroupId = null;
   state.activeGroup = null;
   restoreLastGroup();
+  createNotification(
+    "group",
+    t("groupManagement.leftGroup"),
+    t("groupManagement.leftGroupMessage", {
+      name: currentUser.name,
+    }),
+    null,
+    null,
+    {
+      titleKey: "groupManagement.leftGroup",
+      messageKey: "groupManagement.leftGroupMessage",
+      params: {
+        name: currentUser.name,
+      },
+    },
+  );
 
   saveState();
   closeBottomSheet();
@@ -1095,16 +1104,6 @@ async function completeLeaveGroup(familyGroupId, shouldDelete) {
   );
   window.location.href = "../pages/dashboardPage.html";
 }
-/* Bottom Sheet */
-function openBottomSheet() {
-  bottomSheet.classList.remove("hidden");
-  screenOverlay.classList.remove("hidden");
-}
-function closeBottomSheet() {
-  bottomSheet.classList.add("hidden");
-  screenOverlay.classList.add("hidden");
-}
-screenOverlay.addEventListener("click", closeBottomSheet);
 /* Back */
 function goBack() {
   window.location.href = "../pages/dashboardPage.html";
@@ -1126,7 +1125,6 @@ POST /group/invite
 GET /group/pending-invitations
 POST /group/accept-invitation
 PATCH /group/member-role
-PATCH /group/transfer-owner
 DELETE /group/member
 DELETE /group/leave
 ========================================

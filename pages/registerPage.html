@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Creates a user account, the first shopping group, and optional biometric setup. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <!-- Registration form collects account details and creates the user's first group. -->
     <div class="authPage">
+      <!-- Registration card groups identity fields, optional biometric setup, and submission. -->
       <div class="authCard">
         <h1 class="authTitle" data-i18n="register.title">Register</h1>
         <form id="registerForm" onsubmit="registerUser_mysql(event)">
@@ -94,6 +97,7 @@
     <script src="../js/snackbarManager.js"></script>
     <!-- Application Bootstrap -->
     <script src="../js/bootstrap.js"></script>
+    <!-- Start localization, security, and registration-page initialization after markup loads. -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();

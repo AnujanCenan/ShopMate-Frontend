@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Main workspace for group selection, budget overview, and shopping categories. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -20,7 +21,7 @@
         </div>
         <button type="button" class="menuButton" aria-label="Open Menu">
           <img
-            src="../assets/icons/navigation/menu.svg"
+            data-icon-folder="navigation" data-icon-name="menu"
             class="icon navigationIcon"
             alt=""
           />
@@ -40,7 +41,7 @@
             </span>
             <span class="dropdownArrow">
               <img
-                src="../assets/icons/navigation/collapse.svg"
+                data-icon-folder="navigation" data-icon-name="collapse"
                 class="icon smallIcon"
                 alt=""
               />
@@ -48,7 +49,8 @@
           </button>
         </section>
         <!-- Budget Dashboard -->
-        <section
+      <!-- Group-level monthly budget summary; its contents are rendered by dashboardPage.js. -->
+      <section
           id="budgetDashboardWidget"
           class="budgetDashboardWidget"
         ></section>
@@ -58,6 +60,26 @@
             Select or create a group
           </p>
         </section>
+        <!-- Lets each user choose the display order for categories in this group. -->
+        <div class="sortControl hidden" id="categorySortControl">
+          <label for="categorySortSelect" data-i18n="dashboard.sortCategories">
+            Sort categories
+          </label>
+          <select id="categorySortSelect" class="sortControlSelect">
+            <option value="default" data-i18n="dashboard.sortDefault">
+              Default order
+            </option>
+            <option value="newest-first" data-i18n="dashboard.sortNewestFirst">
+              Newest added first
+            </option>
+            <option value="newest-last" data-i18n="dashboard.sortNewestLast">
+              Newest added last
+            </option>
+            <option value="pending-desc" data-i18n="dashboard.sortMostPending">
+              Most pending
+            </option>
+          </select>
+        </div>
         <!-- Categories -->
         <section class="categoryList" id="categoryList"></section>
       </main>
@@ -73,7 +95,7 @@
         aria-label="Add Category"
       >
         <img
-          src="../assets/icons/actions/add.svg"
+          data-icon-folder="actions" data-icon-name="add"
           class="icon largeIcon"
           alt=""
         />

@@ -23,6 +23,7 @@ strong {
   color: var(--textPrimary);
 }
 
+/* Sets the shared base styling for a elements. */
 a {
   color: var(--primaryColor);
   text-decoration: none;

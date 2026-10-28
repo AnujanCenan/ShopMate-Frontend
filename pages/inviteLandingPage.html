@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Accepts a group invitation code and routes the user to join or registration. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <!-- Invitation entry screen accepts a group code before routing to join or registration. -->
     <div class="authPage">
       <div class="authCard">
         <h1 class="authTitle" data-i18n="invite.groupInvitation">
@@ -31,11 +33,14 @@
         </button>
       </div>
     </div>
+    <!-- Load account and invitation dependencies before page initialization. -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/authManager.js"></script>
     <script src="../js/localization/languageManager.js"></script>
     <script src="../js/bootstrap.js"></script>
+    <!-- Define invite submission behavior and start shared application initialization. -->
     <script>
+      // Route a submitted invite code to registration or group joining based on session state.
       function processInvite() {
         const inviteCode = document
           .getElementById("inviteCodeInput")
@@ -47,6 +52,7 @@
         }
         joinGroupFromInvite(inviteCode);
       }
+      // Start shared application initialization after the page markup is ready.
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();
       });

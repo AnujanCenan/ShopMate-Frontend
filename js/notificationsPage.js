@@ -1,3 +1,4 @@
+/* Initializes notification preferences, filters, read state, and feed rendering. */
 const notificationList = document.getElementById("notificationList");
 /* Initialize */
 function initializeNotifications() {
@@ -286,7 +287,7 @@ async function openNotification(notificationId) {
       window.location.href = "../pages/familyManagementPage.html";
       break;
     case "favorites":
-      window.location.href = "../pages/favoritesPage.html";
+      window.location.href = "../pages/categoryPage.html?tab=favorites";
       break;
     case "category":
       if (notifPayload.action_data) {

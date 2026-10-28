@@ -1,3 +1,4 @@
+/* Handles shopping-item creation, edits, purchases, recurrence, and item actions. */
 const openItemBottomSheetButton = document.getElementById(
   "openItemBottomSheetButton",
 );
@@ -196,13 +197,7 @@ function renderAddItemForm(itemName = "") {
 }
 /* Render Edit Item Form */
 function renderEditItemForm(listItemId) {
-  // const currentCategory = getActiveCategory();
-  // if (!currentCategory) {
-  //   return;
-  // }
-  console.log("In renderEditForm...");
-  console.log(state.listItems);
-  const item = state.listItems.find(function (item) {
+   const item = state.listItems.find(function (item) {
     return item.ListItemId === listItemId;
   });
   if (!item) {
@@ -546,6 +541,16 @@ function getItemWithName(itemName) {
   });
 }
 
+/* Identify recurring entries so one-off additions never alter a recurrence series. */
+function isRecurringShoppingItem(item) {
+  return Boolean(
+    item &&
+    item.recurrence &&
+    item.recurrence.enabled === true &&
+    item.recurrence.frequency !== "none",
+  );
+}
+
 /* Create Item */
 async function createItem() {
   const itemNameInput = document.getElementById("itemNameInput");
@@ -566,7 +571,6 @@ async function createItem() {
     showSnackbar(t("item.enterItemDetails"));
     return;
   }
-  console.log(`In create item: itemQuantityUnits === ${itemQuantityUnit}`);
 
   const generalUnit = getGeneralUnit(itemQuantityUnit, state.settings?.measurementUnit || "metric");
   console.log(`\tgeneral unit === ${generalUnit}`);
@@ -577,6 +581,9 @@ async function createItem() {
     document.getElementById("itemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("itemRecurrenceEndDate")?.value || null;
+
+  const newItemIsRecurring = recurrenceFrequency !== "none";
+  const normalizedItemName = normalizeItemName(itemName);
 
   // const existingItem = currentCategory.items.find(function (item) {
   //   return item.name.toLowerCase() === itemName.toLowerCase();
@@ -665,12 +672,7 @@ async function createItem() {
   
   const itemMasterId = body.itemMasterId;
   const listItemId = body.listItemId;
-  // const recurrenceFrequency =
-  //   document.getElementById("itemRecurrenceFrequency")?.value || "none";
-  // const recurrenceStartDate =
-  //   document.getElementById("itemRecurrenceStartDate")?.value || null;
-  // const recurrenceEndDate =
-  //   document.getElementById("itemRecurrenceEndDate")?.value || null;
+
   const newItem = {
     ListItemId: listItemId,
     ItemMasterId: itemMasterId,
@@ -687,10 +689,17 @@ async function createItem() {
     Purchased: false,
     GeneralUnit: generalUnit,
     recurrence: {
-      enabled: recurrenceFrequency !== "none",
+      enabled: newItemIsRecurring,
       frequency: recurrenceFrequency,
-      startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
-      endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+      occurrenceDate: newItemIsRecurring
+        ? recurrenceStartDate || formatRecurrenceDate(new Date())
+        : null,
+      dayOfMonth: recurrenceFrequency === "monthly"
+        ? (parseRecurrenceDate(recurrenceStartDate) || new Date()).getDate()
+        : null,
+      startDate: newItemIsRecurring ? recurrenceStartDate : null,
+      endDate: newItemIsRecurring ? recurrenceEndDate : null,
+      seriesId: newItemIsRecurring ? newItemId : null,
     },
   };
   state.listItems.unshift(newItem);
@@ -771,19 +780,6 @@ async function createItem() {
 }
 /* Update Duplicate Quantity */
 async function updateDuplicateQuantity(ItemName, addedQuantity) {
-  // const currentCategory = getActiveCategory();
-  // if (!currentCategory) {
-  //   return;
-  // }
-  // const item = currentCategory.items.find(function (item) {
-  //   return item.name === itemName;
-  // });
-  // if (!item) {
-  //   return;
-  // }
-  // item.quantity = Number(item.quantity) + Number(newQuantity);
-  // saveAppState();
-
 
   const existingItem = getItemWithName(ItemName);
   existingItem.Quantity = Number(existingItem.Quantity) +  Number(addedQuantity);
@@ -835,10 +831,7 @@ async function updateItemMySql(listItemId, newItem) {
 }
 
 async function updateItem(listItemId) {
-  // const currentCategory = getActiveCategory();
-  // if (!currentCategory) {
-  //   return;
-  // }
+
   const item = state.listItems.find(function (item) {
     return item.ListItemId === listItemId;
   });
@@ -850,10 +843,8 @@ async function updateItem(listItemId) {
   const newQuantity = document
     .getElementById("editItemQuantityInput")
     .value.trim();
-
   const newQuantityUnit =
     document.getElementById("editItemQuantityUnitInput")?.value || "pcs";
-
   const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
   const newNotes = document.getElementById("editItemNotesInput").value.trim();
@@ -872,16 +863,7 @@ async function updateItem(listItemId) {
       return;
     }
   }
-  // const duplicateItem = state.listItems.find(function (existingItem) {
-  //   return (
-  //     existingItem.ItemName !== originalItemName &&
-  //     existingItem.ItemName.trim().toLowerCase() === normalizedNewName
-  //   );
-  // });
-  // // if (duplicateItem) {
 
-  // // }
-  console.log(`In updateItem: esitmated price == `)
   const recurrenceFrequency =
     document.getElementById("editItemRecurrenceFrequency")?.value || "none";
   const recurrenceStartDate =
@@ -897,8 +879,11 @@ async function updateItem(listItemId) {
   item.recurrence = {
     enabled: recurrenceFrequency !== "none",
     frequency: recurrenceFrequency,
+    occurrenceDate: recurrenceOccurrenceDate,
+    dayOfMonth: recurrenceDayOfMonth,
     startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
     endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
+    seriesId: recurrenceSeriesId,
   };
   item.ItemRecurrenceInterval = recurrenceFrequency;
   item.StartDate = recurrenceStartDate;
@@ -1031,6 +1016,10 @@ async function openPurchaseConfirmation(listItemId) {
           >
         </div>
       </div>
+      <div class="formField">
+        <label class="formLabel">${t("category.shop")}</label>
+        <input type="text" id="actualShopInput" class="bottomSheetInput" value="" placeholder="${t("category.shop")} (optional)">
+      </div>
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
@@ -1062,9 +1051,69 @@ async function confirmPurchase(listItemId) {
   if (!item) {
     return;
   }
+  const actualPriceInput = document.getElementById("actualPriceInput");
+  const rawActualPrice = actualPriceInput?.value.trim() ?? "";
+  const enteredActualPrice =
+    rawActualPrice === "" ? null : Number(rawActualPrice);
+  if (
+    enteredActualPrice !== null &&
+    (!Number.isFinite(enteredActualPrice) || enteredActualPrice < 0)
+  ) {
+    actualPriceInput?.focus();
+    actualPriceInput?.reportValidity();
+    return;
+  }
+  const estimatedPrice = Number(item.estimatedPrice);
+  const hasEstimatedPrice =
+    item.estimatedPrice !== null &&
+    item.estimatedPrice !== undefined &&
+    String(item.estimatedPrice).trim() !== "" &&
+    Number.isFinite(estimatedPrice) &&
+    estimatedPrice > 0;
+  // Prefer the entered actual price, then the estimate, then zero.
   const actualPrice =
-    Number(document.getElementById("actualPriceInput").value) || 0;
+    enteredActualPrice !== null
+      ? enteredActualPrice
+      : hasEstimatedPrice
+        ? estimatedPrice
+        : 0;
+  const actualShop =
+    document.getElementById("actualShopInput")?.value.trim() || "";
+  const isRecurring =
+    item.recurrence &&
+    item.recurrence.enabled === true &&
+    item.recurrence.frequency !== "none";
+  const normalizedName = normalizeItemName(item.name);
+  const normalizedShop = actualShop.trim().toLowerCase();
+  const mergeTarget =
+    !isRecurring &&
+    currentCategory.items.find(function (candidate) {
+      const candidatePrice =
+        candidate.lastPurchasePrice ?? candidate.actualPrice;
+      return (
+        candidate.id !== item.id &&
+        candidate.purchased &&
+        !(
+          candidate.recurrence &&
+          candidate.recurrence.enabled === true &&
+          candidate.recurrence.frequency !== "none"
+        ) &&
+        normalizeItemName(candidate.name) === normalizedName &&
+        candidatePrice !== null &&
+        candidatePrice !== undefined &&
+        Number.isFinite(Number(candidatePrice)) &&
+        Number(candidatePrice) === actualPrice &&
+        (candidate.purchaseShop || "").trim().toLowerCase() ===
+          normalizedShop &&
+        (candidate.quantityUnit || "pcs") === (item.quantityUnit || "pcs")
+      );
+    });
   item.actualPrice = actualPrice;
+  item.purchaseShop = actualShop;
+  // Update the estimate from the entered price only for recurring items.
+  if (isRecurring && enteredActualPrice !== null) {
+    item.estimatedPrice = actualPrice;
+  }
   item.purchased = !item.purchased;
   
   await markPurchased_mysql(item, actualPrice);
@@ -1077,6 +1126,40 @@ async function confirmPurchase(listItemId) {
     }
   } else {
     item.purchaseDate = null;
+  }
+  if (item.purchased && mergeTarget) {
+    if (!Array.isArray(mergeTarget.purchaseEvents)) {
+      mergeTarget.purchaseEvents = [
+        {
+          quantity: mergeTarget.quantity,
+          actualPrice: Number(mergeTarget.actualPrice) || 0,
+          purchaseDate: mergeTarget.purchaseDate || null,
+          purchaseShop: mergeTarget.purchaseShop || "",
+        },
+      ];
+    }
+    mergeTarget.purchaseEvents.push({
+      quantity: item.quantity,
+      actualPrice: actualPrice,
+      purchaseDate: item.purchaseDate,
+      purchaseShop: actualShop,
+    });
+    mergeTarget.quantity = Number(mergeTarget.quantity) + Number(item.quantity);
+    mergeTarget.actualPrice = Number(mergeTarget.actualPrice) + actualPrice;
+    mergeTarget.lastPurchasePrice = actualPrice;
+    mergeTarget.purchaseDate = item.purchaseDate;
+    mergeTarget.purchaseShop = actualShop;
+    currentCategory.items.splice(currentCategory.items.indexOf(item), 1);
+  } else if (item.purchased) {
+    item.lastPurchasePrice = actualPrice;
+    item.purchaseEvents = [
+      {
+        quantity: item.quantity,
+        actualPrice: actualPrice,
+        purchaseDate: item.purchaseDate,
+        purchaseShop: actualShop,
+      },
+    ];
   }
   if (item.purchased) {
     item.purchaseDate = new Date().toISOString();

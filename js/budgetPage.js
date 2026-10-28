@@ -37,10 +37,6 @@
  * │   ├── saveEditedBudget()
  * │   └── deleteCategoryBudget()
  * │
- * ├── Bottom Sheet
- * │   ├── openBottomSheet()
- * │   └── closeBottomSheet()
- * │
  * └── Initialization
  *     └── initializeBudgetPage()
  *
@@ -59,9 +55,7 @@
 const budgetHero = document.getElementById("budgetHero");
 const budgetStats = document.getElementById("budgetStats");
 const budgetCategoryList = document.getElementById("budgetCategoryList");
-const bottomSheet = document.getElementById("bottomSheet");
 const bottomSheetContent = document.getElementById("bottomSheetContent");
-const screenOverlay = document.getElementById("screenOverlay");
 let budgetDisplayGroup = null;
 /* Navigate Back - Returns the user to the dashboard page. */
 function goBack() {
@@ -110,6 +104,8 @@ if (screenOverlay) {
 }
 /* Open Budget Menu - Displays the available actions for the selected budget category. */
 function openBudgetMenu(categoryName) {
+  const activeGroup = budgetDisplayGroup || appState.activeGroup;
+  if (!canManageCategory(categoryName, activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -168,26 +164,8 @@ function openBudgetMenu(categoryName) {
 /* Edit Category Budget - Opens the form to update the monthly budget limit. */
 function editCategoryBudget(categoryName) {
   const activeGroup = budgetDisplayGroup || appState.activeGroup;
-  if (!activeGroup) {
-    showDialog(t("budget.onlyAdminCanEdit"));
-    return;
-  }
-  /*
-   * Permission is checked against the Budget display group,
-   * not against the global appState.activeGroup.
-   */
-  const members = appState.groupMembers?.[activeGroup] || [];
-  const currentUser = appState.currentUser;
-  const currentMember = currentUser
-    ? members.find(function (member) {
-        return member.email === currentUser.email;
-      })
-    : null;
-  const canManageDisplayedGroup =
-    currentMember &&
-    (currentMember.role === "admin" || currentMember.role === "owner");
-  if (!canManageDisplayedGroup) {
-    showDialog(t("budget.onlyAdminCanEdit"));
+  if (!canManageCategory(categoryName, activeGroup)) {
+    showDialog(t("common.permissionDenied"));
     return;
   }
   const categoryBudget =
@@ -235,6 +213,10 @@ function editCategoryBudget(categoryName) {
 /* Save Edited Budget - Updates the monthly budget limit for the selected category. */
 function saveEditedBudget(categoryName) {
   const activeGroup = budgetDisplayGroup || appState.activeGroup;
+  if (!canManageCategory(categoryName, activeGroup)) {
+    showDialog(t("common.permissionDenied"));
+    return;
+  }
   const input = document.getElementById("editBudgetLimit");
   if (!activeGroup || !input) {
     return;
@@ -252,18 +234,6 @@ function saveEditedBudget(categoryName) {
   showToast(t("budget.budgetUpdated"));
   closeBottomSheet();
   renderBudgetAnalysis();
-}
-/* Open Bottom Sheet - Displays the bottom sheet and locks page scrolling. */
-function openBottomSheet() {
-  screenOverlay.classList.remove("hidden");
-  bottomSheet.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-/* Close Bottom Sheet - Hides the bottom sheet and restores page scrolling. */
-function closeBottomSheet() {
-  screenOverlay.classList.add("hidden");
-  bottomSheet.classList.add("hidden");
-  document.body.style.overflow = "";
 }
 /* Get Budget Summary - Calculates the budget summary for the selected group. */
 function getBudgetSummary(groupName) {
@@ -285,18 +255,7 @@ function getBudgetSummary(groupName) {
       highestSpent = categoryBudget.budgetSpent;
     }
   })
-  // categories.forEach(function (category) {
-  //   let total = 0;
-  //   category.items.forEach(function (item) {
-  //     if (item.purchased && item.estimatedPrice) {
-  //       total += Number(item.estimatedPrice);
-  //     }
-  //   });
-  //   if (total > highestSpent) {
-  //     highestSpent = total;
-  //     highestCategory = category.name;
-  //   }
-  // });
+
   const purchasedItems = state.budgets.categoryBudgets.reduce(function (total, categoryBudget) {
     return total + categoryBudget.numPurchased;
   }, 0);
@@ -548,8 +507,15 @@ function renderCategoryBudgetCards() {
 function initializeBudgetPage() {
   const params = new URLSearchParams(window.location.search);
   const requestedGroup = params.get("group");
-  if (requestedGroup && appState.groups && appState.groups[requestedGroup]) {
+  const availableGroups = getCurrentUserGroups();
+  if (availableGroups.length === 0) {
+    window.location.href = "../pages/dashboardPage.html";
+    return;
+  }
+  if (requestedGroup && availableGroups.includes(requestedGroup)) {
     budgetDisplayGroup = requestedGroup;
+  } else if (!getGroupMember(appState.activeGroup)) {
+    budgetDisplayGroup = availableGroups[0];
   } else {
     budgetDisplayGroup = null;
   }

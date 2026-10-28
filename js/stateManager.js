@@ -30,9 +30,14 @@
  * Business logic belongs in the respective manager files.
  ***************************************************************************************************/
 const STORAGE_KEY = "shopMateData";
+/* Create a collision-resistant identifier for a locally stored shopping item. */
+function createItemId() {
+  return "item-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+}
 const defaultAppState = {
   loggedIn: false,
   currentUser: null,
+  lockedUserId: null,
   activeGroup: null,
   activeCategory: null,
   activeTab: "lists",
@@ -61,6 +66,7 @@ const defaultAppState = {
     "My Shopping Group": [
       {
         name: "Monthly Groceries",
+        createdByUserId: "user_1",
         items: [
           {
             name: "Milk",
@@ -85,6 +91,10 @@ const defaultAppState = {
         ],
       },
     ],
+  },
+  groupColorPreferences: {},
+  groupCreators: {
+    "My Shopping Group": "user_1",
   },
   groupMembers: {
     "My Shopping Group": [
@@ -148,6 +158,18 @@ function loadAppState() {
   }
 
   if (
+    (parsedState.lockedUserId !== null &&
+      typeof parsedState.lockedUserId !== "string") ||
+    (typeof parsedState.lockedUserId === "string" &&
+      !parsedState.users.some(function (user) {
+        return user && user.id === parsedState.lockedUserId;
+      }))
+  ) {
+    parsedState.lockedUserId = null;
+    stateUpdated = true;
+  }
+
+  if (
     !parsedState.groups ||
     typeof parsedState.groups !== "object" ||
     Array.isArray(parsedState.groups)
@@ -165,11 +187,77 @@ function loadAppState() {
     stateUpdated = true;
   }
 
+  if (
+    !parsedState.groupCreators ||
+    typeof parsedState.groupCreators !== "object" ||
+    Array.isArray(parsedState.groupCreators)
+  ) {
+    parsedState.groupCreators = {};
+    stateUpdated = true;
+  }
+
+  Object.keys(parsedState.groups).forEach(function (groupName) {
+    if (!Array.isArray(parsedState.groupMembers[groupName])) {
+      parsedState.groupMembers[groupName] = [];
+      stateUpdated = true;
+    }
+    const members = parsedState.groupMembers[groupName];
+    if (!Array.isArray(parsedState.groups[groupName])) {
+      parsedState.groups[groupName] = [];
+      stateUpdated = true;
+    }
+    members.forEach(function (member) {
+      if (member.role === "owner") {
+        member.role = "admin";
+        stateUpdated = true;
+      } else if (member.role !== "admin" && member.role !== "member") {
+        member.role = "member";
+        stateUpdated = true;
+      }
+    });
+
+    if (!Object.prototype.hasOwnProperty.call(parsedState.groupCreators, groupName)) {
+      const originalAdmin = members.find(function (member) {
+        return member.role === "admin";
+      });
+      parsedState.groupCreators[groupName] =
+        originalAdmin?.id || originalAdmin?.email || null;
+      stateUpdated = true;
+    }
+
+    parsedState.groups[groupName].forEach(function (category) {
+      if (!category.createdByUserId) {
+        category.createdByUserId = parsedState.groupCreators[groupName] || null;
+        stateUpdated = true;
+      }
+    });
+  });
+
+  if (
+    !parsedState.groupColorPreferences ||
+    typeof parsedState.groupColorPreferences !== "object" ||
+    Array.isArray(parsedState.groupColorPreferences)
+  ) {
+    parsedState.groupColorPreferences = {};
+    stateUpdated = true;
+  }
+
   if (!Array.isArray(parsedState.pendingInvitations)) {
     parsedState.pendingInvitations = [];
     stateUpdated = true;
   }
   parsedState.pendingInvitations.forEach(function (invitation) {
+    if (invitation.role === "owner") {
+      invitation.role = "admin";
+      stateUpdated = true;
+    } else if (
+      invitation.role !== undefined &&
+      invitation.role !== "admin" &&
+      invitation.role !== "member"
+    ) {
+      invitation.role = "member";
+      stateUpdated = true;
+    }
     if (!invitation.id) {
       invitation.id = `invite_${Date.now()}_${Math.random()
         .toString(36)
@@ -412,6 +500,28 @@ function loadAppState() {
           return;
         }
 
+        if (typeof item.id !== "string" || !item.id) {
+          item.id = createItemId();
+          stateUpdated = true;
+        }
+
+        if (item.purchaseShop === undefined) {
+          item.purchaseShop = "";
+          stateUpdated = true;
+        }
+
+        if (!Array.isArray(item.purchaseEvents)) {
+          item.purchaseEvents = item.purchased
+            ? [{
+                quantity: item.quantity,
+                actualPrice: item.actualPrice ?? null,
+                purchaseDate: item.purchaseDate || null,
+                purchaseShop: item.purchaseShop || "",
+              }]
+            : [];
+          stateUpdated = true;
+        }
+
         if (item.estimatedPrice === undefined) {
           item.estimatedPrice = 0;
           stateUpdated = true;
@@ -431,8 +541,9 @@ function loadAppState() {
         }
 
         if (
-          typeof item.actualPrice !== "number" ||
-          Number.isNaN(item.actualPrice)
+          item.actualPrice !== null &&
+          (typeof item.actualPrice !== "number" ||
+            !Number.isFinite(item.actualPrice))
         ) {
           item.actualPrice = 0;
           stateUpdated = true;

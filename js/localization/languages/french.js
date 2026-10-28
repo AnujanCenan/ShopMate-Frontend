@@ -6,15 +6,17 @@
  *
  * IMPORTANT
  * This file registers itself with the localization registry.
- * The structure and keys must always match en.js.
+ * Keep namespace and key names aligned with en.js; translate values only.
  ***************************************************************************************************/
 registerLanguage("fr", {
+  // Text and metadata shown in the application information screen.
   about: {
     description:
       "ShopMate vous aide à organiser et gérer vos besoins d’achat partagés en un seul endroit.",
     version: "Version",
     copyright: "© 2026 ShopMate. Tous droits réservés.",
   },
+  // Labels and messages for sign-in, registration, and authentication errors.
   auth: {
     alreadyMember: "Déjà membre",
     alreadyMemberMessage: "Vous êtes déjà membre de ce groupe.",
@@ -65,6 +67,7 @@ registerLanguage("fr", {
     tagline: "Gérez vos courses ensemble",
     welcomeBack: "Bon retour",
   },
+  // Labels and guidance used by budget analysis views.
   budget: {
     amount: "Montant",
     budget: "Budget",
@@ -91,6 +94,7 @@ registerLanguage("fr", {
     title: "Budget",
     totalBudget: "Budget total",
   },
+  // Labels and messages for category creation and management.
   category: {
     add: "Ajouter",
     addCategory: "Ajouter une catégorie",
@@ -126,8 +130,15 @@ registerLanguage("fr", {
     renameCategory: "Renommer la catégorie",
     searchItems: "Rechercher des articles",
     shop: "Magasin",
+    sortDefault: "Ordre par défaut",
+    sortNewestFirst: "Ajoutés les plus récents d’abord",
+    sortNewestLast: "Ajoutés les plus récents en dernier",
+    sortItems: "Trier les articles",
+    sortOneOffFirst: "Articles ponctuels d’abord",
+    sortRecurringFirst: "Articles récurrents d’abord",
     title: "Catégorie ShopMate",
   },
+  // Confirmation text shown before deleting local app data.
   clearLocalData: {
     title: "Effacer les données locales",
     description:
@@ -136,6 +147,7 @@ registerLanguage("fr", {
       "Cette action supprimera les données ShopMate stockées sur cet appareil. Votre compte ShopMate et les données du serveur ne seront pas supprimés.",
     clear: "Effacer les données",
   },
+  // Shared labels reused across multiple screens and dialogs.
   common: {
     add: "Ajouter",
     appName: "ShopMate",
@@ -176,6 +188,7 @@ registerLanguage("fr", {
     itemDeleted: "{{itemName}} supprimé",
     quantityUnit: "Unité de quantité",
   },
+  // Names and symbols for supported currencies.
   currency: {
     title: "Devise",
     description: "Choisissez la devise que ShopMate doit utiliser.",
@@ -188,6 +201,7 @@ registerLanguage("fr", {
     savedTitle: "Devise mise à jour",
     savedMessage: "Votre préférence de devise a été enregistrée.",
   },
+  // Dashboard labels, budget states, and group/category actions.
   dashboard: {
     addItem: "Ajouter un article",
     addNewCategory: "Ajouter une nouvelle catégorie",
@@ -213,6 +227,11 @@ registerLanguage("fr", {
     budgetUpdated: "Budget mis à jour",
     budgetUsage: "Utilisation du budget",
     categories: "Catégories",
+    sortCategories: "Trier les catégories",
+    sortDefault: "Ordre par défaut",
+    sortNewestFirst: "Ajoutés les plus récents d’abord",
+    sortNewestLast: "Ajoutés les plus récents en dernier",
+    sortMostPending: "Plus d’articles en attente",
     categoryActions: "Actions de la catégorie",
     categoryAlreadyExists: "Une catégorie portant ce nom existe déjà.",
     categoryBudget: "Budget de catégorie",
@@ -236,6 +255,7 @@ registerLanguage("fr", {
     createGroupButton: "Créer le groupe",
     createGroupTitle: "Créer un groupe de courses",
     createNewGroup: "Créer un nouveau groupe",
+    changeGroupColor: "Changer la couleur du groupe",
     currentUserUnavailable: "Impossible de déterminer l'utilisateur actuel.",
     deleteCategory: "Supprimer la catégorie",
     deleteCategoryConfirmation: "Êtes-vous sûr de vouloir supprimer",
@@ -259,6 +279,12 @@ registerLanguage("fr", {
       "Le total de vos budgets de catégories est déjà de $${allocated}. Augmentez le budget du groupe ou réduisez les budgets des catégories.",
     groupBudgetUpdatedMessage:
       "Le budget de {{groupName}} a été mis à jour à ${{amount}}.",
+    groupColor: "Couleur du groupe",
+    groupColorInUse: "Déjà utilisée par un autre groupe",
+    groupColorOption: "Couleur {{number}}",
+    groupColorTitle: "Changer la couleur du groupe",
+    groupColorUnavailable: "Veuillez choisir une couleur disponible.",
+    groupColorUpdated: "Couleur du groupe mise à jour.",
     groupCreated: "Groupe de courses créé avec succès.",
     groupDeleted: "Groupe supprimé avec succès.",
     groupExistsMessage: "Un groupe de courses portant ce nom existe déjà.",
@@ -317,6 +343,7 @@ registerLanguage("fr", {
     unlimitedBudget: "Budget illimité",
     used: "Utilisé",
   },
+  // Titles and messages for reusable confirmation dialogs.
   dialogs: {
     cancel: "Annuler",
     confirm: "Confirmer",
@@ -332,6 +359,7 @@ registerLanguage("fr", {
     themeUpdatedMessage: "Votre thème préféré a été enregistré.",
     themeUpdatedTitle: "Thème mis à jour",
   },
+  // Labels and messages for the favorites list.
   favorites: {
     addedToFavorites: "Ajouté aux favoris",
     addToFavorites: "Ajouter aux favoris",
@@ -340,6 +368,7 @@ registerLanguage("fr", {
     noFavorites: "Aucun favori",
     removeFromFavorites: "Retirer des favoris",
   },
+  // Text used by the in-app feedback form.
   feedback: {
     title: "Envoyer des commentaires",
     description:
@@ -353,6 +382,7 @@ registerLanguage("fr", {
     successMessage:
       "Merci pour vos commentaires. Ils ont été enregistrés pour être examinés.",
   },
+  // Labels and messages for password recovery.
   forgotPassword: {
     description:
       "Saisissez votre adresse e-mail enregistrée pour recevoir un lien de réinitialisation du mot de passe.",
@@ -370,6 +400,7 @@ registerLanguage("fr", {
     sendButton: "Envoyer le lien de réinitialisation",
     title: "Mot de passe oublié",
   },
+  // Labels and messages for groups, members, roles, and invitations.
   groupManagement: {
     acceptInvitation: "Accepter l'invitation",
     addMember: "Ajouter un membre",
@@ -437,17 +468,12 @@ registerLanguage("fr", {
       "Seuls les administrateurs peuvent supprimer des membres.",
     onlyAdminsCanResend:
       "Seuls les administrateurs peuvent renvoyer les invitations.",
-    onlyAdminsCanTransferOwnership:
-      "Seuls les administrateurs peuvent transférer la propriété.",
-    ownershipTransferred: "Propriété transférée",
-    ownershipTransferredMessage:
-      "{{name}} est maintenant propriétaire du groupe.",
-    ownershipTransferredTitle: "Propriété transférée",
     pendingInvitation: "Invitation en attente",
     pendingInvitations: "Invitations en attente",
     promoteAnotherAdmin:
       "Veuillez nommer un autre membre administrateur avant de partir.",
-    readOnlyAccess: "Vous disposez d'un accès en lecture seule dans ce groupe.",
+    readOnlyAccess:
+      "Les paramètres du groupe sont réservés aux administrateurs. Vous pouvez gérer les catégories que vous créez et utiliser la liste de courses partagée.",
     rejoinRequiresInvite:
       "Pour rejoindre à nouveau le groupe, vous aurez besoin d'une nouvelle invitation.",
     removeMember: "Supprimer le membre",
@@ -455,9 +481,9 @@ registerLanguage("fr", {
     role: "Rôle",
     sendInvitation: "Envoyer une invitation",
     title: "Gestion du groupe",
-    transferOwnership: "Transférer la propriété",
     youLeftGroup: "Vous avez quitté le groupe.",
   },
+  // Text shown when accepting a group invitation.
   invite: {
     acceptInvite: "Accepter l’invitation",
     alreadyMember: "Déjà membre",
@@ -472,6 +498,7 @@ registerLanguage("fr", {
     joinGroup: "Rejoindre le groupe",
     title: "Invitation",
   },
+  // Labels and validation messages for shopping items and purchases.
   item: {
     actualPricePaid: "Prix réellement payé",
     addItem: "Ajouter un article",
@@ -515,6 +542,7 @@ registerLanguage("fr", {
     startDate: "Date de début",
     endDate: "Date de fin",
   },
+  // Names and labels for supported quantity units.
   measurementUnits: {
     title: "Unités de mesure",
     description: "Choisissez le système de mesure que ShopMate doit utiliser.",
@@ -527,6 +555,7 @@ registerLanguage("fr", {
     savedTitle: "Unités de mesure mises à jour",
     savedMessage: "Votre préférence d’unité de mesure a été enregistrée.",
   },
+  // Labels and messages for the notification center.
   notifications: {
     all: "Toutes",
     allRead: "Toutes les notifications ont été marquées comme lues",
@@ -561,6 +590,7 @@ registerLanguage("fr", {
     recurringItemAddedMessage:
       "{{itemName}} a de nouveau été ajouté à votre liste de courses.",
   },
+  // Copy displayed in the privacy policy view.
   privacy: {
     title: "Politique de confidentialité",
     lastUpdated: "Dernière mise à jour : 1 septembre 2026",
@@ -586,6 +616,7 @@ registerLanguage("fr", {
     contactMessage:
       "Pour toute question ou demande relative à la confidentialité, veuillez contacter l’équipe d’assistance ShopMate.",
   },
+  // Labels and messages for profile and account details.
   profile: {
     account: "Compte",
     accountInformation: "Informations du compte",
@@ -610,6 +641,7 @@ registerLanguage("fr", {
     title: "Profil",
     updateProfile: "Mettre à jour le profil",
   },
+  // Labels and validation messages for account registration.
   register: {
     accountExistsMessage: "Un compte avec cette adresse e-mail existe déjà.",
     accountExistsTitle: "Compte déjà existant",
@@ -631,6 +663,7 @@ registerLanguage("fr", {
     title: "Inscription",
   },
 
+  // Labels and messages for PIN, biometric, and app-lock settings.
   security: {
     invalidPinTitle: "PIN invalide",
     invalidPinMessage: "Le PIN doit contenir de 4 à 6 chiffres.",
@@ -666,6 +699,9 @@ registerLanguage("fr", {
     appLockDescription: "Exiger une authentification pour accéder à ShopMate.",
     biometricLoginDescription:
       "Utilisez l’authentification biométrique pour vous connecter à ShopMate.",
+    biometricEnabledTitle: "Biométrie activée",
+    biometricEnabledMessage:
+      "La connexion biométrique a été activée avec succès.",
     appLocked: "ShopMate verrouillé",
     enterPinToUnlock: "Saisissez votre code PIN pour continuer.",
     pinPlaceholder: "PIN",
@@ -692,6 +728,7 @@ registerLanguage("fr", {
     biometricUnavailableMessage:
       "L’authentification biométrique n’est pas disponible sur cet appareil.",
   },
+  // Labels for preferences and settings actions.
   settings: {
     about: "À propos de ShopMate",
     account: "Compte",
@@ -717,6 +754,7 @@ registerLanguage("fr", {
     theme: "Thème",
     title: "Paramètres",
   },
+  // Copy displayed in the terms and conditions view.
   terms: {
     title: "Conditions générales",
     lastUpdated: "Dernière mise à jour : 1 septembre 2026",

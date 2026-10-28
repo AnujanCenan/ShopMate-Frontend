@@ -26,28 +26,28 @@
 /* Empty State Text */
 .emptyStateText {
   color: var(--mutedTextColor);
-  font-size: 18px;
+  font-size: var(--fontSizeLarge);
 }
 /* Duplicate Message */
 .duplicateMessage {
   margin-bottom: 14px;
   color: var(--textSecondary);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   line-height: 1.5;
 }
 /* Delete Message */
 .deleteMessage {
   margin-bottom: 18px;
   color: var(--textSecondary);
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   line-height: 1.5;
 }
 /* Read Only Banner */
 .readOnlyBanner {
-  padding: 16px;
-  margin-bottom: 24px;
-  background: #fff7ed;
-  color: #c2410c;
-  border-radius: 18px;
-  font-size: 14px;
+  padding: var(--spacingMedium);
+  margin-bottom: var(--spacingLarge);
+  background: var(--warningSurface);
+  color: var(--warningText);
+  border-radius: var(--radiusRoomy);
+  font-size: var(--fontSizeSmall);
 }

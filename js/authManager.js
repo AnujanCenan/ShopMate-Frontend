@@ -34,7 +34,7 @@
 │   ├── validateRegistrationDetails()
 │   ├── isEmailRegistered()
 │   ├── createUserAccount()
-│   └── createGroup()
+│   └── createRegistrationGroup()
 │
 ├── Session Management
 │   ├── createUserSession()
@@ -44,7 +44,6 @@
 │   └── getUserPrimaryGroup()
 │
 ├── Authorization Helpers
-│   ├── isAdmin()
 │   ├── getCurrentGroupMembers()
 │   ├── getCurrentUserRole()
 │   └── isGroupMember()
@@ -87,6 +86,33 @@
 function getCurrentUser() {
   return state.currentUser || null;
 }
+/* Check whether the account has an enabled app lock method configured. */
+function isUserAppLockReady(user) {
+  const security = user?.security || {};
+  return (
+    security.appLockEnabled === true &&
+    ((security.pinEnabled === true && !!security.pin) ||
+      user?.biometricEnabled === true)
+  );
+}
+/* Get the user whose App Lock is being checked, including after logout. */
+function getApplicationLockUser() {
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    return currentUser;
+  }
+  if (appState.lockedUserId) {
+    return (
+      (appState.users || []).find(function (user) {
+        return user.id === appState.lockedUserId;
+      }) || null
+    );
+  }
+
+  // Upgrade older signed-out single-user data created before lockedUserId existed.
+  const eligibleUsers = (appState.users || []).filter(isUserAppLockReady);
+  return eligibleUsers.length === 1 ? eligibleUsers[0] : null;
+}
 /* Check Login Status - Returns whether a valid user session currently exists. */
 function isUserLoggedIn() {
   return state.loggedIn;
@@ -97,9 +123,7 @@ function redirectIfLoggedOut() {
     window.location.href = "../pages/loginPage.html";
   }
 }
-/* Redirect Logged-In Users - Prevents authenticated users from accessing authentication pages,
-   except when App Lock has explicitly sent them to the login fallback. */
-
+/* Keep signed-in users out of auth pages, except during the App Lock login fallback. */
 function redirectIfLoggedIn() {
   if (!isUserLoggedIn()) {
     return;
@@ -324,7 +348,7 @@ async function registerUser(event) {
     "",
   );
   /* Create Shopping Group */
-  createGroup(groupName, user);
+  createRegistrationGroup(groupName, user);
   /* Start User Session */
   createUserSession(user);
   /* Welcome New User */
@@ -423,9 +447,13 @@ function createUserAccount(
   saveAppState();
   return user;
 }
-/* Create Group - Creates a new shopping group and assigns the registering user as the administrator. */
-function createGroup(groupName, user) {
+/* Create the initial group during registration and assign the registering user as its administrator. */
+function createRegistrationGroup(groupName, user) {
   appState.groups[groupName] = [];
+  if (!appState.groupCreators) {
+    appState.groupCreators = {};
+  }
+  appState.groupCreators[groupName] = user.id || user.email;
   if (!appState.groupMembers) {
     appState.groupMembers = {};
   }
@@ -443,6 +471,7 @@ function createGroup(groupName, user) {
 /* Create User Session - Creates a new authenticated session for the specified user. */
 function createUserSession(user) {
   appState.loggedIn = true;
+  appState.lockedUserId = null;
   appState.currentUser = {
     id: user.id,
     firstName: user.firstName,
@@ -523,6 +552,21 @@ function getUserPrimaryGroup(userId) {
 }
 /* Logout User - Logs out the current user and redirects to the login page. */
 function logoutUser() {
+  const currentUser = getCurrentUser();
+  const storedUser = currentUser &&
+    (appState.users || []).find(function (user) {
+      return user.id === currentUser.id;
+    });
+  const userToLock = storedUser || currentUser;
+  const security = userToLock?.security || {};
+  const hasUnlockMethod =
+    (security.pinEnabled === true && !!security.pin) ||
+    userToLock?.biometricEnabled === true;
+
+  appState.lockedUserId =
+    security.appLockEnabled === true && hasUnlockMethod
+      ? userToLock.id
+      : null;
   clearUserSession();
   window.location.href = "../pages/loginPage.html";
 }
@@ -587,7 +631,16 @@ async function joinGroupFromInvite(inviteCode) {
     showDialog(t("auth.groupNotFound"), t("auth.groupNotFoundMessage"));
     return;
   }
-  if (isGroupMember(currentUser.id)) {
+  if (
+    groupMembers.some(function (member) {
+      return (
+        member.id === currentUser.id ||
+        (member.email &&
+          currentUser.email &&
+          member.email.toLowerCase() === currentUser.email.toLowerCase())
+      );
+    })
+  ) {
     showDialog(t("auth.alreadyMember"), t("auth.alreadyMemberMessage"));
     return;
   }
@@ -595,7 +648,7 @@ async function joinGroupFromInvite(inviteCode) {
     id: currentUser.id,
     name: currentUser.name,
     email: currentUser.email,
-    role: "member",
+    role: invite.role === "admin" ? "admin" : "member",
   });
   appState.activeGroup = invite.groupName;
   saveAppState();
@@ -694,19 +747,6 @@ async function isBiometricEnabled() {
   }
   return currentUser.biometricEnabled || false;
 }
-/* Base64URL Encode - Converts an ArrayBuffer into a WebAuthn-safe string. */
-function bufferToBase64Url(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  bytes.forEach(function (byte) {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-}
-
 /* Enable Biometric Authentication - Registers the current device authenticator. */
 async function enableBiometricAuthentication() {
   const currentUser = getCurrentUser();
@@ -900,7 +940,7 @@ async function toggleAppLock() {
 }
 /* Authenticate With Biometrics - Authenticates using the registered device credential. */
 async function authenticateWithBiometrics() {
-  const currentUser = getCurrentUser();
+  const currentUser = getApplicationLockUser();
   if (!currentUser || currentUser.biometricEnabled !== true) {
     return false;
   }
@@ -942,12 +982,16 @@ async function unlockApplication() {
     window.location.href = "../pages/loginPage.html";
     return;
   }
+  createUserSession(getApplicationLockUser());
+  sessionStorage.removeItem("shopMateSecurityLoginFallback");
+  sessionStorage.setItem("shopMateAppUnlocked", "true");
   window.location.href = "../pages/dashboardPage.html";
 }
 /* App Lock State */
 let applicationLocked = false;
 const MAX_AUTH_ATTEMPTS = 3;
 
+/* Read the failed-attempt counter for the selected authentication method. */
 function getAuthenticationAttemptCount(type) {
   const key =
     type === "biometric" ? "shopMateBiometricAttempts" : "shopMatePinAttempts";
@@ -955,6 +999,7 @@ function getAuthenticationAttemptCount(type) {
   return Number(sessionStorage.getItem(key) || "0");
 }
 
+/* Increment and return the failed-attempt counter for one authentication method. */
 function incrementAuthenticationAttempt(type) {
   const key =
     type === "biometric" ? "shopMateBiometricAttempts" : "shopMatePinAttempts";
@@ -966,14 +1011,15 @@ function incrementAuthenticationAttempt(type) {
   return attempts;
 }
 
+/* Clear failed biometric and PIN attempt counters after successful authentication. */
 function resetAuthenticationAttempts() {
   sessionStorage.removeItem("shopMateBiometricAttempts");
   sessionStorage.removeItem("shopMatePinAttempts");
 }
 /* Check App Lock Status */
 /* Check Whether App Launch Authentication Is Required */
-async function isApplicationLockEnabled() {
-  const currentUser = getCurrentUser();
+function isApplicationLockEnabled() {
+  const currentUser = getApplicationLockUser();
   if (!currentUser) {
     return false;
   }
@@ -1005,7 +1051,7 @@ async function unlockApplicationWithPin() {
   }
 
   const enteredPin = pinInput.value.trim();
-  const currentUser = getCurrentUser();
+  const currentUser = getApplicationLockUser();
 
   if (
     !currentUser ||
@@ -1020,6 +1066,7 @@ async function unlockApplicationWithPin() {
    * Correct PIN
    */
   if (enteredPin === currentUser.security.pin) {
+    createUserSession(currentUser);
     applicationLocked = false;
 
     resetAuthenticationAttempts();
@@ -1067,92 +1114,98 @@ async function renderApplicationLockScreen() {
   if (document.getElementById("appLockScreen")) {
     return;
   }
-  const currentUser = getCurrentUser();
+  const currentUser = getApplicationLockUser();
   if (!currentUser) {
     window.location.href = "../pages/loginPage.html";
     return;
   }
-  const security = currentUser.security || {};
-  const biometricEnabled = currentUser.biometricEnabled === true;
-  const pinEnabled = security.pinEnabled === true && !!security.pin;
   const lockScreen = document.createElement("div");
   lockScreen.id = "appLockScreen";
-  lockScreen.className = "appLockScreen";
+  lockScreen.className = "appLockOverlay";
   lockScreen.innerHTML = `
-    <div class="appLockCard">
-      <div class="appLockIcon">
-        🔒
-      </div>
-      <h1 class="appLockTitle">
-        ${t("security.appLocked")}
-      </h1>
-      <p class="appLockDescription">
-        ${t("security.chooseUnlockMethod")}
-      </p>
-      ${
-        biometricEnabled
-          ? `
-            <button
-              type="button"
-              class="primaryButton appLockBiometricButton"
-              onclick="unlockApplicationWithBiometrics()"
-            >
-              ${t("security.useBiometric")}
+    <main class="appLockPage">
+      <section class="appLockBrandSection" aria-label="ShopMate">
+        <div class="appLockBrand">
+          <img class="appLockLogo" src="../assets/logos/shopMateLogo.png" alt="" />
+          <span class="appLockTagline">${t("auth.tagline")}</span>
+        </div>
+      </section>
+      <section class="appLockAccessSection">
+        <div class="appLockAccessContent">
+          <h1 class="appLockTitle">${t("security.appLocked")}</h1>
+          <p class="appLockDescription">${t("security.chooseUnlockMethod")}</p>
+          <div class="appLockPinSection" id="appLockPinSection" hidden>
+            <label class="visuallyHidden" for="appLockPinInput">
+              ${t("security.enterPinToUnlock")}
+            </label>
+            <input
+              id="appLockPinInput"
+              class="appLockPinInput"
+              type="password"
+              inputmode="numeric"
+              maxlength="6"
+              autocomplete="one-time-code"
+              placeholder="${t("security.pinPlaceholder")}"
+              aria-describedby="appLockError"
+            />
+            <div id="appLockError" class="appLockError" role="alert" aria-live="polite"></div>
+            <button type="button" class="appLockPinButton" id="appLockPinButton">
+              ${t("security.unlockWithPin")}
             </button>
-            <div
-        id="appLockBiometricError"
-        class="appLockError"
-      ></div>
-          `
-          : ""
-      }
-      ${
-        pinEnabled
-          ? `
-            <div class="appLockPinSection">
-
-              <input
-                id="appLockPinInput"
-                class="appLockPinInput"
-                type="password"
-                inputmode="numeric"
-                maxlength="6"
-                autocomplete="off"
-                placeholder="${t("security.pinPlaceholder")}"
-              />
-              <div
-                id="appLockError"
-                class="appLockError"
-              ></div>
-              <button
-                type="button"
-                class="primaryButton appLockPinButton"
-                onclick="unlockApplicationWithPin()"
-              >
-                ${t("security.unlockWithPin")}
-              </button>
-            </div>
-          `
-          : ""
-      }
-    </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="appLockBiometricButton"
+          id="appLockBiometricButton"
+          aria-label="${t("security.useBiometric")}"
+          title="${t("security.useBiometric")}"
+          hidden
+        >
+          <img
+            id="appLockBiometricIcon"
+            src="${getIconPath("biometric", "fingerprint")}"
+            alt=""
+            class="appLockBiometricIcon"
+          />
+        </button>
+        <div id="appLockBiometricError" class="appLockBiometricError" role="alert" aria-live="polite"></div>
+      </section>
+    </main>
   `;
   document.body.appendChild(lockScreen);
+
+  const security = currentUser.security || {};
+  const pinEnabled =
+    security.pinEnabled === true && !!security.pin;
+  const biometricEnabled = currentUser.biometricEnabled === true;
+  const pinSection = document.getElementById("appLockPinSection");
+  const biometricButton = document.getElementById("appLockBiometricButton");
+
+  if (pinSection) {
+    pinSection.hidden = !pinEnabled;
+  }
+  if (biometricButton) biometricButton.hidden = !biometricEnabled;
+
   const pinInput = document.getElementById("appLockPinInput");
   if (pinInput) {
-    pinInput.focus();
     pinInput.addEventListener("keydown", function (event) {
       if (event.key === "Enter") {
         unlockApplicationWithPin();
       }
     });
   }
+
+  const pinButton = document.getElementById("appLockPinButton");
+  pinButton?.addEventListener("click", unlockApplicationWithPin);
+  biometricButton?.addEventListener("click", unlockApplicationWithBiometrics);
 }
 /* Unlock Application With Biometrics */
 async function unlockApplicationWithBiometrics() {
   const authenticated = await authenticateWithBiometrics();
 
   if (authenticated) {
+    createUserSession(getApplicationLockUser());
     applicationLocked = false;
 
     resetAuthenticationAttempts();
@@ -1178,7 +1231,7 @@ async function unlockApplicationWithBiometrics() {
 
   sessionStorage.removeItem("shopMateBiometricAttempts");
 
-  const currentUser = getCurrentUser();
+  const currentUser = getApplicationLockUser();
 
   const pinEnabled =
     currentUser &&
@@ -1227,19 +1280,22 @@ function initializeApplicationLock() {
     return false;
   }
 
-  applicationLocked = true;
-
   lockApplication();
 
   return true;
 }
 /* Initialize App Entry*/
 function initializeApplicationEntry() {
-  if (!isUserLoggedIn()) {
+  if (sessionStorage.getItem("shopMateSecurityLoginFallback") === "true") {
     return false;
   }
 
-  if (sessionStorage.getItem("shopMateSecurityLoginFallback") === "true") {
+  if (!isUserLoggedIn()) {
+    if (isApplicationLockEnabled()) {
+      applicationLocked = true;
+      renderApplicationLockScreen();
+      return true;
+    }
     return false;
   }
 

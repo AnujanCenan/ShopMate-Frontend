@@ -6,15 +6,17 @@
  *
  * IMPORTANT
  * This file registers itself with the localization registry.
- * The structure and keys must always match en.js.
+ * Keep namespace and key names aligned with en.js; translate values only.
  ***************************************************************************************************/
 registerLanguage("ta", {
+  // Text and metadata shown in the application information screen.
   about: {
     description:
-      "ShopMate உங்கள் பகிரப்பட்ட ஷாப்பிங் தேவைகளை ஒரே இடத்தில் ஒழுங்கமைத்து நிர்வகிக்க உதவுகிறது.",
+      "ShopMate, நீங்கள் பகிர்ந்து கொள்ளும் பொருட்கள் வாங்கும் தேவைகளை ஒரே இடத்தில் ஒழுங்குபடுத்தி, எளிதாக நிர்வகிக்க உதவுகிறது",
     version: "பதிப்பு",
     copyright: "© 2026 ShopMate. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.",
   },
+  // Labels and messages for sign-in, registration, and authentication errors.
   auth: {
     alreadyMember: "ஏற்கனவே உறுப்பினர்",
     alreadyMemberMessage:
@@ -22,7 +24,7 @@ registerLanguage("ta", {
     authenticationRequired: "அங்கீகாரம் தேவை",
     authenticationRequiredMessage: "குழுவில் சேர்வதற்கு முன் உள்நுழையவும்.",
     confirmPassword: "கடவுச்சொல்லை உறுதிப்படுத்து",
-    createShoppingGroup: "ஷாப்பிங் குழுவை உருவாக்கு",
+    createShoppingGroup: "கடைவலம் குழுவை உருவாக்கு",
     emailAddress: "மின்னஞ்சல் முகவரி",
     firstName: "முதல் பெயர்",
     forgotPassword: "கடவுச்சொல்லை மறந்துவிட்டீர்களா?",
@@ -36,7 +38,7 @@ registerLanguage("ta", {
       "உங்கள் மின்னஞ்சல் முகவரி மற்றும் கடவுச்சொல்லை சரிபார்க்கவும்.",
     invitedSubText:
       "உங்கள் பதிவு செய்யப்பட்ட மின்னஞ்சல் முகவரிக்கு அனுப்பப்பட்ட அழைப்பைப் பயன்படுத்தவும்.",
-    invitedText: "ஷாப்பிங் குழுவில் சேர நீங்கள் அழைக்கப்பட்டுள்ளீர்களா?",
+    invitedText: "கடைவலம் குழுவில் சேர நீங்கள் அழைக்கப்பட்டுள்ளீர்களா?",
     lastName: "கடைசி பெயர்",
     login: "உள்நுழை",
     loginFailed: "உள்நுழைவு தோல்வியடைந்தது",
@@ -63,32 +65,34 @@ registerLanguage("ta", {
     tagline: "உங்கள் ஷாப்பிங்கை ஒன்றாக நிர்வகிக்கவும்",
     welcomeBack: "மீண்டும் வரவேற்கிறோம்",
   },
+  // Labels and guidance used by budget analysis views.
   budget: {
     amount: "தொகை",
-    budget: "பட்ஜெட்",
-    budgetExceeded: "பட்ஜெட் வரம்பு மீறப்பட்டது",
-    budgetExceededMessage: "உங்கள் பட்ஜெட் வரம்பை மீறியுள்ளீர்கள்.",
-    budgetExceededToast: "பட்ஜெட் வரம்பு மீறப்பட்டது",
-    budgetHealth: "பட்ஜெட் நிலை",
-    budgetLimit: "பட்ஜெட் வரம்பு",
-    budgetOptions: "பட்ஜெட் விருப்பங்கள்",
-    budgetSettings: "பட்ஜெட் அமைப்புகள்",
-    budgetUpdated: "பட்ஜெட் புதுப்பிக்கப்பட்டது",
-    categoryBudget: "வகை பட்ஜெட்",
+    budget: "பாதீடு",
+    budgetExceeded: "பாதீட்டு வரம்பை மீறிவிட்டது",
+    budgetExceededMessage: "உங்கள் பாதீட்டு வரம்பை மீறியுள்ளீர்கள்.",
+    budgetExceededToast: "பாதீட்டு வரம்பை மீறிவிட்டது",
+    budgetHealth: "பாதீடு நிலை",
+    budgetLimit: "பாதீடு வரம்பு",
+    budgetOptions: "பாதீடு விருப்பங்கள்",
+    budgetSettings: "பாதீடு அமைப்புகள்",
+    budgetUpdated: "பாதீடு புதுப்பிக்கப்பட்டது",
+    categoryBudget: "வகை பாதீடு",
     currentSpending: "தற்போதைய செலவு",
-    deleteBudget: "பட்ஜெட்டை நீக்கு",
-    editBudget: "பட்ஜெட்டைத் திருத்து",
+    deleteBudget: "பாதீட்டை நீக்கு",
+    editBudget: "பாதீட்டைத் திருத்து",
     exceeded: "மீறப்பட்டது",
-    monthlyBudget: "மாதாந்திர பட்ஜெட்",
+    monthlyBudget: "மாதாந்திர பாதீடு",
     noSpendingYet: "இதுவரை செலவு எதுவும் இல்லை",
-    onlyAdminCanEdit: "நிர்வாகி மட்டுமே பட்ஜெட்டைத் திருத்த முடியும்.",
+    onlyAdminCanEdit: "நிர்வாகி மட்டுமே பாதீட்டைத் திருத்த முடியும்.",
     remaining: "மீதமுள்ளது",
-    setBudget: "பட்ஜெட்டை அமை",
+    setBudget: "பாதீட்டை அமை",
     spending: "செலவு",
     spent: "செலவிடப்பட்டது",
-    title: "பட்ஜெட்",
-    totalBudget: "மொத்த பட்ஜெட்",
+    title: "பாதீடு",
+    totalBudget: "மொத்த பாதீடு",
   },
+  // Labels and messages for category creation and management.
   category: {
     add: "சேர்",
     addCategory: "வகையைச் சேர்",
@@ -124,8 +128,15 @@ registerLanguage("ta", {
     renameCategory: "வகையின் பெயரை மாற்று",
     searchItems: "பொருட்களைத் தேடு",
     shop: "கடை",
+    sortDefault: "இயல்புநிலை வரிசை",
+    sortNewestFirst: "சமீபத்தில் சேர்த்தவை முதலில்",
+    sortNewestLast: "சமீபத்தில் சேர்த்தவை கடைசியில்",
+    sortItems: "பொருட்களை வரிசைப்படுத்து",
+    sortOneOffFirst: "ஒருமுறை மட்டும் வாங்கும் பொருட்கள் முதலில்",
+    sortRecurringFirst: "மீண்டும் வாங்கும் பொருட்கள் முதலில்",
     title: "ShopMate வகை",
   },
+  // Confirmation text shown before deleting local app data.
   clearLocalData: {
     title: "உள்ளூர் தரவை அழி",
     description:
@@ -134,6 +145,7 @@ registerLanguage("ta", {
       "இந்த சாதனத்தில் சேமிக்கப்பட்டுள்ள ShopMate தரவு நீக்கப்படும். உங்கள் ShopMate கணக்கும் சர்வரில் உள்ள தரவும் நீக்கப்படாது.",
     clear: "தரவை அழிக்கவும்",
   },
+  // Shared labels reused across multiple screens and dialogs.
   common: {
     add: "சேர்",
     appName: "ShopMate",
@@ -174,6 +186,7 @@ registerLanguage("ta", {
     itemDeleted: "{{itemName}} நீக்கப்பட்டது",
     quantityUnit: "அளவு அலகு",
   },
+  // Names and symbols for supported currencies.
   currency: {
     title: "நாணயம்",
     description: "ShopMate பயன்படுத்த வேண்டிய நாணயத்தைத் தேர்ந்தெடுக்கவும்.",
@@ -186,6 +199,7 @@ registerLanguage("ta", {
     savedTitle: "நாணயம் புதுப்பிக்கப்பட்டது",
     savedMessage: "உங்கள் நாணய விருப்பம் சேமிக்கப்பட்டது.",
   },
+  // Dashboard labels, budget states, and group/category actions.
   dashboard: {
     addItem: "பொருளைச் சேர்",
     addNewCategory: "புதிய வகையைச் சேர்",
@@ -196,11 +210,11 @@ registerLanguage("ta", {
     backupRestored: "காப்புப்பிரதி மீட்டமைக்கப்பட்டது",
     backupRestoredMessage:
       "உங்கள் பயன்பாட்டுத் தரவு வெற்றிகரமாக மீட்டமைக்கப்பட்டது.",
-    budget: "பட்ஜெட்",
-    budgetAmount: "பட்ஜெட் தொகை",
-    budgetAnalysis: "பட்ஜெட் பகுப்பாய்வு",
-    budgetCannotBeNegative: "பட்ஜெட் எதிர்மறையாக இருக்க முடியாது.",
-    budgetExceeded: "பட்ஜெட் வரம்பு மீறப்பட்டது.",
+    budget: "பாதீடு",
+    budgetAmount: "பாதீடு தொகை",
+    budgetAnalysis: "பாதீடு பகுப்பாய்வு",
+    budgetCannotBeNegative: "பாதீடு எதிர்மறையாக இருக்க முடியாது.",
+    budgetExceeded: "பாதீடு வரம்பு மீறப்பட்டது.",
     budgetHealth: {
       critical: "மிகவும் முக்கியமானது",
       full: "முழுமையானது",
@@ -208,18 +222,23 @@ registerLanguage("ta", {
       unlimited: "வரம்பற்றது",
       warning: "எச்சரிக்கை",
     },
-    budgetUpdated: "பட்ஜெட் புதுப்பிக்கப்பட்டது",
-    budgetUsage: "பட்ஜெட் பயன்பாடு",
+    budgetUpdated: "பாதீடு புதுப்பிக்கப்பட்டது",
+    budgetUsage: "பாதீடு பயன்பாடு",
     categories: "வகைகள்",
+    sortCategories: "வகைகளை வரிசைப்படுத்து",
+    sortDefault: "இயல்புநிலை வரிசை",
+    sortNewestFirst: "சமீபத்தில் சேர்த்தவை முதலில்",
+    sortNewestLast: "சமீபத்தில் சேர்த்தவை கடைசியில்",
+    sortMostPending: "நிலுவையில் உள்ளவை அதிகம்",
     categoryActions: "வகை செயல்கள்",
     categoryAlreadyExists: "இந்த பெயரில் ஒரு வகை ஏற்கனவே உள்ளது.",
-    categoryBudget: "வகை பட்ஜெட்",
-    categoryBudgetExceeded: "வகை பட்ஜெட் வரம்பு மீறப்பட்டது",
+    categoryBudget: "வகை பாதீடு",
+    categoryBudgetExceeded: "வகை பாதீடு வரம்பு மீறப்பட்டது",
     categoryBudgetExceededMessage:
-      "மொத்தம் ஒதுக்கப்பட்ட பட்ஜெட் $${totalAllocated}. குழு பட்ஜெட் $${groupBudget} மட்டுமே. மற்றொரு வகையின் பட்ஜெட்டைக் குறைக்கவும் அல்லது குழு பட்ஜெட்டை அதிகரிக்கவும்.",
-    categoryBudgetSaved: "வகை பட்ஜெட் சேமிக்கப்பட்டது",
+      "மொத்தம் ஒதுக்கப்பட்ட பாதீடு $${totalAllocated}. குழு பாதீடு $${groupBudget} மட்டுமே. மற்றொரு வகையின் பாதீட்டைக் குறைக்கவும் அல்லது குழு பாதீட்டை அதிகரிக்கவும்.",
+    categoryBudgetSaved: "வகை பாதீடு சேமிக்கப்பட்டது",
     categoryBudgetsExceedGroupBudget:
-      "வகை பட்ஜெட்டுகள் குழு பட்ஜெட்டை விட அதிகமாக உள்ளன.",
+      "வகை பாதீடுகள் குழு பாதீட்டை விட அதிகமாக உள்ளன.",
     categoryCreated: "வகை வெற்றிகரமாக உருவாக்கப்பட்டது.",
     categoryDeleted: "வகை வெற்றிகரமாக நீக்கப்பட்டது.",
     categoryExistsMessage: "இந்த பெயரில் ஒரு வகை ஏற்கனவே உள்ளது.",
@@ -232,14 +251,15 @@ registerLanguage("ta", {
     createCategoryTitle: "வகையை உருவாக்கு",
     createGroup: "குழுவை உருவாக்கு",
     createGroupButton: "குழுவை உருவாக்கு",
-    createGroupTitle: "ஷாப்பிங் குழுவை உருவாக்கு",
+    createGroupTitle: "கடைவலம் குழுவை உருவாக்கு",
     createNewGroup: "புதிய குழுவை உருவாக்கு",
+    changeGroupColor: "குழுவின் நிறத்தை மாற்று",
     currentUserUnavailable: "தற்போதைய பயனரை அடையாளம் காண முடியவில்லை.",
     deleteCategory: "வகையை நீக்கு",
     deleteCategoryConfirmation: "இந்த வகையை நீக்க விரும்புகிறீர்களா",
     deleteGroup: "குழுவை நீக்கு",
     deleteGroupConfirmationDetails:
-      "இந்தக் குழுவில் உள்ள அனைத்து வகைகள், ஷாப்பிங் பொருட்கள், பட்ஜெட்டுகள் மற்றும் உறுப்பினர்களும் நிரந்தரமாக நீக்கப்படுவார்கள்.",
+      "இந்தக் குழுவில் உள்ள அனைத்து வகைகள், கடைவலம் பொருட்கள், பட்ஜெட்டுகள் மற்றும் உறுப்பினர்களும் நிரந்தரமாக நீக்கப்படுவார்கள்.",
     deleteGroupConfirmationStart: "இந்தக் குழுவை நீக்க விரும்புகிறீர்களா",
     deleteGroupConfirmationWarning: "இந்த செயலை மீண்டும் மாற்ற முடியாது.",
     editBudget: "பட்ஜெட்டைத் திருத்து",
@@ -252,14 +272,20 @@ registerLanguage("ta", {
     group: "குழு",
     groupActions: "குழு செயல்கள்",
     groupAlreadyExists: "இந்த பெயரில் ஒரு குழு ஏற்கனவே உள்ளது.",
-    groupBudget: "குழு பட்ஜெட்",
+    groupBudget: "குழு பாதீடு ",
     groupBudgetBelowAllocated:
-      "உங்கள் வகை பட்ஜெட்டுகளின் மொத்தம் ஏற்கனவே $${allocated}. குழு பட்ஜெட்டை அதிகரிக்கவும் அல்லது வகை பட்ஜெட்டுகளைக் குறைக்கவும்.",
+      "உங்கள் வகை பாதீடுகளின் மொத்தம் ஏற்கனவே $${allocated}. குழு பாதீட்டை அதிகரிக்கவும் அல்லது வகை பாதீடுகளைக் குறைக்கவும்.",
     groupBudgetUpdatedMessage:
-      "{{groupName}} பட்ஜெட் ${{amount}} ஆக புதுப்பிக்கப்பட்டது.",
-    groupCreated: "ஷாப்பிங் குழு வெற்றிகரமாக உருவாக்கப்பட்டது.",
+      "{{groupName}} பாதீடு  ${{amount}} ஆக புதுப்பிக்கப்பட்டது.",
+    groupColor: "குழு நிறம்",
+    groupColorInUse: "மற்றொரு குழு ஏற்கனவே இந்த நிறத்தைப் பயன்படுத்துகிறது",
+    groupColorOption: "நிறம் {{number}}",
+    groupColorTitle: "குழுவின் நிறத்தை மாற்று",
+    groupColorUnavailable: "கிடைக்கும் நிறத்தைத் தேர்ந்தெடுக்கவும்.",
+    groupColorUpdated: "குழு நிறம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது.",
+    groupCreated: "கடைவலம் குழு வெற்றிகரமாக உருவாக்கப்பட்டது.",
     groupDeleted: "குழு வெற்றிகரமாக நீக்கப்பட்டது.",
-    groupExistsMessage: "இந்த பெயரில் ஒரு ஷாப்பிங் குழு ஏற்கனவே உள்ளது.",
+    groupExistsMessage: "இந்த பெயரில் ஒரு கடைவலம் குழு ஏற்கனவே உள்ளது.",
     groupExistsTitle: "குழு ஏற்கனவே உள்ளது",
     groupManagement: "குழு மேலாண்மை",
     groupName: "குழுவின் பெயர்",
@@ -268,27 +294,27 @@ registerLanguage("ta", {
     groupNameMaxLength: "குழுவின் பெயர் 40 எழுத்துகளுக்கு மேல் இருக்கக்கூடாது.",
     groupNameMinLength:
       "குழுவின் பெயரில் குறைந்தது 2 எழுத்துகள் இருக்க வேண்டும்.",
-    groupNamePlaceholder: "ஷாப்பிங் குழுவின் பெயர்",
+    groupNamePlaceholder: "கடைவலம் குழுவின் பெயர்",
     groupNameRequired: "குழுவின் பெயரை உள்ளிடவும்.",
-    groupNameRequiredMessage: "ஷாப்பிங் குழுவின் பெயரை உள்ளிடவும்.",
+    groupNameRequiredMessage: "கடைவலம் குழுவின் பெயரை உள்ளிடவும்.",
     groupNameRequiredTitle: "குழுவின் பெயர் தேவை",
     groupRenamed: "குழுவின் பெயர் வெற்றிகரமாக மாற்றப்பட்டது.",
     import: "இறக்குமதி",
     invalidBackupFile: "தவறான காப்புப்பிரதி கோப்பு",
     invalidBackupFileMessage:
       "தேர்ந்தெடுக்கப்பட்ட கோப்பு சரியான காப்புப்பிரதி கோப்பு அல்ல.",
-    invalidBudget: "தவறான பட்ஜெட்",
+    invalidBudget: "தவறான பாதீடு ",
     invalidEmail: "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்.",
-    invalidGroupBudget: "தவறான குழு பட்ஜெட்",
+    invalidGroupBudget: "தவறான குழு பாதீடு",
     invitationSent: "அழைப்பு வெற்றிகரமாக அனுப்பப்பட்டது.",
     inviteMember: "உறுப்பினரை அழைக்கவும்",
     invitingMemberTo: "உறுப்பினரை அழைக்கும் குழு",
     items: "பொருட்கள்",
     left: "மீதம்",
     memberAlreadyExists: "இந்த பயனர் ஏற்கனவே குழுவில் உறுப்பினராக உள்ளார்.",
-    monthlyBudget: "மாதாந்திர பட்ஜெட்",
-    monthlyBudgetLimit: "மாதாந்திர பட்ஜெட் வரம்பு",
-    monthlyGroupBudget: "மாதாந்திர குழு பட்ஜெட்",
+    monthlyBudget: "மாதாந்திர பாதீடு",
+    monthlyBudgetLimit: "மாதாந்திர பாதீடு வரம்பு",
+    monthlyGroupBudget: "மாதாந்திர குழு பாதீடு",
     noCategories: "இன்னும் வகைகள் இல்லை",
     noGroupSelected: "குழு எதுவும் தேர்ந்தெடுக்கப்படவில்லை",
     noItems: "பொருட்கள் எதுவும் இல்லை",
@@ -301,21 +327,22 @@ registerLanguage("ta", {
     remainingThisMonth: "இந்த மாதம் மீதமுள்ளது.",
     renameCategory: "வகையின் பெயரை மாற்று",
     renameGroup: "குழுவின் பெயரை மாற்று",
-    saveBudget: "பட்ஜெட்டைச் சேமி",
+    saveBudget: "பாதீட்டைச் சேமி",
     selectGroup: "குழுவைத் தேர்ந்தெடுக்கவும்",
-    selectGroupMessage: "முதலில் ஒரு ஷாப்பிங் குழுவைத் தேர்ந்தெடுக்கவும்.",
+    selectGroupMessage: "முதலில் ஒரு கடைவலக் குழுவைத் தேர்ந்தெடுக்கவும்.",
     selectGroupTitle: "குழு எதுவும் தேர்ந்தெடுக்கப்படவில்லை",
     selectOrCreateGroup: "ஒரு குழுவைத் தேர்ந்தெடுக்கவும் அல்லது உருவாக்கவும்",
     sendInvitation: "அழைப்பை அனுப்பு",
-    setCategoryBudget: "வகை பட்ஜெட்டை அமைக்கவும்",
+    setCategoryBudget: "வகை பாதீட்டை அமைக்கவும்",
     settings: "அமைப்புகள்",
-    shoppingList: "ஷாப்பிங் பட்டியல்",
+    shoppingList: "கடைவலப் பட்டியல்",
     spent: "செலவிடப்பட்டது",
-    title: "ShopMate டாஷ்போர்டு",
+    title: "ShopMate முகப்புப் பலகை",
     unlimited: "வரம்பற்றது",
-    unlimitedBudget: "வரம்பற்ற பட்ஜெட்",
+    unlimitedBudget: "வரம்பற்ற பாதீடு",
     used: "பயன்படுத்தப்பட்டது",
   },
+  // Titles and messages for reusable confirmation dialogs.
   dialogs: {
     cancel: "ரத்து செய்",
     confirm: "உறுதிப்படுத்து",
@@ -332,6 +359,7 @@ registerLanguage("ta", {
       "உங்கள் விருப்பமான பயன்பாட்டு தோற்றம் சேமிக்கப்பட்டது.",
     themeUpdatedTitle: "தோற்றம் புதுப்பிக்கப்பட்டது",
   },
+  // Labels and messages for the favorites list.
   favorites: {
     addedToFavorites: "பிடித்தவற்றில் சேர்க்கப்பட்டது",
     addToFavorites: "பிடித்தவற்றில் சேர்",
@@ -340,6 +368,7 @@ registerLanguage("ta", {
     noFavorites: "பிடித்த பொருட்கள் எதுவும் இல்லை",
     removeFromFavorites: "பிடித்தவற்றிலிருந்து அகற்று",
   },
+  // Text used by the in-app feedback form.
   feedback: {
     title: "கருத்தை அனுப்பு",
     description:
@@ -353,6 +382,7 @@ registerLanguage("ta", {
     successMessage:
       "உங்கள் கருத்துக்கு நன்றி. உங்கள் கருத்து பரிசீலனைக்காக பதிவு செய்யப்பட்டுள்ளது.",
   },
+  // Labels and messages for password recovery.
   forgotPassword: {
     description:
       "கடவுச்சொல் மீட்டமைப்பு இணைப்பைப் பெற உங்கள் பதிவு செய்யப்பட்ட மின்னஞ்சல் முகவரியை உள்ளிடவும்.",
@@ -371,6 +401,7 @@ registerLanguage("ta", {
     sendButton: "மீட்டமைப்பு இணைப்பை அனுப்பு",
     title: "கடவுச்சொல்லை மறந்துவிட்டீர்களா?",
   },
+  // Labels and messages for groups, members, roles, and invitations.
   groupManagement: {
     acceptInvitation: "அழைப்பை ஏற்கவும்",
     addMember: "உறுப்பினரைச் சேர்",
@@ -436,26 +467,21 @@ registerLanguage("ta", {
       "நிர்வாகிகள் மட்டுமே உறுப்பினர்களை நீக்க முடியும்.",
     onlyAdminsCanResend:
       "நிர்வாகிகள் மட்டுமே அழைப்புகளை மீண்டும் அனுப்ப முடியும்.",
-    onlyAdminsCanTransferOwnership:
-      "நிர்வாகிகள் மட்டுமே உரிமையை மாற்ற முடியும்.",
-    ownershipTransferred: "உரிமை மாற்றப்பட்டது",
-    ownershipTransferredMessage:
-      "{{name}} இப்போது குழுவின் உரிமையாளராக உள்ளார்.",
-    ownershipTransferredTitle: "உரிமை மாற்றப்பட்டது",
     pendingInvitation: "நிலுவையிலுள்ள அழைப்பு",
     pendingInvitations: "நிலுவையிலுள்ள அழைப்புகள்",
     promoteAnotherAdmin:
       "வெளியேறுவதற்கு முன் மற்றொரு உறுப்பினரை நிர்வாகியாக மாற்றவும்.",
-    readOnlyAccess: "இந்தக் குழுவில் உங்களுக்கு படிக்க மட்டுமே அனுமதி உள்ளது.",
+    readOnlyAccess:
+      "குழு அமைப்புகளை நிர்வாகிகள் மட்டுமே மாற்றலாம். நீங்கள் உருவாக்கிய வகைகளை நிர்வகிக்கவும் பகிரப்பட்ட ஷாப்பிங் பட்டியலைப் பயன்படுத்தவும் முடியும்.",
     rejoinRequiresInvite: "மீண்டும் சேர புதிய அழைப்பு தேவைப்படும்.",
     removeMember: "உறுப்பினரை அகற்று",
     resend: "மீண்டும் அனுப்பவும்",
     role: "பொறுப்பு",
     sendInvitation: "அழைப்பை அனுப்பவும்",
     title: "குழு மேலாண்மை",
-    transferOwnership: "உரிமையை மாற்றவும்",
     youLeftGroup: "நீங்கள் குழுவிலிருந்து வெளியேறிவிட்டீர்கள்.",
   },
+  // Text shown when accepting a group invitation.
   invite: {
     acceptInvite: "அழைப்பை ஏற்கவும்",
     alreadyMember: "ஏற்கனவே உறுப்பினர்",
@@ -470,6 +496,7 @@ registerLanguage("ta", {
     joinGroup: "குழுவில் சேரவும்",
     title: "அழைப்பு",
   },
+  // Labels and validation messages for shopping items and purchases.
   item: {
     actualPricePaid: "செலுத்திய உண்மையான விலை",
     addItem: "பொருளைச் சேர்க்கவும்",
@@ -488,7 +515,7 @@ registerLanguage("ta", {
     estimatedPrice: "மதிப்பிடப்பட்ட விலை",
     item: "பொருள்",
     itemAdded: "பொருள் சேர்க்கப்பட்டது",
-    itemAddedMessage: "{{itemName}} ஷாப்பிங் பட்டியலில் சேர்க்கப்பட்டது.",
+    itemAddedMessage: "{{itemName}} கடைவலப் பட்டியல் சேர்க்கப்பட்டது.",
     itemAlreadyExists: "பொருள் ஏற்கனவே உள்ளது",
     itemDeleted: "பொருள் நீக்கப்பட்டது",
     itemImage: "பொருளின் படம்",
@@ -513,6 +540,7 @@ registerLanguage("ta", {
     startDate: "தொடக்க தேதி",
     endDate: "முடிவு தேதி",
   },
+  // Names and labels for supported quantity units.
   measurementUnits: {
     title: "அளவீட்டு அலகுகள்",
     description:
@@ -526,13 +554,14 @@ registerLanguage("ta", {
     savedTitle: "அளவீட்டு அலகுகள் புதுப்பிக்கப்பட்டன",
     savedMessage: "உங்கள் அளவீட்டு அலகு விருப்பம் சேமிக்கப்பட்டது.",
   },
+  // Labels and messages for the notification center.
   notifications: {
     all: "அனைத்தும்",
     allRead: "அனைத்து அறிவிப்புகளும் படிக்கப்பட்டன",
-    budget: "பட்ஜெட்",
-    budgetExceeded: "பட்ஜெட் வரம்பு மீறப்பட்டது",
-    budgetExceededMessage: "{{name}} பட்ஜெட் வரம்பை மீறியுள்ளது.",
-    budgetExceededToast: "பட்ஜெட் வரம்பு மீறப்பட்டது",
+    budget: "பாதீடு",
+    budgetExceeded: "பாதீடு வரம்பு மீறப்பட்டது",
+    budgetExceededMessage: "{{name}} பாதீடு வரம்பை மீறியுள்ளது.",
+    budgetExceededToast: "பாதீட்டு வரம்பை மீறிவிட்டது",
     clearAll: "அனைத்தையும் அழி",
     clearNotifications: "அறிவிப்புகளை அழி",
     confirmClearAll: "அனைத்து அறிவிப்புகளையும் அழிக்க விரும்புகிறீர்களா?",
@@ -552,20 +581,21 @@ registerLanguage("ta", {
     noNotificationsFound: "அறிவிப்புகள் எதுவும் கிடைக்கவில்லை.",
     notificationDeleted: "அறிவிப்பு நீக்கப்பட்டது",
     notificationsCleared: "அனைத்து அறிவிப்புகளும் அழிக்கப்பட்டன",
-    shopping: "ஷாப்பிங்",
+    shopping: "கடைவலம் ",
     system: "சிஸ்டம்",
     title: "அறிவிப்புகள்",
     unread: "படிக்காதவை",
     recurringItemAdded: "மீண்டும் சேர்க்கப்பட்ட பொருள்",
     recurringItemAddedMessage:
-      "{{itemName}} மீண்டும் உங்கள் ஷாப்பிங் பட்டியலில் சேர்க்கப்பட்டது.",
+      "{{itemName}} மீண்டும் உங்கள் கடைவலப் பட்டியலில் சேர்க்கப்பட்டது.",
   },
+  // Copy displayed in the privacy policy view.
   privacy: {
     title: "தனியுரிமைக் கொள்கை",
     lastUpdated: "கடைசியாகப் புதுப்பிக்கப்பட்டது: 1 செப்டம்பர் 2026",
     informationTitle: "நாங்கள் சேகரிக்கும் தகவல்கள்",
     informationMessage:
-      "உங்கள் கணக்கு, சுயவிவரம், ஷாப்பிங் குழுக்கள், பொருட்கள் மற்றும் பயன்பாட்டு விருப்பங்களை உருவாக்கி நிர்வகிக்க தேவையான தகவல்களை ShopMate சேகரிக்கலாம்.",
+      "உங்கள் கணக்கு, சுயவிவரம், கடைவலக் குழுக்கள், பொருட்கள் மற்றும் பயன்பாட்டு விருப்பங்களை உருவாக்கி நிர்வகிக்க தேவையான தகவல்களை ShopMate சேகரிக்கலாம்.",
     usageTitle: "உங்கள் தகவல்களை எவ்வாறு பயன்படுத்துகிறோம்",
     usageMessage:
       "ShopMate அம்சங்களை வழங்கவும் பராமரிக்கவும், உங்கள் கணக்கு மற்றும் குழுக்களை நிர்வகிக்கவும், நீங்கள் கோரும் செயல்பாடுகளை வழங்கவும் தகவல்கள் பயன்படுத்தப்படுகின்றன.",
@@ -585,6 +615,7 @@ registerLanguage("ta", {
     contactMessage:
       "தனியுரிமை தொடர்பான கேள்விகள் அல்லது கோரிக்கைகளுக்கு ShopMate ஆதரவுக் குழுவைத் தொடர்புகொள்ளவும்.",
   },
+  // Labels and messages for profile and account details.
   profile: {
     account: "கணக்கு",
     accountInformation: "கணக்கு தகவல்",
@@ -609,6 +640,7 @@ registerLanguage("ta", {
     title: "சுயவிவரம்",
     updateProfile: "சுயவிவரத்தைப் புதுப்பிக்கவும்",
   },
+  // Labels and validation messages for account registration.
   register: {
     accountExistsMessage:
       "இந்த மின்னஞ்சல் முகவரியுடன் ஏற்கனவே ஒரு கணக்கு உள்ளது.",
@@ -617,6 +649,7 @@ registerLanguage("ta", {
     biometric: "பயோமெட்ரிக் மூலம் ShopMate-ஐ பாதுகாக்கவும்",
     confirmPassword: "கடவுச்சொல்லை உறுதிப்படுத்து",
     createAccount: "கணக்கை உருவாக்கு",
+    createGroup: "கடைவலக் குழுவை உருவாக்கு",
     email: "மின்னஞ்சல் முகவரி",
     emailAddress: "மின்னஞ்சல் முகவரி",
     firstName: "முதல் பெயர்",
@@ -625,11 +658,12 @@ registerLanguage("ta", {
     password: "கடவுச்சொல்",
     register: "பதிவு செய்",
     successMessage:
-      "உங்கள் ஷாப்பிங் குழு வெற்றிகரமாக உருவாக்கப்பட்டது.\n\nஉங்கள் தனிப்பட்ட சுயவிவரத்தை பின்னர் சுயவிவர மேலாண்மையில் இருந்து பூர்த்தி செய்யலாம்.",
+      "உங்கள் கடைவலக் குழு வெற்றிகரமாக உருவாக்கப்பட்டது.\n\nஉங்கள் தனிப்பட்ட சுயவிவரத்தை பின்னர் சுயவிவர மேலாண்மையில் இருந்து பூர்த்தி செய்யலாம்.",
     successTitle: "ShopMate-க்கு வரவேற்கிறோம்!",
     title: "பதிவு",
   },
 
+  // Labels and messages for PIN, biometric, and app-lock settings.
   security: {
     invalidPinTitle: "தவறான PIN",
     invalidPinMessage: "PIN 4 முதல் 6 இலக்கங்களைக் கொண்டிருக்க வேண்டும்.",
@@ -646,6 +680,8 @@ registerLanguage("ta", {
     changePin: "PIN மாற்றவும்",
     appLock: "ஆப் பூட்டு",
     biometricLogin: "பயோமெட்ரிக் உள்நுழைவு",
+    biometricEnabledTitle: "பயோமெட்ரிக் இயக்கப்பட்டது",
+    biometricEnabledMessage: "பயோமெட்ரிக் உள்நுழைவு வெற்றிகரமாக இயக்கப்பட்டது.",
     enabled: "இயக்கப்பட்டது",
     disabled: "முடக்கப்பட்டது",
     enterPin: "4 முதல் 6 இலக்க PIN-ஐ உள்ளிடவும்:",
@@ -690,6 +726,7 @@ registerLanguage("ta", {
     biometricUnavailableMessage:
       "இந்த சாதனத்தில் பயோமெட்ரிக் அங்கீகாரம் கிடைக்கவில்லை.",
   },
+  // Labels for preferences and settings actions.
   settings: {
     about: "ShopMate பற்றி",
     account: "கணக்கு",
@@ -709,12 +746,13 @@ registerLanguage("ta", {
     security: "பாதுகாப்பு",
     sendFeedback: "கருத்தை அனுப்பு",
     settings: "அமைப்புகள்",
-    shopping: "ஷாப்பிங்",
+    shopping: "கடைவலம்",
     support: "ஆதரவு",
     termsConditions: "விதிமுறைகள் மற்றும் நிபந்தனைகள்",
     theme: "தீம்",
     title: "அமைப்புகள்",
   },
+  // Copy displayed in the terms and conditions view.
   terms: {
     title: "விதிமுறைகள் மற்றும் நிபந்தனைகள்",
     lastUpdated: "கடைசியாகப் புதுப்பிக்கப்பட்டது: 1 செப்டம்பர் 2026",
@@ -726,7 +764,7 @@ registerLanguage("ta", {
       "உங்கள் கணக்கிற்கான உள்நுழைவு தகவல்களின் பாதுகாப்பிற்கும், உங்கள் கணக்கின் மூலம் மேற்கொள்ளப்படும் செயல்பாடுகளுக்கும் நீங்கள் பொறுப்பானவர்.",
     useTitle: "ஏற்றுக்கொள்ளக்கூடிய பயன்பாடு",
     useMessage:
-      "ShopMate ஷாப்பிங், குழு மேலாண்மை மற்றும் தொடர்புடைய செயல்பாடுகளுக்காக மட்டுமே பயன்படுத்தப்பட வேண்டும். பயன்பாட்டை தவறாகப் பயன்படுத்தவோ, அதன் செயல்பாடுகளைத் தடுக்கவோ அல்லது பாதுகாப்பை பாதிக்க முயற்சிக்கவோ கூடாது.",
+      "ShopMate கடைவலம், குழு மேலாண்மை மற்றும் தொடர்புடைய செயல்பாடுகளுக்காக மட்டுமே பயன்படுத்தப்பட வேண்டும். பயன்பாட்டை தவறாகப் பயன்படுத்தவோ, அதன் செயல்பாடுகளைத் தடுக்கவோ அல்லது பாதுகாப்பை பாதிக்க முயற்சிக்கவோ கூடாது.",
     contentTitle: "பயனர் உள்ளடக்கம்",
     contentMessage:
       "ShopMate-ல் நீங்கள் சேர்க்கும் தகவல்கள் மற்றும் உள்ளடக்கத்திற்கு நீங்கள் பொறுப்பானவர். நீங்கள் வழங்கும் தகவல்கள் சரியானவை என்பதையும், அவற்றைப் பகிர தேவையான உரிமைகள் உங்களிடம் உள்ளன என்பதையும் உறுதிப்படுத்த வேண்டும்.",

@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Shows account identity, group membership, profile details, and security controls. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,17 +8,20 @@
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <!-- Profile shell contains identity, group membership, account details, and security settings. -->
     <div class="appContainer">
+      <!-- Shared page header returns to the dashboard and labels the profile view. -->
       <header class="modernHeader">
         <button class="modernBackButton" onclick="goBack()">
           <img
-            src="../assets/icons/navigation/back.svg"
+            data-icon-folder="navigation" data-icon-name="back"
             class="icon navigationIcon"
             alt="Back"
           />
         </button>
         <h1 class="modernPageTitle" data-i18n="profile.title">Profile</h1>
       </header>
+      <!-- Profile, membership, account, and security sections form the page content. -->
       <main class="pageContent">
         <!-- Profile Hero -->
         <section class="profileHero">
@@ -125,6 +129,7 @@
         hidden
         onchange="previewProfilePhoto(event)"
       />
+      <!-- Load profile dependencies before running the shared page bootstrap. -->
       <script src="../js/stateManager.js"></script>
       <script src="../js/helpers.js"></script>
       <script src="../js/authManager.js"></script>
@@ -132,6 +137,7 @@
       <script src="../js/profilePage.js"></script>
       <script src="../js/snackbarManager.js"></script>
       <script src="../js/bootstrap.js"></script>
+      <!-- Initialize profile data and bind page actions after the DOM is ready. -->
       <script>
         document.addEventListener("DOMContentLoaded", function () {
           initializeApplication();

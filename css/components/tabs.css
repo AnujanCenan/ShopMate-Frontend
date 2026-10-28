@@ -14,12 +14,8 @@
  * PAGES
  * • Shared Across Multiple Pages
  ***************************************************************************************************/
-/* Tab Section */
-.tabSection {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-}
+
+
 /* Active Tab */
 .activeTab {
   background: var(--primaryColor);
@@ -33,8 +29,8 @@
   padding: 6px;
   margin-bottom: 18px;
   background: var(--surfaceColor);
-  border-radius: 999px;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radiusPill);
+  box-shadow: inset 0 2px 6px var(--shadowAmbientSoft);
 }
 /* Modern Tab Button */
 .modernTabButton {
@@ -42,20 +38,21 @@
   padding: 14px 0;
   background: transparent;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
   color: var(--mutedTextColor);
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
   transition:
     background 0.2s ease,
     color 0.2s ease,
     box-shadow 0.2s ease;
 }
+/* Styles the modern tab button, active tab component and its layout. */
 .modernTabButton.activeTab {
   background: var(--primaryColor);
   color: var(--textPrimary);
-  box-shadow: 0 4px 12px rgba(17, 138, 178, 0.22);
+  box-shadow: 0 4px 12px var(--primaryGlow);
 }
 /* Standard Tab Button */
 .tabButton {
@@ -63,8 +60,8 @@
   padding: 14px 0;
   background: transparent;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radiusPill);
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
 }

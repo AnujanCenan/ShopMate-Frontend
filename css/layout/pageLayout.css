@@ -29,7 +29,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacingMedium);
-  margin-bottom: 24px;
+  margin-bottom: var(--spacingLarge);
 }
 /* Group Item */
 .groupItem {
@@ -45,14 +45,47 @@
 /* Group Item Name */
 .groupItemName {
   flex: 1;
-  text-align: center;
-  font-size: 17px;
+  text-align: left;
+  font-size: var(--fontSizeBodyLarge);
   font-weight: 500;
 }
-/* Group Item Row */
-.groupItemRow {
-  display: flex;
+
+/* Styles the group name with color component and its layout. */
+.groupNameWithColor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+
+/* Styles the group color dot component and its layout. */
+.groupColorDot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 12px;
+  border: 1px solid var(--borderColor);
+  border-radius: 50%;
+}
+
+/* Styles the group color edit button component and its layout. */
+.groupColorEditButton {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 10px;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Defines the focus-visible state styling for the group color edit button. */
+.groupColorEditButton:focus-visible,
+.groupColorSwatch:focus-visible {
+  outline: 3px solid var(--primaryColor);
+  outline-offset: 2px;
 }

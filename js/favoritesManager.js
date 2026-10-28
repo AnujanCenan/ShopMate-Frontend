@@ -39,10 +39,10 @@ function toggleFavorite(itemName) {
   if (!item) {
     return;
   }
-  const normalizedItemName = item.name.trim().toLowerCase();
+  const normalizedItemName = normalizeItemName(item.name);
   const favoriteIndex = appState.favoriteItems.findIndex(
     function (favoriteItem) {
-      return favoriteItem.name.trim().toLowerCase() === normalizedItemName;
+      return normalizeItemName(favoriteItem.name) === normalizedItemName;
     },
   );
   if (favoriteIndex === -1) {
@@ -71,9 +71,9 @@ function addFavorite(itemName) {
   if (!currentItem) {
     return;
   }
-  const normalizedName = currentItem.name.trim().toLowerCase();
+  const normalizedName = normalizeItemName(currentItem.name);
   const alreadyExists = appState.favoriteItems.some(function (favoriteItem) {
-    return favoriteItem.name.trim().toLowerCase() === normalizedName;
+    return normalizeItemName(favoriteItem.name) === normalizedName;
   });
   if (alreadyExists) {
     showSnackbar(t("favorites.itemAlreadyExists"));

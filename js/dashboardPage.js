@@ -1,5 +1,8 @@
+/* Renders dashboard groups, category cards, budget summaries, and related forms. */
 const categoryList = document.getElementById("categoryList");
 const emptyStateSection = document.getElementById("emptyStateSection");
+const categorySortControl = document.getElementById("categorySortControl");
+const categorySortSelect = document.getElementById("categorySortSelect");
 const selectedGroupName = document.getElementById("selectedGroupName");
 const groupDropdownButton = document.getElementById("groupDropdownButton");
 const openCategoryBottomSheetButton = document.getElementById(
@@ -10,18 +13,53 @@ const screenOverlay = document.getElementById("screenOverlay");
 const menuButton = document.querySelector(".menuButton");
 const sideDrawer = document.getElementById("sideDrawer");
 const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
+let selectedGroupColor = "";
+let colorEditingGroupName = null;
+/* Save the category sort preference separately for each user and group. */
+if (categorySortSelect) {
+  categorySortSelect.addEventListener("change", function () {
+    localStorage.setItem(getCategorySortPreferenceKey(), categorySortSelect.value);
+    renderCategories();
+  });
+}
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
-async function initializeDashboard() {
-  await getGroups();    // setting the state.groups
+function initializeDashboard() {
+  if (ensureGroupColorsForCurrentUser()) {
+    saveAppState();
+  }
+  await getGroups();   
   restoreLastGroup();
   // renderCategories();    // restore last group handles the rendering now
   await renderBudgetDashboardWidget();
 }
 /* Restore Last Group */
 function restoreLastGroup() {
-  selectGroup(state.activeGroup, state.activeGroupId);
-  return;
-
+  if (
+    !selectedGroupName ||
+    !appState.groups ||
+    typeof appState.groups !== "object"
+  ) {
+    return;
+  }
+  const availableGroups = getCurrentUserGroups();
+  const savedGroup = localStorage.getItem("activeGroup");
+  const stateGroup =
+    appState.activeGroup && availableGroups.includes(appState.activeGroup)
+      ? appState.activeGroup
+      : null;
+  const groupToRestore =
+    savedGroup && availableGroups.includes(savedGroup)
+      ? savedGroup
+      : stateGroup || availableGroups[0] || null;
+  if (groupToRestore) {
+    appState.activeGroup = groupToRestore;
+    selectedGroupName.innerHTML = renderGroupNameWithColor(groupToRestore);
+    localStorage.setItem("activeGroup", groupToRestore);
+    return;
+  }
+  appState.activeGroup = null;
+  selectedGroupName.textContent = t("dashboard.noGroupSelected");
+  localStorage.removeItem("activeGroup");
 }
 /* Render Categories */
 async function renderCategories() {
@@ -29,8 +67,9 @@ async function renderCategories() {
   if (!categoryList) {
     return;
   }
+  categorySortControl?.classList.add("hidden");
   categoryList.innerHTML = "";
-  if (!state.activeGroup) {
+  if (!state.activeGroup || !getGroupMember(state.activeGroup)) {
     emptyStateSection.innerHTML = `
       <p class="emptyStateText">
         ${t("dashboard.selectOrCreateGroup")}
@@ -81,6 +120,18 @@ async function renderCategories() {
     const categoryBudget = categoryBudgetInfo?.budgetLimit || 0;
     const categorySpent = categoryBudgetInfo?.budgetSpent || 0;
 
+  // categorySortControl?.classList.remove("hidden");
+  // if (categorySortSelect) {
+  //   categorySortSelect.value = getCategorySortMode();
+  // }
+  // getSortedCategoriesForDisplay(categories).forEach(function (category) {
+  //   const categoryBudget =
+  //     appState.budgets.categoryBudgets?.[appState.activeGroup]?.[category.name]
+  //       ?.monthlyLimit ?? 0;
+  //   let categorySpent = 0;
+  //   category.items.forEach(function (item) {
+  //     categorySpent += getItemSpentAmount(item);
+  //   });
     const categoryRemaining =
       categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
     const pendingCount = category.numItems - category.numPurchased;
@@ -92,24 +143,23 @@ async function renderCategories() {
         onclick="openCategoryPage('${category.name}', ${category.listId})"
       >
         <div class="categoryHeaderTitle">
-        <h2 class="categoryTitle">
-          ${category.name}
-        </h2>
-        <button
-          class="categoryMoreButton"
-          onclick="
-            event.stopPropagation();
-            renderCategoryActions(
-              '${category.name}', ${category.listId}
-            );
-          "
-        >
-          <img
-    src="${getIconPath("navigation", "menu")}"
-    class="icon actionIcon"
-    alt="More"
->
-        </button>
+          <h2 class="categoryTitle">
+            ${category.name}
+          </h2>
+          ${
+            canManageCategory(category.name, appState.activeGroup)
+              ? `<button
+                  class="categoryMoreButton"
+                  onclick="event.stopPropagation(); renderCategoryActions('${category.name}', ${category.listId});"
+                >
+                  <img
+                    src="${getIconPath("navigation", "menu")}"
+                    class="icon actionIcon"
+                    alt="${t("common.more")}"
+                  />
+                </button>`
+              : ""
+          }
         </div>
         <div class="categoryBudgetSummary">
           ${t("dashboard.budget")}
@@ -138,15 +188,66 @@ async function renderCategories() {
     `;
   });
 }
+/* Build a per-user and per-group key for the dashboard category sort mode. */
+function getCategorySortPreferenceKey() {
+  const currentUser = getCurrentUser();
+  const keyParts = [
+    currentUser?.id || currentUser?.email || "local-user",
+    appState.activeGroup || "no-group",
+  ];
+  return `shopMate:category-sort:${keyParts.map(encodeURIComponent).join(":")}`;
+}
+/* Return a valid saved category sort mode or preserve the original order. */
+function getCategorySortMode() {
+  const savedMode = localStorage.getItem(getCategorySortPreferenceKey());
+  return ["default", "newest-first", "newest-last", "pending-desc"].includes(savedMode)
+    ? savedMode
+    : "default";
+}
+/* Sort a copy of category cards without changing the saved category order. */
+function getSortedCategoriesForDisplay(categories) {
+  const sortedCategories = categories.slice();
+  const sortMode = getCategorySortMode();
+  if (sortMode === "newest-first" || sortMode === "newest-last") {
+    const direction = sortMode === "newest-first" ? -1 : 1;
+    return sortedCategories.sort(function (left, right) {
+      // BACKEND TODO: Return category createdAt (ISO-8601) from SQL/API for chronological sorting.
+      const leftValue = left.createdAt;
+      const rightValue = right.createdAt;
+      const leftCreated = leftValue == null ? null : Date.parse(leftValue);
+      const rightCreated = rightValue == null ? null : Date.parse(rightValue);
+      const validLeft = leftCreated !== null && Number.isFinite(leftCreated);
+      const validRight = rightCreated !== null && Number.isFinite(rightCreated);
+      if (!validLeft && !validRight) return 0;
+      if (!validLeft) return 1;
+      if (!validRight) return -1;
+      return (leftCreated - rightCreated) * direction;
+    });
+  }
+  if (sortMode === "pending-desc") {
+    return sortedCategories.sort(function (left, right) {
+      const leftPending = left.items.filter(function (item) {
+        return !item.purchased;
+      }).length;
+      const rightPending = right.items.filter(function (item) {
+        return !item.purchased;
+      }).length;
+      return (
+        rightPending - leftPending ||
+        left.name.localeCompare(right.name, undefined, { sensitivity: "base" })
+      );
+    });
+  }
+  return sortedCategories;
+}
 /* Select Group */
-async function selectGroup(groupName, groupId) {
-  console.log(`Seelcting group... name = ${groupName}; id = ${groupId}`);
-  state.activeGroup = groupName;
-  selectedGroupName.textContent = (groupId) ? groupName : t("dashboard.noGroupSelected");;
+function selectGroup(groupName, groupId) {
+  if (!getGroupMember(groupName)) return;
+  appState.activeGroup = groupName;
+  selectedGroupName.innerHTML = renderGroupNameWithColor(groupName);
+  localStorage.setItem("activeGroup", groupName);
   state.activeGroupId = groupId;
   state.activeGroup = groupName;
-  saveState();
-  
   renderCategories();
   await renderBudgetDashboardWidget();
   // renderGroupDropdown();
@@ -154,6 +255,15 @@ async function selectGroup(groupName, groupId) {
 }
 /* Open Category Page */
 function openCategoryPage(categoryName, categoryId) {
+  if (
+    !getGroupMember(appState.activeGroup) ||
+    !(appState.groups[appState.activeGroup] || []).some(function (category) {
+      return category.name === categoryName;
+    })
+  ) {
+    return;
+  }
+  localStorage.setItem("activeGroup", appState.activeGroup);
   localStorage.setItem("activeCategory", categoryName);
   localStorage.setItem("activeCategoryId", categoryId)
   state.activeCategory = categoryName;
@@ -164,21 +274,26 @@ function openCategoryPage(categoryName, categoryId) {
 /* Render Group Dropdown */
 async function renderGroupDropdown() {
   let groupItemsHTML = "";
-
   const groups = await getGroups(); 
   if (!groups) return;
-
   groups.forEach(function (group) {
-     groupItemsHTML += `
-<div
+    groupItemsHTML += `
+      <div
         class="groupItem"
         onclick="selectGroup('${group.familyName}', ${group.familyGroupId})"
       >
         <span class="groupItemName">
-          ${group.familyName}
+          ${renderGroupNameWithColor(groupName)}
         </span>
         ${
-          group.isAdmin 
+          canManageGroupColor(groupName)
+            ? `<button type="button" class="groupColorEditButton" aria-label="${t("dashboard.changeGroupColor")}" title="${t("dashboard.changeGroupColor")}" onclick="event.stopPropagation(); renderGroupColorForm('${groupName}')">
+                <img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt="">
+              </button>`
+            : ""
+        }
+        ${
+          canManageGroupSettings(groupName)
             ? `
               <button
                 class="groupMoreButton"
@@ -233,6 +348,9 @@ async function renderGroupDropdown() {
 }
 /* Render Create Group Form */
 function renderCreateGroupForm() {
+  ensureGroupColorsForCurrentUser();
+  colorEditingGroupName = null;
+  selectedGroupColor = "";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -269,6 +387,13 @@ function renderCreateGroupForm() {
           class="validationMessage"
         ></div>
       </div>
+      <div class="formField">
+        <label class="formLabel">${t("dashboard.groupColor")}</label>
+        <div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">
+          ${renderGroupColorSwatches(null)}
+        </div>
+        <div id="groupColorError" class="validationMessage"></div>
+      </div>
       <div class="bottomSheetButtonRow">
         <button
           type="button"
@@ -280,7 +405,7 @@ function renderCreateGroupForm() {
         <button
           type="button"
           class="primaryButton"
-          onclick="createGroup()"
+          onclick="createDashboardGroup()"
         >
           ${t("dashboard.createGroupButton")}
         </button>
@@ -295,6 +420,97 @@ function renderCreateGroupForm() {
     }
     groupNameInput.focus();
   }, 100);
+}
+/* Render the group's available color choices and mark its current selection. */
+function renderGroupColorSwatches(groupName) {
+  const colorMap = getGroupColorMap();
+  const options = getGroupColorOptions();
+  const usedBy = new Map();
+  Object.keys(colorMap).forEach(function (name) {
+    usedBy.set(colorMap[name].toLowerCase(), name);
+  });
+  return options
+    .map(function (color, index) {
+      const owner = usedBy.get(color.toLowerCase());
+      const unavailable = owner && owner !== groupName;
+      const selected = color === selectedGroupColor;
+      return `<button type="button" class="groupColorSwatch ${selected ? "selected" : ""}" style="--swatch-color:${color}" role="radio" aria-checked="${selected}" aria-label="${t("dashboard.groupColorOption", { number: index + 1 })}" title="${unavailable ? t("dashboard.groupColorInUse") : t("dashboard.groupColorOption", { number: index + 1 })}" ${unavailable ? "disabled" : ""} onclick="selectGroupColor('${color}', this)"></button>`;
+    })
+    .join("");
+}
+/* Update the selected swatch and clear any prior color-selection error. */
+function selectGroupColor(color, button) {
+  if (!colorEditingGroupName || !canManageGroupColor(colorEditingGroupName)) {
+    return;
+  }
+  const colorMap = getGroupColorMap();
+  const owner = Object.keys(colorMap).find(function (name) {
+    return colorMap[name].toLowerCase() === color.toLowerCase();
+  });
+  if (owner && owner !== colorEditingGroupName) return;
+  selectedGroupColor = color;
+  const swatches =
+    button?.parentElement?.querySelectorAll(".groupColorSwatch") || [];
+  swatches.forEach(function (swatch) {
+    const selected = swatch === button;
+    swatch.classList.toggle("selected", selected);
+    swatch.setAttribute("aria-checked", String(selected));
+  });
+  const error = document.getElementById("groupColorError");
+  if (error) error.textContent = "";
+}
+/* Open the color picker for a group with its current color preselected. */
+function renderGroupColorForm(groupName) {
+  if (!canManageGroupColor(groupName)) return;
+  ensureGroupColorsForCurrentUser();
+  colorEditingGroupName = groupName;
+  selectedGroupColor = getGroupColor(groupName);
+  bottomSheetContent.innerHTML = `
+    <div class="bottomSheetHeader"><h2>${t("dashboard.groupColorTitle")}</h2><button class="closeButton" onclick="closeBottomSheet()" aria-label="${t("common.close")}"><img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt=""></button></div>
+    <div class="bottomSheetBody"><p>${renderGroupNameWithColor(groupName)}</p><div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">${renderGroupColorSwatches(groupName)}</div><div id="groupColorError" class="validationMessage"></div><div class="bottomSheetButtonRow"><button class="secondaryButton" onclick="closeBottomSheet()">${t("common.cancel")}</button><button class="primaryButton" onclick="saveGroupColor()">${t("common.save")}</button></div></div>`;
+  openBottomSheet();
+}
+/* Save the chosen color for the group and refresh its visible name markers. */
+function saveGroupColor() {
+  if (
+    !colorEditingGroupName ||
+    !canManageGroupColor(colorEditingGroupName)
+  ) {
+    return;
+  }
+  const colorMap = getGroupColorMap();
+  const error = document.getElementById("groupColorError");
+  const duplicateOwner = Object.keys(colorMap).find(function (name) {
+    return (
+      name !== colorEditingGroupName &&
+      colorMap[name].toLowerCase() === selectedGroupColor.toLowerCase()
+    );
+  });
+  if (!selectedGroupColor || duplicateOwner) {
+    if (error) error.textContent = t("dashboard.groupColorUnavailable");
+    return;
+  }
+  const updatedGroupName = colorEditingGroupName;
+  colorMap[updatedGroupName] = selectedGroupColor;
+  saveAppState();
+  renderGroupDropdown();
+  if (selectedGroupName) {
+    selectedGroupName.innerHTML =
+      appState.activeGroup && appState.groups[appState.activeGroup]
+        ? renderGroupNameWithColor(appState.activeGroup)
+        : t("dashboard.noGroupSelected");
+  }
+  if (updatedGroupName === appState.activeGroup) {
+    const budgetGroupName = document.querySelector(
+      "#budgetDashboardWidget .budgetGroupName",
+    );
+    if (budgetGroupName) {
+      budgetGroupName.innerHTML = renderGroupNameWithColor(updatedGroupName);
+    }
+  }
+  colorEditingGroupName = null;
+  closeBottomSheet();
+  showSnackbar(t("dashboard.groupColorUpdated"));
 }
 /* Clear Group Validation */
 function clearGroupValidation() {
@@ -330,8 +546,8 @@ function clearRenameGroupValidation() {
   renameGroupInput.classList.remove("formInputError");
   renameGroupError.textContent = "";
 }
-/* Create Group */
-async function createGroup() {
+/* Create a dashboard group after validating its name, color, and uniqueness. */
+function createDashboardGroup() {
   const groupNameInput = document.getElementById("groupNameInput");
   const groupNameError = document.getElementById("groupNameError");
   const groupName = groupNameInput.value.trim().replace(/\s+/g, " ");
@@ -363,7 +579,12 @@ async function createGroup() {
     groupNameInput.focus();
     return;
   }
-  
+  if (!selectedGroupColor) {
+    const groupColorError = document.getElementById("groupColorError");
+    if (groupColorError)
+      groupColorError.textContent = t("dashboard.groupColorUnavailable");
+    return;
+  }
   const groupExists = Object.keys(appState.groups).some(
     function (existingGroup) {
       return existingGroup.toLowerCase() === groupName.toLowerCase();
@@ -378,7 +599,8 @@ async function createGroup() {
 
     return;
   }
- 
+  getGroupColorMap()[groupName] = selectedGroupColor;   // local storage -- need to actually push the selected colour to the database and pull it from the database as well
+  
   // put this fetch in createGroup In AuthManager
   const res = await fetch(`http://localhost:5113/api/group-create`, {
     method: "POST",
@@ -474,7 +696,10 @@ function renderCreateCategoryForm() {
   openBottomSheet();
 }
 /* Create Category */
-async function createCategory() {
+function createCategory() {
+  // if (!appState.activeGroup || !getCurrentMember()) return;
+  // const currentUser = getCurrentUser();
+  // if (!currentUser) return;
   const categoryNameInput = document.getElementById("categoryNameInput");
   const categoryName = categoryNameInput.value.trim();
   if (!categoryName) {
@@ -587,13 +812,7 @@ function renderCategoryActions(categoryName, listId) {
 }
 /* Rename Category */
 function renameCategory(categoryName, listId) {
-  // const categories = appState.groups[appState.activeGroup];
-  // const category = categories.find(function (item) {
-  //   return item.name === categoryName;
-  // });
-  // if (!category) {
-  //   return;
-  // }
+
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -823,7 +1042,7 @@ function renderInviteMemberForm(groupName, familyGroupId) {
           ${t("dashboard.invitingMemberTo")}
         </label>
         <div class="inviteGroupName">
-          ${groupName}
+          ${renderGroupNameWithColor(groupName)}
         </div>
       </div>
       <div class="formField">
@@ -1067,36 +1286,6 @@ This action cannot be undone.`,
     },
   );
 }
-/* Sort Categories */
-function sortCategories() {
-  if (!appState.activeGroup) {
-    return;
-  }
-  appState.groups[appState.activeGroup].sort(function (a, b) {
-    return a.name.localeCompare(b.name);
-  });
-  saveAppState();
-  renderCategories();
-  closeBottomSheet();
-}
-/* Sort Categories By Pending */
-function sortCategoriesByPending() {
-  if (!appState.activeGroup) {
-    return;
-  }
-  appState.groups[appState.activeGroup].sort(function (a, b) {
-    const pendingA = a.items.filter(function (item) {
-      return !item.purchased;
-    }).length;
-    const pendingB = b.items.filter(function (item) {
-      return !item.purchased;
-    }).length;
-    return pendingB - pendingA;
-  });
-  saveAppState();
-  renderCategories();
-  closeBottomSheet();
-}
 /* Render Dashboard Menu */
 /* Open Side Drawer */
 function openSideDrawer() {
@@ -1164,7 +1353,6 @@ function renderSideDrawer() {
         >
         <span>${t("dashboard.notifications")}</span>
       </button>
-
       <button
         class="drawerItem"
         onclick="window.location.href='../pages/settingsPage.html'"
@@ -1206,7 +1394,6 @@ function renderSideDrawer() {
         onchange="importAppData(event)"
       >
     </div>
-
     <div class="drawerLogout">
       <button
         type="button"
@@ -1271,9 +1458,7 @@ async function renderBudgetDashboardWidget() {
   const budgets = await res.json();
   state.budgets.groupBudgets = budgets;
   saveState();
-  console.log("Rendering budget dashboard widget...");
-  console.log("Active Group Id === ");
-  console.log(state.activeGroupId);
+
   if (!state.activeGroupId) return;
 
   const currBudget = state.budgets.groupBudgets.find(b => b.familyGroupId === state.activeGroupId);
@@ -1294,6 +1479,7 @@ async function renderBudgetDashboardWidget() {
   const groupBudget = appState.budgets.groupBudgets[appState.activeGroup];
   const limit = currBudget.monthlyLimit ?? 0;
   const spent = currBudget.spendingThisMonth;
+  const isExpanded = appState.dashboardBudgetExpanded === true;
   const remaining = Math.max(limit - spent, 0);
   let allocated = 0;
   
@@ -1336,36 +1522,44 @@ async function renderBudgetDashboardWidget() {
       <button
         class="budgetSummaryHeader"
         onclick="toggleBudgetCard()"
+        aria-expanded="${isExpanded}"
+        aria-controls="budgetSummaryBody"
       >
         <div>
           <h3>
             ${t("dashboard.monthlyBudget")}
           </h3>
           <p class="budgetGroupName">
-            ${state.activeGroup || t("dashboard.noGroupSelected")}
+            ${renderGroupNameWithColor(appState.activeGroup) || t("dashboard.noGroupSelected")}
           </p>
         </div>
         <span id="budgetCollapseIcon">
           <img
-            src="${getIconPath("navigation", "collapse")}"
+            src="${getIconPath("navigation", isExpanded ? "collapse" : "expand")}"
             class="icon actionIcon"
-            alt=""
+            alt="${isExpanded ? t("common.collapse") : t("common.expand")}"
           >
         </span>
       </button>
       <div
-        id="budgetSummaryBody"
-        class="budgetSummaryBody"
+        id="budgetCompactSummary"
+        class="budgetCompactSummary${isExpanded ? " hidden" : ""}"
+        aria-hidden="${isExpanded}"
       >
-        <h2>
-          ${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}
-        </h2>
+        <span>${t("dashboard.allocated")} <strong>${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}</strong></span>
+        <span>${t("dashboard.spent")} <strong>${getCurrencySymbol()} ${spent}</strong></span>
+        <span>${t("dashboard.remaining")} <strong>${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + remaining}</strong></span>
+      </div>
+      <div
+        id="budgetSummaryBody"
+        class="budgetSummaryBody${isExpanded ? "" : " hidden"}"
+      >
         <div class="analysisValue">
           <span>
             ${t("dashboard.allocated")}
           </span>
           <span>
-            ${getCurrencySymbol()} ${allocated}
+            ${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}
           </span>
         </div>
         <div class="analysisValue">
@@ -1441,31 +1635,29 @@ async function renderBudgetDashboardWidget() {
             `
         }
         <div class="budgetActionButtons">
-  ${
-    canManageBudget()
-      ? `
-        <button
-          class="primaryButton budgetEditButton"
-          onclick="renderEditGroupBudgetForm()"
-        >
-          Edit Budget
-        </button>
-      `
-      : ""
-  }
-
-  <button
-    class="secondaryButton budgetAnalysisButton"
-    onclick="
-      window.location.href =
-        '../pages/budgetPage.html?group=' +
-        encodeURIComponent(appState.activeGroup)
-    "
-  >
-    Budget Analysis
-  </button>
-</div>
-
+          ${
+            canManageBudget()
+              ? `
+                <button
+                  class="primaryButton budgetEditButton"
+                  onclick="renderEditGroupBudgetForm()"
+                >
+                  Edit Budget
+                </button>
+              `
+              : ""
+          }
+          <button
+            class="secondaryButton budgetAnalysisButton"
+            onclick="
+              window.location.href =
+                '../pages/budgetPage.html?group=' +
+                encodeURIComponent(appState.activeGroup)
+            "
+          >
+            Budget Analysis
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -1486,9 +1678,19 @@ async function renderBudgetDashboardWidget() {
 /* Toggle Budget Card */
 function toggleBudgetCard() {
   const body = document.getElementById("budgetSummaryBody");
+  const compactSummary = document.getElementById("budgetCompactSummary");
   const icon = document.getElementById("budgetCollapseIcon");
-  body.classList.toggle("hidden");
-  if (body.classList.contains("hidden")) {
+  const header = document.querySelector(".budgetSummaryHeader");
+  if (!body || !compactSummary || !icon || !header) {
+    return;
+  }
+  appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
+  saveAppState();
+  body.classList.toggle("hidden", !appState.dashboardBudgetExpanded);
+  compactSummary.classList.toggle("hidden", appState.dashboardBudgetExpanded);
+  header.setAttribute("aria-expanded", String(appState.dashboardBudgetExpanded));
+  compactSummary.setAttribute("aria-hidden", String(appState.dashboardBudgetExpanded));
+  if (!appState.dashboardBudgetExpanded) {
     icon.innerHTML = `
       <img
         src="${getIconPath("navigation", "expand")}"
@@ -1508,6 +1710,7 @@ function toggleBudgetCard() {
 }
 /* Render Edit Group Budget Form */
 function renderEditGroupBudgetForm() {
+  if (!canManageBudget(appState.activeGroup)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>

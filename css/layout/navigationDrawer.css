@@ -19,12 +19,13 @@
 .sideDrawerOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--overlayColor);
   opacity: 0;
   visibility: hidden;
   transition: all 0.25s ease;
   z-index: 998;
 }
+/* Styles the side drawer overlay component and its layout. */
 .sideDrawerOverlay.active {
   opacity: 1;
   visibility: visible;
@@ -40,28 +41,20 @@
   height: 100vh;
   overflow-y: auto;
   background: var(--cardColor);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 30px var(--shadowAmbient);
   transition: transform 0.25s ease;
   z-index: 999;
 }
+/* Styles the side drawer component and its layout. */
 .sideDrawer.active {
   transform: translateX(0);
-}
-/* Right Drawer */
-.sideDrawerRight {
-  right: 0;
-  transform: translateX(100%);
-}
-/* Left Drawer */
-.sideDrawerLeft {
-  left: 0;
-  transform: translateX(-100%);
 }
 /* Right Drawer Mode */
 .sideDrawer.right {
   right: 0;
   transform: translateX(100%);
 }
+/* Styles the side drawer, right component and its layout. */
 .sideDrawer.right.active {
   transform: translateX(0);
 }
@@ -70,45 +63,9 @@
   left: 0;
   transform: translateX(-100%);
 }
+/* Styles the side drawer, left component and its layout. */
 .sideDrawer.left.active {
   transform: translateX(0);
-}
-/* Sidebar Profile */
-.sidebarHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.sidebarProfileButton {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 20px;
-  transition: background 0.2s;
-}
-.sidebarProfileButton:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-.sidebarProfileAvatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--primaryColor);
-  color: var(--textPrimary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-}
-.sidebarProfileName {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--textPrimary);
 }
 /* Drawer Header */
 .drawerHeader {
@@ -118,29 +75,25 @@
   padding: 18px 20px;
   border-bottom: 1px solid var(--borderColor);
 }
-/* Drawer Title */
-.drawerTitle {
-  font-size: 22px;
-  font-weight: 700;
-}
 /* Drawer Menu */
 .drawerMenu {
-  padding: 12px;
+  padding: var(--spacingCompact);
 }
 /* Drawer Item */
 .drawerItem {
   width: 100%;
   display: flex;
   gap: 14px;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: var(--spacingMedium);
+  margin-bottom: var(--spacingSmall);
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radiusCompact);
   cursor: pointer;
   text-align: left;
-  font-size: 16px;
+  font-size: var(--fontSizeBody);
 }
+/* Defines the hover state styling for the drawer item. */
 .drawerItem:hover {
   background: var(--surfaceColor);
 }
@@ -150,8 +103,9 @@
   align-items: center;
   gap: 14px;
   cursor: pointer;
-  padding: 8px 0;
+  padding: var(--spacingSmall) 0;
 }
+/* Styles the drawer avatar component and its layout. */
 .drawerAvatar {
   width: 56px;
   height: 56px;
@@ -161,44 +115,44 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: var(--fontSizeXXLarge);
   font-weight: 700;
   overflow: hidden;
   flex-shrink: 0;
 }
+/* Styles the drawer avatar image component and its layout. */
 .drawerAvatarImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+/* Styles the drawer profile details component and its layout. */
 .drawerProfileDetails {
   display: flex;
   flex-direction: column;
 }
 
-.drawerProfileSubtitle {
-  font-size: 14px;
-  color: var(--textSecondary);
-}
-
 /* Drawer Profile Name */
 .drawerProfileName {
-  font-size: 15px;
+  font-size: var(--fontSizeBodySmall);
   font-weight: 600;
   color: var(--textPrimary);
   white-space: nowrap;
 }
 
+/* Styles the drawer logout component and its layout. */
 .drawerLogout {
   margin-top: auto;
-  padding: 12px 14px 16px;
+  padding: var(--spacingCompact) 14px var(--spacingMedium);
   border-top: 1px solid var(--borderColor);
 }
 
+/* Styles the drawer logout item component and its layout. */
 .drawerLogoutItem {
   width: 100%;
 }
 
+/* Styles the drawer logout item, feature icon component and its layout. */
 .drawerLogoutItem .featureIcon {
   width: 22px;
   height: 22px;

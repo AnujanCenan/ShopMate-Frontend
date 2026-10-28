@@ -18,6 +18,10 @@ async function initializeApplication() {
       applyTheme();
     }
 
+    if (typeof refreshIcons === "function") {
+      refreshIcons();
+    }
+
     if (typeof initializeLocalization === "function") {
       await initializeLocalization();
     }

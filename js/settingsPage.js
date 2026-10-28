@@ -1,3 +1,4 @@
+/* Handles settings controls, preference forms, data export, and local-data removal. */
 redirectIfLoggedOut();
 /* Toggle Dark Mode */
 function toggleDarkMode() {
@@ -872,6 +873,7 @@ function clearLocalData() {
   `;
   openBottomSheet();
 }
+/* Clear this browser's saved app data after the user confirms the destructive action. */
 function confirmClearLocalData() {
   localStorage.removeItem(STORAGE_KEY);
   sessionStorage.removeItem("shopMateAppUnlocked");

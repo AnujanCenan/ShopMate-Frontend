@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Notification center with type filters, a rendered feed, and bulk actions. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,11 +8,13 @@
     <link rel="stylesheet" href="../css/app.css" />
   </head>
   <body>
+    <!-- Notifications screen contains filtering, the rendered feed, and bulk actions. -->
     <div class="appContainer">
+      <!-- Shared page header returns to the dashboard and labels the current screen. -->
       <header class="modernHeader">
         <button class="modernBackButton" onclick="goBack()">
           <img
-            src="../assets/icons/navigation/back.svg"
+            data-icon-folder="navigation" data-icon-name="back"
             class="icon navigationIcon"
             alt="Back"
           />
@@ -20,7 +23,9 @@
           Notifications
         </h1>
       </header>
+      <!-- Notification filters and bulk actions operate on the feed in this region. -->
       <main class="pageContent">
+        <!-- Filter the feed by notification type or read status. -->
         <div class="notificationFilterBar">
           <button
             class="notificationFilterButton activeNotificationFilter"
@@ -65,6 +70,7 @@
             System
           </button>
         </div>
+        <!-- JavaScript renders the filtered notification cards into this mount point. -->
         <div id="notificationList"></div>
         <div class="bottomActionBar">
           <button
@@ -84,11 +90,13 @@
         </div>
       </main>
     </div>
+    <!-- Load shared state and page services before the bootstrap starts the screen. -->
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/localization/languageManager.js"></script>
     <script src="../js/notificationsPage.js"></script>
     <script src="../js/bootstrap.js"></script>
+    <!-- Start localization and render the notification feed after markup is ready. -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();

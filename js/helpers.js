@@ -33,7 +33,6 @@
  * ├── openBottomSheet()
  * ├── closeBottomSheet()
  * ├── getActiveCategory()
- * └── debugActiveCategory()
  *
  * Permission Helpers
  * ├── getCurrentMember()
@@ -201,15 +200,19 @@ async function renderProductSuggestions(searchText) {
     products
       .map(function (product) {
         const image = getProductImage(product);
-        let displayName = product;
-
+        let displayName = escapeHtml(product);
         if (search !== "") {
-          const safeSearch = escapeRegex(search);
-          const regex = new RegExp("(" + safeSearch + ")", "ig");
-          displayName = product.replace(
-            regex,
-            "<span class='matchedText'>$1</span>"
-          );
+          const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp("(" + escapedSearch + ")", "ig");
+          displayName = product
+            .split(regex)
+            .map(function (part) {
+              const safePart = escapeHtml(part);
+              return part.toLowerCase() === search.toLowerCase()
+                ? `<span class="matchedText">${safePart}</span>`
+                : safePart;
+            })
+            .join("");
         }
 
         // Escape single quotes in product name for the inline onclick handler
@@ -221,7 +224,7 @@ async function renderProductSuggestions(searchText) {
             onclick="selectSuggestedProduct('${safeProductAttribute}')"
           >
             <div class="productSuggestionImage">
-              ${image ? `<img src="${image}">` : "📦"}
+              ${image ? `<img src="${escapeHtml(image)}" alt="">` : "📦"}
             </div>
             <div class="productSuggestionName">
               ${displayName}
@@ -230,6 +233,14 @@ async function renderProductSuggestions(searchText) {
         `;
       })
       .join("");
+
+  suggestionContainer
+    .querySelectorAll(".productSuggestionItem")
+    .forEach(function (suggestion) {
+      suggestion.addEventListener("click", function () {
+        selectSuggestedProduct(suggestion.dataset.productName);
+      });
+    });
 }
 
 
@@ -263,18 +274,19 @@ function selectSuggestedProduct(productName) {
 }
 const ICON_BASE_PATH = "../assets/icons";
 
-/* Get Currency Symbol */
-function getCurrencySymbol() {
-  const currency = appState.settings?.currency || "AUD";
-
-  const currencySymbols = {
-    AUD: "$",
-    LKR: "Rs",
-    INR: "₹",
-  };
-
-  return currencySymbols[currency] || "$";
+/* Escape untrusted values before inserting them into HTML text or attributes. */
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function (character) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[character];
+  });
 }
+
 /* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {
   let themeFolder = "light";
@@ -291,33 +303,36 @@ function getIconPath(folder, iconName) {
 function refreshIcons() {
   document.querySelectorAll("img.icon").forEach(function (icon) {
     const source = icon.getAttribute("src");
-    if (!source) {
-      return;
-    }
-    const parts = source.split("/");
-    const iconFile = parts.pop();
-    const folder = parts.pop();
-    icon.src = getIconPath(folder, iconFile.replace(".svg", ""));
-    const fingerprintIcon = document.getElementById("fingerprintIcon");
-    if (fingerprintIcon) {
-      fingerprintIcon.src = getIconPath("biometric", "fingerprint");
-    }
-    const faceIdIcon = document.getElementById("faceIdIcon");
-    if (faceIdIcon) {
-      faceIdIcon.src = getIconPath("biometric", "faceid");
+    const parts = source ? source.split("/") : [];
+    const iconFile = parts.pop() || "";
+    const folder = icon.dataset.iconFolder || parts.pop();
+    const iconName = icon.dataset.iconName ||
+      iconFile.replace(/\.svg(?:[?#].*)?$/, "");
+    if (folder && iconName) {
+      icon.src = getIconPath(folder, iconName);
     }
   });
+
+  const fingerprintIcon = document.getElementById("fingerprintIcon");
+  if (fingerprintIcon) {
+    fingerprintIcon.src = getIconPath("biometric", "fingerprint");
+  }
+  const faceIdIcon = document.getElementById("faceIdIcon");
+  if (faceIdIcon) {
+    faceIdIcon.src = getIconPath("biometric", "faceid");
+  }
 }
 /* Open Bottom Sheet - Displays the bottom sheet and prevents background interaction. */
 function openBottomSheet() {
   const bottomSheet = document.getElementById("bottomSheet");
   const screenOverlay = document.getElementById("screenOverlay");
   const appFooter = document.querySelector(".appFooter");
-  if (!bottomSheet || !screenOverlay) {
-    return;
+  if (screenOverlay) {
+    screenOverlay.classList.remove("hidden");
   }
-  screenOverlay.classList.remove("hidden");
-  bottomSheet.classList.remove("hidden");
+  if (bottomSheet) {
+    bottomSheet.classList.remove("hidden");
+  }
   if (appFooter) {
     appFooter.classList.add("hiddenFooter");
   }
@@ -332,8 +347,12 @@ function closeBottomSheet() {
     console.error("Could Not close the bottom sheet");
     return;
   }
-  screenOverlay.classList.add("hidden");
-  bottomSheet.classList.add("hidden");
+  if (screenOverlay) {
+    screenOverlay.classList.add("hidden");
+  }
+  if (bottomSheet) {
+    bottomSheet.classList.add("hidden");
+  }
   if (appFooter) {
     appFooter.classList.remove("hiddenFooter");
   }
@@ -362,23 +381,23 @@ function getActiveCategory() {
     return category.name === activeCategory;
   });
 }
-/* Debug Active Category - Logs the active category to the browser console. */
-function debugActiveCategory() {
-  console.log("ACTIVE CATEGORY:", getActiveCategory());
-}
-/* Get Current Member - Returns the current user's membership details for the active group. */
-function getCurrentMember() {
-  const groupName = appState.activeGroup;
-  if (!groupName || !appState.currentUser) {
+/* Return the signed-in user's membership record for a selected group. */
+function getGroupMember(groupName = appState.activeGroup) {
+  const currentUser = appState.currentUser;
+  if (!groupName || !currentUser) {
     return null;
   }
-  const members = appState.groupMembers[groupName] || [];
+  const members = appState.groupMembers?.[groupName] || [];
   return members.find(function (member) {
-    return member.email === appState.currentUser.email;
+    return (
+      (currentUser.id && member.id === currentUser.id) ||
+      (currentUser.email &&
+        member.email?.toLowerCase() === currentUser.email.toLowerCase())
+    );
   });
 }
 
-function isAdminOfGroup(familyGroupId) {
+function isAdminOfGroup(familyGroupId) {    /// OBSOLETE
   const group = state.groups.find(group => group.familyGroupId === familyGroupId);
   return group ? Boolean(group.isAdmin) : false;
 }
@@ -387,7 +406,7 @@ function isAdminOfGroup(familyGroupId) {
   Is Admin - Determines whether the current user is an administrator of the active group. 
   Assumes state.activeGroupId is set to accurately reflect the 
 */
-function isAdmin() {
+function isAdmin() {      // OBSOLETE???
   const currGroupId = state.activeGroupId;
   return isAdminOfGroup(currGroupId);
 }
@@ -398,14 +417,226 @@ function isMember() {
   const member = getCurrentMember();
   return member ? member.role === "member" : false;
 }
-/* Can Manage Budget - Determines whether the current user can manage group budgets. */
-function canManageBudget() {
-  return isAdmin();
+/* Keep active-group callers compatible while using the shared group lookup. */
+function getCurrentMember() {
+  return getGroupMember(appState.activeGroup);
 }
-/* Can Manage Group - Determines whether the current user can manage the active group. */
-function canManageGroup() {
-  const member = getCurrentMember();
-  return member ? member.role === "admin" || member.role === "owner" : false;
+/* Return only the groups the signed-in user belongs to. */
+function getCurrentUserGroups() {
+  return Object.keys(appState.groups || {}).filter(function (groupName) {
+    return Boolean(getGroupMember(groupName));
+  });
+}
+/* Check whether the signed-in user is an administrator in the selected group. */
+function isAdmin(groupName = appState.activeGroup) {
+  return getGroupMember(groupName)?.role === "admin";
+}
+/* Check whether the signed-in user is a standard member in the selected group. */
+function isMember(groupName = appState.activeGroup) {
+  return getGroupMember(groupName)?.role === "member";
+}
+/* Check whether a user created the selected group. */
+function isGroupCreator(groupName = appState.activeGroup) {
+  const currentUser = appState.currentUser;
+  if (!getGroupMember(groupName)) return false;
+  const creatorId = appState.groupCreators?.[groupName];
+  return Boolean(
+    currentUser &&
+      creatorId &&
+      ((currentUser.id && creatorId === currentUser.id) ||
+        (currentUser.email &&
+          String(creatorId).toLowerCase() === currentUser.email.toLowerCase())),
+  );
+}
+/* Admin-only permissions cover invitations and member administration. */
+function canManageGroup(groupName = appState.activeGroup) {
+  return isAdmin(groupName);
+}
+/* Group creators may manage their group; admins retain full control. */
+function canManageGroupSettings(groupName = appState.activeGroup) {
+  return isAdmin(groupName) || isGroupCreator(groupName);
+}
+/* Group creators and admins may change the group-level budget. */
+function canManageBudget(groupName = appState.activeGroup) {
+  return canManageGroupSettings(groupName);
+}
+/* Admins or the category creator may manage that category and its budget. */
+function canManageCategory(categoryName, groupName = appState.activeGroup) {
+  const currentMember = getGroupMember(groupName);
+  if (!currentMember) return false;
+  if (currentMember.role === "admin") {
+    return true;
+  }
+  const category = (appState.groups?.[groupName] || []).find(function (entry) {
+    return entry.name === categoryName;
+  });
+  const currentUser = appState.currentUser;
+  const creatorId = category?.createdByUserId;
+  return Boolean(
+    currentUser &&
+      creatorId &&
+      ((currentUser.id && creatorId === currentUser.id) ||
+        (currentUser.email &&
+          String(creatorId).toLowerCase() === currentUser.email.toLowerCase())),
+  );
+}
+/* Members cannot change group colors; admins may customize their own view. */
+function canManageGroupColor(groupName) {
+  return isAdmin(groupName);
+}
+/* Personal group colors are stored per user so they do not change other members' view. */
+const GROUP_COLOR_PALETTE = [
+  "#d1495b",
+  "#ed9b40",
+  "#00798c",
+  "#30638e",
+  "#6a4c93",
+  "#2a9d8f",
+  "#688e26",
+  "#b56576",
+  "#5b5f97",
+  "#bc6c25",
+  "#3a7d44",
+  "#8f3985",
+];
+
+/* Return the saved group-color assignments for the selected user. */
+function getGroupColorMap(userId) {
+  if (
+    !appState.groupColorPreferences ||
+    typeof appState.groupColorPreferences !== "object" ||
+    Array.isArray(appState.groupColorPreferences)
+  ) {
+    appState.groupColorPreferences = {};
+  }
+  const ownerId = String(userId || getCurrentUser()?.id || "local-user");
+  if (
+    !appState.groupColorPreferences[ownerId] ||
+    typeof appState.groupColorPreferences[ownerId] !== "object" ||
+    Array.isArray(appState.groupColorPreferences[ownerId])
+  ) {
+    appState.groupColorPreferences[ownerId] = {};
+  }
+  return appState.groupColorPreferences[ownerId];
+}
+
+/* Build the color choices available to the current user, excluding assigned colors. */
+function getGroupColorOptions() {
+  const colorMap = getGroupColorMap();
+  const used = new Set(
+    Object.values(colorMap)
+      .filter(function (color) {
+        return typeof color === "string";
+      })
+      .map(function (color) {
+        return color.toLowerCase();
+      }),
+  );
+  const options = GROUP_COLOR_PALETTE.slice();
+  Object.values(colorMap).forEach(function (color) {
+    if (typeof color === "string" && color.startsWith("hsl("))
+      options.push(color.toLowerCase());
+  });
+  const paletteExhausted = GROUP_COLOR_PALETTE.every(function (color) {
+    return used.has(color);
+  });
+  if (!paletteExhausted) return [...new Set(options)];
+  const needed = Object.keys(appState.groups || {}).length + 8;
+  for (let index = 0; index < needed; index += 1) {
+    const hue = Math.round((index * 137.508) % 360);
+    options.push(`hsl(${hue} 62% 42%)`);
+  }
+  return [...new Set(options)];
+}
+
+/* Assign available default colors to groups that do not yet have one. */
+function ensureGroupColorsForCurrentUser() {
+  const colorMap = getGroupColorMap();
+  const used = new Set();
+  let changed = false;
+  Object.keys(colorMap).forEach(function (groupName) {
+    if (
+      !Object.prototype.hasOwnProperty.call(appState.groups || {}, groupName)
+    ) {
+      delete colorMap[groupName];
+      changed = true;
+    }
+  });
+  Object.keys(appState.groups || {}).forEach(function (groupName) {
+    const current = colorMap[groupName];
+    const options = getGroupColorOptions();
+    if (
+      typeof current === "string" &&
+      options.includes(current.toLowerCase()) &&
+      !used.has(current.toLowerCase())
+    ) {
+      colorMap[groupName] = current.toLowerCase();
+      used.add(colorMap[groupName]);
+      return;
+    }
+    const available = options.find(function (color) {
+      return !used.has(color.toLowerCase());
+    });
+    colorMap[groupName] = available || options[0];
+    used.add(colorMap[groupName].toLowerCase());
+    changed = true;
+  });
+  return changed;
+}
+
+/* Resolve a group's saved color, using the palette default when none is assigned. */
+function getGroupColor(groupName) {
+  ensureGroupColorsForCurrentUser();
+  return getGroupColorMap()[groupName] || GROUP_COLOR_PALETTE[0];
+}
+
+/* Render an escaped group name with its user-selected color marker. */
+function renderGroupNameWithColor(groupName) {
+  const safeName = String(groupName).replace(/[&<>"']/g, function (character) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[character];
+  });
+  const color = getGroupColor(groupName);
+  return `<span class="groupNameWithColor"><span class="groupColorDot" style="background-color:${color}" aria-hidden="true"></span><span>${safeName}</span></span>`;
+}
+
+/* Keep each user's color assignment attached when a group is renamed. */
+function renameGroupColorPreferences(oldGroupName, newGroupName) {
+  if (oldGroupName === newGroupName) return;
+  Object.values(appState.groupColorPreferences || {}).forEach(
+    function (colorMap) {
+      if (colorMap && colorMap[oldGroupName]) {
+        colorMap[newGroupName] = colorMap[oldGroupName];
+        delete colorMap[oldGroupName];
+      }
+    },
+  );
+}
+
+/* Remove a deleted group from every user's saved color assignments. */
+function removeGroupColorPreferences(groupName) {
+  Object.values(appState.groupColorPreferences || {}).forEach(
+    function (colorMap) {
+      if (colorMap) delete colorMap[groupName];
+    },
+  );
+}
+/* Get Purchased Item Spend - Uses the recorded purchase amount, with a fallback for legacy data that has no actual price. */
+function getItemSpentAmount(item) {
+  if (!item || !item.purchased) {
+    return 0;
+  }
+  if (item.actualPrice !== null && item.actualPrice !== undefined) {
+    const actualPrice = Number(item.actualPrice);
+    return Number.isFinite(actualPrice) ? actualPrice : 0;
+  }
+  const estimatedPrice = Number(item.estimatedPrice);
+  return Number.isFinite(estimatedPrice) ? estimatedPrice : 0;
 }
 /* Calculate Group Budget - Calculates the total amount spent for the specified shopping group. */
 function calculateGroupBudget(groupName) {
@@ -419,9 +650,7 @@ function calculateGroupBudget(groupName) {
       return;
     }
     category.items.forEach(function (item) {
-      if (item.purchased && item.estimatedPrice) {
-        spent += Number(item.estimatedPrice);
-      }
+      spent += getItemSpentAmount(item);
     });
   });
   return spent;
@@ -557,143 +786,219 @@ function showToast(message, type = "success") {
     }
   }, 2500);
 }
-/* Process Recurring Items */
+/* Get Recurrence Series ID - Generated occurrences retain the identity of their original recurring item. */
+function getRecurrenceSeriesId(item) {
+  if (!item || !item.recurrence) {
+    return null;
+  }
+  if (item.recurrence.seriesId) {
+    return item.recurrence.seriesId;
+  }
+  /* Older saved entries have no series ID. Use their recurrence details to keep
+     generated legacy occurrences together without joining unrelated products. */
+  return [
+    "legacy",
+    String(item.name || "")
+      .trim()
+      .toLowerCase(),
+    item.recurrence.frequency || "none",
+    String(item.quantity ?? ""),
+    item.quantityUnit || "pcs",
+    String(item.preferredShop || "")
+      .trim()
+      .toLowerCase(),
+    String(item.estimatedPrice ?? ""),
+    String(item.notes || "")
+      .trim()
+      .toLowerCase(),
+    item.recurrence.endDate || "",
+  ].join("|");
+}
+/* Parse a recurrence date using local calendar fields to avoid timezone shifts. */
+function parseRecurrenceDate(value) {
+  if (!value) return null;
+  const dateText = String(value);
+  const dateParts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateText);
+  const date = dateParts
+    ? new Date(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3]))
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+/* Format a date as a stable local YYYY-MM-DD recurrence value. */
+function formatRecurrenceDate(date) {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+/* Calculate the next scheduled date while preserving the configured recurrence day. */
+function nextRecurrenceDate(date, frequency, monthlyDay) {
+  const nextDate = new Date(date);
+  if (frequency === "daily") {
+    nextDate.setDate(nextDate.getDate() + 1);
+  } else if (frequency === "weekly") {
+    nextDate.setDate(nextDate.getDate() + 7);
+  } else if (frequency === "monthly") {
+    const day = Number(monthlyDay) || nextDate.getDate();
+    nextDate.setDate(1);
+    nextDate.setMonth(nextDate.getMonth() + 1);
+    const finalDay = new Date(
+      nextDate.getFullYear(),
+      nextDate.getMonth() + 1,
+      0,
+    ).getDate();
+    nextDate.setDate(Math.min(day, finalDay));
+  }
+  nextDate.setHours(0, 0, 0, 0);
+  return nextDate;
+}
+
+/* Replace overdue pending occurrences with one current occurrence per series. */
 function processRecurringItems() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   let stateUpdated = false;
+
   Object.values(appState.groups || {}).forEach(function (categories) {
+    if (!Array.isArray(categories)) return;
     categories.forEach(function (category) {
-      if (!Array.isArray(category.items)) {
-        return;
-      }
-      const recurringItems = category.items.filter(function (item) {
-        return (
-          item.recurrence &&
-          item.recurrence.enabled === true &&
-          item.recurrence.frequency !== "none"
-        );
+      if (!Array.isArray(category.items)) return;
+      const seriesMap = new Map();
+
+      category.items.forEach(function (item) {
+        if (
+          !item.recurrence ||
+          item.recurrence.enabled !== true ||
+          item.recurrence.frequency === "none"
+        ) return;
+        const seriesId = getRecurrenceSeriesId(item);
+        if (!item.recurrence.seriesId) {
+          item.recurrence.seriesId = seriesId;
+          stateUpdated = true;
+        }
+        if (!seriesMap.has(seriesId)) seriesMap.set(seriesId, []);
+        seriesMap.get(seriesId).push(item);
       });
-      recurringItems.forEach(function (item) {
-        if (!item.purchased || !item.purchaseDate) {
-          return;
-        }
-        if (item.recurrence.startDate) {
-          const recurrenceStartDate = new Date(
-            item.recurrence.startDate + "T00:00:00",
+
+      seriesMap.forEach(function (seriesItems, seriesId) {
+        const pendingItems = seriesItems.filter(function (item) {
+          return item.purchased !== true;
+        });
+        const purchasedItems = seriesItems.filter(function (item) {
+          return item.purchased === true && item.purchaseDate;
+        });
+        /* Resolve the schedule date used to identify the current pending series entry. */
+        const pendingDate = function (item) {
+          return parseRecurrenceDate(
+            item.recurrence.occurrenceDate ||
+              item.recurrence.startDate ||
+              item.recurrence.lastGeneratedDate,
           );
-          recurrenceStartDate.setHours(0, 0, 0, 0);
-          if (today < recurrenceStartDate) {
-            return;
+        };
+        pendingItems.sort(function (a, b) {
+          return (pendingDate(b)?.getTime() || 0) -
+            (pendingDate(a)?.getTime() || 0);
+        });
+        purchasedItems.sort(function (a, b) {
+          return new Date(b.purchaseDate).getTime() -
+            new Date(a.purchaseDate).getTime();
+        });
+
+        const currentPending = pendingItems[0] || null;
+        const template = currentPending || purchasedItems[0];
+        if (!template) return;
+        const recurrence = template.recurrence;
+        const frequency = recurrence.frequency;
+        if (!["daily", "weekly", "monthly"].includes(frequency)) return;
+
+        const startDate = parseRecurrenceDate(recurrence.startDate);
+        const endDate = parseRecurrenceDate(recurrence.endDate);
+        const monthlyDay = Number(recurrence.dayOfMonth) ||
+          (startDate || today).getDate();
+        let dueDate = null;
+
+        if (currentPending) {
+          const existingDueDate = pendingDate(currentPending) || startDate || today;
+          dueDate = new Date(existingDueDate);
+          while (nextRecurrenceDate(dueDate, frequency, monthlyDay) <= today) {
+            dueDate = nextRecurrenceDate(dueDate, frequency, monthlyDay);
           }
-        }
-        const recurrence = item.recurrence;
-        const lastOccurrenceDate = new Date(item.purchaseDate);
-        lastOccurrenceDate.setHours(0, 0, 0, 0);
-        let nextOccurrenceDate = new Date(lastOccurrenceDate);
-        if (recurrence.frequency === "daily") {
-          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
-        } else if (recurrence.frequency === "weekly") {
-          nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
-        } else if (recurrence.frequency === "monthly") {
-          nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
-        }
-        while (nextOccurrenceDate <= today) {
-          const existingOccurrence = category.items.some(
-            function (existingItem) {
-              return (
-                existingItem.name === item.name &&
-                existingItem.purchaseDate &&
-                existingItem.recurrence &&
-                existingItem.recurrence.frequency === recurrence.frequency &&
-                existingItem.purchaseDate.startsWith(
-                  nextOccurrenceDate.toISOString().split("T")[0],
-                )
-              );
-            },
-          );
-          if (existingOccurrence) {
-            nextOccurrenceDate = new Date(nextOccurrenceDate);
-            if (recurrence.frequency === "daily") {
-              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 1);
-            } else if (recurrence.frequency === "weekly") {
-              nextOccurrenceDate.setDate(nextOccurrenceDate.getDate() + 7);
-            } else if (recurrence.frequency === "monthly") {
-              nextOccurrenceDate.setMonth(nextOccurrenceDate.getMonth() + 1);
+          if (dueDate.getTime() === existingDueDate.getTime()) dueDate = null;
+        } else {
+          const lastPurchaseDate = parseRecurrenceDate(purchasedItems[0].purchaseDate);
+          if (lastPurchaseDate) {
+            dueDate = nextRecurrenceDate(lastPurchaseDate, frequency, monthlyDay);
+            while (nextRecurrenceDate(dueDate, frequency, monthlyDay) <= today) {
+              dueDate = nextRecurrenceDate(dueDate, frequency, monthlyDay);
             }
-          } else {
-            break;
           }
         }
-        const endDate = recurrence.endDate
-          ? new Date(recurrence.endDate + "T00:00:00")
-          : null;
-        if (endDate) {
-          endDate.setHours(0, 0, 0, 0);
-        }
-        if (endDate && nextOccurrenceDate > endDate) {
+
+        if (!dueDate || dueDate > today) {
+          if (pendingItems.length > 1) {
+            pendingItems.slice(1).forEach(function (duplicate) {
+              category.items.splice(category.items.indexOf(duplicate), 1);
+            });
+            stateUpdated = true;
+          }
           return;
         }
-        if (nextOccurrenceDate > today) {
-          return;
-        }
+        if (startDate && dueDate < startDate) return;
+        if (endDate && dueDate > endDate) return;
+
         const newItem = {
-          name: item.name,
-          quantity: item.quantity,
-          notes: item.notes,
-          preferredShop: item.preferredShop,
-          estimatedPrice: item.estimatedPrice,
+          id: createItemId(),
+          name: template.name,
+          quantity: template.quantity,
+          quantityUnit: template.quantityUnit || "pcs",
+          notes: template.notes,
+          preferredShop: template.preferredShop,
+          estimatedPrice: template.estimatedPrice,
           actualPrice: 0,
           purchaseDate: null,
           purchased: false,
           recurrence: {
             enabled: true,
-            frequency: recurrence.frequency,
-            startDate: nextOccurrenceDate.toISOString().split("T")[0],
+            frequency: frequency,
+            seriesId: seriesId,
+            occurrenceDate: formatRecurrenceDate(dueDate),
+            dayOfMonth: monthlyDay,
+            startDate: formatRecurrenceDate(dueDate),
             endDate: recurrence.endDate || null,
-            lastGeneratedDate: nextOccurrenceDate.toISOString(),
+            lastGeneratedDate: dueDate.toISOString(),
           },
         };
-        const duplicatePendingItem = category.items.some(
-          function (existingItem) {
-            return (
-              existingItem.name === newItem.name &&
-              !existingItem.purchased &&
-              existingItem.recurrence &&
-              existingItem.recurrence.enabled === true &&
-              existingItem.recurrence.frequency === newItem.recurrence.frequency
-            );
+
+        pendingItems.forEach(function (pending) {
+          const index = category.items.indexOf(pending);
+          if (index !== -1) category.items.splice(index, 1);
+        });
+        category.items.unshift(newItem);
+        createNotification(
+          "item",
+          t("notifications.recurringItemAdded"),
+          t("notifications.recurringItemAddedMessage", {
+            itemName: newItem.name,
+          }),
+          "category",
+          { group: appState.activeGroup, category: category.name },
+          {
+            titleKey: "notifications.recurringItemAdded",
+            messageKey: "notifications.recurringItemAddedMessage",
+            params: { itemName: newItem.name },
           },
         );
-        if (!duplicatePendingItem) {
-          category.items.unshift(newItem);
-          createNotification(
-            "item",
-            t("notifications.recurringItemAdded"),
-            t("notifications.recurringItemAddedMessage", {
-              itemName: newItem.name,
-            }),
-            "category",
-            {
-              group: appState.activeGroup,
-              category: category.name,
-            },
-            {
-              titleKey: "notifications.recurringItemAdded",
-              messageKey: "notifications.recurringItemAddedMessage",
-              params: {
-                itemName: newItem.name,
-              },
-            },
-          );
-          stateUpdated = true;
-        }
+        stateUpdated = true;
       });
     });
   });
-  if (stateUpdated) {
-    saveAppState();
-  }
+
+  if (stateUpdated) saveAppState();
 }
 
 /**
@@ -865,6 +1170,7 @@ const PRODUCT_IMAGE_PATH = "../assets/images/products";
 function getProductImage(itemName) {
   const product = productDatabase.find(function (product) {
     return product.name && product.name.trim().toLowerCase() === itemName.trim().toLowerCase();
+    // return normalizeItemName(product.name) === normalizeItemName(itemName);
   });
   if (!product) {
     return "";
@@ -882,7 +1188,7 @@ function getProductImage(itemName) {
  *   imageUrl
  * }
  ***************************************************************************************************/
-/* Normalize Item Name */
+/* Normalize item names for comparison without changing the saved display text. */
 function normalizeItemName(itemName) {
   return itemName.trim().toLowerCase();
 }
@@ -925,6 +1231,7 @@ function getCurrencySymbol() {
   return currencySymbols[currency] || "$";
 }
 
+/* Return unit labels and conversion behavior for the selected measurement system. */
 function getMeasurementUnits() {
   const measurementSystem = state.settings?.measuringSystem || "metric";
 
@@ -947,6 +1254,7 @@ function getMeasurementUnits() {
   ];
 }
 
+/* Resolve a stored quantity-unit code to its user-facing label. */
 function getQuantityUnitLabel(unit) {
   const units = getMeasurementUnits();
   const selectedUnit = units.find(function (measurement) {
@@ -956,6 +1264,7 @@ function getQuantityUnitLabel(unit) {
   return selectedUnit ? selectedUnit.label : "pcs";
 }
 
+/* Build the quantity-unit options and mark the currently selected value. */
 function getQuantityUnitOptions(selectedUnit = "pcs") {
   return getMeasurementUnits()
     .map(function (measurement) {

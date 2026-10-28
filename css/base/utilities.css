@@ -43,12 +43,3 @@
   opacity: 0;
   pointer-events: none;
 }
-/* Clickable Elements */
-.clickable,
-.clickableMember {
-  cursor: pointer;
-}
-/* Full Width */
-.fullWidth {
-  width: 100%;
-}

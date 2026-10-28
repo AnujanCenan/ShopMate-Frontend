@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Shows one category's shopping items, tabs, search, and bulk item actions. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,7 +13,7 @@
       <header class="modernHeader">
         <button class="modernBackButton" id="backButton">
           <img
-            src="../assets/icons/navigation/back.svg"
+            data-icon-folder="navigation" data-icon-name="back"
             class="icon navigationIcon"
             alt="Back"
           />
@@ -55,7 +56,7 @@
         <div class="searchWrapper">
           <span class="searchIcon">
             <img
-              src="../assets/icons/actions/search.svg"
+              data-icon-folder="actions" data-icon-name="search"
               class="icon actionIcon"
               alt="Search"
             />
@@ -67,7 +68,31 @@
             data-i18n-placeholder="category.searchItems"
           />
         </div>
+        <!-- Lets users change item display order without changing saved item order. -->
+        <div class="sortControl itemSortControl">
+          <label for="itemSortSelect" data-i18n="category.sortItems">
+            Sort items
+          </label>
+          <select id="itemSortSelect" class="sortControlSelect">
+            <option value="default" data-i18n="category.sortDefault">
+              Default order
+            </option>
+            <option value="newest-first" data-i18n="category.sortNewestFirst">
+              Newest added first
+            </option>
+            <option value="newest-last" data-i18n="category.sortNewestLast">
+              Newest added last
+            </option>
+            <option value="recurring-first" data-recurrence-sort data-i18n="category.sortRecurringFirst">
+              Recurring first
+            </option>
+            <option value="one-off-first" data-recurrence-sort data-i18n="category.sortOneOffFirst">
+              One-off first
+            </option>
+          </select>
+        </div>
         <!-- EMPTY STATE -->
+        <!-- Empty-state message is shown when the active tab has no matching items. -->
         <section class="emptyStateSection" id="itemEmptyState"></section>
         <!-- ITEM LIST -->
         <section class="itemList" id="itemList"></section>
@@ -87,7 +112,7 @@
           id="bulkFavoriteButton"
         >
           <img
-            src="../assets/icons/actions/favorite-outline.svg"
+            data-icon-folder="actions" data-icon-name="favorite-outline"
             class="icon actionIcon"
             alt="Favorite"
           />
@@ -98,7 +123,7 @@
           id="bulkPurchasedButton"
         >
           <img
-            src="../assets/icons/actions/purchased.svg"
+            data-icon-folder="actions" data-icon-name="purchased"
             class="icon actionIcon"
             alt="Purchased"
           />
@@ -109,7 +134,7 @@
           id="bulkDeleteButton"
         >
           <img
-            src="../assets/icons/actions/delete.svg"
+            data-icon-folder="actions" data-icon-name="delete"
             class="icon actionIcon"
             alt="Delete"
           />
@@ -122,7 +147,7 @@
       <!-- FLOATING ACTION BUTTON -->
       <button class="floatingActionButton" id="openItemBottomSheetButton">
         <img
-          src="../assets/icons/actions/add.svg"
+          data-icon-folder="actions" data-icon-name="add"
           class="icon largeIcon"
           alt="Add Item"
         />
@@ -163,6 +188,7 @@
     <script src="../js/unitsMapping.js"></script>
     <script src="../js/localization/languageManager.js"></script>
     <script src="../js/bootstrap.js"></script>
+    <!-- Initialize category tabs, item data, gestures, and localization after page load. -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initializeApplication();
