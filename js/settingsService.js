@@ -83,6 +83,7 @@ async function changeTheme_mysql(theme) {
     }
 
     checkStateSettings()
+    if (!state.settings) state.settings = {};
     state.settings.theme = theme;
     saveState();
 
@@ -218,6 +219,7 @@ async function getUserSettings_mysql() {
  * The object produced in getUserSettings_mysql().
  */
 function copySettingsFromDatabaseToLocal(fetchedSettings) {
+      if (!state.settings) state.settings = {};
     state.settings.theme = fetchedSettings.Theme;
     state.settings.measuringSystem = fetchedSettings.measuringSystem;
     state.settings.measuringSystem = fetchedSettings.measuringSystem;

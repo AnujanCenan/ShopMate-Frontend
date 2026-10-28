@@ -115,7 +115,7 @@ function redirectIfLoggedIn() {
   ) {
     if (sessionStorage.getItem("shopMateAppUnlocked") !== "true") {
       applicationLocked = true;
-      renderApplicationLockScreen();
+      // renderApplicationLockScreen();
       return;
     }
   }
@@ -545,7 +545,7 @@ function getCurrentGroupMembers() {
   return appState.groupMembers[appState.activeGroup] || [];
 }
 /* Get Current User Role - Returns the current user's role within the active group. */
-function getCurrentUserRole() {
+async function getCurrentUserRole() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     return null;
@@ -568,7 +568,7 @@ function validateInvite(inviteCode) {
   });
 }
 /* Join Group From Invite - Adds the current user to the invited group. */
-function joinGroupFromInvite(inviteCode) {
+async function joinGroupFromInvite(inviteCode) {
   const invite = validateInvite(inviteCode);
   if (!invite) {
     showDialog(t("auth.invalidInvite"), t("auth.invalidInviteMessage"));
@@ -687,7 +687,7 @@ function validatePasswordRecoveryEmail(email) {
   return true;
 }
 /* Check Biometric Status - Returns whether biometric authentication is enabled for the current user. */
-function isBiometricEnabled() {
+async function isBiometricEnabled() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     return false;
@@ -756,7 +756,7 @@ async function enableBiometricAuthentication() {
   }
 }
 /* Disable Biometric Authentication - Removes the biometric login setting. */
-function disableBiometricAuthentication() {
+async function disableBiometricAuthentication() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     return false;
@@ -778,7 +778,7 @@ function validatePin(pin) {
   return /^\d{4,6}$/.test(pin);
 }
 /* PIN Security - Creates or updates the PIN for the current user. */
-function setApplicationPin(pin, confirmPin, currentPin = null) {
+async function setApplicationPin(pin, confirmPin, currentPin = null) {
   const currentUser = getCurrentUser();
 
   if (!currentUser) {
@@ -846,7 +846,7 @@ function setApplicationPin(pin, confirmPin, currentPin = null) {
   return true;
 }
 /* Check App Lock Status */
-function isAppLockEnabled() {
+async function isAppLockEnabled() {
   const currentUser = getCurrentUser();
   if (!currentUser || !currentUser.security) {
     return false;
@@ -854,7 +854,7 @@ function isAppLockEnabled() {
   return currentUser.security.appLockEnabled === true;
 }
 /* Enable / Disable App Lock */
-function toggleAppLock() {
+async function toggleAppLock() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     return false;
@@ -972,7 +972,7 @@ function resetAuthenticationAttempts() {
 }
 /* Check App Lock Status */
 /* Check Whether App Launch Authentication Is Required */
-function isApplicationLockEnabled() {
+async function isApplicationLockEnabled() {
   const currentUser = getCurrentUser();
   if (!currentUser) {
     return false;
@@ -993,10 +993,10 @@ function lockApplication() {
   }
   applicationLocked = true;
   sessionStorage.removeItem("shopMateAppUnlocked");
-  renderApplicationLockScreen();
+  // renderApplicationLockScreen();
 }
 /* Unlock Application With PIN */
-function unlockApplicationWithPin() {
+async function unlockApplicationWithPin() {
   const pinInput = document.getElementById("appLockPinInput");
   const errorMessage = document.getElementById("appLockError");
 
@@ -1063,7 +1063,7 @@ function unlockApplicationWithPin() {
   }
 }
 /* Render Application Lock Screen */
-function renderApplicationLockScreen() {
+async function renderApplicationLockScreen() {
   if (document.getElementById("appLockScreen")) {
     return;
   }
@@ -1245,18 +1245,18 @@ function initializeApplicationEntry() {
 
   if (!isApplicationLockEnabled()) {
     sessionStorage.setItem("shopMateAppUnlocked", "true");
-    // window.location.href = "../pages/dashboardPage.html";
+    window.location.href = "../pages/dashboardPage.html";
     return true;
   }
 
   if (sessionStorage.getItem("shopMateAppUnlocked") === "true") {
     applicationLocked = false;
-    // window.location.href = "../pages/dashboardPage.html";
+    window.location.href = "../pages/dashboardPage.html";
     return true;
   }
 
   applicationLocked = true;
-  renderApplicationLockScreen();
+  // renderApplicationLockScreen();
 
   return true;
 }

@@ -6,7 +6,7 @@ function toggleDarkMode() {
   saveAppState();
 }
 /* Toggle Notifications */
-function toggleNotifications() {
+async function toggleNotifications() {
   appState.notificationsEnabled = !appState.notificationsEnabled;
   saveAppState();
   showDialog(
@@ -31,7 +31,7 @@ function toggleBiometric() {
   );
 }
 /* Open Profile */
-function openProfilePage() {
+async function openProfilePage() {
   localStorage.setItem(
     "selectedMember",
     JSON.stringify(
@@ -134,7 +134,7 @@ function openSecuritySettings() {
   openBottomSheet();
 }
 /* Open PIN Setup */
-function openPinSetup() {
+async function openPinSetup() {
   const currentUser = getCurrentUser();
   const security = currentUser?.security || {};
   const pinAlreadyEnabled = security.pinEnabled === true && !!security.pin;
@@ -246,7 +246,7 @@ async function savePinFromSettings() {
   }
 }
 /* Toggle App Lock from Security Settings */
-function toggleAppLockFromSettings() {
+async function toggleAppLockFromSettings() {
   toggleAppLock();
   openSecuritySettings();
 }
@@ -281,7 +281,7 @@ async function toggleBiometricFromSettings() {
 }
 /* Open Theme Settings - Displays available application themes. */
 function openThemeSettings() {
-  const selectedTheme = appState.settings.theme;
+  const selectedTheme = state?.settings?.theme || "light";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>Theme</h2>
@@ -392,7 +392,8 @@ async function saveThemePreference() {
       return;
     }
   }
-  appState.settings.theme = selectedTheme.value;
+  if (!state.settings) state.settings = {};
+  state.settings.theme = selectedTheme.value;
   await changeTheme_mysql(selectedTheme.value);
 
   applyTheme();

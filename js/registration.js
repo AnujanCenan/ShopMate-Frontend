@@ -10,13 +10,13 @@ async function handleInvitationFlow() {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.message || "Invalid or expired invitation token.");
+      showSnackBar(data.message || "Invalid or expired invitation token.");
       return;
     }
 
     // User account already exists -> Redirect to Login Page
     if (data.userExists) {
-      alert("An account with this email already exists. Please log in to join the group.");
+      showSnackBar("An account with this email already exists. Please log in to join the group.");
       window.location.href = `./loginPage.html?token=${token}&email=${encodeURIComponent(data.email)}`;
       return;
     }
@@ -51,71 +51,7 @@ async function handleInvitationFlow() {
   }
 }
 
-// function setupFormSubmitHandler() {
-//   const registerForm = document.getElementById("registerForm");
-//   const loginForm = document.getElementById("loginForm");
-//   const inviteToken = document.getElementById("inv_token")?.value || null;
-
-//   // Handle Registration
-//   if (registerForm) {
-//     registerForm.addEventListener("submit", async (e) => {
-//       e.preventDefault();
-
-//       const payload = {
-//         // name: document.getElementById("usr_name")?.value,
-//         email: document.getElementById("emailInput")?.value,
-//         password: document.getElementById("passwordInput")?.value,
-//         // phone: document.getElementById("usr_phone")?.value || "",
-//         inviteToken: inviteToken
-//       };
-
-//       await handleAuthSubmit("http://localhost:5113/api/user-create", payload);
-//     });
-//   }
-
-//   // Handle Login
-//   if (loginForm) {
-//     loginForm.addEventListener("submit", async (e) => {
-//       e.preventDefault();
-
-//       const payload = {
-//         userEmail: document.getElementById("usr_email")?.value,
-//         userPassword: document.getElementById("usr_password")?.value,
-//         inviteToken: inviteToken
-//       };
-
-//       await handleAuthSubmit("http://localhost:5113/api/login", payload);
-//     });
-//   }
-// }
-
-// // Reusable fetch handler for both authentication forms
-// async function handleAuthSubmit(endpoint, payload) {
-//   try {
-//     const res = await fetch(endpoint, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(payload)
-//     });
-
-//     const result = await res.json();
-
-//     if (res.ok) {
-//       if (result.token) {
-//         localStorage.setItem("authToken", result.token);
-//       }
-//       window.location.href = "/pages/dashboard.html";
-//     } else {
-//       alert(result.message || "An error occurred during authentication.");
-//     }
-//   } catch (error) {
-//     console.error("Authentication request failed:", error);
-//     alert("Unable to connect to the server. Please try again.");
-//   }
-// }
-
-// Inline handler called by onsubmit="registerUser(event)"
-async function registerUser(event) {
+async function registerUser_mysql(event) {
   event.preventDefault();
 
   const inviteToken = document.getElementById("inviteTokenInput")?.value || null;
@@ -143,9 +79,15 @@ async function registerUser(event) {
     if (response.ok) {
       localStorage.setItem("authToken", result.token);
       resetState();
+      await obtainUserProfile();
       window.location.href = "./dashboardPage.html";
     } else {
-      alert(result.message || "Registration failed.");
+      if (result.message) {
+          // t() translates the key based on the user's current language
+          showSnackBar(result.message); 
+      } else {
+          alert(result.message || "An error occurred.");
+      }
     }
   } catch (err) {
     console.error("Registration error:", err);

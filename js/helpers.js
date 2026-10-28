@@ -127,14 +127,20 @@ function getQuickPickProducts(maxResults = 5) {
 }
 
 async function getCatalogue() {
-  const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+  const CACHE_TTL_MS = 30 * 1000; // 30 seconds
   const hasValidCache = state.catalogue?.items && 
     (new Date() - new Date(state.catalogue.timeFetched) < CACHE_TTL_MS);
 
   if (hasValidCache) {
+    console.log(state.catalogue.timeFetched)
+    console.log(new Date().toLocaleDateString());
+
+    console.log("Have valid cache; state catalogue is ")
+    console.log(state.catalogue.items)
     return state.catalogue.items;
   }
 
+  console.log("No valid cache; need to fetch...");
   const res = await fetch('http://localhost:5113/api/get-catalogue', {
     method: "GET",
     credentials: 'include',
@@ -162,6 +168,8 @@ async function renderProductSuggestions(searchText) {
   }
   suggestionContainer.innerHTML = "";
   let products = await getCatalogue();
+  console.log("Suggestion Products ===");
+  console.log(products);
   const search = searchText.trim();
 
   if (search && search !== "") {
@@ -270,9 +278,9 @@ function getCurrencySymbol() {
 /* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {
   let themeFolder = "light";
-  if (appState.settings.theme === "dark") {
+  if (state?.settings?.theme === "dark") {
     themeFolder = "dark";
-  } else if (appState.settings.theme === "system") {
+  } else if (state?.settings?.theme === "system") {
     themeFolder = window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
@@ -880,7 +888,7 @@ function normalizeItemName(itemName) {
 }
 /* Apply Theme - Applies the user's selected theme throughout the application. */
 function applyTheme() {
-  const selectedTheme = appState.settings.theme;
+  const selectedTheme = state?.settings?.theme;
   document.body.classList.remove("darkMode");
   if (selectedTheme === "dark") {
     document.body.classList.add("darkMode");
@@ -898,7 +906,7 @@ function applyTheme() {
 function initializeThemeListener() {
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
   mediaQuery.addEventListener("change", function () {
-    if (appState.settings.theme === "system") {
+    if (state?.settings?.theme === "system") {
       applyTheme();
     }
   });

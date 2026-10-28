@@ -10,7 +10,7 @@
     <div class="authPage">
       <div class="authCard">
         <h1 class="authTitle" data-i18n="register.title">Register</h1>
-        <form id="registerForm" onsubmit="registerUser(event)">
+        <form id="registerForm" onsubmit="registerUser_mysql(event)">
           <input
             type="text"
             class="authInput"
@@ -91,6 +91,7 @@
     <script src="../js/registration.js"></script>
     <!-- Localization -->
     <script src="../js/localization/languageManager.js"></script>
+    <script src="../js/snackbarManager.js"></script>
     <!-- Application Bootstrap -->
     <script src="../js/bootstrap.js"></script>
     <script>

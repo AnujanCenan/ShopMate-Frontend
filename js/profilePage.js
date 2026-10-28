@@ -69,6 +69,7 @@ function initializeProfilePage() {
   }
   renderProfile();
   renderProfileStatistics();
+
 }
 /* Navigation */
 /* Go Back - Returns to the Dashboard page. */
@@ -126,18 +127,16 @@ function renderProfile() {
 }
 /* Render Profile Statistics - Displays the number of active groups the user belongs to. */
 function renderProfileStatistics() {
-  let groupCount = 0;
-  Object.keys(appState.groups || {}).forEach(function (groupName) {
-    const members = appState.groupMembers[groupName] || [];
-    const isMember = members.some(function (member) {
-      return member.id === currentUser.id;
-    });
-    if (isMember) {
-      groupCount++;
-    }
-  });
-  profileGroups.textContent = groupCount;
+  let currentUser = getCurrentUser();
+  if (!currentUser) {
+    profileGroups.textContent = 0;
+    return;
+  }
+
+  profileGroups.textContent = currentUser.numGroups;
+  return;
 }
+
 /* Actions */
 /* Render Edit Profile - Opens the Edit Profile bottom sheet. */
 function renderEditProfileForm() {
@@ -297,8 +296,9 @@ async function saveProfileChanges() {
   };
 
   try {
-    const response = await fetch("http://localhost:5113/api/user-profile", {
+    const response = await fetch("http://localhost:5113/api/user-profile-update", {
       method: "PUT",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         // Authorization header included if cookies are not used exclusively
@@ -329,7 +329,7 @@ async function saveProfileChanges() {
 }
 
 /* Preview Profile Photo */
-function previewProfilePhoto(event) {
+async function previewProfilePhoto(event) {
   const file = event.target.files[0];
   if (!file) {
     return;
