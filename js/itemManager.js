@@ -699,7 +699,7 @@ async function createItem() {
         : null,
       startDate: newItemIsRecurring ? recurrenceStartDate : null,
       endDate: newItemIsRecurring ? recurrenceEndDate : null,
-      seriesId: newItemIsRecurring ? newItemId : null,
+      seriesId: newItemIsRecurring ? listItemId : null,
     },
   };
   state.listItems.unshift(newItem);
@@ -792,17 +792,13 @@ async function updateDuplicateQuantity(ItemName, addedQuantity) {
 /* Update Item */
 
 async function updateItemMySql(listItemId, newItem) {
+  console.log(`Pushing udpated item to database; general unit is ${newItem.GeneralUnit}`)
   const recurrenceFrequency =
     document.getElementById("editItemRecurrenceFrequency")?.value || "none";
   const recurrenceStartDate =
     document.getElementById("editItemRecurrenceStartDate")?.value || null;
   const recurrenceEndDate =
     document.getElementById("editItemRecurrenceEndDate")?.value || null;
-  
-  console.log(`In updateItemMySql: esitmated price value = ${newItem.EstimatedPrice}`);
-  console.log(`In updateItem MySQL; listItemId == ${listItemId}; type == ${typeof(listItemId)}`);
-  console.log(`In updateItem MySQL: List ID being passed in is ${newItem.ListId}`);
-  console.log(`In updateItem MySQL: Quantity passed in is ${newItem.Quantity}`);
 
   const res = await fetch("http://localhost:5113/api/edit-item", {
     method: "PUT",
@@ -815,6 +811,7 @@ async function updateItemMySql(listItemId, newItem) {
       FamilyGroupId: state.activeGroupId,
       ListId: newItem.ListId,
       Quantity: newItem.Quantity,
+      GeneralUnit: newItem.GeneralUnit || "numeric",
       OptionalNotes: newItem.OptionalNotes,
       EstimatedPrice: newItem.EstimatedPrice,
       ItemRecurrenceInterval: recurrenceFrequency,
@@ -845,6 +842,8 @@ async function updateItem(listItemId) {
     .value.trim();
   const newQuantityUnit =
     document.getElementById("editItemQuantityUnitInput")?.value || "pcs";
+  const generalUnit = getGeneralUnit(newQuantityUnit, state.settings?.measurementUnit || "metric");
+  console.log(`Updating Item: general Unit selected == ${generalUnit}`);
   const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;
   const newNotes = document.getElementById("editItemNotesInput").value.trim();
@@ -873,18 +872,17 @@ async function updateItem(listItemId) {
   item.ItemName = newName;
   item.Quantity = newQuantity;
   item.quantityUnit = newQuantityUnit;
+  item.GeneralUnit = generalUnit;
   item.EstimatedPrice = newPrice;
   item.OptionalNotes = newNotes;
   item.ShopName = newShop;
   item.recurrence = {
     enabled: recurrenceFrequency !== "none",
     frequency: recurrenceFrequency,
-    occurrenceDate: recurrenceOccurrenceDate,
-    dayOfMonth: recurrenceDayOfMonth,
     startDate: recurrenceFrequency !== "none" ? recurrenceStartDate : null,
     endDate: recurrenceFrequency !== "none" ? recurrenceEndDate : null,
-    seriesId: recurrenceSeriesId,
   };
+
   item.ItemRecurrenceInterval = recurrenceFrequency;
   item.StartDate = recurrenceStartDate;
   item.EndDate = recurrenceEndDate;
@@ -1083,31 +1081,9 @@ async function confirmPurchase(listItemId) {
     item.recurrence &&
     item.recurrence.enabled === true &&
     item.recurrence.frequency !== "none";
-  const normalizedName = normalizeItemName(item.name);
+  const normalizedName = normalizeItemName(item.ItemName);
   const normalizedShop = actualShop.trim().toLowerCase();
-  const mergeTarget =
-    !isRecurring &&
-    currentCategory.items.find(function (candidate) {
-      const candidatePrice =
-        candidate.lastPurchasePrice ?? candidate.actualPrice;
-      return (
-        candidate.id !== item.id &&
-        candidate.purchased &&
-        !(
-          candidate.recurrence &&
-          candidate.recurrence.enabled === true &&
-          candidate.recurrence.frequency !== "none"
-        ) &&
-        normalizeItemName(candidate.name) === normalizedName &&
-        candidatePrice !== null &&
-        candidatePrice !== undefined &&
-        Number.isFinite(Number(candidatePrice)) &&
-        Number(candidatePrice) === actualPrice &&
-        (candidate.purchaseShop || "").trim().toLowerCase() ===
-          normalizedShop &&
-        (candidate.quantityUnit || "pcs") === (item.quantityUnit || "pcs")
-      );
-    });
+  
   item.actualPrice = actualPrice;
   item.purchaseShop = actualShop;
   // Update the estimate from the entered price only for recurring items.
@@ -1119,53 +1095,6 @@ async function confirmPurchase(listItemId) {
   await markPurchased_mysql(item, actualPrice);
   item.Purchased = true;      // update local state as well
 
-  if (item.purchased) {
-    item.purchaseDate = new Date().toISOString();
-    if (item.recurrence && item.recurrence.enabled === true) {
-      item.recurrence.lastGeneratedDate = null;
-    }
-  } else {
-    item.purchaseDate = null;
-  }
-  if (item.purchased && mergeTarget) {
-    if (!Array.isArray(mergeTarget.purchaseEvents)) {
-      mergeTarget.purchaseEvents = [
-        {
-          quantity: mergeTarget.quantity,
-          actualPrice: Number(mergeTarget.actualPrice) || 0,
-          purchaseDate: mergeTarget.purchaseDate || null,
-          purchaseShop: mergeTarget.purchaseShop || "",
-        },
-      ];
-    }
-    mergeTarget.purchaseEvents.push({
-      quantity: item.quantity,
-      actualPrice: actualPrice,
-      purchaseDate: item.purchaseDate,
-      purchaseShop: actualShop,
-    });
-    mergeTarget.quantity = Number(mergeTarget.quantity) + Number(item.quantity);
-    mergeTarget.actualPrice = Number(mergeTarget.actualPrice) + actualPrice;
-    mergeTarget.lastPurchasePrice = actualPrice;
-    mergeTarget.purchaseDate = item.purchaseDate;
-    mergeTarget.purchaseShop = actualShop;
-    currentCategory.items.splice(currentCategory.items.indexOf(item), 1);
-  } else if (item.purchased) {
-    item.lastPurchasePrice = actualPrice;
-    item.purchaseEvents = [
-      {
-        quantity: item.quantity,
-        actualPrice: actualPrice,
-        purchaseDate: item.purchaseDate,
-        purchaseShop: actualShop,
-      },
-    ];
-  }
-  if (item.purchased) {
-    item.purchaseDate = new Date().toISOString();
-  } else {
-    item.purchaseDate = null;
-  }
   updateBudgetTracking(state.activeCategory, actualPrice);
   calculateGroupBudget();
   saveState();

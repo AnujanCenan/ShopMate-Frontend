@@ -508,10 +508,10 @@ function initializeBudgetPage() {
   const params = new URLSearchParams(window.location.search);
   const requestedGroup = params.get("group");
   const availableGroups = getCurrentUserGroups();
-  if (availableGroups.length === 0) {
-    window.location.href = "../pages/dashboardPage.html";
-    return;
-  }
+  // if (availableGroups.length === 0) {
+  //   window.location.href = "../pages/dashboardPage.html";
+  //   return;
+  // }
   if (requestedGroup && availableGroups.includes(requestedGroup)) {
     budgetDisplayGroup = requestedGroup;
   } else if (!getGroupMember(appState.activeGroup)) {

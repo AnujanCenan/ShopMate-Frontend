@@ -98,7 +98,7 @@ async function renderGroupAccordion() {
         >
           <div>
             <h3 class="groupAccordionTitle">
-              ${renderGroupNameWithColor(groupName)}
+              ${renderGroupNameWithColor(groupName, groupId)}
             </h3>
             <p class="groupAccordionSubtitle">
               ${members.length} ${t("groupManagement.members")} •

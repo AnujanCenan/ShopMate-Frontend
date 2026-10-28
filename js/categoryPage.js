@@ -138,6 +138,7 @@ function compareRecurringOccurrenceDates(left, right) {
 }
 /* Sort a display copy so the saved category item order remains untouched. */
 function sortItemsForDisplay(items) {
+  console.log(items);
   const sortMode = getItemSortMode();
   if (sortMode === "default") {
     return items;
@@ -166,13 +167,13 @@ function sortItemsForDisplay(items) {
     if (
       leftRecurring &&
       rightRecurring &&
-      normalizeItemName(left.name) === normalizeItemName(right.name)
+      normalizeItemName(left.ItemName) === normalizeItemName(right.ItemName)
     ) {
       const dateOrder = compareRecurringOccurrenceDates(left, right);
       if (dateOrder !== 0) return dateOrder;
     }
-    return normalizeItemName(left.name).localeCompare(
-      normalizeItemName(right.name),
+    return normalizeItemName(left.ItemName).localeCompare(
+      normalizeItemName(right.ItemName),
     );
   });
 }

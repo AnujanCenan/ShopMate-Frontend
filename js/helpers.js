@@ -428,9 +428,14 @@ function getCurrentUserGroups() {
   });
 }
 /* Check whether the signed-in user is an administrator in the selected group. */
-function isAdmin(groupName = appState.activeGroup) {
-  return getGroupMember(groupName)?.role === "admin";
+function isAdmin(groupName = state.activeGroup, groupId = state.activeGroupId) {
+  const currGroup = state.groups.find(g => g.familyGroupId == groupId);
+  if (!currGroup) {
+    return false;
+  }
+  return currGroup.isAdmin;
 }
+
 /* Check whether the signed-in user is a standard member in the selected group. */
 function isMember(groupName = appState.activeGroup) {
   return getGroupMember(groupName)?.role === "member";
@@ -461,26 +466,12 @@ function canManageBudget(groupName = appState.activeGroup) {
   return canManageGroupSettings(groupName);
 }
 /* Admins or the category creator may manage that category and its budget. */
-function canManageCategory(categoryName, groupName = appState.activeGroup) {
-  const currentMember = getGroupMember(groupName);
-  if (!currentMember) return false;
-  if (currentMember.role === "admin") {
-    return true;
-  }
-  const category = (appState.groups?.[groupName] || []).find(function (entry) {
-    return entry.name === categoryName;
-  });
-  const currentUser = appState.currentUser;
-  const creatorId = category?.createdByUserId;
-  return Boolean(
-    currentUser &&
-      creatorId &&
-      ((currentUser.id && creatorId === currentUser.id) ||
-        (currentUser.email &&
-          String(creatorId).toLowerCase() === currentUser.email.toLowerCase())),
-  );
+function canManageCategory(categoryName, groupName = state.activeGroup, groupId = state.activeGroupId) {
+  return isAdmin(groupName, groupId)
 }
+
 /* Members cannot change group colors; admins may customize their own view. */
+/// YES THEY CAN
 function canManageGroupColor(groupName) {
   return isAdmin(groupName);
 }
@@ -585,13 +576,13 @@ function ensureGroupColorsForCurrentUser() {
 }
 
 /* Resolve a group's saved color, using the palette default when none is assigned. */
-function getGroupColor(groupName) {
+function getGroupColor(groupName, groupId) {
   ensureGroupColorsForCurrentUser();
   return getGroupColorMap()[groupName] || GROUP_COLOR_PALETTE[0];
 }
 
 /* Render an escaped group name with its user-selected color marker. */
-function renderGroupNameWithColor(groupName) {
+function renderGroupNameWithColor(groupName, groupId) {
   const safeName = String(groupName).replace(/[&<>"']/g, function (character) {
     return {
       "&": "&amp;",
