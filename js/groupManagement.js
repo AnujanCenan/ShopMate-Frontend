@@ -219,7 +219,7 @@ async function renderGroupAccordion() {
                           onclick="
                             event.stopPropagation();
                             openInviteActions(
-                              ${groupId}, ${invitation.id}
+                              ${groupId}, ${invitation.invId}
                             );
                           "
                         >
@@ -321,13 +321,12 @@ function openInviteActions(groupId, invitationId) {
   }
   const invitation = (state.tempPendingInvites[groupId] || []).find(
     function (invitation) {
-      return invitation.id === invitationId;
+      return Number(invitation.invId) === Number(invitationId);
     },
   );
   if (!invitation) {
     return;
   }
-  if (!canManageGroup(invitation.groupName)) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -379,53 +378,63 @@ function openInviteActions(groupId, invitationId) {
   `;
   openBottomSheet();
 }
-/* Resend Invitation */
-function resendInvitation(invitationId) {
-  const invitation = (appState.pendingInvitations || []).find(
-    function (entry) {
-      return entry.id === invitationId;
-    },
-  );
-  if (!invitation || !canManageGroup(invitation.groupName)) {
+/* Find a cached pending invitation (from get-group-management-info) and its group id. */
+function findPendingInvitation(invitationId) {
+  for (const groupId of Object.keys(state.tempPendingInvites || {})) {
+    const invitation = (state.tempPendingInvites[groupId] || []).find(function (entry) {
+      return Number(entry.invId) === Number(invitationId);
+    });
+    if (invitation) {
+      return { groupId: Number(groupId), invitation: invitation };
+    }
+  }
+  return null;
+}
+/* Resend Invitation - Emails a fresh link and extends the invitation's expiry by 7 days. */
+async function resendInvitation(invitationId) {
+  if (!canManageGroup()) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanResend"),
     );
     return;
   }
-  invitation.invitedAt = new Date().toISOString();
-  invitation.expiresAt = new Date(
-    Date.now() + 7 * 24 * 60 * 60 * 1000,
-  ).toISOString();
-  saveAppState();
-  renderGroupAccordion();
+  const found = findPendingInvitation(invitationId);
+  if (!found) {
+    return;
+  }
+  const res = await fetch(`${SERVER_ENDPOINT}/api/invitation-resend?invitationId=${Number(invitationId)}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(function () { return {}; });
+    console.error("resendInvitation failed", body);
+    if (res.status === 403 || res.status === 404) {
+      showDialog(
+        t("common.permissionDenied"),
+        t("groupManagement.onlyAdminsCanResend"),
+      );
+    } else {
+      showDialog(t("common.error"), body.message || t("common.error"));
+    }
+    return;
+  }
   closeBottomSheet();
+  await renderGroupAccordion();
   showToast(t("groupManagement.invitationResent"));
-  createNotification(
-    "group",
-    t("groupManagement.invitationResent"),
-    t("groupManagement.invitationResentTo", {
-      email: invitation.email,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.invitationResent",
-      messageKey: "groupManagement.invitationResentTo",
-      params: {
-        email: invitation.email,
-      },
-    },
+  await createGroupNotification_mysql(
+    found.groupId,
+    "groupManagement.invitationResent",
+    "groupManagement.invitationResentTo",
+    { email: found.invitation.invEmail },
+    Number(invitationId),
   );
 }
 /* Cancel Invitation */
 function cancelInvitation(invitationId) {
-  const invitation = (appState.pendingInvitations || []).find(
-    function (entry) {
-      return entry.id === invitationId;
-    },
-  );
-  if (!invitation || !canManageGroup(invitation.groupName)) return;
+  if (!canManageGroup() || !findPendingInvitation(invitationId)) return;
   showConfirmDialog(
     t("groupManagement.cancelInvitation"),
     t("groupManagement.confirmCancelInvitation"),
