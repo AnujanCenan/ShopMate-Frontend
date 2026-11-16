@@ -123,17 +123,17 @@ async function renderCategories() {
     categoryList.innerHTML += `
       <div
         class="categoryCard"
-        onclick="openCategoryPage('${category.name}', ${category.listId})"
+        ${actionAttributes("openCategoryPage", category.name, category.listId)}
       >
         <div class="categoryHeaderTitle">
           <h2 class="categoryTitle">
-            ${category.name}
+            ${escapeHtml(category.name)}
           </h2>
           ${
             canManageCategory(category.name, state.activeGroupId)
               ? `<button
                   class="categoryMoreButton"
-                  onclick="event.stopPropagation(); renderCategoryActions('${category.name}', ${category.listId});"
+                  ${actionAttributes("renderCategoryActions", category.name, category.listId)}
                 >
                   <img
                     src="${getIconPath("navigation", "menu")}"
@@ -248,13 +248,13 @@ async function renderGroupDropdown() {
     groupItemsHTML += `
       <div
         class="groupItem"
-        onclick="selectGroup('${group.familyName}', ${group.familyGroupId})"
+        ${actionAttributes("selectGroup", group.familyName, group.familyGroupId)}
       >
         <span class="groupItemName">
           ${renderGroupNameWithColor(group.familyName, group.familyGroupId)}
         </span>
         ${
-          `<button type="button" class="groupColorEditButton" aria-label="${t("dashboard.changeGroupColor")}" title="${t("dashboard.changeGroupColor")}" onclick="event.stopPropagation(); renderGroupColorForm('${group.familyName}', ${group.familyGroupId})">
+          `<button type="button" class="groupColorEditButton" aria-label="${t("dashboard.changeGroupColor")}" title="${t("dashboard.changeGroupColor")}" ${actionAttributes("renderGroupColorForm", group.familyName, group.familyGroupId)}>
             <img src="${getIconPath("actions", "edit")}" class="icon actionIcon" alt="">
           </button>`
         }
@@ -263,10 +263,7 @@ async function renderGroupDropdown() {
             ? `
               <button
                 class="groupMoreButton"
-                onclick="
-                  event.stopPropagation();
-                  renderGroupActions('${group.familyName}',  ${group.familyGroupId});
-                "
+                ${actionAttributes("renderGroupActions", group.familyName, group.familyGroupId)}
               >
                 <img
                   src="${getIconPath("navigation", "more")}"
@@ -703,7 +700,7 @@ function renderCategoryActions(categoryName, listId) {
     <div class="bottomSheetBody">
       <button
         class="bottomSheetActionButton"
-        onclick="renameCategory('${categoryName}', ${listId})"
+        ${actionAttributes("renameCategory", categoryName, listId)}
       >
         <img
           src="${getIconPath("actions", "edit")}"
@@ -714,13 +711,13 @@ function renderCategoryActions(categoryName, listId) {
       </button>
       <button
         class="bottomSheetActionButton"
-        onclick="renderCategoryBudgetForm('${categoryName}', ${listId})"
+        ${actionAttributes("renderCategoryBudgetForm", categoryName, listId)}
       >
         ${t("dashboard.setCategoryBudget")}
       </button>
       <button
         class="bottomSheetDeleteButton"
-        onclick="deleteCategory('${categoryName}', ${listId})"
+        ${actionAttributes("deleteCategory", categoryName, listId)}
       >
         <img
           src="${getIconPath("actions", "delete")}"
@@ -758,18 +755,18 @@ function renameCategory(categoryName, listId) {
         type="text"
         class="bottomSheetInput"
         id="renameCategoryInput"
-        value="${categoryName}"
+        value="${escapeHtml(categoryName)}"
       >
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderCategoryActions('${categoryName}', ${listId})"
+          ${actionAttributes("renderCategoryActions", categoryName, listId)}
         >
           ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
-          onclick="saveRenamedCategory('${categoryName}', ${listId})"
+          ${actionAttributes("saveRenamedCategory", categoryName, listId)}
         >
           ${t("common.save")}
         </button>
@@ -827,7 +824,7 @@ function deleteCategory(categoryName, listId) {
       </h2>
       <button
         class="closeButton"
-        onclick="renderCategoryActions('${categoryName}', ${listId})"
+        ${actionAttributes("renderCategoryActions", categoryName, listId)}
         aria-label="${t("common.close")}"
       >
         <img
@@ -845,13 +842,13 @@ function deleteCategory(categoryName, listId) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderCategoryActions('${categoryName}', ${listId})"
+          ${actionAttributes("renderCategoryActions", categoryName, listId)}
         >
           ${t("common.cancel")}
         </button>
         <button
           class="bottomSheetDeleteButton"
-          onclick="confirmDeleteCategory('${categoryName}', ${listId})"
+          ${actionAttributes("confirmDeleteCategory", categoryName, listId)}
         >
           ${t("common.delete")}
         </button>
@@ -899,7 +896,7 @@ function renderGroupActions(groupName, familyGroupId) {
     <div class="bottomSheetBody">
       <button
         class="bottomSheetActionButton"
-        onclick="renameGroup('${groupName}', ${familyGroupId})"
+        ${actionAttributes("renameGroup", groupName, familyGroupId)}
       >
         <img
           src="${getIconPath("actions", "edit")}"
@@ -912,7 +909,7 @@ function renderGroupActions(groupName, familyGroupId) {
       </button>
       <button
         class="bottomSheetActionButton"
-        onclick="renderInviteMemberForm('${groupName}', ${familyGroupId})"
+        ${actionAttributes("renderInviteMemberForm", groupName, familyGroupId)}
       >
         <img
           src="${getIconPath("actions", "add")}"
@@ -925,7 +922,7 @@ function renderGroupActions(groupName, familyGroupId) {
       </button>
       <button
         class="bottomSheetDeleteButton"
-        onclick="deleteGroup('${groupName}', ${familyGroupId})"
+        ${actionAttributes("deleteGroup", groupName, familyGroupId)}
       >
         <img
           src="${getIconPath("actions", "delete")}"
@@ -987,7 +984,7 @@ function renderInviteMemberForm(groupName, familyGroupId) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderGroupActions('${groupName}', ${familyGroupId})"
+          ${actionAttributes("renderGroupActions", groupName, familyGroupId)}
         >
           ${t("common.cancel")}
         </button>
@@ -1085,7 +1082,7 @@ async function renameGroup(groupName, familyGroupId) {
         <input
           id="renameGroupInput"
           class="bottomSheetInput"
-          value="${groupName}"
+          value="${escapeHtml(groupName)}"
           placeholder="${t("dashboard.enterGroupName")}"
           maxlength="40"
           oninput="clearRenameGroupValidation()"
@@ -1098,13 +1095,13 @@ async function renameGroup(groupName, familyGroupId) {
       <div class="bottomSheetButtonRow">
         <button
           class="secondaryButton"
-          onclick="renderGroupActions('${groupName}', ${familyGroupId})"
+          ${actionAttributes("renderGroupActions", groupName, familyGroupId)}
         >
           ${t("common.cancel")}
         </button>
         <button
           class="primaryButton"
-          onclick="saveRenamedGroup('${groupName}', ${familyGroupId})"
+          ${actionAttributes("saveRenamedGroup", groupName, familyGroupId)}
         >
           ${t("common.save")}
         </button>
@@ -1706,11 +1703,7 @@ function renderCategoryBudgetForm(categoryName, categoryId) {
 
       <button
         class="primaryButton"
-        onclick="
-          saveCategoryBudget(
-            '${categoryName}', ${categoryId}
-          )
-        "
+        ${actionAttributes("saveCategoryBudget", categoryName, categoryId)}
       >
         ${t("dashboard.saveBudget")}
       </button>

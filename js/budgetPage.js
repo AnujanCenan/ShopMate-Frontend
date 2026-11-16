@@ -125,11 +125,7 @@ function openBudgetMenu(categoryName) {
     <div class="bottomSheetBody">
       <button
         class="bottomSheetActionButton"
-        onclick="
-          editCategoryBudget(
-            '${categoryName}'
-          )
-        "
+        ${actionAttributes("editCategoryBudget", categoryName)}
       >
         <img
           src="${getIconPath("actions", "edit")}"
@@ -142,11 +138,7 @@ function openBudgetMenu(categoryName) {
       </button>
       <button
         class="bottomSheetActionButton destructiveAction"
-        onclick="
-          deleteCategoryBudget(
-            '${categoryName}'
-          )
-        "
+        ${actionAttributes("deleteCategoryBudget", categoryName)}
       >
         <img
           src="${getIconPath("actions", "delete")}"
@@ -198,11 +190,7 @@ function editCategoryBudget(categoryName) {
       >
       <button
         class="primaryButton"
-        onclick="
-          saveEditedBudget(
-            '${categoryName}'
-          )
-        "
+        ${actionAttributes("saveEditedBudget", categoryName)}
       >
         ${t("common.save")}
       </button>

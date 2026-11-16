@@ -347,7 +347,7 @@ function renderItems(items) {
                   }
                 "
               >
-                ${item.ItemName}
+                ${escapeHtml(item.ItemName)}
               </h2>
               ${
                 state.activeTab === "favorites"
@@ -383,7 +383,7 @@ function renderItems(items) {
                   ? `
                     <button
                       class="modernActionButton addActionButton"
-                      onclick="addFavoriteToList('${item.ItemName}')"
+                      ${actionAttributes("addFavoriteToList", item.ItemName)}
                     >
                       <img
                         src="${getIconPath("actions", "add")}"

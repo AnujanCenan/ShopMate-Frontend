@@ -38,7 +38,7 @@ function renderAddItemForm(itemName = "") {
           id="itemNameInput"
           class="bottomSheetInput"
           placeholder="${t("item.enterItemName")}"
-          value="${itemName}"
+          value="${escapeHtml(itemName)}"
           ${itemName ? "readonly" : ""}
         >
         ${
@@ -231,7 +231,7 @@ function renderEditItemForm(listItemId) {
           type="text"
           id="editItemNameInput"
           class="bottomSheetInput"
-          value="${item.ItemName}"
+          value="${escapeHtml(item.ItemName)}"
         >
       </div>
       <div class="formRow">
@@ -300,7 +300,7 @@ function renderEditItemForm(listItemId) {
           type="text"
           id="editItemNotesInput"
           class="bottomSheetInput"
-          value="${item.OptionalNotes || ""}"
+          value="${escapeHtml(item.OptionalNotes || "")}"
         >
       </div>
             <div class="formField">
@@ -311,7 +311,7 @@ function renderEditItemForm(listItemId) {
           type="text"
           id="editItemShopInput"
           class="bottomSheetInput"
-          value="${item.ShopName || ""}"
+          value="${escapeHtml(item.ShopName || "")}"
         >
       </div>
       <div class="formField">
@@ -593,10 +593,7 @@ async function createItem() {
           </button>
           <button
             class="primaryButton"
-            onclick="updateDuplicateQuantity(
-              '${itemName}',
-              ${itemQuantity}
-            )"
+            ${actionAttributes("updateDuplicateQuantity", itemName, itemQuantity)}
           >
             ${t("item.updateQuantity")}
           </button>

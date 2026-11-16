@@ -232,12 +232,7 @@ async function renderGroupAccordion() {
           }
           <button
             class="primaryButton"
-            onclick="
-              state.activeGroupId=${groupId};
-              state.activeGroup='${groupName}';
-              saveState();
-              renderInviteMemberForm();
-            "
+            ${actionAttributes("openInviteFormForGroup", groupId, groupName)}
           >
             ${t("groupManagement.sendInvitation")}
           </button>
@@ -730,6 +725,13 @@ async function removeMember(memberId, groupId) {
       memberId,
     );
   }
+}
+/* Select the group being invited to, then open the invite form. */
+function openInviteFormForGroup(groupId, groupName) {
+  state.activeGroupId = groupId;
+  state.activeGroup = groupName;
+  saveState();
+  renderInviteMemberForm();
 }
 /* Invite Member Form */
 function renderInviteMemberForm() {

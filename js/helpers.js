@@ -241,13 +241,11 @@ async function renderProductSuggestions(searchText) {
             .join("");
         }
 
-        // Escape single quotes in product name for the inline onclick handler
-        const safeProductAttribute = product.replace(/'/g, "\\'");
-
+        // The click listener below reads data-product-name (no inline JavaScript).
         return `
           <div
             class="productSuggestionItem"
-            onclick="selectSuggestedProduct('${safeProductAttribute}')"
+            data-product-name="${escapeHtml(product)}"
           >
             <div class="productSuggestionImage">
               ${image ? `<img src="${escapeHtml(image)}" alt="">` : "📦"}
@@ -312,6 +310,38 @@ function escapeHtml(value) {
     }[character];
   });
 }
+
+/*
+ * Safe click handlers
+ * Never build inline JavaScript from user text, e.g. onclick="fn('${name}')": a name such as
+ * Mum's List ends the string early (and other characters can inject markup or code).
+ * Instead render ${actionAttributes("fn", name, id)}. The arguments are JSON-encoded into an
+ * escaped data attribute and one delegated listener calls window.fn(...args).
+ * The innermost element with data-action handles the click, so a button inside a clickable
+ * card does not also trigger the card. Only plain `function` declarations can be targets.
+ */
+function actionAttributes(actionName, ...args) {
+  return `data-action="${escapeHtml(actionName)}" data-action-args="${escapeHtml(JSON.stringify(args))}"`;
+}
+document.addEventListener("click", function (event) {
+  const element = event.target.closest("[data-action]");
+  if (!element) {
+    return;
+  }
+  const handler = window[element.dataset.action];
+  if (typeof handler !== "function") {
+    console.error(`No handler named ${element.dataset.action}`);
+    return;
+  }
+  let args = [];
+  try {
+    args = JSON.parse(element.dataset.actionArgs || "[]");
+  } catch (error) {
+    console.error("Invalid data-action-args", error);
+    return;
+  }
+  handler.apply(null, args);
+});
 
 /* Get Icon Path - Returns the correct icon based on the selected application theme. */
 function getIconPath(folder, iconName) {

@@ -166,7 +166,7 @@ function renderEditProfileForm() {
             id="profileFirstNameInput"
             class="bottomSheetInput"
             type="text"
-            value="${currentUser.name.split(" ")[0]}"
+            value="${escapeHtml(currentUser.name.split(" ")[0])}"
         >
     </div>
     <div class="formField">
@@ -177,7 +177,7 @@ function renderEditProfileForm() {
             id="profileLastNameInput"
             class="bottomSheetInput"
             type="text"
-            value="${currentUser.name.split(" ").slice(1).join(" ")}"
+            value="${escapeHtml(currentUser.name.split(" ").slice(1).join(" "))}"
         >
     </div>
     <div class="formField">
@@ -187,7 +187,7 @@ function renderEditProfileForm() {
         <input
             class="bottomSheetInput"
             type="email"
-            value="${currentUser.email}"
+            value="${escapeHtml(currentUser.email)}"
             disabled
         >
     </div>
