@@ -322,6 +322,10 @@ async function saveProfileChanges() {
     renderProfile();
     closeBottomSheet();
     showSnackbar("Profile updated successfully.");
+    await createSystemNotification_mysql(
+      "notifications.profileUpdated",
+      "notifications.profileUpdatedMessage",
+    );
   } catch (error) {
     console.error(error);
     showSnackbar("Network error. Please try again.");
@@ -462,6 +466,10 @@ async function updatePassword() {
 
     closeBottomSheet();
     showSnackbar("Password updated successfully.");
+    await createSystemNotification_mysql(
+      "notifications.passwordChanged",
+      "notifications.passwordChangedMessage",
+    );
   } catch (error) {
     console.error(error);
     showSnackbar("Network error. Please try again.");

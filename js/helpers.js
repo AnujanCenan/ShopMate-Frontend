@@ -1098,10 +1098,52 @@ async function createNotification_mysql(
   if (!res.ok) {
     const msg = await res.text();
     console.error(msg);
-    return;
+    return false;
   }
 
-  return;
+  return true;
+}
+
+/*
+ * Group notification - stored in the database and fanned out to every active member of the group.
+ * messageParams are substituted into the localized message when the feed is rendered.
+ */
+function createGroupNotification_mysql(familyGroupId, titleKey, messageKey, messageParams = {}, targetId = null) {
+  return createNotification_mysql(
+    "group",
+    titleKey,
+    messageKey,
+    {
+      title_params: {},
+      message_params: messageParams,
+      action: "group",
+      action_data: { groupId: familyGroupId },
+      image_key: "group"
+    },
+    targetId,
+    familyGroupId
+  );
+}
+
+/*
+ * System notification - personal to the current user (no family group, so the backend only
+ * delivers it to the actor). Used for account/security events.
+ */
+function createSystemNotification_mysql(titleKey, messageKey, messageParams = {}, action = "profile") {
+  return createNotification_mysql(
+    "system",
+    titleKey,
+    messageKey,
+    {
+      title_params: {},
+      message_params: messageParams,
+      action: action,
+      action_data: null,
+      image_key: "system"
+    },
+    null,
+    null
+  );
 }
 
 /* Create Notification - Creates a new notification and updates the notification badge. */
@@ -1203,14 +1245,28 @@ async function markAllNotificationsRead() {
   showToast(t("notifications.allRead"));
 }
 /* Update Notification Badge - Updates the unread notification count displayed in the application header. */
-function updateNotificationBadge() {
+async function updateNotificationBadge() {
   const badge = document.getElementById("notificationBadge");
   if (!badge) {
     return;
   }
-  const unreadCount = appState.notifications.filter(function (notification) {
-    return !notification.read;
-  }).length;
+  // Unread count comes from the database feed (the local appState list is legacy).
+  let unreadCount = 0;
+  try {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/get-notifications`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.ok) {
+      const notifications = await res.json();
+      unreadCount = notifications.filter(function (notification) {
+        return !notification.isRead;
+      }).length;
+    }
+  } catch (error) {
+    console.error("Failed to load notification count", error);
+  }
   badge.textContent = unreadCount;
   badge.classList.toggle("hidden", unreadCount === 0);
 }

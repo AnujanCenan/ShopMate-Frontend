@@ -443,27 +443,26 @@ async function revokeInvite(invitationId) {
     );
     return;
   }
+  // Look up the invitation's group before deleteInvitation_mysql removes it from the cache.
+  const invitationGroupId = Object.keys(state.tempPendingInvites || {}).find(function (groupId) {
+    return (state.tempPendingInvites[groupId] || []).some(function (invite) {
+      return String(invite.invId) === String(invitationId);
+    });
+  });
   const deletedInvEmail = await deleteInvitation_mysql(invitationId);
 
   renderGroupAccordion();
   closeBottomSheet();
   showToast(t("groupManagement.invitationCancelled"));
-  createNotification(
-    "group",
-    t("groupManagement.invitationCancelled"),
-    t("groupManagement.invitationCancelledTo", {
-      email: deletedInvEmail,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.invitationCancelled",
-      messageKey: "groupManagement.invitationCancelledTo",
-      params: {
-        email: deletedInvEmail,
-      },
-    },
-  );
+  if (invitationGroupId && deletedInvEmail) {
+    await createGroupNotification_mysql(
+      Number(invitationGroupId),
+      "groupManagement.invitationCancelled",
+      "groupManagement.invitationCancelledTo",
+      { email: deletedInvEmail },
+      Number(invitationId),
+    );
+  }
 }
 /* Member Actions */
 function openMemberActions(memberId, groupId) {
@@ -631,21 +630,12 @@ async function makeAdmin(otherUserId, familyGroupId) {
 
   showToast(t("groupManagement.memberPromoted"));
 
-  createNotification(
-    "group",
-    t("groupManagement.memberPromotedTitle"),
-    t("groupManagement.memberPromotedMessage", {
-      name: member.usrName,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.memberPromotedTitle",
-      messageKey: "groupManagement.memberPromotedMessage",
-      params: {
-        name: member.usrName,
-      },
-    },
+  await createGroupNotification_mysql(
+    familyGroupId,
+    "groupManagement.memberPromotedTitle",
+    "groupManagement.memberPromotedMessage",
+    { name: member.usrName },
+    otherUserId,
   );
 }
 /* Remove Dialog */
@@ -728,21 +718,12 @@ async function removeMember(memberId, groupId) {
   closeBottomSheet();
   showToast(t("groupManagement.memberRemoved"));
   if (member) {
-    createNotification(
-      "group",
-      t("groupManagement.memberRemovedTitle"),
-      t("groupManagement.memberRemovedMessage", {
-        name: member.usrName,
-      }),
-      null,
-      null,
-      {
-        titleKey: "groupManagement.memberRemovedTitle",
-        messageKey: "groupManagement.memberRemovedMessage",
-        params: {
-          name: member.usrName,
-        },
-      },
+    await createGroupNotification_mysql(
+      groupId,
+      "groupManagement.memberRemovedTitle",
+      "groupManagement.memberRemovedMessage",
+      { name: member.usrName },
+      memberId,
     );
   }
 }
@@ -853,21 +834,11 @@ async function sendInvitation() {
 
   showToast(t("groupManagement.invitationSent"));
 
-  createNotification(
-    "group",
-    t("groupManagement.invitationSent"),
-    t("groupManagement.memberInvited", {
-      email: email,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.invitationSent",
-      messageKey: "groupManagement.memberInvited",
-      params: {
-        email: email,
-      },
-    },
+  await createGroupNotification_mysql(
+    Number(state.activeGroupId),
+    "groupManagement.invitationSent",
+    "groupManagement.memberInvited",
+    { email: email },
   );
 }
 /* Leave Group Dialog */
@@ -962,23 +933,16 @@ async function completeLeaveGroup(familyGroupId, shouldDelete) {
   state.groups = state.groups.filter(group => group.familyGroupId !== familyGroupId);
   state.activeGroupId = null;
   state.activeGroup = null;
-  restoreLastGroup();
-  createNotification(
-    "group",
-    t("groupManagement.leftGroup"),
-    t("groupManagement.leftGroupMessage", {
-      name: currentUser.name,
-    }),
-    null,
-    null,
-    {
-      titleKey: "groupManagement.leftGroup",
-      messageKey: "groupManagement.leftGroupMessage",
-      params: {
-        name: currentUser.name,
-      },
-    },
-  );
+  localStorage.removeItem("activeGroup");
+  if (!shouldDelete) {
+    // Sent after leaving, so it is delivered to the members who remain.
+    await createGroupNotification_mysql(
+      familyGroupId,
+      "groupManagement.leftGroup",
+      "groupManagement.leftGroupMessage",
+      { name: state.currentUser?.name || "" },
+    );
+  }
 
   saveState();
   closeBottomSheet();

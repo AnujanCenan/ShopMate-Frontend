@@ -553,6 +553,10 @@ registerLanguage("en", {
   },
   // Labels and messages for the notification center.
   notifications: {
+    passwordChanged: "Password Changed",
+    passwordChangedMessage: "Your account password was changed.",
+    profileUpdated: "Profile Updated",
+    profileUpdatedMessage: "Your profile details were updated.",
     all: "All",
     allRead: "All notifications marked as read",
     budget: "Budget",

@@ -570,6 +570,10 @@ registerLanguage("fr", {
   },
   // Labels and messages for the notification center.
   notifications: {
+    passwordChanged: "Mot de passe modifié",
+    passwordChangedMessage: "Le mot de passe de votre compte a été modifié.",
+    profileUpdated: "Profil mis à jour",
+    profileUpdatedMessage: "Les informations de votre profil ont été mises à jour.",
     all: "Toutes",
     allRead: "Toutes les notifications ont été marquées comme lues",
     budget: "Budget",

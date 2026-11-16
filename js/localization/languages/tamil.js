@@ -569,6 +569,10 @@ registerLanguage("ta", {
   },
   // Labels and messages for the notification center.
   notifications: {
+    passwordChanged: "கடவுச்சொல் மாற்றப்பட்டது",
+    passwordChangedMessage: "உங்கள் கணக்கின் கடவுச்சொல் மாற்றப்பட்டது.",
+    profileUpdated: "சுயவிவரம் புதுப்பிக்கப்பட்டது",
+    profileUpdatedMessage: "உங்கள் சுயவிவர விவரங்கள் புதுப்பிக்கப்பட்டன.",
     all: "அனைத்தும்",
     allRead: "அனைத்து அறிவிப்புகளும் படிக்கப்பட்டன",
     budget: "பாதீடு",

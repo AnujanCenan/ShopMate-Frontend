@@ -1071,6 +1071,12 @@ async function sendMemberInvitation(familyGroupId) {
   }
   closeBottomSheet();
   showToast(t("dashboard.invitationSent"));
+  await createGroupNotification_mysql(
+    familyGroupId,
+    "groupManagement.invitationSent",
+    "groupManagement.memberInvited",
+    { email: email },
+  );
 }
 /* Rename Group */
 async function renameGroup(groupName, familyGroupId) {

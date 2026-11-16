@@ -156,17 +156,19 @@ async function renderNotifications() {
   const notifs = await getNotifications_mysql() ;
   notificationList.innerHTML = "";
   const notificationSettings = appState.settings.notifications;
-  let notifications = notifs.filter(function (notification) {
-    if (notification.type === "group" && !notificationSettings.group) {
+  // Database notifications carry their category in targetType ("item", "budget", "group", "system").
+  let notifications = (notifs || []).filter(function (notification) {
+    const type = notification.targetType;
+    if (type === "group" && !notificationSettings.group) {
       return false;
     }
-    if (notification.type === "items" && !notificationSettings.shopping) {
+    if ((type === "item" || type === "purchase") && !notificationSettings.shopping) {
       return false;
     }
-    if (notification.type === "budget" && !notificationSettings.budget) {
+    if (type === "budget" && !notificationSettings.budget) {
       return false;
     }
-    if (notification.type === "system" && !notificationSettings.general) {
+    if (type === "system" && !notificationSettings.general) {
       return false;
     }
     return true;
@@ -280,8 +282,10 @@ async function openNotification(notificationId) {
       window.location.href = "../pages/budgetPage.html";
       break;
     case "notifications":
-      state.activeGroupId = 
       window.location.href = "../pages/notificationsPage.html";
+      break;
+    case "profile":
+      window.location.href = "../pages/profilePage.html";
       break;
     case "group":
       window.location.href = "../pages/familyManagementPage.html";

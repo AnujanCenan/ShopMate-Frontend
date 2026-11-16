@@ -72,6 +72,10 @@ async function initializeApplication() {
     if (typeof initializeDashboard === "function") {
       await initializeDashboard();
     }
+
+    if (typeof updateNotificationBadge === "function" && typeof isUserLoggedIn === "function" && isUserLoggedIn()) {
+      updateNotificationBadge();
+    }
   } catch (error) {
     console.error("ShopMate application initialization failed.", error);
   } finally {

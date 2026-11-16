@@ -200,8 +200,9 @@ async function deleteInvitation_mysql(invitationId) {
     
     // If found, delete it from the array and stop searching
     if (index !== -1) {
-      const deletedEmail = state.tempPendingInvites[key].invEmail;
+      const deletedEmail = state.tempPendingInvites[key][index].invEmail;
       state.tempPendingInvites[key].splice(index, 1);
+      saveState();
       return deletedEmail; 
       }
     }

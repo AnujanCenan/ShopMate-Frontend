@@ -1058,7 +1058,7 @@ async function confirmPurchase(listItemId) {
   await markPurchased_mysql(item, actualPrice);
   item.Purchased = true;      // update local state as well
 
-  updateBudgetTracking(state.activeCategory, actualPrice);
+  await updateBudgetTracking(state.activeCategory, actualPrice);
   calculateGroupBudget();
   saveState();
   renderFilteredItems();
@@ -1114,38 +1114,48 @@ async function confirmPurchase(listItemId) {
   );
 }
 
-/* Update Budget Tracking */
-function updateBudgetTracking(categoryName, amount) {
-  if (!state.budgets) {
+/* Update Budget Tracking - Adds a purchase to the cached list budget and notifies the group
+   (via the database) the first time the list goes over its limit. */
+async function updateBudgetTracking(categoryName, amount) {
+  const spentAmount = Number(amount) || 0;
+  if (!state.budgets || !Array.isArray(state.budgets.categoryBudgets) || spentAmount <= 0) {
     return;
   }
-  /* Update Group Budget */
-  const categoryBudget = appState.budgets.categoryBudgets[categoryName];
-  if (categoryBudget) {
-    /* Update Category Budget */
-    categoryBudget.spent += amount;
-    /* Overspend Check */
-    if (
-      categoryBudget.spent > categoryBudget.monthlyLimit &&
-      !categoryBudget.overspendNotified
-    ) {
-      categoryBudget.overspendNotified = true;
-      createNotification(
-        "budget",
-        t("notifications.budgetExceeded"),
-        t("notifications.budgetExceededMessage", {
-          categoryName: categoryName,
-        }),
-      );
-      showToast(
-        t("notifications.budgetExceededToast", {
-          categoryName: categoryName,
-        }),
-        "info",
-      );
-    }
+  const categoryBudget = state.budgets.categoryBudgets.find(function (budget) {
+    return Number(budget.shoppingListId) === Number(state.activeCategoryId);
+  });
+  if (!categoryBudget) {
+    return;
   }
-  saveAppState();
+  const limit = Number(categoryBudget.budgetLimit) || 0;
+  const spentBefore = Number(categoryBudget.budgetSpent) || 0;
+  const spentAfter = spentBefore + spentAmount;
+  categoryBudget.budgetSpent = spentAfter;
+  saveState();
+
+  // Only notify when this purchase crosses the limit, so the group is told once per overspend.
+  if (limit > 0 && spentBefore <= limit && spentAfter > limit) {
+    showToast(t("notifications.budgetExceededToast"), "info");
+    await createNotification_mysql(
+      "budget",
+      "notifications.budgetExceeded",
+      "notifications.budgetExceededMessage",
+      {
+        title_params: {},
+        message_params: {
+          name: categoryName
+        },
+        action: "budget",
+        action_data: {
+          groupId: state.activeGroupId,
+          group: state.activeGroup,
+        },
+        image_key: "budget"
+      },
+      Number(state.activeCategoryId),
+      state.activeGroupId
+    );
+  }
 }
 
 
