@@ -1063,10 +1063,10 @@ async function sendMemberInvitation(familyGroupId) {
     return;
   }
 
-  const invitationSent = await sendInvititation_mysql(email, "Normal", familyGroupId);
-  if (!invitationSent) {
+  const invitationResult = await sendInvititation_mysql(email, "Normal", familyGroupId);
+  if (!invitationResult?.success) {
     emailInput.classList.add("formInputError");
-    emailError.textContent = t("common.error");
+    emailError.textContent = invitationResult?.message || t("common.error");
     return;
   }
   closeBottomSheet();

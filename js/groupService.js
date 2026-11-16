@@ -139,7 +139,7 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
 
   if (fgpId === null) {
     console.error("Unable to determine family group id");
-    return false;
+    return { success: false, message: t("common.error") };
   }
 
   if (!invitee_email) {
@@ -158,9 +158,17 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
   });
 
   if (!res.ok) {
+    // Surface the server's reason (not an admin, already a member, email failed, ...).
     const msg = await res.text();
     console.error(msg);
-    return false;
+    let message = t("common.error");
+    try {
+      message = JSON.parse(msg).message || message;
+    } catch (error) {
+      // non-JSON error body
+    }
+    // 502 = the invitation was saved but the email failed; it can be resent later.
+    return { success: false, message: message, saved: res.status === 502 };
   }
 
   const body = await res.json();
@@ -180,7 +188,7 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
   if (!state.tempPendingInvites[fgpId]) state.tempPendingInvites[fgpId] = [];
   state.tempPendingInvites[fgpId].push(invitation);
   saveState();
-  return true;
+  return { success: true };
 }
 
 async function deleteInvitation_mysql(invitationId) {

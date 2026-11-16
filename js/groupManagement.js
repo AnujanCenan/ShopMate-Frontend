@@ -784,7 +784,7 @@ function renderInviteMemberForm() {
       </div>
       <button
         class="primaryButton"
-        onclick="sendInvititation_mysql()"
+        onclick="sendInvitation()"
       >
         ${t("groupManagement.sendInvitation")}
       </button>
@@ -833,9 +833,13 @@ async function sendInvitation() {
 
   const groupName = appState.activeGroup;
 
-  const invitationSent = await sendInvititation_mysql(email, role);
-  if (!invitationSent) {
-    showToast(t("common.error"));
+  const invitationResult = await sendInvititation_mysql(email, role);
+  if (!invitationResult?.success) {
+    if (invitationResult?.saved) {
+      // Saved without an email: show it in the pending list so it can be resent.
+      renderGroupAccordion();
+    }
+    showDialog(t("common.error"), invitationResult?.message || t("common.error"));
     return;
   }
   renderGroupAccordion();
