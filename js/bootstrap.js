@@ -22,6 +22,20 @@ async function initializeApplication() {
     startPageSkeleton(dashboardSkeletonId);
   }
   try {
+    // state.loggedIn can outlive the 2-hour auth cookie. Check with the server first so the
+    // login page doesn't bounce an expired user to the dashboard, and app pages don't load
+    // half-working. (null = server unreachable: keep the local state and carry on.)
+    if (state.loggedIn && typeof verifySession === "function") {
+      const sessionValid = await verifySession();
+      if (sessionValid === false && !isAuthPage()) {
+        window.location.href = "../pages/loginPage.html";
+        return;
+      }
+    } else if (!state.loggedIn && typeof isAuthPage === "function" && !isAuthPage()) {
+      window.location.href = "../pages/loginPage.html";
+      return;
+    }
+
     // Settings live in the database; load them once per login before applying theme/language.
     if (
       typeof loadUserSettings === "function" &&

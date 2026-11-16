@@ -1095,6 +1095,82 @@ function createSystemNotification_mysql(titleKey, messageKey, messageParams = {}
   );
 }
 
+/*
+ * Session handling
+ * `state.loggedIn` is only a local hint; the real session is the HttpOnly X-Auth-Token
+ * cookie, which expires after 2 hours. These helpers keep the two in step.
+ */
+const AUTH_PAGES = ["loginPage.html", "registerPage.html", "inviteLandingPage.html"];
+
+function isAuthPage() {
+  return AUTH_PAGES.some(function (page) {
+    return window.location.pathname.endsWith(page);
+  });
+}
+
+/* Send the user to the login page after their session has ended. */
+function handleExpiredSession() {
+  resetState();
+  sessionStorage.removeItem("shopMateAppUnlocked");
+  if (!isAuthPage()) {
+    window.location.href = "../pages/loginPage.html";
+  }
+}
+
+/*
+ * Ask the server whether the auth cookie is still valid.
+ * Returns true (valid), false (expired/missing - local state is reset) or null (server unreachable).
+ */
+async function verifySession() {
+  try {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/user-profile`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (res.status === 401) {
+      resetState();
+      return false;
+    }
+    if (!res.ok) {
+      return null;
+    }
+    state.currentUser = await res.json();
+    saveState();
+    return true;
+  } catch (error) {
+    console.error("Could not verify the session", error);
+    return null;
+  }
+}
+
+/*
+ * Any API call that comes back 401 on an app page means the session expired while the page
+ * was open: clear local state and go to the login page. (On the login/register pages a 401 is
+ * just "wrong password", so it is left to the page.)
+ */
+(function installSessionExpiryHandler() {
+  if (typeof window === "undefined" || typeof window.fetch !== "function" || window.fetch.shopMateWrapped) {
+    return;
+  }
+  const originalFetch = window.fetch.bind(window);
+  const wrappedFetch = async function (input, init) {
+    const response = await originalFetch(input, init);
+    const url = typeof input === "string" ? input : input?.url || "";
+    if (
+      response.status === 401 &&
+      typeof SERVER_ENDPOINT !== "undefined" &&
+      url.startsWith(SERVER_ENDPOINT) &&
+      !isAuthPage()
+    ) {
+      handleExpiredSession();
+    }
+    return response;
+  };
+  wrappedFetch.shopMateWrapped = true;
+  window.fetch = wrappedFetch;
+})();
+
 /* Map a stored language value ("en", "english", "French", ...) to a supported code. */
 function normalizeLanguageCode(value) {
   const code = String(value || "").trim().toLowerCase();

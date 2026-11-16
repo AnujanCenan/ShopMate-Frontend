@@ -634,7 +634,16 @@ function getUserPrimaryGroup(userId) {
   );
 }
 /* Logout User - Logs out the current user and redirects to the login page. */
-function logoutUser() {
+async function logoutUser() {
+  // Ask the server to delete the HttpOnly auth cookie (JavaScript cannot remove it itself).
+  try {
+    await fetch(`${SERVER_ENDPOINT}/api/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Logout request failed; clearing local session anyway.", error);
+  }
   const currentUser = getCurrentUser();
   const storedUser = currentUser &&
     (appState.users || []).find(function (user) {
