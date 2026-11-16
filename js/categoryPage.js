@@ -1,3 +1,27 @@
+/* Format a server date as YYYY-MM-DD (what date inputs and the recurrence sort expect). */
+function toDateOnly(value) {
+  return value ? String(value).slice(0, 10) : "";
+}
+/*
+ * Translate the server's item fields into the shape the sort and edit-form code uses:
+ *   createdAt  <- CreatedAt (lit_time_created)
+ *   recurrence <- RecurrenceInterval / NextRecurrenceAt / RecurrenceStartDate / RecurrenceEndDate
+ */
+function addSortFieldsToItem(item) {
+  const interval = String(item.RecurrenceInterval || "None").toLowerCase();
+  const isRecurring = ["daily", "weekly", "monthly"].includes(interval);
+  return {
+    ...item,
+    createdAt: item.CreatedAt || null,
+    recurrence: {
+      enabled: isRecurring,
+      frequency: isRecurring ? interval : "none",
+      occurrenceDate: toDateOnly(item.NextRecurrenceAt),
+      startDate: toDateOnly(item.RecurrenceStartDate),
+      endDate: toDateOnly(item.RecurrenceEndDate),
+    },
+  };
+}
 async function getRenderingItems() {
   const categoryId = state.activeCategoryId;
   const groupId = state.activeGroupId;
@@ -16,7 +40,7 @@ async function getRenderingItems() {
 
   const all_items = await res.json();
 
-  state.listItems = all_items.ListItems;
+  state.listItems = (all_items.ListItems || []).map(addSortFieldsToItem);
   state.favoriteItems = all_items.Favourites;
 
   saveState();
@@ -112,7 +136,7 @@ function isRecurringSortItem(item) {
       item.recurrence.frequency !== "none",
   );
 }
-/* BACKEND TODO: Return createdAt (ISO-8601) from SQL/API for every item so newest sorting is reliable. */
+/* Item creation time (lit_time_created, mapped to createdAt in addSortFieldsToItem). */
 function getItemCreationTime(item) {
   const value = item?.createdAt;
   if (!value) return null;

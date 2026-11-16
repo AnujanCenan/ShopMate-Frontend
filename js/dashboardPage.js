@@ -192,7 +192,7 @@ function getSortedCategoriesForDisplay(categories) {
   if (sortMode === "newest-first" || sortMode === "newest-last") {
     const direction = sortMode === "newest-first" ? -1 : 1;
     return sortedCategories.sort(function (left, right) {
-      // BACKEND TODO: Return category createdAt (ISO-8601) from SQL/API for chronological sorting.
+      // createdAt comes from shl_time_created via /api/get-lists.
       const leftValue = left.createdAt;
       const rightValue = right.createdAt;
       const leftCreated = leftValue == null ? null : Date.parse(leftValue);

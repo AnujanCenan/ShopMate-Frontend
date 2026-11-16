@@ -638,6 +638,7 @@ async function createItem() {
 
   const newItem = {
     ListItemId: listItemId,
+    createdAt: new Date().toISOString(),   // so "newest first" places it correctly before a reload
     ItemMasterId: itemMasterId,
 
     ItemName: itemName,
