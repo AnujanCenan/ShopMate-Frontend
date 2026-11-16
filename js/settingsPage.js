@@ -1,36 +1,5 @@
 /* Handles settings controls, preference forms, data export, and local-data removal. */
 redirectIfLoggedOut();
-/* Toggle Dark Mode */
-function toggleDarkMode() {
-  document.body.classList.toggle("darkMode");
-  appState.darkMode = !appState.darkMode;
-  saveAppState();
-}
-/* Toggle Notifications */
-async function toggleNotifications() {
-  appState.notificationsEnabled = !appState.notificationsEnabled;
-  saveAppState();
-  showDialog(
-    appState.notificationsEnabled
-      ? "Notifications Enabled"
-      : "Notifications Disabled",
-  );
-}
-/* Toggle Biometrics */
-function toggleBiometric() {
-  const currentUser = getCurrentUser();
-  const user = appState.users.find(function (user) {
-    return user.id === currentUser.id;
-  });
-  if (!user) {
-    return;
-  }
-  user.biometricEnabled = !user.biometricEnabled;
-  saveAppState();
-  showDialog(
-    user.biometricEnabled ? "Biometrics Enabled" : "Biometrics Disabled",
-  );
-}
 /* Open Profile */
 async function openProfilePage() {
   localStorage.setItem(
@@ -73,7 +42,7 @@ function openSecuritySettings() {
         ${t("security.description")}
       </div>
       <!-- App PIN -->
-      <div class="toggleRow">
+      <div class="toggleRow securityActionRow">
         <div class="toggleContent">
           <div class="toggleTitle">
             ${t("security.pin")}
@@ -115,7 +84,6 @@ function openSecuritySettings() {
           <span class="toggleSlider"></span>
         </label>
       </div>
-      <!-- Biometric Login -->
       <!-- Biometric Login -->
       <div class="toggleRow">
           <div class="toggleContent">

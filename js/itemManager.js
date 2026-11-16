@@ -69,6 +69,7 @@ function renderAddItemForm(itemName = "") {
             id="itemQuantityUnitInput"
             class="quantityUnitInput"
             aria-label="${t("item.quantityUnit")}"
+            data-split-select
           >${getQuantityUnitOptions("pcs")}
           </select>
           </div>
@@ -90,7 +91,7 @@ function renderAddItemForm(itemName = "") {
           </div>
         </div>
       </div>
-      <div class="formField">
+      <div class="formField ${imageUrl ? "" : "hidden"}">
         <img
           id="itemImagePreview"
           class="itemImagePreview ${imageUrl ? "" : "hidden"}"
@@ -128,6 +129,7 @@ function renderAddItemForm(itemName = "") {
     <select
       id="itemRecurrenceFrequency"
       class="bottomSheetInput"
+      data-split-select
     >
       <option value="none">
         ${t("item.doesNotRepeat")}
@@ -203,7 +205,7 @@ function renderEditItemForm(listItemId) {
   if (!item) {
     return;
   }
-  console.log(item);
+  const imageUrl = getProductImage(item.ItemName);
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -250,6 +252,7 @@ function renderEditItemForm(listItemId) {
         id="editItemQuantityUnitInput"
         class="quantityUnitInput"
         aria-label="${t("item.quantityUnit")}"
+        data-split-select
       >
         ${getQuantityUnitOptions(item.quantityUnit || "pcs")}
       </select>
@@ -275,7 +278,7 @@ function renderEditItemForm(listItemId) {
           </div>
         </div>
       </div>
-      <div class="formField">
+      <div class="formField ${imageUrl ? "" : "hidden"}">
         <label class="formLabel">
           ${t("item.itemImage")}
         </label>
@@ -283,9 +286,9 @@ function renderEditItemForm(listItemId) {
           id="editItemImagePreview"
           class="
             itemImagePreview
-            ${getProductImage(item.ItemName) ? "" : "hidden"}
+            ${imageUrl ? "" : "hidden"}
           "
-          src="${getProductImage(item.ItemName)}"
+          src="${imageUrl}"
           alt=""
         >
       </div>
@@ -319,6 +322,7 @@ function renderEditItemForm(listItemId) {
     <select
       id="editItemRecurrenceFrequency"
       class="bottomSheetInput"
+      data-split-select
     >
       <option
         value="none"
@@ -402,7 +406,6 @@ function renderEditItemForm(listItemId) {
     </div>
   `;
   openBottomSheet();
-  initializeEditImagePreview();
   initializeEditRecurrenceForm();
 }
 /* Initialize Item Form */
@@ -489,46 +492,6 @@ function initializeEditRecurrenceForm() {
   recurrenceFrequency.addEventListener("change", function () {
     recurrenceDates.style.display =
       recurrenceFrequency.value === "none" ? "none" : "";
-  });
-}
-/*Image Preview */
-function initializeImagePreview() {
-  const imageInput = document.getElementById("itemImageInput");
-  const preview = document.getElementById("itemImagePreview");
-  if (!imageInput || !preview) {
-    return;
-  }
-  imageInput.addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      preview.src = e.target.result;
-      preview.classList.remove("hidden");
-    };
-    reader.readAsDataURL(file);
-  });
-}
-/* Image Preview for Edit Form */
-function initializeEditImagePreview() {
-  const imageInput = document.getElementById("editItemImageInput");
-  const preview = document.getElementById("editItemImagePreview");
-  if (!imageInput || !preview) {
-    return;
-  }
-  imageInput.addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) {
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      preview.src = e.target.result;
-      preview.classList.remove("hidden");
-    };
-    reader.readAsDataURL(file);
   });
 }
 

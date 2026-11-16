@@ -297,7 +297,3 @@ async function changeLanguage(languageCode) {
   translatePage();
   notifyLanguageChanged();
 }
-/* Compatibility Function */
-async function initializeLocalizationFramework() {
-  return initializeLocalization();
-}

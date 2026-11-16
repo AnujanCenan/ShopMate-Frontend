@@ -23,6 +23,7 @@
   flex-direction: column;
   gap: var(--spacingMedium);
   margin-top: 0;
+  padding-bottom: 88px;
 }
 /* Item Name */
 .itemName {
@@ -98,6 +99,27 @@
   border-radius: var(--radiusRoomy);
   font-size: var(--fontSizeHero);
 }
+/* Give item details more room beside thumbnails on compact phone screens. */
+@media (max-width: 380px) {
+  .itemCard {
+    padding: 12px;
+  }
+
+  .itemCardContent {
+    gap: 10px;
+  }
+
+  .itemImageContainer,
+  .itemImage,
+  .itemImagePlaceholder {
+    width: 64px;
+    height: 64px;
+  }
+
+  .itemImageContainer {
+    margin-left: 0;
+  }
+}
 /* Swipe Wrapper */
 .swipeWrapper {
   position: relative;
@@ -115,7 +137,12 @@
   overflow: hidden;
   border-radius: inherit;
   transition: opacity 0.15s ease;
+  opacity: 0;
   z-index: 1;
+}
+/* Reveal destructive and purchase actions only while the card is being swiped. */
+.swipeWrapper.isDragging .swipeBackground {
+  opacity: 1;
 }
 /* Swipe Purchased */
 .swipePurchased {

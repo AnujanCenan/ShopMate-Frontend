@@ -28,6 +28,30 @@
       </header>
       <!-- MAIN CONTENT -->
       <main class="pageContent">
+        <!-- List loading placeholders stay hidden unless catalog or localization loading takes long enough. -->
+        <div class="pageSkeleton categoryPageSkeleton" id="categoryPageSkeleton" aria-hidden="true">
+          <div class="skeletonBlock skeletonTabs"></div>
+          <div class="skeletonBlock skeletonSearch"></div>
+          <div class="skeletonSortRow">
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+            <span class="skeletonBlock skeletonSortControl"></span>
+          </div>
+          <div class="skeletonBlock skeletonItemCard">
+            <span class="skeletonBlock skeletonLine skeletonLineMedium"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineFull"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+          </div>
+          <div class="skeletonBlock skeletonItemCard">
+            <span class="skeletonBlock skeletonLine skeletonLineMedium"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineFull"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+          </div>
+          <div class="skeletonBlock skeletonItemCard">
+            <span class="skeletonBlock skeletonLine skeletonLineMedium"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineFull"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+          </div>
+        </div>
         <!-- TABS -->
         <div class="modernTabContainer">
           <button
@@ -73,7 +97,7 @@
           <label for="itemSortSelect" data-i18n="category.sortItems">
             Sort items
           </label>
-          <select id="itemSortSelect" class="sortControlSelect">
+          <select id="itemSortSelect" class="sortControlSelect" data-split-select>
             <option value="default" data-i18n="category.sortDefault">
               Default order
             </option>

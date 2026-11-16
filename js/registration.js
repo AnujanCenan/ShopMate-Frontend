@@ -29,6 +29,12 @@ async function handleInvitationFlow() {
       emailInput.readOnly = true;
     }
 
+    // Joining an invited group: hide the new-group field (layout from upstream's invite flow).
+    const groupField = document.getElementById("registrationGroupField");
+    if (groupField) groupField.classList.add("hidden");
+    const submitButton = document.getElementById("registerSubmitButton");
+    if (submitButton) submitButton.textContent = t("register.joinInvitedGroup");
+
     // // Hide the Group Name field since they are joining an existing invited group
     // const groupNameInput = document.getElementById("groupNameInput");
     // if (groupNameInput) {

@@ -24,8 +24,12 @@ if (categorySortSelect) {
 }
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 async function initializeDashboard() {
+  // Start each dashboard visit with the budget card minimized, as requested by the default layout.
+  appState.dashboardBudgetExpanded = false;
+  // Invitations are accepted server-side via the emailed token (registerPage/loginPage),
+  // and group colours are synced inside getGroups().
   await obtainUserProfile();
-  await getGroups();   
+  await getGroups();
   restoreLastGroup();
   renderCategories(); 
   await renderBudgetDashboardWidget();
@@ -104,25 +108,17 @@ async function renderCategories() {
   saveState();
 
   emptyStateSection.innerHTML = "";
-  categories.forEach(function (category) {
+  categorySortControl?.classList.remove("hidden");
+  if (categorySortSelect) {
+    categorySortSelect.value = getCategorySortMode();
+    syncSplitSelectDisplay(categorySortSelect);
+  }
+  getSortedCategoriesForDisplay(categories).forEach(function (category) {
     const listId = category.listId;
     const categoryBudgetInfo = state.budgets.categoryBudgets?.find(b => b.shoppingListId === listId);
-    
+
     const categoryBudget = categoryBudgetInfo?.budgetLimit || 0;
     const categorySpent = categoryBudgetInfo?.budgetSpent || 0;
-
-  // categorySortControl?.classList.remove("hidden");
-  // if (categorySortSelect) {
-  //   categorySortSelect.value = getCategorySortMode();
-  // }
-  // getSortedCategoriesForDisplay(categories).forEach(function (category) {
-  //   const categoryBudget =
-  //     appState.budgets.categoryBudgets?.[appState.activeGroup]?.[category.name]
-  //       ?.monthlyLimit ?? 0;
-  //   let categorySpent = 0;
-  //   category.items.forEach(function (item) {
-  //     categorySpent += getItemSpentAmount(item);
-  //   });
     const categoryRemaining =
       categoryBudget > 0 ? Math.max(categoryBudget - categorySpent, 0) : null;
     const pendingCount = category.numItems - category.numPurchased;
@@ -153,20 +149,18 @@ async function renderCategories() {
           }
         </div>
         <div class="categoryBudgetSummary">
-          ${t("dashboard.budget")}
-          <strong>
-           ${categoryBudget > 0 ? getCurrencySymbol() + Number(categoryBudget).toFixed(2) : t("dashboard.notSet")}
-          </strong>
-          &nbsp; • &nbsp;
-          ${t("dashboard.spent")}
-          <strong>
-            ${getCurrencySymbol()}${Number(categorySpent).toFixed(2)}
-          </strong>
-          &nbsp; • &nbsp;
-          ${t("dashboard.left")}
-          <strong>
-            ${categoryBudget > 0 ? getCurrencySymbol() + Number(categoryRemaining).toFixed(2) : "-"}
-          </strong>
+          <span class="categoryBudgetMetric">
+            <span class="categoryBudgetMetricLabel">${t("dashboard.budget")}</span>
+            <strong>${categoryBudget > 0 ? getCurrencySymbol() + Number(categoryBudget).toFixed(2) : t("dashboard.notSet")}</strong>
+          </span>
+          <span class="categoryBudgetMetric">
+            <span class="categoryBudgetMetricLabel">${t("dashboard.spent")}</span>
+            <strong>${getCurrencySymbol()}${Number(categorySpent).toFixed(2)}</strong>
+          </span>
+          <span class="categoryBudgetMetric">
+            <span class="categoryBudgetMetricLabel">${t("dashboard.left")}</span>
+            <strong>${categoryBudget > 0 ? getCurrencySymbol() + Number(categoryRemaining).toFixed(2) : "-"}</strong>
+          </span>
         </div>
         <p class="categoryInfo">
           ${pendingCount}
@@ -184,7 +178,7 @@ function getCategorySortPreferenceKey() {
   const currentUser = getCurrentUser();
   const keyParts = [
     currentUser?.id || currentUser?.email || "local-user",
-    appState.activeGroup || "no-group",
+    state.activeGroupId || "no-group",
   ];
   return `shopMate:category-sort:${keyParts.map(encodeURIComponent).join(":")}`;
 }
@@ -217,12 +211,8 @@ function getSortedCategoriesForDisplay(categories) {
   }
   if (sortMode === "pending-desc") {
     return sortedCategories.sort(function (left, right) {
-      const leftPending = left.items.filter(function (item) {
-        return !item.purchased;
-      }).length;
-      const rightPending = right.items.filter(function (item) {
-        return !item.purchased;
-      }).length;
+      const leftPending = (left.numItems || 0) - (left.numPurchased || 0);
+      const rightPending = (right.numItems || 0) - (right.numPurchased || 0);
       return (
         rightPending - leftPending ||
         left.name.localeCompare(right.name, undefined, { sensitivity: "base" })
@@ -1073,49 +1063,12 @@ async function sendMemberInvitation(familyGroupId) {
     return;
   }
 
-  await sendInvititation_mysql(email, "Normal", familyGroupId);
-  // const members = appState.groupMembers[groupName] || [];
-  // const memberExists = members.some(function (member) {
-  //   return member.email.toLowerCase() === email;
-  // });
-  // if (memberExists) {
-  //   emailInput.classList.add("formInputError");
-  //   emailError.textContent = t("dashboard.memberAlreadyExists");
-  //   emailInput.focus();
-  //   return;
-  // }
-  // const invitationExists = appState.pendingInvitations.some(
-  //   function (invitation) {
-  //     return (
-  //       invitation.groupName === groupName &&
-  //       invitation.email.toLowerCase() === email &&
-  //       invitation.status === "pending"
-  //     );
-  //   },
-  // );
-  // if (invitationExists) {
-  //   emailInput.classList.add("formInputError");
-  //   emailError.textContent = t("dashboard.pendingInvitationExists");
-  //   emailInput.focus();
-  //   return;
-  // }
-  // const currentUser = getCurrentUser();
-  // if (!currentUser) {
-  //   showToast(t("dashboard.currentUserUnavailable"), "info");
-  //   return;
-  // }
-  // const invitation = {
-  //   id: crypto.randomUUID(),
-  //   groupId: groupName,
-  //   groupName: groupName,
-  //   email: email,
-  //   invitedBy: currentUser.email,
-  //   invitedAt: new Date().toISOString(),
-  //   expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-  //   status: "pending",
-  // };
-  // appState.pendingInvitations.push(invitation);
-  saveAppState();
+  const invitationSent = await sendInvititation_mysql(email, "Normal", familyGroupId);
+  if (!invitationSent) {
+    emailInput.classList.add("formInputError");
+    emailError.textContent = t("common.error");
+    return;
+  }
   closeBottomSheet();
   showToast(t("dashboard.invitationSent"));
 }
@@ -1499,9 +1452,9 @@ async function renderBudgetDashboardWidget() {
         class="budgetCompactSummary${isExpanded ? " hidden" : ""}"
         aria-hidden="${isExpanded}"
       >
-        <span>${t("dashboard.allocated")} <strong>${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + limit}</strong></span>
-        <span>${t("dashboard.spent")} <strong>${getCurrencySymbol()} ${spent}</strong></span>
-        <span>${t("dashboard.remaining")} <strong>${limit === 0 ? t("dashboard.unlimited") : getCurrencySymbol() + " " + remaining}</strong></span>
+        <span>${t("dashboard.allocatedShort")} <strong>${limit === 0 ? t("dashboard.unlimitedShort") : getCurrencySymbol() + " " + limit}</strong></span>
+        <span>${t("dashboard.spentShort")} <strong>${getCurrencySymbol()} ${spent}</strong></span>
+        <span>${t("dashboard.remainingShort")} <strong>${limit === 0 ? t("dashboard.unlimitedShort") : getCurrencySymbol() + " " + remaining}</strong></span>
       </div>
       <div
         id="budgetSummaryBody"

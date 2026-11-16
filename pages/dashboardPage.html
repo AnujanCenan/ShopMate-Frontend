@@ -29,6 +29,25 @@
       </header>
       <!-- Main Dashboard -->
       <main class="pageContent">
+        <!-- Dashboard loading placeholders stay hidden unless initialization takes long enough to show them. -->
+        <div class="pageSkeleton dashboardPageSkeleton" id="dashboardPageSkeleton" aria-hidden="true">
+          <div class="skeletonBlock skeletonGroupSelector"></div>
+          <div class="skeletonBlock skeletonBudgetCard">
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineMedium"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineFull"></span>
+          </div>
+          <div class="skeletonBlock skeletonCategoryCard">
+            <span class="skeletonBlock skeletonLine skeletonLineMedium"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineFull"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+          </div>
+          <div class="skeletonBlock skeletonCategoryCard">
+            <span class="skeletonBlock skeletonLine skeletonLineMedium"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineFull"></span>
+            <span class="skeletonBlock skeletonLine skeletonLineShort"></span>
+          </div>
+        </div>
         <!-- Group Selector -->
         <section class="groupDropdownSection">
           <button
@@ -65,7 +84,7 @@
           <label for="categorySortSelect" data-i18n="dashboard.sortCategories">
             Sort categories
           </label>
-          <select id="categorySortSelect" class="sortControlSelect">
+          <select id="categorySortSelect" class="sortControlSelect" data-split-select>
             <option value="default" data-i18n="dashboard.sortDefault">
               Default order
             </option>
@@ -125,10 +144,9 @@
     <script src="../js/stateManager.js"></script>
     <script src="../js/helpers.js"></script>
     <script src="../js/authManager.js"></script>
+    <script src="../js/groupService.js"></script>
     <!-- LOCALIZATION FRAMEWORK -->
-    <script src="../js/localization/localizationRegistry.js"></script>
     <script src="../js/localization/languageManager.js"></script>
-    <script src="../js/localization/localizationBootstrap.js"></script>
     <!-- APPLICATION BOOTSTRAP -->
     <script src="../js/bootstrap.js"></script>
     <!-- DASHBOARD -->

@@ -49,6 +49,35 @@ async function canLeave(groupId) {
   }
 }
 
+/*
+ * Local-only invitation stubs from upstream. The live app sends and accepts invitations
+ * through the backend (sendInvititation_mysql and the emailed ?token= link handled on the
+ * register/login pages); these remain only for the legacy local flow on inviteLandingPage.
+ */
+/*
+ * BACKEND TODO: Replace this local-only stub with the invitation API.
+ * Persist the invitation, email inviteUrl to email, and return delivery status.
+ * The current UI saves the invitation in local app state after success.
+ */
+async function inviteMemberToGroup(payload) {
+  return {
+    success: true,
+    localOnly: true,
+  };
+}
+/*
+ * BACKEND TODO: Replace this local-only stub with invitation acceptance API.
+ * Validate code, expiry, pending status, authenticated recipient email, and
+ * membership server-side; return the canonical group ID and assigned role.
+ * The current UI applies the accepted membership to local app state.
+ */
+async function joinGroupByInvite(inviteCode) {
+  return {
+    success: true,
+    localOnly: true,
+  };
+}
+
 
 
 /**
@@ -110,7 +139,7 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
 
   if (fgpId === null) {
     console.error("Unable to determine family group id");
-    return;
+    return false;
   }
 
   if (!invitee_email) {
@@ -131,14 +160,14 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
   if (!res.ok) {
     const msg = await res.text();
     console.error(msg);
-    return;
+    return false;
   }
 
   const body = await res.json();
 
   const invitation = {
     fgpId: fgpId,
-    invId: body.InvId,
+    invId: body.invId ?? body.InvId,
     invEmail: invitee_email,
     role: role,
     invStatus: "Pending",
@@ -146,7 +175,12 @@ async function sendInvititation_mysql(inputEmail, inputRole, inputFamilyGroupId)
     invExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
-  state.tempPendingInvites[fgpId].push()
+  // Cache the invite for the group management page (the dashboard may not have this cache yet).
+  if (!state.tempPendingInvites) state.tempPendingInvites = {};
+  if (!state.tempPendingInvites[fgpId]) state.tempPendingInvites[fgpId] = [];
+  state.tempPendingInvites[fgpId].push(invitation);
+  saveState();
+  return true;
 }
 
 async function deleteInvitation_mysql(invitationId) {
