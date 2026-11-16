@@ -613,101 +613,150 @@ function saveAppState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
 }
 
-///////////// Anujan's Modified State Variable ////////////
+///////////// Server-backed state (`state`) ////////////
+/*
+ * `state` is the primary client store. It caches data fetched from the API plus the
+ * current session/navigation context, and is persisted to localStorage under STATE_KEY.
+ *
+ * GUARANTEES (enforced by normalizeState on every page load and by resetState):
+ *   - Every key in createDefaultState() exists with the right type. Arrays are always
+ *     arrays and objects are always plain objects, so `state.groups.find(...)` or
+ *     `state.budgets.categoryBudgets.forEach(...)` never throw on a fresh/old/corrupt store.
+ *   - Saved data from an older STATE_VERSION is discarded (only the session/navigation
+ *     context is kept) and is re-fetched from the API.
+ *   - Logging in or out resets everything, so one user's cached data never leaks to another.
+ *
+ * NOT GUARANTEED: that cached server data is fresh or loaded. Fields marked [server cache]
+ * are only as current as the last fetch on some page; e.g. `groups` is filled by getGroups()
+ * on the dashboard. Pages that need them must fetch (or check) before relying on them.
+ */
+const STATE_KEY = "ShopMate-StateData";
+const STATE_VERSION = 2;
 
+function createDefaultState() {
+  return {
+    version: STATE_VERSION,
 
-const STATE_KEY = "ShopMate-StateData"
+    // Session
+    loggedIn: false,
+    currentUser: null,            // [server cache] /api/user-profile -> { userId, name, email, ... }
 
-const defaultState = {
-  loggedIn: false,
-  currentUser: null,
-  activeGroup: null,
-  activeGroupId: null,
-  activeCategory: null,
-  activeCategoryId: null,
-  activeTab: "lists",
-  searchQuery: "",
-  selectionMode: false,
-  selectedItems: [],
-  favoriteItems: [],
-  listItems: [],
-  notifications: [],
-  dashboardBudgetExpanded: false,
-  drawerPosition: "right",
-  groups: {
-    // 0: {
-    // "name": "Family Group",
-    // "lists": [
-    //   {
-    //     name: "Monthly Groceries",
-    //     num_items: 0,
-    //     num_purchased: 0
-    //     listItems: [
-    //       {
-    //         name: "Milk",
-    //         quantity: 2,
-    //         notes: "Low Fat",
-    //         preferredShop: "Woolworths",
-    //         purchased: false,
-    //         estimatedPrice: 60,
-    //         actualPrice: 0,
-    //         purchaseDate: null,
-    //       },
-    //       {
-    //         name: "Bread",
-    //         quantity: 1,
-    //         notes: "",
-    //         preferredShop: "",
-    //         purchased: false,
-    //         estimatedPrice: 40,
-    //         actualPrice: 0,
-    //         purchaseDate: null,
-    //       },
-    //     ],
-    //   },
-    // ]},
-  },
-  budgets: {
-    groupBudgets: [
-      {
-        // familyGroupId: 0
-        // limit: 0
-      }
-    ],
-    categoryBudgets: [
-      {
-        // shoppingListId: 0
-        // shoppingListName: ""
-        // budgetLimit: 0,
-        // budgetSpent: 0,
-        // numPurchased: 0,
-        // shoppingListName: "",
-        // userType: (Admin|Normal)
-      }
-    ],
-  },
-};
+    // Navigation context
+    activeGroup: null,            // name of the selected family group (display only)
+    activeGroupId: null,          // id of the selected family group (use this for API calls)
+    activeCategory: null,         // name of the selected shopping list (display only)
+    activeCategoryId: null,       // id of the selected shopping list
+    activeTab: "lists",           // category page tab: "lists" | "purchased" | "favorites"
+    searchQuery: "",              // category page search box
+    selectionMode: false,
+    selectedItems: [],
 
+    // [server cache] data
+    groups: [],                   // /api/get-groups -> [{ familyGroupId, familyName, isAdmin, groupColour }]
+    currentCategories: [],        // /api/get-lists for the active group
+    listItems: [],                // items of the active shopping list
+    favoriteItems: [],
+    notifications: [],            // notifications currently rendered on the notifications page
+    budgets: {
+      groupBudgets: [],
+      categoryBudgets: [],        // [{ shoppingListId, budgetLimit, budgetSpent, ... }]
+    },
+    tempMembers: {},              // { [familyGroupId]: members[] } - group management page
+    tempPendingInvites: {},       // { [familyGroupId]: invitations[] } - group management page
+    catalogue: null,              // product catalogue cache { items, timeFetched }
+
+    // UI preferences (device only)
+    dashboardBudgetExpanded: false,
+    drawerPosition: "right",
+
+    // [server cache] /api/get-settings - the single source for user settings.
+    // Loaded once per login by loadUserSettings() (see bootstrap); the change*_mysql
+    // functions in settingsService.js keep it in sync after each save.
+    settingsLoaded: false,
+    settings: {
+      theme: "system",            // "system" | "light" | "dark"
+      language: "en",             // "en" | "fr" | "ta"
+      currency: "AUD",            // "AUD" | "LKR" | "INR"
+      measuringSystem: "metric",  // "metric" | "imperial"
+      notifications: {
+        group: true,
+        shopping: true,
+        budget: true,
+        general: true,
+      },
+      security: {
+        appLockOn: false,
+        pinOn: false,
+        biometricOn: false,
+      },
+    },
+  };
+}
+
+function isPlainObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/* Fill in missing keys and replace values of the wrong type with their defaults. Unknown keys are kept. */
+function mergeWithDefaults(defaults, saved) {
+  const result = isPlainObject(saved) ? { ...saved } : {};
+  Object.keys(defaults).forEach(function (key) {
+    const defaultValue = defaults[key];
+    const savedValue = result[key];
+    if (Array.isArray(defaultValue)) {
+      result[key] = Array.isArray(savedValue) ? savedValue : defaultValue;
+    } else if (isPlainObject(defaultValue)) {
+      result[key] = mergeWithDefaults(defaultValue, savedValue);
+    } else if (defaultValue === null) {
+      result[key] = savedValue === undefined ? null : savedValue;
+    } else if (typeof savedValue !== typeof defaultValue) {
+      result[key] = defaultValue;
+    }
+  });
+  return result;
+}
+
+/* Bring a saved (possibly old or corrupt) state up to the current schema. */
+function normalizeState(saved) {
+  const defaults = createDefaultState();
+  if (!isPlainObject(saved)) {
+    return defaults;
+  }
+  if (saved.version !== STATE_VERSION) {
+    // Older layout: keep only the session/navigation context; server data is re-fetched.
+    const kept = {};
+    ["loggedIn", "currentUser", "activeGroup", "activeGroupId", "activeCategory", "activeCategoryId"]
+      .forEach(function (key) {
+        if (key in saved) kept[key] = saved[key];
+      });
+    return mergeWithDefaults(defaults, kept);
+  }
+  return mergeWithDefaults(defaults, saved);
+}
 
 function loadState() {
-  const savedState = localStorage.getItem(STATE_KEY);
-  if (!savedState) {
-    return structuredClone(defaultState);
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(STATE_KEY));
+  } catch (error) {
+    console.error("Saved state was unreadable; starting fresh.", error);
   }
-
-  return JSON.parse(savedState);
+  const normalized = normalizeState(saved);
+  localStorage.setItem(STATE_KEY, JSON.stringify(normalized));
+  return normalized;
 }
 
 function saveState() {
   localStorage.setItem(STATE_KEY, JSON.stringify(state));
 }
 
+/* Reset to a clean default state (used on login and logout). `state` is const, so mutate in place. */
 function resetState() {
-  localStorage.removeItem(STATE_KEY);
-  state.activeGroup = null;
-  state.activeGroupId = null;
-  state.activeCategory = null;
-  state.activeCategoryId = null;
+  Object.keys(state).forEach(function (key) {
+    delete state[key];
+  });
+  Object.assign(state, createDefaultState());
+  saveState();
 }
 
 

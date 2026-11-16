@@ -25,7 +25,7 @@ if (categorySortSelect) {
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 async function initializeDashboard() {
   // Start each dashboard visit with the budget card minimized, as requested by the default layout.
-  appState.dashboardBudgetExpanded = false;
+  state.dashboardBudgetExpanded = false;
   // Invitations are accepted server-side via the emailed token (registerPage/loginPage),
   // and group colours are synced inside getGroups().
   await obtainUserProfile();
@@ -36,11 +36,7 @@ async function initializeDashboard() {
 }
 /* Restore Last Group */
 function restoreLastGroup() {
-  if (
-    !selectedGroupName ||
-    !appState.groups ||
-    typeof appState.groups !== "object"
-  ) {
+  if (!selectedGroupName) {
     return;
   }
   const savedGroupName = state.activeGroup;
@@ -134,7 +130,7 @@ async function renderCategories() {
             ${category.name}
           </h2>
           ${
-            canManageCategory(category.name, appState.activeGroup)
+            canManageCategory(category.name, state.activeGroupId)
               ? `<button
                   class="categoryMoreButton"
                   onclick="event.stopPropagation(); renderCategoryActions('${category.name}', ${category.listId});"
@@ -235,7 +231,7 @@ async function selectGroup(groupName, groupId) {
 /* Open Category Page */
 function openCategoryPage(categoryName, categoryId) {
   
-  localStorage.setItem("activeGroup", appState.activeGroup);
+  localStorage.setItem("activeGroup", state.activeGroup);
   localStorage.setItem("activeCategory", categoryName);
   localStorage.setItem("activeCategoryId", categoryId)
   state.activeCategory = categoryName;
@@ -263,7 +259,7 @@ async function renderGroupDropdown() {
           </button>`
         }
         ${
-          canManageGroupSettings(group.familyName)
+          canManageGroupSettings(group.familyGroupId)
             ? `
               <button
                 class="groupMoreButton"
@@ -681,22 +677,6 @@ async function createCategory() {
   //   name: categoryName,
   //   items: [],
   // });
-  if (!appState.budgets) {
-    appState.budgets = {
-      groupBudgets: {},
-      categoryBudgets: {},
-    };
-  }
-  if (!appState.budgets.categoryBudgets) {
-    appState.budgets.categoryBudgets = {};
-  }
-  if (!appState.budgets.categoryBudgets[appState.activeGroup]) {
-    appState.budgets.categoryBudgets[appState.activeGroup] = {};
-  }
-  appState.budgets.categoryBudgets[appState.activeGroup][categoryName] = {
-    monthlyLimit: null,
-  };
-  saveAppState();
   renderCategories();
   closeBottomSheet();
   showSnackbar(t("dashboard.categoryCreated"));
@@ -1202,7 +1182,7 @@ This action cannot be undone.`,
 /* Open Side Drawer */
 function openSideDrawer() {
   renderSideDrawer();
-  const drawerPosition = appState.drawerPosition || "right";
+  const drawerPosition = state.drawerPosition || "right";
   sideDrawer.classList.remove("left", "right");
   sideDrawer.classList.add(drawerPosition);
   sideDrawer.classList.add("active");
@@ -1383,15 +1363,9 @@ async function renderBudgetDashboardWidget() {
   if (!state.budgets.groupBudgets) {
     state.budgets.groupBudgets = {};
   }
-  if (!appState.budgets.groupBudgets[appState.activeGroup]) {
-    appState.budgets.groupBudgets[appState.activeGroup] = {
-      monthlyLimit: null,
-    };
-  }
-  const groupBudget = appState.budgets.groupBudgets[appState.activeGroup];
   const limit = currBudget.monthlyLimit ?? 0;
   const spent = currBudget.spendingThisMonth;
-  const isExpanded = appState.dashboardBudgetExpanded === true;
+  const isExpanded = state.dashboardBudgetExpanded === true;
   const remaining = Math.max(limit - spent, 0);
   let allocated = 0;
   
@@ -1564,7 +1538,7 @@ async function renderBudgetDashboardWidget() {
             onclick="
               window.location.href =
                 '../pages/budgetPage.html?group=' +
-                encodeURIComponent(appState.activeGroup)
+                encodeURIComponent(state.activeGroup)
             "
           >
             Budget Analysis
@@ -1596,13 +1570,13 @@ function toggleBudgetCard() {
   if (!body || !compactSummary || !icon || !header) {
     return;
   }
-  appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
-  saveAppState();
-  body.classList.toggle("hidden", !appState.dashboardBudgetExpanded);
-  compactSummary.classList.toggle("hidden", appState.dashboardBudgetExpanded);
-  header.setAttribute("aria-expanded", String(appState.dashboardBudgetExpanded));
-  compactSummary.setAttribute("aria-hidden", String(appState.dashboardBudgetExpanded));
-  if (!appState.dashboardBudgetExpanded) {
+  state.dashboardBudgetExpanded = !state.dashboardBudgetExpanded;
+  saveState();
+  body.classList.toggle("hidden", !state.dashboardBudgetExpanded);
+  compactSummary.classList.toggle("hidden", state.dashboardBudgetExpanded);
+  header.setAttribute("aria-expanded", String(state.dashboardBudgetExpanded));
+  compactSummary.setAttribute("aria-hidden", String(state.dashboardBudgetExpanded));
+  if (!state.dashboardBudgetExpanded) {
     icon.innerHTML = `
       <img
         src="${getIconPath("navigation", "expand")}"
@@ -1622,7 +1596,7 @@ function toggleBudgetCard() {
 }
 /* Render Edit Group Budget Form */
 function renderEditGroupBudgetForm() {
-  if (!canManageBudget(appState.activeGroup)) return;
+  if (!canManageBudget()) return;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -1655,8 +1629,9 @@ function renderEditGroupBudgetForm() {
               currencyInput
             "
             value="${
-              appState.budgets.groupBudgets?.[appState.activeGroup]
-                ?.monthlyLimit ?? ""
+              (state.budgets.groupBudgets || []).find(function (budget) {
+                return Number(budget.familyGroupId) === Number(state.activeGroupId);
+              })?.monthlyLimit ?? ""
             }"
           >
         </div>
@@ -1682,8 +1657,9 @@ function renderEditGroupBudgetForm() {
 /* Render Category Budget Form */
 function renderCategoryBudgetForm(categoryName, categoryId) {
   const currentBudget =
-    appState.budgets.categoryBudgets?.[appState.activeGroup]?.[categoryName]
-      ?.monthlyLimit ?? "";
+    (state.budgets.categoryBudgets || []).find(function (budget) {
+      return Number(budget.shoppingListId) === Number(categoryId);
+    })?.budgetLimit ?? "";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -1905,7 +1881,7 @@ async function saveGroupBudget() {
       .replace("${amount}", amount),
     "budget",
     {
-      group: appState.activeGroup,
+      group: state.activeGroup,
     },
     {
       titleKey: "dashboard.budgetUpdated",
@@ -1923,8 +1899,8 @@ async function saveGroupBudget() {
 
 /* Toggle Budget Widget */
 function toggleBudgetWidget() {
-  appState.dashboardBudgetExpanded = !appState.dashboardBudgetExpanded;
-  saveAppState();
+  state.dashboardBudgetExpanded = !state.dashboardBudgetExpanded;
+  saveState();
   renderBudgetDashboardWidget();
 }
 /* Export App Data */

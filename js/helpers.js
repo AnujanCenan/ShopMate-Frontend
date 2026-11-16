@@ -407,99 +407,48 @@ function getActiveCategory() {
     return category.name === activeCategory;
   });
 }
-/* Return the signed-in user's membership record for a selected group. */
-function getGroupMember(groupName = appState.activeGroup) {
-  const currentUser = appState.currentUser;
-  if (!groupName || !currentUser) {
-    return null;
-  }
-  const members = appState.groupMembers?.[groupName] || [];
-  return members.find(function (member) {
-    return (
-      (currentUser.id && member.id === currentUser.id) ||
-      (currentUser.email &&
-        member.email?.toLowerCase() === currentUser.email.toLowerCase())
-    );
-  });
-}
-
-function isAdminOfGroup(familyGroupId) {    /// OBSOLETE
-  const group = state.groups.find(group => group.familyGroupId === familyGroupId);
-  return group ? Boolean(group.isAdmin) : false;
-}
-
-/* 
-  Is Admin - Determines whether the current user is an administrator of the active group. 
-  Assumes state.activeGroupId is set to accurately reflect the 
-*/
-function isAdmin() {      // OBSOLETE???
-  const currGroupId = state.activeGroupId;
-  return isAdminOfGroup(currGroupId);
-}
-
-
-/* Is Member - Determines whether the current user is a standard member of the active group. */
-function isMember() {
-  const member = getCurrentMember();
-  return member ? member.role === "member" : false;
-}
-/* Keep active-group callers compatible while using the shared group lookup. */
-function getCurrentMember() {
-  return getGroupMember(appState.activeGroup);
-}
-/* Return only the groups the signed-in user belongs to. */
-function getCurrentUserGroups() {
-  return Object.keys(appState.groups || {}).filter(function (groupName) {
-    return Boolean(getGroupMember(groupName));
-  });
-}
-/* Check whether the signed-in user is an administrator in the selected group. */
-function isAdmin(groupName = state.activeGroup, groupId = state.activeGroupId) {
-  const currGroup = state.groups.find(g => g.familyGroupId == groupId);
-  if (!currGroup) {
-    return false;
-  }
-  return currGroup.isAdmin;
-}
-
-/* Check whether the signed-in user is a standard member in the selected group. */
-function isMember(groupName = appState.activeGroup) {
-  return getGroupMember(groupName)?.role === "member";
-}
-/* Check whether a user created the selected group. */
-function isGroupCreator(groupName = appState.activeGroup) {
-  const currentUser = appState.currentUser;
-  if (!getGroupMember(groupName)) return false;
-  const creatorId = appState.groupCreators?.[groupName];
-  return Boolean(
-    currentUser &&
-      creatorId &&
-      ((currentUser.id && creatorId === currentUser.id) ||
-        (currentUser.email &&
-          String(creatorId).toLowerCase() === currentUser.email.toLowerCase())),
+/*
+ * Permissions - the single source is state.groups[].isAdmin from /api/get-groups
+ * (the server also enforces these rules). Every helper takes an optional family group id
+ * and defaults to the active group.
+ */
+function getUserGroup(familyGroupId = state.activeGroupId) {
+  return (
+    state.groups.find(function (group) {
+      return Number(group.familyGroupId) === Number(familyGroupId);
+    }) || null
   );
 }
-/* Admin-only permissions cover invitations and member administration. */
-function canManageGroup(groupName = appState.activeGroup) {
-  return isAdmin(groupName);
+/* Check whether the signed-in user is an administrator of the group. */
+function isAdmin(familyGroupId = state.activeGroupId) {
+  return Boolean(getUserGroup(familyGroupId)?.isAdmin);
 }
-/* Group creators may manage their group; admins retain full control. */
-function canManageGroupSettings(groupName = appState.activeGroup) {
-  return isAdmin(groupName) || isGroupCreator(groupName);
+/* Check whether the signed-in user is a standard (non-admin) member of the group. */
+function isMember(familyGroupId = state.activeGroupId) {
+  const group = getUserGroup(familyGroupId);
+  return Boolean(group) && !group.isAdmin;
 }
-/* Group creators and admins may change the group-level budget. */
-function canManageBudget(groupName = appState.activeGroup) {
-  return canManageGroupSettings(groupName);
+/* Admins manage invitations and members. */
+function canManageGroup(familyGroupId = state.activeGroupId) {
+  return isAdmin(familyGroupId);
 }
-/* Admins or the category creator may manage that category and its budget. */
-function canManageCategory(categoryName, groupName = state.activeGroup, groupId = state.activeGroupId) {
-  return isAdmin(groupName, groupId)
+/* Admins rename/delete the group. */
+function canManageGroupSettings(familyGroupId = state.activeGroupId) {
+  return isAdmin(familyGroupId);
+}
+/* Admins change the group-level budget. */
+function canManageBudget(familyGroupId = state.activeGroupId) {
+  return isAdmin(familyGroupId);
+}
+/* Admins manage categories (shopping lists) and their budgets. */
+function canManageCategory(categoryName, familyGroupId = state.activeGroupId) {
+  return isAdmin(familyGroupId);
 }
 
 /* Members cannot change group colors; admins may customize their own view. */
 /// YES THEY CAN
-function canManageGroupColor(groupName) {
-  return isAdmin(groupName);
+function canManageGroupColor(familyGroupId = state.activeGroupId) {
+  return isAdmin(familyGroupId);
 }
 /*
  * Group colours are personal to each (user, group) pair and are stored on the server
@@ -1146,6 +1095,61 @@ function createSystemNotification_mysql(titleKey, messageKey, messageParams = {}
   );
 }
 
+/* Map a stored language value ("en", "english", "French", ...) to a supported code. */
+function normalizeLanguageCode(value) {
+  const code = String(value || "").trim().toLowerCase();
+  const aliases = { english: "en", french: "fr", tamil: "ta" };
+  const normalized = aliases[code] || code;
+  return ["en", "fr", "ta"].includes(normalized) ? normalized : "en";
+}
+
+/* Copy the /api/get-settings response into state.settings (accepts camelCase or PascalCase keys). */
+function copySettingsFromDatabaseToLocal(fetchedSettings) {
+  if (!fetchedSettings) return;
+  const pick = function (key) {
+    const pascal = key.charAt(0).toUpperCase() + key.slice(1);
+    return fetchedSettings[key] !== undefined ? fetchedSettings[key] : fetchedSettings[pascal];
+  };
+  const settings = state.settings;
+  settings.theme = ["system", "light", "dark"].includes(pick("theme")) ? pick("theme") : "system";
+  settings.language = normalizeLanguageCode(pick("language"));
+  settings.currency = pick("currency") || "AUD";
+  settings.measuringSystem = pick("measuringSystem") === "imperial" ? "imperial" : "metric";
+  settings.notifications = {
+    group: pick("groupNotifsOn") !== false,
+    shopping: pick("shoppingNotifsOn") !== false,
+    budget: pick("budgetNotifsOn") !== false,
+    general: pick("generalNotifsOn") !== false,
+  };
+  settings.security = {
+    appLockOn: pick("appLockOn") === true,
+    pinOn: pick("pinOn") === true,
+    biometricOn: pick("biometricOn") === true,
+  };
+  state.settingsLoaded = true;
+  saveState();
+}
+
+/* Load the signed-in user's settings from the database into state.settings. */
+async function loadUserSettings() {
+  try {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/get-settings`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) {
+      console.error("Could not load user settings");
+      return false;
+    }
+    copySettingsFromDatabaseToLocal(await res.json());
+    return true;
+  } catch (error) {
+    console.error("Could not load user settings", error);
+    return false;
+  }
+}
+
 /* Create Notification - Creates a new notification and updates the notification badge. */
 function createNotification(
   type,
@@ -1325,7 +1329,7 @@ function initializeThemeListener() {
 /* Currency & Measurement Helpers */
 
 function getCurrencySymbol() {
-  const currency = appState.settings?.currency || "AUD";
+  const currency = state.settings.currency || "AUD";
 
   const currencySymbols = {
     AUD: "$",

@@ -61,14 +61,10 @@ let currentLanguage = "en";
 const dictionaryLoadPromises = {};
 /* Get Language Code */
 function getCurrentLanguageCode() {
-  if (
-    typeof appState === "undefined" ||
-    !appState.settings ||
-    !appState.settings.language
-  ) {
+  if (typeof state === "undefined" || !state.settings || !state.settings.language) {
     return "en";
   }
-  return appState.settings.language;
+  return state.settings.language;
 }
 /* Get Dictionary Base URL */
 function getDictionaryBaseUrl() {
@@ -285,13 +281,10 @@ async function changeLanguage(languageCode) {
     return;
   }
   await loadLanguage(languageCode);
-  if (typeof appState !== "undefined") {
-    if (!appState.settings) {
-      appState.settings = {};
-    }
-    appState.settings.language = currentLanguage;
-    if (typeof saveAppState === "function") {
-      saveAppState();
+  if (typeof state !== "undefined" && state.settings) {
+    state.settings.language = currentLanguage;
+    if (typeof saveState === "function") {
+      saveState();
     }
   }
   translatePage();

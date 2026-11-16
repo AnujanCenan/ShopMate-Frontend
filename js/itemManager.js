@@ -535,7 +535,7 @@ async function createItem() {
     return;
   }
 
-  const generalUnit = getGeneralUnit(itemQuantityUnit, state.settings?.measurementUnit || "metric");
+  const generalUnit = getGeneralUnit(itemQuantityUnit, state.settings.measuringSystem || "metric");
   console.log(`\tgeneral unit === ${generalUnit}`);
   const categoryId = state.activeCategoryId; 
   const recurrenceFrequency =
@@ -805,7 +805,7 @@ async function updateItem(listItemId) {
     .value.trim();
   const newQuantityUnit =
     document.getElementById("editItemQuantityUnitInput")?.value || "pcs";
-  const generalUnit = getGeneralUnit(newQuantityUnit, state.settings?.measurementUnit || "metric");
+  const generalUnit = getGeneralUnit(newQuantityUnit, state.settings.measuringSystem || "metric");
   console.log(`Updating Item: general Unit selected == ${generalUnit}`);
   const newPrice =
     Number(document.getElementById("editItemPriceInput").value) || 0;

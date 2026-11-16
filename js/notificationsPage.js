@@ -2,10 +2,6 @@
 const notificationList = document.getElementById("notificationList");
 /* Initialize */
 function initializeNotifications() {
-  if (!appState.notifications) {
-    appState.notifications = [];
-    saveAppState();
-  }
   applyNotificationPreferences();
   renderNotifications();
 
@@ -15,7 +11,7 @@ function applyNotificationPreferences() {
   const notificationButtons = document.querySelectorAll(
     ".notificationFilterButton",
   );
-  const notificationSettings = appState.settings.notifications;
+  const notificationSettings = state.settings.notifications;
   let activeFilterAvailable = true;
   notificationButtons.forEach(function (button) {
     const filterType = button.textContent.trim().toLowerCase();
@@ -155,7 +151,7 @@ async function getNotifications_mysql() {
 async function renderNotifications() {
   const notifs = await getNotifications_mysql() ;
   notificationList.innerHTML = "";
-  const notificationSettings = appState.settings.notifications;
+  const notificationSettings = state.settings.notifications;
   // Database notifications carry their category in targetType ("item", "budget", "group", "system").
   let notifications = (notifs || []).filter(function (notification) {
     const type = notification.targetType;
@@ -336,8 +332,6 @@ async function clearNotifications() {
     t("notifications.confirmClearAll"),
     async function () {
       await deleteNotification_mysql(null);
-      appState.notifications = [];
-      saveAppState();
       renderNotifications();
       updateNotificationBadge();
       showToast(t("notifications.notificationsCleared"));

@@ -85,6 +85,7 @@ async function registerUser_mysql(event) {
     if (response.ok) {
       localStorage.setItem("authToken", result.token);
       resetState();
+      state.loggedIn = true;
       await obtainUserProfile();
       window.location.href = "./dashboardPage.html";
     } else {

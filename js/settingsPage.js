@@ -2,14 +2,6 @@
 redirectIfLoggedOut();
 /* Open Profile */
 async function openProfilePage() {
-  localStorage.setItem(
-    "selectedMember",
-    JSON.stringify(
-      getCurrentGroupMembers().find(function (member) {
-        return member.id === getCurrentUser().id;
-      }),
-    ),
-  );
   window.location.href = "../pages/profilePage.html";
 }
 /* Back */
@@ -361,7 +353,6 @@ async function saveThemePreference() {
       return;
     }
   }
-  if (!state.settings) state.settings = {};
   state.settings.theme = selectedTheme.value;
   await changeTheme_mysql(selectedTheme.value);
 
@@ -374,7 +365,7 @@ async function saveThemePreference() {
 }
 /* Open Notification Settings - Displays notification preferences. */
 function openNotificationSettings() {
-  const notifications = appState.settings.notifications;
+  const notifications = state.settings.notifications;
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>Notification Preferences</h2>
@@ -452,19 +443,6 @@ function openNotificationSettings() {
 }
 /* Save Notification Settings - Saves the user's notification preferences. */
 async function saveNotificationSettings() {
-  appState.settings.notifications.group = document.getElementById(
-    "groupNotificationToggle",
-  ).checked;
-  appState.settings.notifications.shopping = document.getElementById(
-    "shoppingNotificationToggle",
-  ).checked;
-  appState.settings.notifications.budget = document.getElementById(
-    "budgetNotificationToggle",
-  ).checked;
-  appState.settings.notifications.general = document.getElementById(
-    "generalNotificationToggle",
-  ).checked;
-
   const notificationSettings = {
     groupNotifsOn: document.getElementById("groupNotificationToggle").checked,
     shoppingNotifsOn: document.getElementById("shoppingNotificationToggle").checked,
@@ -472,8 +450,8 @@ async function saveNotificationSettings() {
     generalNotifsOn: document.getElementById("generalNotificationToggle").checked,
   }
 
+  // Saves to the database and updates state.settings.notifications.
   await changeNotificationSettings_mysql(notificationSettings);
-  saveAppState();
   closeBottomSheet();
   showDialog(
     "Notification Preferences",
@@ -507,7 +485,7 @@ function initializeRadioOptionSelection(
 }
 /* Open Language Settings - Displays available application languages. */
 function openLanguageSettings() {
-  const selectedLanguage = appState.settings.language;
+  const selectedLanguage = state.settings.language;
 
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
@@ -632,9 +610,11 @@ async function saveLanguagePreference() {
   if (!selectedLanguage) {
     return;
   }
-  await changeLanguage_mysql(selectedLanguage.value);     // call changeLanguage code as well
-  appState.settings.language = selectedLanguage.value;
-  saveAppState();
+  // Save to the database (updates state.settings.language), then apply it to the page.
+  await changeLanguage_mysql(selectedLanguage.value);
+  if (typeof changeLanguage === "function") {
+    await changeLanguage(selectedLanguage.value);
+  }
   closeBottomSheet();
   showDialog(
     t("dialogs.languageUpdatedTitle"),
@@ -647,7 +627,7 @@ function setCurrency() {
   if (!bottomSheetContent) {
     return;
   }
-  const currentCurrency = appState.settings.currency || "AUD";
+  const currentCurrency = state.settings.currency || "AUD";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>${t("currency.title")}</h2>
@@ -715,10 +695,8 @@ async function selectCurrency(currency) {
   if (!supportedCurrencies.includes(currency)) {
     return;
   }
+  // Saves to the database and updates state.settings.currency.
   await changeCurrency_mysql(currency);
-
-  appState.settings.currency = currency;
-  saveAppState();
   closeBottomSheet();
   showDialog(t("currency.savedTitle"), t("currency.savedMessage"));
 }
@@ -728,7 +706,7 @@ function setMeasurementUnit() {
   if (!bottomSheetContent) {
     return;
   }
-  const currentUnit = appState.settings.measurementUnit || "metric";
+  const currentUnit = state.settings.measuringSystem || "metric";
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>${t("measurementUnits.title")}</h2>
@@ -786,10 +764,8 @@ async function selectMeasurementUnit(unit) {
   if (unit !== "metric" && unit !== "imperial") {
     return;
   }
+  // Saves to the database and updates state.settings.measuringSystem.
   await changeMeasuringSystem_mysql(unit);
-  
-  appState.settings.measurementUnit = unit;
-  saveAppState();
   closeBottomSheet();
   showDialog(
     t("measurementUnits.savedTitle"),

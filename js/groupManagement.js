@@ -38,20 +38,16 @@ function handleGroupManagementAction(event) {
       openInviteActions(actionElement.dataset.invitationId);
       break;
     case "send-invitation":
-      if (!canManageGroup(groupName)) return;
-      appState.activeGroup = groupName;
+      if (!canManageGroup()) return;
       renderInviteMemberForm();
       break;
     case "leave-group":
-      appState.activeGroup = groupName;
       openLeaveGroupDialog();
       break;
     case "make-admin":
-      appState.activeGroup = groupName;
       makeAdmin(memberId, groupName);
       break;
     case "remove-member":
-      appState.activeGroup = groupName;
       openRemoveMemberDialog(memberId);
       break;
   }
@@ -150,7 +146,7 @@ async function renderGroupAccordion() {
                           </div>
                         </div>
                         ${
-                          canManageGroup() && member?.usrId !== getCurrentUser()?.usrId
+                          canManageGroup(groupId) && member?.usrId !== getCurrentUser()?.usrId
                             ? `
                               <button
                                 class="groupMoreButton"
@@ -237,7 +233,6 @@ async function renderGroupAccordion() {
           <button
             class="primaryButton"
             onclick="
-              appState.activeGroup='${groupName}';
               state.activeGroupId=${groupId};
               state.activeGroup='${groupName}';
               saveState();
@@ -249,7 +244,6 @@ async function renderGroupAccordion() {
           <button
             class="secondaryButton"
             onclick="
-              appState.activeGroup='${groupName}';
               openLeaveGroupDialog(${groupId});
             "
           >
@@ -316,7 +310,7 @@ function setupPermissions() {
 function openInviteActions(groupId, invitationId) {
   console.log("Opening invite actions...");
   console.log(state.tempPendingInvites);
-  if (!canManageGroup()) {
+  if (!canManageGroup(groupId)) {
     return;
   }
   const invitation = (state.tempPendingInvites[groupId] || []).find(
@@ -392,15 +386,15 @@ function findPendingInvitation(invitationId) {
 }
 /* Resend Invitation - Emails a fresh link and extends the invitation's expiry by 7 days. */
 async function resendInvitation(invitationId) {
-  if (!canManageGroup()) {
+  const found = findPendingInvitation(invitationId);
+  if (!found) {
+    return;
+  }
+  if (!canManageGroup(found.groupId)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanResend"),
     );
-    return;
-  }
-  const found = findPendingInvitation(invitationId);
-  if (!found) {
     return;
   }
   const res = await fetch(`${SERVER_ENDPOINT}/api/invitation-resend?invitationId=${Number(invitationId)}`, {
@@ -434,7 +428,8 @@ async function resendInvitation(invitationId) {
 }
 /* Cancel Invitation */
 function cancelInvitation(invitationId) {
-  if (!canManageGroup() || !findPendingInvitation(invitationId)) return;
+  const found = findPendingInvitation(invitationId);
+  if (!found || !canManageGroup(found.groupId)) return;
   showConfirmDialog(
     t("groupManagement.cancelInvitation"),
     t("groupManagement.confirmCancelInvitation"),
@@ -475,7 +470,7 @@ async function revokeInvite(invitationId) {
 }
 /* Member Actions */
 function openMemberActions(memberId, groupId) {
-  if (!canManageGroup()) {
+  if (!canManageGroup(groupId)) {
     return;
   }
 
@@ -583,7 +578,7 @@ function openMemberActions(memberId, groupId) {
 }
 /* Make Admin */
 async function makeAdmin(otherUserId, familyGroupId) {
-  if (!canManageGroup()) {
+  if (!canManageGroup(familyGroupId)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanChangeRoles"),
@@ -693,7 +688,7 @@ function openRemoveMemberDialog(memberId, groupId) {
 }
 /* Remove Member */
 async function removeMember(memberId, groupId) {
-  if (!canManageGroup()) {
+  if (!canManageGroup(groupId)) {
     showDialog(
       t("common.permissionDenied"),
       t("groupManagement.onlyAdminsCanRemoveMembers"),
@@ -830,8 +825,6 @@ async function sendInvitation() {
     showToast(t("common.currentUserUnavailable"));
     return;
   }
-
-  const groupName = appState.activeGroup;
 
   const invitationResult = await sendInvititation_mysql(email, role);
   if (!invitationResult?.success) {

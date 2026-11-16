@@ -505,20 +505,8 @@ function renderCategoryBudgetCards() {
 }
 /* Initialize Budget Page - Loads the Budget page using an optional temporary group. */
 function initializeBudgetPage() {
-  const params = new URLSearchParams(window.location.search);
-  const requestedGroup = params.get("group");
-  const availableGroups = getCurrentUserGroups();
-  // if (availableGroups.length === 0) {
-  //   window.location.href = "../pages/dashboardPage.html";
-  //   return;
-  // }
-  if (requestedGroup && availableGroups.includes(requestedGroup)) {
-    budgetDisplayGroup = requestedGroup;
-  } else if (!getGroupMember(appState.activeGroup)) {
-    budgetDisplayGroup = availableGroups[0];
-  } else {
-    budgetDisplayGroup = null;
-  }
+  // The budget page always shows the active group (state.activeGroup / state.activeGroupId).
+  budgetDisplayGroup = null;
   renderBudgetAnalysis();
 }
 

@@ -31,7 +31,7 @@ async function initializeCategoryPage() {
   await getRenderingItems();
 
   state.activeTab = "lists";
-  appState.searchQuery = "";
+  state.searchQuery = "";
   updateItemSortSelector();
   initializeTabs();
   activateDefaultTab();
@@ -43,7 +43,7 @@ function activateDefaultTab() {
   const tabButtons = document.querySelectorAll(".tabButton");
   tabButtons.forEach(function (tab) {
     tab.classList.remove("activeTab");
-    if (tab.dataset.tab === appState.activeTab) {
+    if (tab.dataset.tab === state.activeTab) {
       tab.classList.add("activeTab");
     }
   });
@@ -71,7 +71,7 @@ function getItemSortPreferenceKey() {
   const currentUser = getCurrentUser();
   const keyParts = [
     currentUser?.id || currentUser?.email || "local-user",
-    appState.activeGroup || "no-group",
+    state.activeGroupId || "no-group",
     localStorage.getItem("activeCategory") || "no-category",
   ];
   return `shopMate:item-sort:${keyParts.map(encodeURIComponent).join(":")}`;
@@ -88,7 +88,7 @@ function getItemSortMode() {
   ].includes(savedMode)
     ? savedMode
     : "default";
-  return appState.activeTab === "favorites" &&
+  return state.activeTab === "favorites" &&
     ["recurring-first", "one-off-first"].includes(validMode)
     ? "newest-first"
     : validMode;
@@ -96,7 +96,7 @@ function getItemSortMode() {
 /* Disable recurrence-only sort choices for favorites, which have no recurrence data. */
 function updateItemSortSelector() {
   if (!itemSortSelect) return;
-  const isFavoritesTab = appState.activeTab === "favorites";
+  const isFavoritesTab = state.activeTab === "favorites";
   itemSortSelect.querySelectorAll("option[data-recurrence-sort]").forEach(
     function (option) {
       option.disabled = isFavoritesTab;
@@ -122,18 +122,18 @@ function getItemCreationTime(item) {
 /* Put earlier dated occurrences first, leaving undated recurring items last. */
 function compareRecurringOccurrenceDates(left, right) {
   const leftDate =
-    (appState.activeTab === "purchased" && left.purchaseDate) ||
+    (state.activeTab === "purchased" && left.purchaseDate) ||
     left.recurrence?.occurrenceDate ||
     left.recurrence?.startDate ||
     "";
   const rightDate =
-    (appState.activeTab === "purchased" && right.purchaseDate) ||
+    (state.activeTab === "purchased" && right.purchaseDate) ||
     right.recurrence?.occurrenceDate ||
     right.recurrence?.startDate ||
     "";
   if (!leftDate && rightDate) return 1;
   if (leftDate && !rightDate) return -1;
-  return appState.activeTab === "purchased"
+  return state.activeTab === "purchased"
     ? rightDate.localeCompare(leftDate)
     : leftDate.localeCompare(rightDate);
 }
@@ -198,9 +198,9 @@ function getFilteredItems() {
     }
   }
   /* Search Filter */
-  if (appState.searchQuery) {
+  if (state.searchQuery) {
     filteredItems = filteredItems.filter(function (item) {
-      return item.ItemName.toLowerCase().includes(appState.searchQuery);
+      return item.ItemName.toLowerCase().includes(state.searchQuery);
     });
   }
   return sortItemsForDisplay(filteredItems);
@@ -463,7 +463,7 @@ function initializeTabs() {
 /* Search */
 if (searchInput) {
   searchInput.addEventListener("input", function (event) {
-    appState.searchQuery = event.target.value.trim().toLowerCase();
+    state.searchQuery = event.target.value.trim().toLowerCase();
     renderFilteredItems();
   });
 }

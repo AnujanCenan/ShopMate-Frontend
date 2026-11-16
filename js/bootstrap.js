@@ -22,6 +22,16 @@ async function initializeApplication() {
     startPageSkeleton(dashboardSkeletonId);
   }
   try {
+    // Settings live in the database; load them once per login before applying theme/language.
+    if (
+      typeof loadUserSettings === "function" &&
+      typeof isUserLoggedIn === "function" &&
+      isUserLoggedIn() &&
+      !state.settingsLoaded
+    ) {
+      await loadUserSettings();
+    }
+
     if (typeof applyTheme === "function") {
       applyTheme();
     }

@@ -100,9 +100,10 @@ async function changeTheme_mysql(theme) {
  * 
  */
 async function changeSecuritySettings_mysql(securitySettings) {
-    const pinOn = "pinOn" in securitySettings ? securitySettings.pinOn : (state.securitySettings?.pinOn || false);
-    const appLockOn = "appLockOn" in securitySettings ? securitySettings.appLockOn : (state.securitySettings?.appLockOn || false);
-    const biometricOn = "biometricOn" in securitySettings ? securitySettings.biometricOn : (state.securitySettings?.biometricOn || false);
+    const current = state.settings.security;
+    const pinOn = "pinOn" in securitySettings ? securitySettings.pinOn : current.pinOn;
+    const appLockOn = "appLockOn" in securitySettings ? securitySettings.appLockOn : current.appLockOn;
+    const biometricOn = "biometricOn" in securitySettings ? securitySettings.biometricOn : current.biometricOn;
 
     const body = {
         PinOn: pinOn,
@@ -123,7 +124,7 @@ async function changeSecuritySettings_mysql(securitySettings) {
     }
 
     checkStateSettings()
-    state.settings.security = body;
+    state.settings.security = { appLockOn: appLockOn, pinOn: pinOn, biometricOn: biometricOn };
     saveState();
     
     return true;
@@ -140,10 +141,11 @@ async function changeSecuritySettings_mysql(securitySettings) {
  * 
  */
 async function changeNotificationSettings_mysql(notificationSettings) {
-    const groupNotifsOn = "groupNotifsOn" in notificationSettings ? notificationSettings.groupNotifsOn : (state.notificationSettings?.groupNotifsOn || false);
-    const shoppingNotifsOn = "shoppingNotifsOn" in notificationSettings ? notificationSettings.shoppingNotifsOn : (state.notificationSettings?.shoppingNotifsOn || false);
-    const budgetNotifsOn = "budgetNotifsOn" in notificationSettings ? notificationSettings.budgetNotifsOn : (state.notificationSettings?.budgetNotifsOn || false);
-    const generalNotifsOn = "generalNotifsOn" in notificationSettings ? notificationSettings.generalNotifsOn : (state.notificationSettings?.generalNotifsOn || false);
+    const current = state.settings.notifications;
+    const groupNotifsOn = "groupNotifsOn" in notificationSettings ? notificationSettings.groupNotifsOn : current.group;
+    const shoppingNotifsOn = "shoppingNotifsOn" in notificationSettings ? notificationSettings.shoppingNotifsOn : current.shopping;
+    const budgetNotifsOn = "budgetNotifsOn" in notificationSettings ? notificationSettings.budgetNotifsOn : current.budget;
+    const generalNotifsOn = "generalNotifsOn" in notificationSettings ? notificationSettings.generalNotifsOn : current.general;
 
     const body = {
         GroupNotifsOn: groupNotifsOn,
@@ -167,7 +169,12 @@ async function changeNotificationSettings_mysql(notificationSettings) {
     }
     
     checkStateSettings()
-    state.settings.notifications = body;
+    state.settings.notifications = {
+        group: groupNotifsOn,
+        shopping: shoppingNotifsOn,
+        budget: budgetNotifsOn,
+        general: generalNotifsOn,
+    };
     saveState();
 
     return true;
@@ -212,29 +219,6 @@ async function getUserSettings_mysql() {
     copySettingsFromDatabaseToLocal(settings);
     return settings;
 }
-
-/**
- * 
- * @param {Object} fetchedSettings 
- * The object produced in getUserSettings_mysql().
- */
-function copySettingsFromDatabaseToLocal(fetchedSettings) {
-      if (!state.settings) state.settings = {};
-    state.settings.theme = fetchedSettings.Theme;
-    state.settings.measuringSystem = fetchedSettings.measuringSystem;
-    state.settings.measuringSystem = fetchedSettings.measuringSystem;
-    state.settings.language = fetchedSettings.Language;
-    state.settings.currency = fetchedSettings.Currency;
-    state.settings.appLockOn = fetchedSettings.AppLockOn;
-    state.settings.pinOn = fetchedSettings.PinOn;
-    state.settings.biometricOn = fetchedSettings.BiometricOn;
-    state.settings.groupNotifsOn = fetchedSettings.GroupNotifsOn;
-    state.settings.shoppingNotifsOn = fetchedSettings.ShoppingNotifsOn;
-    state.settings.budgetInfoOn = fetchedSettings.BudgetInfoOn;
-    state.settings.generalNotifsOn = fetchedSettings.GeneralNotifsOn;
-    saveState();
-}
-
 
 function checkStateSettings() {
     if (!("settings" in state)) state.settings = {};

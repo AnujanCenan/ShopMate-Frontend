@@ -273,6 +273,8 @@ async function loginUserMySQL(event) {
       return;
     }
 
+    // Start from a clean state so a previous user's cached data never carries over.
+    resetState();
     state.loggedIn = true;
     await obtainUserProfile();
 
@@ -611,6 +613,10 @@ function clearUserSession() {
   appState.loggedIn = false;
   appState.currentUser = null;
   appState.activeGroup = null;
+  // Clears loggedIn, the cached profile, groups, lists, etc. for the server-backed state.
+  if (typeof resetState === "function") {
+    resetState();
+  }
 
   sessionStorage.removeItem("shopMateAppUnlocked");
   sessionStorage.removeItem("shopMateSecurityLoginFallback");
@@ -647,17 +653,7 @@ function logoutUser() {
   clearUserSession();
   window.location.href = "../pages/loginPage.html";
 }
-/* Check Administrator Access - Returns whether the current user has administrator privileges. */
-function isAdmin() {
-  const currGroupId = state.activeGroupId;
-  const group = state.groups.find(group => group.familyGroupId === currGroupId);
-  return group ? Boolean(group.isAdmin) : false;
-}
-
-/* Can Manage Group - Returns whether the current user can manage the active group. */
-function canManageGroup() {
-  return isAdmin();
-}
+/* Permission helpers (isAdmin, canManageGroup, ...) live in helpers.js and use state.groups. */
 /* Get Current Group Members - Returns all members belonging to the active group. */
 function getCurrentGroupMembers() {
   if (!appState.activeGroup) {
