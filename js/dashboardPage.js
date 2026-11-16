@@ -14,7 +14,7 @@ const menuButton = document.querySelector(".menuButton");
 const sideDrawer = document.getElementById("sideDrawer");
 const sideDrawerOverlay = document.getElementById("sideDrawerOverlay");
 let selectedGroupColor = "";
-let colorEditingGroupName = null;
+let colorEditingGroupId = null;
 /* Save the category sort preference separately for each user and group. */
 if (categorySortSelect) {
   categorySortSelect.addEventListener("change", function () {
@@ -24,9 +24,6 @@ if (categorySortSelect) {
 }
 /* Initialize Dashboard - Restores the last viewed group and renders the dashboard. */
 async function initializeDashboard() {
-  if (ensureGroupColorsForCurrentUser()) {
-    saveAppState();
-  }
   await obtainUserProfile();
   await getGroups();   
   restoreLastGroup();
@@ -331,9 +328,9 @@ async function renderGroupDropdown() {
 }
 /* Render Create Group Form */
 function renderCreateGroupForm() {
-  ensureGroupColorsForCurrentUser();
-  colorEditingGroupName = null;
-  selectedGroupColor = "";
+  colorEditingGroupId = null;
+  // Preselect a colour not used by the user's other groups.
+  selectedGroupColor = getNextAvailableGroupColor(null);
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader">
       <h2>
@@ -404,33 +401,37 @@ function renderCreateGroupForm() {
     groupNameInput.focus();
   }, 100);
 }
-/* Render the group's available color choices and mark its current selection. */
-function renderGroupColorSwatches(groupName) {
+/* Render the colour choices; colours used by the user's other groups are disabled. */
+function renderGroupColorSwatches(groupId) {
   const colorMap = getGroupColorMap();
   const options = getGroupColorOptions();
   const usedBy = new Map();
-  Object.keys(colorMap).forEach(function (name) {
-    usedBy.set(colorMap[name].toLowerCase(), name);
+  Object.keys(colorMap).forEach(function (id) {
+    usedBy.set(colorMap[id], Number(id));
   });
   return options
     .map(function (color, index) {
       const owner = usedBy.get(color.toLowerCase());
-      const unavailable = owner && owner !== groupName;
-      const selected = color === selectedGroupColor;
+      const unavailable = owner !== undefined && owner !== Number(groupId);
+      const selected = color.toLowerCase() === selectedGroupColor.toLowerCase();
       return `<button type="button" class="groupColorSwatch ${selected ? "selected" : ""}" style="--swatch-color:${color}" role="radio" aria-checked="${selected}" aria-label="${t("dashboard.groupColorOption", { number: index + 1 })}" title="${unavailable ? t("dashboard.groupColorInUse") : t("dashboard.groupColorOption", { number: index + 1 })}" ${unavailable ? "disabled" : ""} onclick="selectGroupColor('${color}', this)"></button>`;
     })
     .join("");
 }
+/* Return the id of another group that already uses this colour, if any. */
+function findGroupUsingColor(color, excludeGroupId) {
+  const colorMap = getGroupColorMap();
+  const owner = Object.keys(colorMap).find(function (id) {
+    return (
+      Number(id) !== Number(excludeGroupId) &&
+      colorMap[id] === String(color).toLowerCase()
+    );
+  });
+  return owner === undefined ? null : Number(owner);
+}
 /* Update the selected swatch and clear any prior color-selection error. */
 function selectGroupColor(color, button) {
-  // if (!colorEditingGroupName || !canManageGroupColor(colorEditingGroupName)) {
-  //   return;
-  // }
-  const colorMap = getGroupColorMap();
-  const owner = Object.keys(colorMap).find(function (name) {
-    return colorMap[name].toLowerCase() === color.toLowerCase();
-  });
-  if (owner && owner !== colorEditingGroupName) return;
+  if (findGroupUsingColor(color, colorEditingGroupId) !== null) return;
   selectedGroupColor = color;
   const swatches =
     button?.parentElement?.querySelectorAll(".groupColorSwatch") || [];
@@ -444,54 +445,43 @@ function selectGroupColor(color, button) {
 }
 /* Open the color picker for a group with its current color preselected. */
 function renderGroupColorForm(groupName, groupId) {
-  // if (!canManageGroupColor(groupName)) return;
-  ensureGroupColorsForCurrentUser();
-  colorEditingGroupName = groupName;
+  colorEditingGroupId = groupId;
   selectedGroupColor = getGroupColor(groupName, groupId);
   bottomSheetContent.innerHTML = `
     <div class="bottomSheetHeader"><h2>${t("dashboard.groupColorTitle")}</h2><button class="closeButton" onclick="closeBottomSheet()" aria-label="${t("common.close")}"><img src="${getIconPath("navigation", "close")}" class="icon actionIcon" alt=""></button></div>
-    <div class="bottomSheetBody"><p>${renderGroupNameWithColor(groupName, groupId)}</p><div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">${renderGroupColorSwatches(groupName)}</div><div id="groupColorError" class="validationMessage"></div><div class="bottomSheetButtonRow"><button class="secondaryButton" onclick="closeBottomSheet()">${t("common.cancel")}</button><button class="primaryButton" onclick="saveGroupColor(${groupId})">${t("common.save")}</button></div></div>`;
+    <div class="bottomSheetBody"><p>${renderGroupNameWithColor(groupName, groupId)}</p><div class="groupColorSwatches" role="radiogroup" aria-label="${t("dashboard.groupColor")}">${renderGroupColorSwatches(groupId)}</div><div id="groupColorError" class="validationMessage"></div><div class="bottomSheetButtonRow"><button class="secondaryButton" onclick="closeBottomSheet()">${t("common.cancel")}</button><button class="primaryButton" onclick="saveGroupColor(${groupId})">${t("common.save")}</button></div></div>`;
   openBottomSheet();
 }
-/* Save the chosen color for the group and refresh its visible name markers. */
-function saveGroupColor(groupId) {
-  // if (
-  //   !colorEditingGroupName ||
-  //   !canManageGroupColor(colorEditingGroupName)
-  // ) {
-  //   return;
-  // }
-  const colorMap = getGroupColorMap();
+/* Save the chosen colour to the server and refresh visible group-name markers. */
+async function saveGroupColor(groupId) {
   const error = document.getElementById("groupColorError");
-  const duplicateOwner = Object.keys(colorMap).find(function (name) {
-    return (
-      name !== colorEditingGroupName &&
-      colorMap[name].toLowerCase() === selectedGroupColor.toLowerCase()
-    );
-  });
-  if (!selectedGroupColor || duplicateOwner) {
+  if (!selectedGroupColor || findGroupUsingColor(selectedGroupColor, groupId) !== null) {
     if (error) error.textContent = t("dashboard.groupColorUnavailable");
     return;
   }
-  const updatedGroupName = colorEditingGroupName;
-  colorMap[updatedGroupName] = selectedGroupColor;
-  saveAppState();
-  renderGroupDropdown();
-  if (selectedGroupName) {
-    selectedGroupName.innerHTML =
-      appState.activeGroup && appState.groups[appState.activeGroup]
-        ? renderGroupNameWithColor(appState.activeGroup, groupId)
-        : t("dashboard.noGroupSelected");
+  const saved = await updateGroupColourOnServer(groupId, selectedGroupColor);
+  if (!saved) {
+    if (error) error.textContent = t("dashboard.groupColorSaveFailed");
+    return;
   }
-  if (updatedGroupName === appState.activeGroup) {
+  const group = findUserGroup(groupId);
+  if (group) group.groupColour = selectedGroupColor;
+  saveState();
+
+  if (selectedGroupName) {
+    selectedGroupName.innerHTML = state.activeGroupId
+      ? renderGroupNameWithColor(state.activeGroup, state.activeGroupId)
+      : t("dashboard.noGroupSelected");
+  }
+  if (Number(groupId) === Number(state.activeGroupId)) {
     const budgetGroupName = document.querySelector(
       "#budgetDashboardWidget .budgetGroupName",
     );
     if (budgetGroupName) {
-      budgetGroupName.innerHTML = renderGroupNameWithColor(updatedGroupName, groupId);
+      budgetGroupName.innerHTML = renderGroupNameWithColor(state.activeGroup, groupId);
     }
   }
-  colorEditingGroupName = null;
+  colorEditingGroupId = null;
   closeBottomSheet();
   showSnackbar(t("dashboard.groupColorUpdated"));
 }
@@ -568,22 +558,7 @@ async function createDashboardGroup() {
       groupColorError.textContent = t("dashboard.groupColorUnavailable");
     return;
   }
-  const groupExists = Object.keys(appState.groups).some(
-    function (existingGroup) {
-      return existingGroup.toLowerCase() === groupName.toLowerCase();
-    },
-  );
-
-  if (groupExists) {
-    groupNameInput.classList.add("formInputError");
-    groupNameError.textContent = t("dashboard.groupAlreadyExists");
-    groupNameInput.focus();
-    groupNameInput.select();
-
-    return;
-  }
-  getGroupColorMap()[groupName] = selectedGroupColor;   // local storage -- need to actually push the selected colour to the database and pull it from the database as well
-  
+  // Duplicate group names are allowed: groups are told apart by their colour.
   // put this fetch in createGroup In AuthManager
   const res = await fetch(`${SERVER_ENDPOINT}/api/group-create`, {
     method: "POST",
@@ -592,16 +567,18 @@ async function createDashboardGroup() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      name: groupName
+      name: groupName,
+      groupColour: selectedGroupColor
     })
   });
 
-  const body = await res.json();
-
-  if (state.groups.find(group => group.FamilyName === groupName)) {
-    showDialog("Group Exists", "A group with this name already exists.");
+  if (!res.ok) {
+    showDialog(t("common.error"), t("dashboard.groupCreateFailed"));
     return;
   }
+
+  const body = await res.json();
+
   if (!state.budgets) {
     state.budgets = {};
   }
@@ -616,7 +593,8 @@ async function createDashboardGroup() {
   state.groups.push({
     familyGroupId: body.familyGroupId,
     familyName: groupName,
-    isAdmin: true
+    isAdmin: true,
+    groupColour: selectedGroupColor
   })
 
 

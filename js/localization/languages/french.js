@@ -285,6 +285,8 @@ registerLanguage("fr", {
     groupColorTitle: "Changer la couleur du groupe",
     groupColorUnavailable: "Veuillez choisir une couleur disponible.",
     groupColorUpdated: "Couleur du groupe mise à jour.",
+    groupColorSaveFailed: "Impossible d'enregistrer la couleur du groupe. Veuillez réessayer.",
+    groupCreateFailed: "Impossible de créer le groupe. Veuillez réessayer.",
     groupCreated: "Groupe de courses créé avec succès.",
     groupDeleted: "Groupe supprimé avec succès.",
     groupExistsMessage: "Un groupe de courses portant ce nom existe déjà.",

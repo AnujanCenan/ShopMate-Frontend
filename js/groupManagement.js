@@ -5,9 +5,6 @@ const readOnlyBanner = document.getElementById("readOnlyBanner");
 const bottomSheetContent = document.getElementById("bottomSheetContent");
 /* Initialize */
 function initializeGroupManagement() {
-  if (ensureGroupColorsForCurrentUser()) {
-    saveAppState();
-  }
   const groupContainer = document.getElementById("groupManagementContainer");
   [groupContainer, bottomSheetContent].forEach(function (container) {
     if (container && !container.dataset.safeGroupActionsBound) {

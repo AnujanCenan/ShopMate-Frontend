@@ -475,7 +475,12 @@ function canManageCategory(categoryName, groupName = state.activeGroup, groupId 
 function canManageGroupColor(groupName) {
   return isAdmin(groupName);
 }
-/* Personal group colors are stored per user so they do not change other members' view. */
+/*
+ * Group colours are personal to each (user, group) pair and are stored on the server
+ * (user_group_map.ugm_colour). They are returned by /api/get-groups as `groupColour`
+ * and cached in state.groups. Colours are keyed by familyGroupId, not by name, so two
+ * groups with the same name can be told apart.
+ */
 const GROUP_COLOR_PALETTE = [
   "#d1495b",
   "#ed9b40",
@@ -490,98 +495,147 @@ const GROUP_COLOR_PALETTE = [
   "#3a7d44",
   "#8f3985",
 ];
+/* The server default for a member who has never picked a colour. */
+const UNASSIGNED_GROUP_COLOR = "#ffffff";
+const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
-/* Return the saved group-color assignments for the selected user. */
-function getGroupColorMap(userId) {
-  if (
-    !appState.groupColorPreferences ||
-    typeof appState.groupColorPreferences !== "object" ||
-    Array.isArray(appState.groupColorPreferences)
-  ) {
-    appState.groupColorPreferences = {};
-  }
-  const ownerId = String(userId || getCurrentUser()?.id || "local-user");
-  if (
-    !appState.groupColorPreferences[ownerId] ||
-    typeof appState.groupColorPreferences[ownerId] !== "object" ||
-    Array.isArray(appState.groupColorPreferences[ownerId])
-  ) {
-    appState.groupColorPreferences[ownerId] = {};
-  }
-  return appState.groupColorPreferences[ownerId];
+/* Convert an HSL colour to #rrggbb (the database column only fits hex values). */
+function hslToHex(hue, saturation, lightness) {
+  const s = saturation / 100;
+  const l = lightness / 100;
+  const k = function (n) {
+    return (n + hue / 30) % 12;
+  };
+  const a = s * Math.min(l, 1 - l);
+  const channel = function (n) {
+    const value = l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return Math.round(value * 255).toString(16).padStart(2, "0");
+  };
+  return `#${channel(0)}${channel(8)}${channel(4)}`;
 }
 
-/* Build the color choices available to the current user, excluding assigned colors. */
-function getGroupColorOptions() {
-  const colorMap = getGroupColorMap();
-  const used = new Set(
-    Object.values(colorMap)
-      .filter(function (color) {
-        return typeof color === "string";
-      })
-      .map(function (color) {
-        return color.toLowerCase();
-      }),
+/* Return the current user's groups as an array (state.groups comes from /api/get-groups). */
+function getUserGroupList() {
+  return Array.isArray(state.groups) ? state.groups : [];
+}
+
+/* Find a group in state by its id. */
+function findUserGroup(groupId) {
+  return getUserGroupList().find(function (group) {
+    return Number(group.familyGroupId) === Number(groupId);
+  });
+}
+
+/* True when the stored colour is a real user choice rather than the server default. */
+function isAssignedGroupColor(color) {
+  return (
+    typeof color === "string" &&
+    HEX_COLOR_PATTERN.test(color) &&
+    color.toLowerCase() !== UNASSIGNED_GROUP_COLOR
   );
+}
+
+/* Map of familyGroupId -> colour for every group that already has a colour. */
+function getGroupColorMap() {
+  const colorMap = {};
+  getUserGroupList().forEach(function (group) {
+    if (isAssignedGroupColor(group.groupColour)) {
+      colorMap[group.familyGroupId] = group.groupColour.toLowerCase();
+    }
+  });
+  return colorMap;
+}
+
+/* Build the colour choices available to the current user (all hex). */
+function getGroupColorOptions() {
+  const used = new Set(Object.values(getGroupColorMap()));
   const options = GROUP_COLOR_PALETTE.slice();
-  Object.values(colorMap).forEach(function (color) {
-    if (typeof color === "string" && color.startsWith("hsl("))
-      options.push(color.toLowerCase());
+  // Keep any custom colour already in use selectable.
+  used.forEach(function (color) {
+    if (!options.includes(color)) options.push(color);
   });
   const paletteExhausted = GROUP_COLOR_PALETTE.every(function (color) {
     return used.has(color);
   });
-  if (!paletteExhausted) return [...new Set(options)];
-  const needed = Object.keys(appState.groups || {}).length + 8;
-  for (let index = 0; index < needed; index += 1) {
-    const hue = Math.round((index * 137.508) % 360);
-    options.push(`hsl(${hue} 62% 42%)`);
+  if (paletteExhausted) {
+    const needed = getUserGroupList().length + 8;
+    for (let index = 0; index < needed; index += 1) {
+      options.push(hslToHex(Math.round((index * 137.508) % 360), 62, 42));
+    }
   }
   return [...new Set(options)];
 }
 
-/* Assign available default colors to groups that do not yet have one. */
-function ensureGroupColorsForCurrentUser() {
+/* Return the first colour option not used by another of the user's groups. */
+function getNextAvailableGroupColor(excludeGroupId) {
   const colorMap = getGroupColorMap();
-  const used = new Set();
-  let changed = false;
-  Object.keys(colorMap).forEach(function (groupName) {
-    if (
-      !Object.prototype.hasOwnProperty.call(appState.groups || {}, groupName)
-    ) {
-      delete colorMap[groupName];
-      changed = true;
-    }
-  });
-  Object.keys(appState.groups || {}).forEach(function (groupName) {
-    const current = colorMap[groupName];
-    const options = getGroupColorOptions();
-    if (
-      typeof current === "string" &&
-      options.includes(current.toLowerCase()) &&
-      !used.has(current.toLowerCase())
-    ) {
-      colorMap[groupName] = current.toLowerCase();
-      used.add(colorMap[groupName]);
-      return;
-    }
-    const available = options.find(function (color) {
-      return !used.has(color.toLowerCase());
-    });
-    colorMap[groupName] = available || options[0];
-    used.add(colorMap[groupName].toLowerCase());
-    changed = true;
-  });
-  return changed;
+  const used = new Set(
+    Object.keys(colorMap)
+      .filter(function (id) {
+        return Number(id) !== Number(excludeGroupId);
+      })
+      .map(function (id) {
+        return colorMap[id];
+      }),
+  );
+  const options = getGroupColorOptions();
+  return (
+    options.find(function (color) {
+      return !used.has(color);
+    }) || options[0]
+  );
 }
 
-/* Resolve a group's saved color, using the palette default when none is assigned. */
+/*
+ * Give a default colour to any group that does not have one yet (e.g. groups joined via
+ * an invitation). Updates state only; returns the groups that changed so the caller can
+ * persist them to the server.
+ */
+function ensureGroupColorsForCurrentUser() {
+  const changed = [];
+  getUserGroupList().forEach(function (group) {
+    if (isAssignedGroupColor(group.groupColour)) return;
+    group.groupColour = getNextAvailableGroupColor(group.familyGroupId);
+    changed.push(group);
+  });
+  if (changed.length) saveState();
+  return changed.length ? changed : false;
+}
+
+/* Resolve a group's colour by id. groupName is kept for older call sites. */
 function getGroupColor(groupName, groupId) {
-  ensureGroupColorsForCurrentUser();
-  return getGroupColorMap()[groupName] || GROUP_COLOR_PALETTE[0];
+  const group =
+    groupId != null
+      ? findUserGroup(groupId)
+      : getUserGroupList().find(function (g) {
+          return g.familyName === groupName;
+        });
+  if (group && isAssignedGroupColor(group.groupColour)) {
+    return group.groupColour.toLowerCase();
+  }
+  return GROUP_COLOR_PALETTE[0];
 }
 
-/* Render an escaped group name with its user-selected color marker. */
+/* Persist the current user's colour for a group. Returns true on success. */
+async function updateGroupColourOnServer(familyGroupId, groupColour) {
+  try {
+    const res = await fetch(`${SERVER_ENDPOINT}/api/group-colour`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        familyGroupId: Number(familyGroupId),
+        newGroupColour: groupColour,
+      }),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error("Failed to update group colour", error);
+    return false;
+  }
+}
+
+/* Render an escaped group name with its colour marker. */
 function renderGroupNameWithColor(groupName, groupId) {
   const safeName = String(groupName).replace(/[&<>"']/g, function (character) {
     return {
@@ -592,30 +646,8 @@ function renderGroupNameWithColor(groupName, groupId) {
       "'": "&#39;",
     }[character];
   });
-  const color = getGroupColor(groupName);
+  const color = getGroupColor(groupName, groupId);
   return `<span class="groupNameWithColor"><span class="groupColorDot" style="background-color:${color}" aria-hidden="true"></span><span>${safeName}</span></span>`;
-}
-
-/* Keep each user's color assignment attached when a group is renamed. */
-function renameGroupColorPreferences(oldGroupName, newGroupName) {
-  if (oldGroupName === newGroupName) return;
-  Object.values(appState.groupColorPreferences || {}).forEach(
-    function (colorMap) {
-      if (colorMap && colorMap[oldGroupName]) {
-        colorMap[newGroupName] = colorMap[oldGroupName];
-        delete colorMap[oldGroupName];
-      }
-    },
-  );
-}
-
-/* Remove a deleted group from every user's saved color assignments. */
-function removeGroupColorPreferences(groupName) {
-  Object.values(appState.groupColorPreferences || {}).forEach(
-    function (colorMap) {
-      if (colorMap) delete colorMap[groupName];
-    },
-  );
 }
 /* Get Purchased Item Spend - Uses the recorded purchase amount, with a fallback for legacy data that has no actual price. */
 function getItemSpentAmount(item) {

@@ -86,6 +86,15 @@ async function getGroups() {
 
   const groups = await res.json();
   state.groups = groups;
+
+  // Groups without a colour yet (e.g. joined via invitation) get a default one,
+  // which is saved to the server so it is the same on every device.
+  const newlyColoured = ensureGroupColorsForCurrentUser();
+  if (newlyColoured) {
+    await Promise.all(newlyColoured.map(function (group) {
+      return updateGroupColourOnServer(group.familyGroupId, group.groupColour);
+    }));
+  }
   console.log("User's groups...")
   console.log(state.groups);
   saveState();

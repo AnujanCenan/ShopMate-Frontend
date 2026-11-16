@@ -277,6 +277,8 @@ registerLanguage("en", {
     groupColorTitle: "Change group color",
     groupColorUnavailable: "Please choose an available color.",
     groupColorUpdated: "Group color updated successfully.",
+    groupColorSaveFailed: "Could not save the group color. Please try again.",
+    groupCreateFailed: "Could not create the group. Please try again.",
     groupCreated: "Shopping group created successfully.",
     groupDeleted: "Group deleted successfully.",
     groupExistsMessage: "A shopping group with this name already exists.",
